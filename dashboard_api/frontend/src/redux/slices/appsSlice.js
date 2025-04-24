@@ -1,0 +1,160 @@
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
+// Datos de ejemplo para las apps (simulamos datos que vendrían del backend)
+const MOCK_APPS_DATA = [
+  {
+    id: 'instagram-stats',
+    title: 'Instagram Statistics',
+    description: 'Analiza perfiles de Instagram, obtén estadísticas y monitorea crecimiento',
+    imageUrl: 'https://cdn.pixabay.com/photo/2016/08/09/17/52/instagram-1581266_960_720.jpg',
+    category: 'Social Media',
+    route: '/apps/instagram',
+    apiName: 'Instagram Statistics API'
+  },
+  {
+    id: 'weather-forecast',
+    title: 'Weather Forecast',
+    description: 'Consulta el pronóstico del tiempo en cualquier ubicación del mundo',
+    imageUrl: 'https://cdn.pixabay.com/photo/2013/04/01/09/22/clouds-98536_960_720.png',
+    category: 'Weather',
+    route: '/apps/weather',
+    apiName: 'Weather Forecast API'
+  },
+  {
+    id: 'currency-converter',
+    title: 'Currency Converter',
+    description: 'Convierte divisas con tasas de cambio en tiempo real',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/23/13/44/currency-exchange-2672531_960_720.png',
+    category: 'Finance',
+    route: '/apps/currency',
+    apiName: 'Currency Exchange API'
+  },
+  {
+    id: 'stock-tracker',
+    title: 'Stock Market Tracker',
+    description: 'Sigue el rendimiento de acciones y mercados financieros en tiempo real',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/11/27/07/02/financial-2980349_960_720.jpg',
+    category: 'Finance',
+    route: '/apps/stocks',
+    apiName: 'Stock Market API'
+  },
+  {
+    id: 'news-aggregator',
+    title: 'News Aggregator',
+    description: 'Recopila noticias de diferentes fuentes en un solo lugar',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/06/26/19/03/news-2444778_960_720.jpg',
+    category: 'News',
+    route: '/apps/news',
+    apiName: 'News API'
+  },
+  {
+    id: 'covid-tracker',
+    title: 'COVID-19 Tracker',
+    description: 'Monitorea estadísticas y tendencias de COVID-19 en todo el mundo',
+    imageUrl: 'https://cdn.pixabay.com/photo/2020/04/21/00/40/coronavirus-5071045_960_720.jpg',
+    category: 'Health',
+    route: '/apps/covid',
+    apiName: 'COVID-19 Statistics API'
+  }
+];
+
+// Estado inicial
+const initialState = {
+  apps: [],
+  categories: [],
+  currentApp: null,
+  loading: false,
+  error: null,
+};
+
+// Acciones asíncronas
+export const fetchApps = createAsyncThunk(
+  'apps/fetchApps',
+  async (_, { rejectWithValue }) => {
+    try {
+      // Simular una llamada a la API
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Extraer categorías únicas
+      const categories = ['All', ...Array.from(new Set(MOCK_APPS_DATA.map(app => app.category)))];
+      
+      return { apps: MOCK_APPS_DATA, categories };
+    } catch (error) {
+      return rejectWithValue(error.message || 'Error al cargar las apps');
+    }
+  }
+);
+
+export const fetchAppDetails = createAsyncThunk(
+  'apps/fetchAppDetails',
+  async (appId, { rejectWithValue }) => {
+    try {
+      // Simular una llamada a la API
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const app = MOCK_APPS_DATA.find(a => a.id === appId);
+      
+      if (!app) {
+        return rejectWithValue('App no encontrada');
+      }
+      
+      return app;
+    } catch (error) {
+      return rejectWithValue(error.message || 'Error al cargar los detalles de la app');
+    }
+  }
+);
+
+// Slice
+const appsSlice = createSlice({
+  name: 'apps',
+  initialState,
+  reducers: {
+    clearCurrentApp: (state) => {
+      state.currentApp = null;
+    },
+    clearErrors: (state) => {
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      // fetchApps
+      .addCase(fetchApps.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchApps.fulfilled, (state, action) => {
+        state.loading = false;
+        state.apps = action.payload.apps;
+        state.categories = action.payload.categories;
+      })
+      .addCase(fetchApps.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // fetchAppDetails
+      .addCase(fetchAppDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAppDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentApp = action.payload;
+      })
+      .addCase(fetchAppDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
+});
+
+export const { clearCurrentApp, clearErrors } = appsSlice.actions;
+
+export const selectApps = (state) => state.apps.apps;
+export const selectCategories = (state) => state.apps.categories;
+export const selectCurrentApp = (state) => state.apps.currentApp;
+export const selectAppsLoading = (state) => state.apps.loading;
+export const selectAppsError = (state) => state.apps.error;
+
+export default appsSlice.reducer; 

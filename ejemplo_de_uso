@@ -1,0 +1,22 @@
+import os
+from rapid import TwitterBot
+import logging
+
+# Configurar logging
+logging.config.fileConfig('logging_config.ini')
+
+try:
+    bot = TwitterBot(os.getenv("RAPIDAPI_KEY"))
+    response = bot.create_tweet(
+        text="Probando sistema de logging y errores 🚨",
+        auth_token=os.getenv("TWITTER_AUTH_TOKEN"),
+        ct0=os.getenv("TWITTER_CT0")
+    )
+    
+    if 'error' in response:
+        logging.error(f"Error al crear tweet: {response['error']}")
+    else:
+        logging.info("Tweet publicado exitosamente!")
+        
+except Exception as e:
+    logging.critical(f"Error crítico: {str(e)}", exc_info=True) 
