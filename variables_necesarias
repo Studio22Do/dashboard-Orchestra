@@ -1,0 +1,4 @@
+# En tu entorno (.env)
+RAPIDAPI_KEY = "tu_clave_paga"  # De la página de RapidAPI
+TWITTER_AUTH_TOKEN = "tu_token_de_twitter"  # Obtenido via login
+API_HOST = "twitter-api-v1-1-enterprise.p.rapidapi.com" 
