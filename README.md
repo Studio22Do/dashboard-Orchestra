@@ -1,8 +1,7 @@
-# Bot de Twitter con RapidAPI y Tweepy
+##LA APLICACION ESTA EN LA MISMA CARPETA
 
-Este proyecto proporciona diferentes alternativas para interactuar con Twitter (X):
-1. Usando APIs de RapidAPI, permitiendo publicar tweets y obtener información sin depender exclusivamente de la API oficial de Twitter.
-2. Usando la biblioteca Tweepy para interactuar directamente con la API oficial de Twitter.
+backend y frontend
+cada uno con su README.
 
 ## Requisitos
 
