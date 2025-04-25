@@ -11,31 +11,57 @@ import NotificationManager from './components/Notifications/NotificationManager'
 import { useAppDispatch, useAppSelector } from './redux/hooks/reduxHooks';
 import { selectIsAuthenticated, setAuth } from './redux/slices/authSlice';
 import { selectTheme } from './redux/slices/uiSlice';
+import Analytics from './pages/Analytics/Analytics';
 
 // Theme configuration function
 const createAppTheme = (mode) => createTheme({
   palette: {
-    mode,
+    mode: 'dark',
     primary: {
-      main: '#2196f3',
+      main: '#4CAF50', // Verde principal
+      light: '#81C784',
+      dark: '#388E3C',
+      contrastText: '#ffffff',
     },
     secondary: {
-      main: '#f50057',
+      main: '#2196f3', // Azul para acentos
+      light: '#64B5F6',
+      dark: '#1976D2',
+      contrastText: '#ffffff',
     },
     background: {
-      default: mode === 'light' ? '#f5f5f5' : '#121212',
-      paper: mode === 'light' ? '#ffffff' : '#1E1E1E',
+      default: '#1a1a1a', // Fondo principal más oscuro
+      paper: '#242424', // Fondo de las tarjetas
+      dark: '#121212', // Fondo más oscuro para contraste
     },
+    text: {
+      primary: '#ffffff',
+      secondary: 'rgba(255, 255, 255, 0.7)',
+      disabled: 'rgba(255, 255, 255, 0.5)',
+    },
+    action: {
+      active: '#4CAF50',
+      hover: 'rgba(76, 175, 80, 0.08)',
+      selected: 'rgba(76, 175, 80, 0.16)',
+    },
+    divider: 'rgba(255, 255, 255, 0.12)',
   },
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
     h1: {
       fontSize: '2.5rem',
       fontWeight: 500,
+      color: '#ffffff',
     },
     h2: {
       fontSize: '2rem',
       fontWeight: 500,
+      color: '#ffffff',
+    },
+    h3: {
+      fontSize: '1.5rem',
+      fontWeight: 500,
+      color: '#4CAF50',
     },
   },
   components: {
@@ -44,6 +70,16 @@ const createAppTheme = (mode) => createTheme({
         root: {
           borderRadius: 8,
           textTransform: 'none',
+          padding: '8px 16px',
+          '&:hover': {
+            boxShadow: '0 0 10px rgba(76, 175, 80, 0.3)',
+          },
+        },
+        contained: {
+          background: 'linear-gradient(45deg, #388E3C 30%, #4CAF50 90%)',
+          '&:hover': {
+            background: 'linear-gradient(45deg, #4CAF50 30%, #81C784 90%)',
+          },
         },
       },
     },
@@ -51,7 +87,30 @@ const createAppTheme = (mode) => createTheme({
       styleOverrides: {
         root: {
           borderRadius: 12,
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          backgroundColor: '#242424',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          transition: 'all 0.3s ease-in-out',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: '0 6px 12px rgba(76, 175, 80, 0.2)',
+            borderColor: '#4CAF50',
+          },
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#242424',
+          backgroundImage: 'none',
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#1a1a1a',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
         },
       },
     },
@@ -111,7 +170,7 @@ function App() {
 
           <Route path="/analytics" element={
             <ProtectedRoute>
-              <div>Analytics (Coming soon)</div>
+              <Analytics />
             </ProtectedRoute>
           } />
         </Routes>
