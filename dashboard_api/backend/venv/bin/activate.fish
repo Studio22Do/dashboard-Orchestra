@@ -29,7 +29,7 @@ end
 # unset irrelevant variables
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV /home/johngoyo/Desktop/rapidApi/dashboard_api/backend/venv
+set -gx VIRTUAL_ENV /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/"bin $PATH
