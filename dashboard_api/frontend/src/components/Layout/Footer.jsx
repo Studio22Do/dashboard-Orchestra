@@ -20,7 +20,7 @@ const Footer = () => {
         color="text.secondary" 
         sx={{ fontSize: '0.75rem' }}
       >
-        &copy; {currentYear} Orchestra by Studio22. Todos los derechos reservados.
+        &copy; {currentYear} Sympho by Studio22. Todos los derechos reservados.
       </Typography>
     </Box>
   );

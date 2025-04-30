@@ -9,7 +9,7 @@ from marshmallow import ValidationError
 
 from api import db
 from api.models.user import User
-from api.utils.schemas import UserSchema, LoginSchema
+from api.utils.schemas import UserSchema, LoginSchema, ChangePasswordSchema
 from api.utils.error_handlers import AuthenticationError, ValidationError as ApiValidationError
 
 # Crear blueprint
@@ -18,6 +18,7 @@ auth_bp = Blueprint('auth', __name__)
 # Esquemas
 user_schema = UserSchema()
 login_schema = LoginSchema()
+change_password_schema = ChangePasswordSchema()
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -133,4 +134,44 @@ def get_user_info():
     if not user:
         raise AuthenticationError("Usuario no encontrado")
     
-    return jsonify(user_schema.dump(user)), 200 
+    return jsonify(user_schema.dump(user)), 200
+
+@auth_bp.route('/change-password', methods=['POST'])
+@jwt_required()
+def change_password():
+    """Cambiar la contraseña del usuario autenticado"""
+    try:
+        # Obtener y validar datos
+        data = request.get_json()
+        if not data:
+            raise ApiValidationError("No se proporcionaron datos")
+        
+        # Validar datos con el esquema
+        password_data = change_password_schema.load(data)
+        
+        # Obtener usuario actual
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
+        
+        if not user:
+            raise AuthenticationError("Usuario no encontrado")
+        
+        # Verificar contraseña actual
+        if not user.verify_password(password_data['current_password']):
+            raise AuthenticationError("Contraseña actual incorrecta")
+        
+        # Actualizar contraseña
+        user.password = password_data['new_password']
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Contraseña actualizada exitosamente'
+        }), 200
+        
+    except ValidationError as e:
+        raise ApiValidationError(str(e.messages))
+    except Exception as e:
+        db.session.rollback()
+        if isinstance(e, (AuthenticationError, ApiValidationError)):
+            raise e
+        raise ApiValidationError(str(e)) 

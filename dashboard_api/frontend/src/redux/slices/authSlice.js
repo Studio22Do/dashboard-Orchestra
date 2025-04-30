@@ -1,4 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+
+// Base URL de la API
+const API_URL = 'http://localhost:5000/api';
 
 // Credenciales para desarrollo
 const TEST_CREDENTIALS = {
@@ -13,6 +17,16 @@ const initialState = {
   isAuthenticated: localStorage.getItem('token') ? true : false,
   loading: false,
   error: null,
+  passwordChangeSuccess: false,
+};
+
+// Configuración de axios con token
+const setAuthToken = (token) => {
+  if (token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete axios.defaults.headers.common['Authorization'];
+  }
 };
 
 // Acciones asíncronas
@@ -20,27 +34,26 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      // Para simulación - esto sería una llamada API real
-      if (email === TEST_CREDENTIALS.email && password === TEST_CREDENTIALS.password) {
-        const mockToken = 'mock-jwt-token-' + Date.now();
-        const userData = {
-          id: 1,
-          name: 'Usuario de Prueba',
-          email: TEST_CREDENTIALS.email,
-          role: 'admin',
-        };
-        
-        // Simular latencia de red
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Guardar en localStorage para persistencia
-        localStorage.setItem('token', mockToken);
-        
-        return { user: userData, token: mockToken };
-      } else {
-        return rejectWithValue('Credenciales incorrectas');
-      }
+      // Realizar petición al backend
+      const response = await axios.post(`${API_URL}/auth/login`, {
+        email,
+        password
+      });
+      
+      const { user, access_token } = response.data;
+      
+      // Guardar en localStorage para persistencia
+      localStorage.setItem('token', access_token);
+      
+      // Configurar token para futuras peticiones
+      setAuthToken(access_token);
+      
+      return { user, token: access_token };
     } catch (error) {
+      // Manejar diferentes tipos de errores
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data.message || 'Credenciales incorrectas');
+      }
       return rejectWithValue(error.message || 'Error al iniciar sesión');
     }
   }
@@ -52,9 +65,43 @@ export const logoutUser = createAsyncThunk(
     try {
       // Eliminar token del localStorage
       localStorage.removeItem('token');
+      // Limpiar token de axios
+      setAuthToken(null);
       return true;
     } catch (error) {
       return rejectWithValue(error.message || 'Error al cerrar sesión');
+    }
+  }
+);
+
+export const changePassword = createAsyncThunk(
+  'auth/changePassword',
+  async ({ currentPassword, newPassword, confirmPassword }, { rejectWithValue, getState }) => {
+    try {
+      // Obtener token del estado
+      const token = getState().auth.token || localStorage.getItem('token');
+      
+      if (!token) {
+        return rejectWithValue('Usuario no autenticado');
+      }
+      
+      // Configurar token para la petición
+      setAuthToken(token);
+      
+      // Realizar petición al backend
+      const response = await axios.post(`${API_URL}/auth/change-password`, {
+        current_password: currentPassword,
+        new_password: newPassword,
+        confirm_password: confirmPassword
+      });
+      
+      return response.data;
+    } catch (error) {
+      // Manejar diferentes tipos de errores
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data.message || 'Error al cambiar la contraseña');
+      }
+      return rejectWithValue(error.message || 'Error al cambiar la contraseña');
     }
   }
 );
@@ -69,6 +116,9 @@ const authSlice = createSlice({
     },
     setAuth: (state, action) => {
       state.isAuthenticated = action.payload;
+    },
+    clearPasswordChangeStatus: (state) => {
+      state.passwordChangeSuccess = false;
     },
   },
   extraReducers: (builder) => {
@@ -102,14 +152,31 @@ const authSlice = createSlice({
       .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // Change Password
+      .addCase(changePassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.passwordChangeSuccess = false;
+      })
+      .addCase(changePassword.fulfilled, (state) => {
+        state.loading = false;
+        state.passwordChangeSuccess = true;
+        state.error = null;
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.passwordChangeSuccess = false;
       });
   },
 });
 
-export const { clearErrors, setAuth } = authSlice.actions;
+export const { clearErrors, setAuth, clearPasswordChangeStatus } = authSlice.actions;
 
 export const selectAuth = (state) => state.auth;
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectUser = (state) => state.auth.user;
+export const selectPasswordChangeStatus = (state) => state.auth.passwordChangeSuccess;
 
 export default authSlice.reducer; 

@@ -18,12 +18,6 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks/reduxHooks';
 import { loginUser, selectAuth, clearErrors } from '../../redux/slices/authSlice';
 import { addNotification } from '../../redux/slices/uiSlice';
 
-// Credenciales de prueba
-const TEST_CREDENTIALS = {
-  email: 'test@example.com',
-  password: 'test123'
-};
-
 const Login = () => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -42,6 +36,15 @@ const Login = () => {
       navigate('/');
     }
   }, [isAuthenticated, navigate]);
+
+  // Limpiar errores al montar/desmontar
+  useEffect(() => {
+    dispatch(clearErrors());
+    
+    return () => {
+      dispatch(clearErrors());
+    };
+  }, [dispatch]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -111,7 +114,7 @@ const Login = () => {
           >
             <Box sx={{ textAlign: 'center', mb: 2 }}>
               <Typography variant="h4" component="h1" gutterBottom>
-                Orchestra
+                Sympho
               </Typography>
               <Typography variant="subtitle1" color="primary" gutterBottom>
                 by Studio22
@@ -120,13 +123,6 @@ const Login = () => {
                 Plataforma centralizada de inteligencia y automatización de marketing
               </Typography>
             </Box>
-
-            {/* Alerta con credenciales de prueba */}
-            <Alert severity="info" sx={{ mb: 2 }}>
-              Credenciales de prueba:<br />
-              Email: {TEST_CREDENTIALS.email}<br />
-              Password: {TEST_CREDENTIALS.password}
-            </Alert>
 
             {error && (
               <Alert severity="error" sx={{ mb: 2 }}>
@@ -195,7 +191,6 @@ const Login = () => {
 
             <Box sx={{ textAlign: 'center', mt: 2 }}>
               <Typography variant="body2" color="text.secondary">
-                El registro estará disponible cuando el backend esté listo
               </Typography>
             </Box>
           </Box>

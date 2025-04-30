@@ -6,12 +6,15 @@ import Layout from './components/Layout/Layout';
 import Login from './pages/Login/Login';
 import AppCatalog from './pages/AppCatalog/AppCatalog';
 import InstagramStats from './pages/InstagramStats/InstagramStats';
+import GoogleTrends from './pages/GoogleTrends/GoogleTrends';
 import Dashboard from './pages/Dashboard/Dashboard';
 import NotificationManager from './components/Notifications/NotificationManager';
 import { useAppDispatch, useAppSelector } from './redux/hooks/reduxHooks';
 import { selectIsAuthenticated, setAuth } from './redux/slices/authSlice';
 import { selectTheme } from './redux/slices/uiSlice';
 import Analytics from './pages/Analytics/Analytics';
+import Profile from './pages/Profile/Profile';
+import ChangePassword from './pages/Profile/ChangePassword';
 
 // Theme configuration function
 const createAppTheme = (mode) => createTheme({
@@ -167,10 +170,29 @@ function App() {
               <InstagramStats />
             </ProtectedRoute>
           } />
+          
+          <Route path="/apps/trends" element={
+            <ProtectedRoute>
+              <GoogleTrends />
+            </ProtectedRoute>
+          } />
 
           <Route path="/analytics" element={
             <ProtectedRoute>
               <Analytics />
+            </ProtectedRoute>
+          } />
+          
+          {/* Rutas de perfil de usuario */}
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/profile/change-password" element={
+            <ProtectedRoute>
+              <ChangePassword />
             </ProtectedRoute>
           } />
         </Routes>

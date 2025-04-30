@@ -22,6 +22,7 @@ class Config:
     # Configuración de RapidAPI
     RAPIDAPI_KEY = os.environ.get('RAPIDAPI_KEY', '')
     RAPIDAPI_INSTAGRAM_HOST = os.environ.get('RAPIDAPI_INSTAGRAM_HOST', 'instagram-statistics-api.p.rapidapi.com')
+    RAPIDAPI_GOOGLE_TRENDS_HOST = os.environ.get('RAPIDAPI_GOOGLE_TRENDS_HOST', 'google-trends.p.rapidapi.com')
 
 class DevelopmentConfig(Config):
     """Configuración para desarrollo"""
