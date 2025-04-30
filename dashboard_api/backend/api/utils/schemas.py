@@ -15,6 +15,20 @@ class LoginSchema(Schema):
     email = fields.Email(required=True)
     password = fields.Str(required=True)
 
+class ChangePasswordSchema(Schema):
+    """Esquema para validar datos de cambio de contraseña"""
+    current_password = fields.Str(required=True)
+    new_password = fields.Str(required=True, validate=validate.Length(min=6))
+    confirm_password = fields.Str(required=True)
+
+    def validate_passwords_match(self, data):
+        """Validar que la nueva contraseña y su confirmación coincidan"""
+        if data['new_password'] != data['confirm_password']:
+            raise ValidationError('Las contraseñas no coinciden')
+        if data['current_password'] == data['new_password']:
+            raise ValidationError('La nueva contraseña debe ser diferente a la actual')
+        return data
+
 class AppSchema(Schema):
     """Esquema para serializar/deserializar datos de aplicación"""
     id = fields.Str(required=True)

@@ -40,7 +40,7 @@ const UserMetrics = () => {
       change: '+12%',
       period: 'vs mes anterior',
       icon: GroupAdd,
-      color: '#4CAF50'
+      color: '#837cf2'
     },
     {
       title: 'Tiempo Promedio',

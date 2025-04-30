@@ -98,6 +98,15 @@ def create_sample_apps():
             'api_name': 'Instagram Statistics API'
         },
         {
+            'id': 'google-trends',
+            'title': 'Google Trends',
+            'description': 'Explora tendencias de búsqueda en Google, términos populares y patrones de interés a lo largo del tiempo',
+            'image_url': 'https://cdn.pixabay.com/photo/2015/12/11/11/43/google-1088004_960_720.png',
+            'category': 'Social Media',
+            'route': '/apps/trends',
+            'api_name': 'Google Trends API'
+        },
+        {
             'id': 'weather-forecast',
             'title': 'Weather Forecast',
             'description': 'Consulta el pronóstico del tiempo en cualquier ubicación del mundo',

@@ -21,7 +21,7 @@ const AnalyticsContainer = styled(Container)(({ theme }) => ({
 }));
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
-  marginBottom: theme.spacing(3),
+  marginBottom: theme.spacing(2),
   color: theme.palette.primary.main,
   fontWeight: 500,
 }));
@@ -69,7 +69,7 @@ const Analytics = () => {
       <SectionTitle variant="h4" component="h1">
         Vista General
       </SectionTitle>
-      <Grid container spacing={3} mb={6}>
+      <Grid container spacing={3} sx={{ mb: 3 }}>
         {Object.entries(metrics).map(([key, metric]) => (
           <Grid item xs={12} sm={6} md={3} key={key}>
             <MetricCard {...metric} />
@@ -77,42 +77,34 @@ const Analytics = () => {
         ))}
       </Grid>
 
-      {/* Uso de Herramientas y APIs */}
-      <Grid container spacing={3} mb={6}>
-        <Grid item xs={12} md={8}>
+      {/* Layout principal con 3 columnas */}
+      <Grid container spacing={3}>
+        {/* Columna 1: Uso de Herramientas */}
+        <Grid item xs={12} md={4}>
           <StyledPaper>
-            <Box display="flex" alignItems="center" mb={3}>
+            <Box display="flex" alignItems="center" mb={2}>
               <Timeline sx={{ color: 'primary.main', mr: 1 }} />
               <Typography variant="h5">Uso de Herramientas</Typography>
             </Box>
             <UsageChart />
           </StyledPaper>
         </Grid>
+
+        {/* Columna 2: Rendimiento de APIs */}
         <Grid item xs={12} md={4}>
           <StyledPaper>
-            <Box display="flex" alignItems="center" mb={3}>
-              <Assessment sx={{ color: 'primary.main', mr: 1 }} />
-              <Typography variant="h5">Top Herramientas</Typography>
-            </Box>
-            {/* Aquí irá el componente de top herramientas */}
-          </StyledPaper>
-        </Grid>
-      </Grid>
-
-      {/* Rendimiento de APIs y Métricas de Usuario */}
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <StyledPaper>
-            <Box display="flex" alignItems="center" mb={3}>
+            <Box display="flex" alignItems="center" mb={2}>
               <ShowChart sx={{ color: 'primary.main', mr: 1 }} />
               <Typography variant="h5">Rendimiento de APIs</Typography>
             </Box>
             <ApiPerformance />
           </StyledPaper>
         </Grid>
-        <Grid item xs={12} md={6}>
+
+        {/* Columna 3: Métricas de Usuario */}
+        <Grid item xs={12} md={4}>
           <StyledPaper>
-            <Box display="flex" alignItems="center" mb={3}>
+            <Box display="flex" alignItems="center" mb={2}>
               <People sx={{ color: 'primary.main', mr: 1 }} />
               <Typography variant="h5">Métricas de Usuario</Typography>
             </Box>

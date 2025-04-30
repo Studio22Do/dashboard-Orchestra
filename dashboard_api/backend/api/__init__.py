@@ -27,11 +27,13 @@ def create_app(config_object):
     from api.routes.apps import apps_bp
     from api.routes.stats import stats_bp
     from api.routes.instagram import instagram_bp
+    from api.routes.google_trends import google_trends_bp
     
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(apps_bp, url_prefix='/api/apps')
     app.register_blueprint(stats_bp, url_prefix='/api/stats')
     app.register_blueprint(instagram_bp, url_prefix='/api/instagram')
+    app.register_blueprint(google_trends_bp, url_prefix='/api/trends')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers

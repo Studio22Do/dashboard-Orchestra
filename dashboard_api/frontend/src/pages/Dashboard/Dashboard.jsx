@@ -43,7 +43,7 @@ const categories = [
   },
   {
     id: 'ux-ui',
-    title: 'UX/UI & Content',
+    title: 'Creative & Content',
     icon: Palette,
     tools: [
       {
@@ -63,7 +63,7 @@ const categories = [
   },
   {
     id: 'web-seo',
-    title: 'Web & 3EO',
+    title: 'Web & SEO',
     icon: Language,
     tools: [
       {
