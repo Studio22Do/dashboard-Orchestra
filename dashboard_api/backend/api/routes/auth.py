@@ -134,7 +134,7 @@ def get_user_info():
     if not user:
         raise AuthenticationError("Usuario no encontrado")
     
-    return jsonify(user_schema.dump(user)), 200
+    return jsonify(user_schema.dump(user)), 200 
 
 @auth_bp.route('/change-password', methods=['POST'])
 @jwt_required()

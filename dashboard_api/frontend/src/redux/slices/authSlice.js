@@ -41,13 +41,13 @@ export const loginUser = createAsyncThunk(
       });
       
       const { user, access_token } = response.data;
-      
-      // Guardar en localStorage para persistencia
+        
+        // Guardar en localStorage para persistencia
       localStorage.setItem('token', access_token);
       
       // Configurar token para futuras peticiones
       setAuthToken(access_token);
-      
+        
       return { user, token: access_token };
     } catch (error) {
       // Manejar diferentes tipos de errores
