@@ -1,5 +1,5 @@
 import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Box, Typography } from '@mui/material';
-import { Dashboard, Apps, Instagram, Analytics, TrendingUp } from '@mui/icons-material';
+import { Dashboard, Apps, Instagram, Analytics, TrendingUp, MonetizationOn } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const DRAWER_WIDTH = 240;
@@ -9,6 +9,7 @@ const menuItems = [
   { text: 'Apps', icon: <Apps />, path: '/apps' },
   { text: 'Instagram Stats', icon: <Instagram />, path: '/apps/instagram' },
   { text: 'Google Trends', icon: <TrendingUp />, path: '/apps/trends' },
+  { text: 'Google Paid Search', icon: <MonetizationOn />, path: '/apps/paid-search' },
   { text: 'Analytics', icon: <Analytics />, path: '/analytics' },
 ];
 

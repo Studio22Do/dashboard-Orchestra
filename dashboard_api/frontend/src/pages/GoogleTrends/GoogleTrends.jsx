@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { 
   Container, 
   Typography, 
@@ -28,17 +29,8 @@ import {
   BarChart 
 } from '@mui/icons-material';
 
-// Datos simulados de respuesta de la API para trending searches
-const mockTrendingSearches = {
-  date: "2023-09-15",
-  trendingSearches: [
-    { title: "iPhone 15", formattedTraffic: "500K+", relatedQueries: ["iPhone 15 Pro", "Apple Event", "iPhone 15 price"] },
-    { title: "Champions League", formattedTraffic: "200K+", relatedQueries: ["UCL results", "Champions League fixtures", "Real Madrid"] },
-    { title: "Taylor Swift", formattedTraffic: "150K+", relatedQueries: ["Taylor Swift tour", "Taylor Swift new album", "Taylor Swift tickets"] },
-    { title: "COVID-19 vaccine", formattedTraffic: "100K+", relatedQueries: ["booster shot", "vaccine side effects", "vaccination center near me"] },
-    { title: "Bitcoin price", formattedTraffic: "50K+", relatedQueries: ["cryptocurrency", "ethereum", "crypto market"] }
-  ]
-};
+// Base URL de la API
+const API_URL = 'http://localhost:5000/api';
 
 // Lista de países para el selector
 const countries = [
@@ -56,49 +48,46 @@ const GoogleTrends = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [country, setCountry] = useState('US');
   const [trendingData, setTrendingData] = useState(null);
+  const [interestData, setInterestData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
+    setError(null);
   };
 
-  const handleTrendingSearches = () => {
+  const handleTrendingSearches = async () => {
     setLoading(true);
     setError(null);
     
-    // Simulando llamada a la API
-    setTimeout(() => {
-      setTrendingData(mockTrendingSearches);
+    try {
+      // Obtener token del localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No estás autenticado. Por favor inicia sesión.');
+      }
+      
+      // Configurar headers con token de autenticación
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      };
+      
+      // Obtener tendencias
+      const response = await axios.get(`${API_URL}/trends/trending-searches?geo=${country}`, config);
+      
+      setTrendingData(response.data);
+    } catch (err) {
+      console.error('Error fetching Google Trends data:', err);
+      setError(err.response?.data?.error || err.message || 'Error al obtener datos de tendencias');
+    } finally {
       setLoading(false);
-    }, 1500);
-    
-    // Aquí iría la llamada real a la API
-    // const fetchTrendingSearches = async () => {
-    //   try {
-    //     const response = await fetch(`/api/trends/trending-searches?geo=${country}`, {
-    //       headers: {
-    //         'Authorization': `Bearer ${localStorage.getItem('token')}`
-    //       }
-    //     });
-    //     
-    //     if (!response.ok) {
-    //       throw new Error('Error al obtener tendencias');
-    //     }
-    //     
-    //     const data = await response.json();
-    //     setTrendingData(data);
-    //   } catch (error) {
-    //     setError(error.message || 'Error al obtener datos de tendencias');
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-    // 
-    // fetchTrendingSearches();
+    }
   };
 
-  const handleSearchInterest = (e) => {
+  const handleSearchInterest = async (e) => {
     e.preventDefault();
     
     if (!searchTerm) {
@@ -109,16 +98,38 @@ const GoogleTrends = () => {
     setLoading(true);
     setError(null);
     
-    // Aquí iría la llamada real a la API para obtener interés a lo largo del tiempo
-    // ...
-    
-    // Por ahora solo simularemos que se está cargando
-    setTimeout(() => {
+    try {
+      // Obtener token del localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No estás autenticado. Por favor inicia sesión.');
+      }
+      
+      // Configurar headers con token de autenticación
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      };
+      
+      // Obtener datos de interés a lo largo del tiempo
+      const response = await axios.get(`${API_URL}/trends/interest-over-time?keyword=${encodeURIComponent(searchTerm)}&geo=${country}`, config);
+      
+      setInterestData(response.data);
+    } catch (err) {
+      console.error('Error fetching interest over time data:', err);
+      setError(err.response?.data?.error || err.message || 'Error al obtener datos de interés');
+    } finally {
       setLoading(false);
-      // Y mostraremos un mensaje de que aún no está implementado
-      setError('Esta funcionalidad estará disponible próximamente');
-    }, 1500);
+    }
   };
+
+  // Cargar tendencias al montar el componente
+  useEffect(() => {
+    if (activeTab === 0 && !trendingData && !loading) {
+      handleTrendingSearches();
+    }
+  }, [activeTab]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -197,36 +208,42 @@ const GoogleTrends = () => {
               <Box sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
                 <CalendarToday sx={{ mr: 1 }} color="primary" />
                 <Typography variant="subtitle1">
-                  Tendencias de búsqueda para {countries.find(c => c.code === country)?.name} - {trendingData.date}
+                  Tendencias de búsqueda para {countries.find(c => c.code === country)?.name}
                 </Typography>
               </Box>
               
-              {trendingData.trendingSearches.map((trend, index) => (
-                <Card key={index} sx={{ mb: 2, borderLeft: '4px solid', borderColor: 'primary.main' }}>
-                  <CardContent>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={8}>
-                        <Typography variant="h6" component="div">
-                          {trend.title}
-                        </Typography>
-                        <Box sx={{ mt: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
-                            Búsquedas relacionadas: {trend.relatedQueries.join(", ")}
+              {trendingData.items ? (
+                trendingData.items.map((trend, index) => (
+                  <Card key={index} sx={{ mb: 2, borderLeft: '4px solid', borderColor: 'primary.main' }}>
+                    <CardContent>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={8}>
+                          <Typography variant="h6" component="div">
+                            {trend.title || trend.term || trend.query}
                           </Typography>
-                        </Box>
+                          {trend.relatedQueries && (
+                            <Box sx={{ mt: 1 }}>
+                              <Typography variant="body2" color="text.secondary">
+                                Búsquedas relacionadas: {Array.isArray(trend.relatedQueries) ? trend.relatedQueries.join(", ") : trend.relatedQueries}
+                              </Typography>
+                            </Box>
+                          )}
+                        </Grid>
+                        <Grid item xs={12} sm={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                          <Typography variant="h6" color="primary.main">
+                            {trend.traffic || trend.formattedTraffic || "N/A"}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                            búsquedas
+                          </Typography>
+                        </Grid>
                       </Grid>
-                      <Grid item xs={12} sm={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                        <Typography variant="h6" color="primary.main">
-                          {trend.formattedTraffic}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                          búsquedas
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Alert severity="info">No se encontraron tendencias para la región seleccionada.</Alert>
+              )}
             </Paper>
           )}
         </>
@@ -245,11 +262,11 @@ const GoogleTrends = () => {
                       placeholder="Ej: 'inteligencia artificial'"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      error={!!error}
-                      helperText={error}
+                      error={!!error && !searchTerm}
+                      helperText={!searchTerm && error ? error : ''}
                       InputProps={{
                         startAdornment: (
-                          <Search color="action" sx={{ mr: 1 }} />
+                          <Search sx={{ mr: 1, color: 'action.active' }} />
                         ),
                       }}
                     />
@@ -262,6 +279,7 @@ const GoogleTrends = () => {
                         value={country}
                         label="País"
                         onChange={(e) => setCountry(e.target.value)}
+                        startAdornment={<Public sx={{ mr: 1, ml: -0.5 }} />}
                       >
                         {countries.map((country) => (
                           <MenuItem key={country.code} value={country.code}>
@@ -299,7 +317,47 @@ const GoogleTrends = () => {
             </Alert>
           )}
 
-          {/* Aquí iría la visualización del interés a lo largo del tiempo */}
+          {!loading && interestData && (
+            <Paper elevation={2} sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Interés a lo largo del tiempo para: {searchTerm}
+              </Typography>
+              
+              {interestData.timelineData ? (
+                <Box sx={{ mt: 3 }}>
+                  <Alert severity="info">
+                    Datos recibidos correctamente. Esta visualización se mejorará con gráficos interactivos en próximas actualizaciones.
+                  </Alert>
+                  
+                  <Box sx={{ mt: 3 }}>
+                    {interestData.timelineData.slice(0, 5).map((point, index) => (
+                      <Card key={index} sx={{ mb: 2 }}>
+                        <CardContent>
+                          <Grid container>
+                            <Grid item xs={4}>
+                              <Typography variant="body1">
+                                {point.formattedTime || point.time}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={8}>
+                              <Typography variant="body1" color="primary.main">
+                                Valor: {point.value || (point.value === 0 ? '0' : 'N/A')}
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    <Typography variant="body2" align="center" color="text.secondary">
+                      Mostrando 5 de {interestData.timelineData.length} puntos de datos
+                    </Typography>
+                  </Box>
+                </Box>
+              ) : (
+                <Alert severity="info">No hay datos disponibles para el término y región seleccionados.</Alert>
+              )}
+            </Paper>
+          )}
         </>
       )}
     </Container>

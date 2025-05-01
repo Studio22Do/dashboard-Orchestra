@@ -1,16 +1,67 @@
 import os
-from api import create_app, db
-from config import get_config
+from flask import Flask
+from flask_cors import CORS
+from config import config
+from blueprints import register_blueprints
+from utils.error_handlers import register_error_handlers
+from utils.logging_config import configure_logging
+import logging
 from api.utils.database import init_db
 from api.models.app import App
+from api import db
+from flask_jwt_extended import JWTManager
 
-# Crear instancia de la aplicación
-app = create_app(get_config())
+logger = logging.getLogger(__name__)
 
-@app.route('/api/health')
-def health_check():
-    """Endpoint para verificar el estado de la API"""
-    return {'status': 'healthy', 'version': '1.0.0'}
+def create_app(config_name=None):
+    """Función factoría de aplicación Flask."""
+    # Determinar la configuración a usar
+    if config_name is None:
+        # Usar FLASK_DEBUG para determinar el entorno (compatible con Flask 2.3+)
+        if os.environ.get('FLASK_DEBUG') == '1':
+            config_name = 'development'
+        elif os.environ.get('FLASK_ENV'):
+            # Mantener compatibilidad con FLASK_ENV para versiones anteriores
+            config_name = os.environ.get('FLASK_ENV')
+        else:
+            config_name = 'default'
+    
+    # Inicializar aplicación
+    app = Flask(__name__)
+    app.config.from_object(config[config_name])
+    
+    # Habilitar CORS para todas las rutas con soporte para credenciales
+    CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
+    
+    # Inicializar JWT para autenticación
+    jwt = JWTManager(app)
+    
+    # Configurar logging
+    configure_logging(app)
+    
+    # Registrar manejadores de errores
+    register_error_handlers(app)
+    
+    # Registrar blueprints
+    register_blueprints(app)
+    
+    # Inicializar base de datos
+    db.init_app(app)
+    
+    # Ruta de estado para verificación de salud
+    @app.route('/health')
+    def health_check():
+        return {
+            'status': 'online',
+            'version': app.config['VERSION']
+        }
+    
+    logger.info(f"Aplicación inicializada en modo: {config_name}")
+    
+    return app
+
+# Crear la aplicación para poder usarla con los comandos CLI y al ejecutar directamente
+app = create_app()
 
 @app.cli.command("init-db")
 def init_db_command():
@@ -50,7 +101,8 @@ def update_apps_command():
             db.session.commit()
             print("Aplicación Google Trends actualizada correctamente")
 
-# Inicializar base de datos si estamos en entorno de desarrollo
+# Inicializar base de datos si estamos en entorno de desarrollo (deshabilitado temporalmente)
+"""
 if os.environ.get('FLASK_ENV') == 'development' or not os.environ.get('FLASK_ENV'):
     with app.app_context():
         try:
@@ -58,7 +110,7 @@ if os.environ.get('FLASK_ENV') == 'development' or not os.environ.get('FLASK_ENV
             app.logger.info("Base de datos inicializada automáticamente")
         except Exception as e:
             app.logger.error(f"Error inicializando la base de datos: {str(e)}")
+"""
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=app.config['DEBUG'])
