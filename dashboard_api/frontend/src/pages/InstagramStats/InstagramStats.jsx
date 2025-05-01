@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from 'axios';
 import { 
   Container, 
   Typography, 
@@ -17,66 +18,61 @@ import {
 } from '@mui/material';
 import { Instagram, Public, Verified, CalendarMonth, PhotoCamera } from '@mui/icons-material';
 
-// Datos simulados de respuesta de la API
-const mockApiResponse = {
-  username: "instagram",
-  fullName: "Instagram",
-  biography: "Bringing you closer to the people and things you love. ❤️",
-  profilePicUrl: "https://scontent-ams2-1.cdninstagram.com/v/t51.2885-19/281440578_1088265838702675_6233856337905829714_n.jpg?stp=dst-jpg_s150x150&_nc_ht=scontent-ams2-1.cdninstagram.com&_nc_cat=1&_nc_ohc=cE3fZVYctRoAX9uNAug&edm=APs17CUBAAAA&ccb=7-5&oh=00_AT_lqEftTaROzTT6hyQSvED2jXAYJQEGhGh1NWCzIWiDCA&oe=62BBD6DE&_nc_sid=978cb9",
-  followersCount: 505000000,
-  followingCount: 76,
-  postsCount: 7162,
-  profileUrl: "https://instagram.com/instagram",
-  isVerified: true,
-  isPrivate: false,
-  externalUrl: "https://about.instagram.com/",
-};
+// Base URL de la API
+const API_URL = 'http://localhost:5000/api';
 
 const InstagramStats = () => {
-  const [profileUrl, setProfileUrl] = useState('');
+  const [username, setUsername] = useState('');
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [engagementData, setEngagementData] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!profileUrl) {
-      setError('Por favor ingresa una URL de perfil de Instagram');
+    if (!username) {
+      setError('Por favor ingresa un nombre de usuario de Instagram');
       return;
     }
     
     setLoading(true);
     setError(null);
     
-    // Simulando llamada a la API
-    setTimeout(() => {
-      setProfileData(mockApiResponse);
+    try {
+      // Obtener token del localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No estás autenticado. Por favor inicia sesión.');
+      }
+      
+      // Configurar headers con token de autenticación
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      };
+      
+      // Obtener datos del perfil
+      const profileResponse = await axios.get(`${API_URL}/instagram/followers?username=${username}`, config);
+      
+      // Obtener datos de engagement
+      const engagementResponse = await axios.get(`${API_URL}/instagram/engagement?username=${username}`, config);
+      
+      // Combinar datos
+      setProfileData(profileResponse.data);
+      setEngagementData(engagementResponse.data);
+    } catch (err) {
+      console.error('Error fetching Instagram data:', err);
+      setError(err.response?.data?.error || err.message || 'Error al obtener datos del perfil');
+    } finally {
       setLoading(false);
-    }, 1500);
-    
-    // Aquí irá la llamada real a la API de RapidAPI cuando tengamos el backend
-    // const fetchProfileData = async () => {
-    //   try {
-    //     const response = await fetch('/api/instagram/profile', {
-    //       method: 'POST',
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify({ profileUrl }),
-    //     });
-    //     const data = await response.json();
-    //     setProfileData(data);
-    //   } catch (error) {
-    //     setError('Error al obtener datos del perfil');
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-    // fetchProfileData();
+    }
   };
 
   const formatNumber = (num) => {
+    if (!num && num !== 0) return 'N/A';
+    
     if (num >= 1000000) {
       return (num / 1000000).toFixed(1) + 'M';
     }
@@ -84,6 +80,22 @@ const InstagramStats = () => {
       return (num / 1000).toFixed(1) + 'K';
     }
     return num.toString();
+  };
+
+  const extractUsername = (url) => {
+    // Eliminar @ si está presente
+    let username = url.trim();
+    if (username.startsWith('@')) {
+      username = username.substring(1);
+    }
+    
+    // Si es una URL, extraer el username
+    if (username.includes('instagram.com')) {
+      const parts = username.split('/');
+      return parts[parts.length - 1].replace(/\/$/, '');
+    }
+    // Si no es URL, asumir que es directamente el username
+    return username;
   };
 
   return (
@@ -99,14 +111,14 @@ const InstagramStats = () => {
         <CardContent>
           <Box component="form" onSubmit={handleSubmit}>
             <Grid container spacing={2} alignItems="center">
-              <Grid xs={12} md={8}>
+              <Grid item xs={12} md={8}>
                 <TextField
                   fullWidth
-                  label="URL del perfil de Instagram"
-                  placeholder="https://instagram.com/username"
+                  label="Nombre de usuario de Instagram"
+                  placeholder="username"
                   variant="outlined"
-                  value={profileUrl}
-                  onChange={(e) => setProfileUrl(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(extractUsername(e.target.value))}
                   error={!!error}
                   helperText={error}
                   InputProps={{
@@ -116,7 +128,7 @@ const InstagramStats = () => {
                   }}
                 />
               </Grid>
-              <Grid xs={12} md={4}>
+              <Grid item xs={12} md={4}>
                 <Button
                   type="submit"
                   variant="contained"
@@ -139,121 +151,114 @@ const InstagramStats = () => {
         </Box>
       )}
 
+      {!loading && error && (
+        <Alert severity="error" sx={{ mb: 4 }}>
+          {error}
+        </Alert>
+      )}
+
       {!loading && profileData && (
         <Box>
           <Paper elevation={2} sx={{ mb: 4, overflow: 'hidden' }}>
             <Box sx={{ p: 3, bgcolor: 'primary.main', color: 'white' }}>
               <Grid container spacing={3} alignItems="center">
-                <Grid>
+                <Grid item>
                   <Avatar
-                    src={profileData.profilePicUrl}
                     alt={profileData.username}
                     sx={{ width: 80, height: 80, border: '3px solid white' }}
-                  />
+                  >
+                    {profileData.username?.[0]?.toUpperCase() || 'I'}
+                  </Avatar>
                 </Grid>
-                <Grid xs>
+                <Grid item xs>
                   <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    {profileData.fullName}
-                    {profileData.isVerified && <Verified fontSize="small" />}
-                  </Typography>
-                  <Typography variant="body1" sx={{ opacity: 0.9 }}>
-                    @{profileData.username}
+                    {profileData.username}
                   </Typography>
                 </Grid>
               </Grid>
             </Box>
             
             <Box sx={{ p: 3 }}>
-              <Typography variant="body1" paragraph>
-                {profileData.biography}
-              </Typography>
-              
-              {profileData.externalUrl && (
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Public fontSize="small" color="action" sx={{ mr: 1 }} />
-                  <Typography variant="body2" component="a" href={profileData.externalUrl} target="_blank" rel="noopener noreferrer">
-                    {profileData.externalUrl}
-                  </Typography>
-                </Box>
-              )}
-              
               <Grid container spacing={3} sx={{ mt: 2 }}>
-                <Grid xs={4}>
+                <Grid item xs={12} md={4}>
                   <Box sx={{ textAlign: 'center' }}>
                     <Typography variant="h4" color="primary">
-                      {formatNumber(profileData.postsCount)}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Publicaciones
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid xs={4}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h4" color="primary">
-                      {formatNumber(profileData.followersCount)}
+                      {formatNumber(profileData.followers_count)}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Seguidores
                     </Typography>
                   </Box>
                 </Grid>
-                <Grid xs={4}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h4" color="primary">
-                      {formatNumber(profileData.followingCount)}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Siguiendo
-                    </Typography>
-                  </Box>
-                </Grid>
+                {engagementData && (
+                  <>
+                    <Grid item xs={6} md={4}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Typography variant="h4" color="primary">
+                          {formatNumber(engagementData.likes_count)}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Likes
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6} md={4}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Typography variant="h4" color="primary">
+                          {formatNumber(engagementData.comments_count)}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Comentarios
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  </>
+                )}
               </Grid>
             </Box>
           </Paper>
           
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Detalles del Perfil
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            
-            <Grid container spacing={2}>
-              <Grid xs={12} md={6}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="subtitle1" sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <PhotoCamera sx={{ mr: 1 }} /> Engagement Rate
-                    </Typography>
-                    <Typography variant="h4" color="primary">
-                      4.6%
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Promedio basado en últimas publicaciones
-                    </Typography>
-                  </CardContent>
-                </Card>
+          {engagementData && (
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h6" gutterBottom>
+                Detalles del Perfil
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="subtitle1" sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <PhotoCamera sx={{ mr: 1 }} /> Engagement Rate
+                      </Typography>
+                      <Typography variant="h4" color="primary">
+                        {engagementData.engagement_rate ? `${engagementData.engagement_rate.toFixed(2)}%` : 'N/A'}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Promedio basado en últimas publicaciones
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="subtitle1" sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <CalendarMonth sx={{ mr: 1 }} /> Última actualización
+                      </Typography>
+                      <Typography variant="h6" color="primary">
+                        {engagementData.timestamp ? new Date(engagementData.timestamp).toLocaleString() : 'N/A'}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
               </Grid>
-              <Grid xs={12} md={6}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="subtitle1" sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <CalendarMonth sx={{ mr: 1 }} /> Frecuencia de Publicación
-                    </Typography>
-                    <Typography variant="h4" color="primary">
-                      3.2
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Publicaciones por semana
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-          </Box>
+            </Box>
+          )}
           
-          <Alert severity="info">
-            Nota: Estos datos son simulados. En la versión final, se obtendrán datos reales de la API de Instagram Statistics.
+          <Alert severity="info" sx={{ mt: 4 }}>
+            Los datos mostrados son obtenidos de Instagram Statistics API. La precisión depende de la disponibilidad de datos públicos del perfil.
           </Alert>
         </Box>
       )}

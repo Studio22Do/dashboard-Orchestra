@@ -8,8 +8,8 @@ const StyledCard = styled(Card)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
-  padding: theme.spacing(2),
-  minHeight: 100,
+  padding: theme.spacing(1.5),
+  minHeight: 90,
   backgroundColor: theme.palette.background.paper,
   '&:hover': {
     transform: 'translateY(-4px)',
@@ -19,10 +19,11 @@ const StyledCard = styled(Card)(({ theme }) => ({
       color: theme.palette.primary.main,
     }
   },
+  transition: 'all 0.3s ease',
 }));
 
 const ToolIcon = styled(Box)(({ theme }) => ({
-  marginBottom: theme.spacing(1),
+  marginBottom: theme.spacing(0.5),
   color: theme.palette.text.secondary,
   transition: 'color 0.3s ease',
 }));
@@ -30,11 +31,11 @@ const ToolIcon = styled(Box)(({ theme }) => ({
 const ToolCard = ({ title, icon: Icon, onClick }) => {
   return (
     <StyledCard onClick={onClick}>
-      <CardContent>
+      <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
         <ToolIcon className="tool-icon">
-          {Icon && <Icon sx={{ fontSize: 32 }} />}
+          {Icon && <Icon sx={{ fontSize: 28 }} />}
         </ToolIcon>
-        <Typography variant="h6" component="h3" sx={{ fontWeight: 500 }}>
+        <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 500 }}>
           {title}
         </Typography>
       </CardContent>

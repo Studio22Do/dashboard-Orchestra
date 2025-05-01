@@ -6,7 +6,10 @@ import Layout from './components/Layout/Layout';
 import Login from './pages/Login/Login';
 import AppCatalog from './pages/AppCatalog/AppCatalog';
 import InstagramStats from './pages/InstagramStats/InstagramStats';
+import InstagramRealtime from './pages/InstagramRealtime';
+import ScrapTik from './pages/ScrapTik';
 import GoogleTrends from './pages/GoogleTrends/GoogleTrends';
+import GooglePaidSearch from './pages/GooglePaidSearch/GooglePaidSearch';
 import Dashboard from './pages/Dashboard/Dashboard';
 import NotificationManager from './components/Notifications/NotificationManager';
 import { useAppDispatch, useAppSelector } from './redux/hooks/reduxHooks';
@@ -171,9 +174,27 @@ function App() {
             </ProtectedRoute>
           } />
           
+          <Route path="/instagram-realtime" element={
+            <ProtectedRoute>
+              <InstagramRealtime />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/tiktok" element={
+            <ProtectedRoute>
+              <ScrapTik />
+            </ProtectedRoute>
+          } />
+          
           <Route path="/apps/trends" element={
             <ProtectedRoute>
               <GoogleTrends />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/apps/paid-search" element={
+            <ProtectedRoute>
+              <GooglePaidSearch />
             </ProtectedRoute>
           } />
 
