@@ -9,6 +9,8 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from api.routes.auth import auth_bp
 from api.routes.google_trends import google_trends_bp
+from api.routes.google_paid_search import google_paid_search_bp
+from api.routes.scraptik import scraptik_bp
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +24,12 @@ def register_blueprints(app):
     
     # Registrar blueprint de Google Trends
     app.register_blueprint(google_trends_bp, url_prefix='/api/trends')
+    
+    # Registrar blueprint de Google Paid Search
+    app.register_blueprint(google_paid_search_bp, url_prefix='/api/paid-search')
+    
+    # Registrar blueprint de TikTok
+    app.register_blueprint(scraptik_bp, url_prefix='/api/tiktok')
     
     # Agregar más blueprints aquí
     

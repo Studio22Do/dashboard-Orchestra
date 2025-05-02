@@ -28,6 +28,7 @@ class Config:
     RAPIDAPI_INSTAGRAM_REALTIME_HOST = os.environ.get('RAPIDAPI_INSTAGRAM_REALTIME_HOST', 'instagram-realtimeapi.p.rapidapi.com')
     RAPIDAPI_GOOGLE_TRENDS_HOST = os.environ.get('RAPIDAPI_GOOGLE_TRENDS_HOST', 'google-trends.p.rapidapi.com')
     RAPIDAPI_GOOGLE_PAID_SEARCH_HOST = os.environ.get('RAPIDAPI_GOOGLE_PAID_SEARCH_HOST', 'google-paid-search-api.p.rapidapi.com')
+    RAPIDAPI_SCRAPTIK_HOST = os.environ.get('RAPIDAPI_SCRAPTIK_HOST', 'scraptik.p.rapidapi.com')
 
     # Instagram API config
     INSTAGRAM_API_BASE_URL = os.environ.get('INSTAGRAM_API_BASE_URL')

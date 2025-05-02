@@ -11,7 +11,7 @@ google_paid_search_bp = Blueprint('google_paid_search', __name__)
 APP_ID = "google-paid-search"
 
 @google_paid_search_bp.route('/search', methods=['GET'])
-@jwt_required()
+# @jwt_required()  # Comentado para desarrollo
 def get_paid_search_results():
     """Obtener resultados de Google Ads para una consulta específica"""
     # Obtener parámetros
@@ -22,8 +22,9 @@ def get_paid_search_results():
     if not query:
         raise ValidationError("Se requiere un término de búsqueda")
     
-    # Obtener usuario actual
-    current_user_id = get_jwt_identity()
+    # Obtener usuario actual (comentado para desarrollo)
+    # current_user_id = get_jwt_identity()
+    current_user_id = "dev_user"  # Usuario temporal para desarrollo
     
     # Configurar solicitud a RapidAPI
     api_url = f"https://{current_app.config['RAPIDAPI_GOOGLE_PAID_SEARCH_HOST']}/search"
@@ -47,7 +48,7 @@ def get_paid_search_results():
     return jsonify(result), 200
 
 @google_paid_search_bp.route('/keywords', methods=['GET'])
-@jwt_required()
+# @jwt_required()  # Comentado para desarrollo
 def get_keyword_metrics():
     """Obtener métricas de palabras clave en Google Ads"""
     # Obtener parámetros
@@ -57,8 +58,9 @@ def get_keyword_metrics():
     if not keywords:
         raise ValidationError("Se requieren palabras clave")
     
-    # Obtener usuario actual
-    current_user_id = get_jwt_identity()
+    # Obtener usuario actual (comentado para desarrollo)
+    # current_user_id = get_jwt_identity()
+    current_user_id = "dev_user"  # Usuario temporal para desarrollo
     
     # Configurar solicitud a RapidAPI
     api_url = f"https://{current_app.config['RAPIDAPI_GOOGLE_PAID_SEARCH_HOST']}/keyword-metrics"
@@ -81,7 +83,7 @@ def get_keyword_metrics():
     return jsonify(result), 200
 
 @google_paid_search_bp.route('/competitors', methods=['GET'])
-@jwt_required()
+# @jwt_required()  # Comentado para desarrollo
 def get_competitors():
     """Obtener principales competidores para una palabra clave en Google Ads"""
     # Obtener parámetros
@@ -92,8 +94,9 @@ def get_competitors():
     if not keyword:
         raise ValidationError("Se requiere una palabra clave")
     
-    # Obtener usuario actual
-    current_user_id = get_jwt_identity()
+    # Obtener usuario actual (comentado para desarrollo)
+    # current_user_id = get_jwt_identity()
+    current_user_id = "dev_user"  # Usuario temporal para desarrollo
     
     # Configurar solicitud a RapidAPI
     api_url = f"https://{current_app.config['RAPIDAPI_GOOGLE_PAID_SEARCH_HOST']}/competitors"
@@ -117,7 +120,7 @@ def get_competitors():
     return jsonify(result), 200
 
 @google_paid_search_bp.route('/ad-performance', methods=['GET'])
-@jwt_required()
+# @jwt_required()  # Comentado para desarrollo
 def get_ad_performance():
     """Obtener rendimiento de anuncios para un dominio o marca específica"""
     # Obtener parámetros
@@ -127,8 +130,9 @@ def get_ad_performance():
     if not domain:
         raise ValidationError("Se requiere un dominio")
     
-    # Obtener usuario actual
-    current_user_id = get_jwt_identity()
+    # Obtener usuario actual (comentado para desarrollo)
+    # current_user_id = get_jwt_identity()
+    current_user_id = "dev_user"  # Usuario temporal para desarrollo
     
     # Configurar solicitud a RapidAPI
     api_url = f"https://{current_app.config['RAPIDAPI_GOOGLE_PAID_SEARCH_HOST']}/ad-performance"
