@@ -14,6 +14,7 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    plan = db.Column(db.String(20), default='basic')  # Plan del usuario: basic, pro, premium
     
     def __init__(self, email, password, name, role='user'):
         self.email = email
@@ -42,6 +43,7 @@ class User(db.Model):
             'email': self.email,
             'name': self.name,
             'role': self.role,
+            'plan': self.plan,
             'is_active': self.is_active,
             'created_at': self.created_at.isoformat() if self.created_at else None,
         }

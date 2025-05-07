@@ -49,8 +49,8 @@ def register():
         db.session.commit()
         
         # Generar tokens
-        access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
+        refresh_token = create_refresh_token(identity=str(user.id))
         
         # Retornar respuesta
         return jsonify({
@@ -90,8 +90,8 @@ def login():
             raise AuthenticationError("Cuenta desactivada")
         
         # Generar tokens
-        access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
+        refresh_token = create_refresh_token(identity=str(user.id))
         
         # Retornar respuesta
         return jsonify({
@@ -118,7 +118,7 @@ def refresh():
     if not user or not user.is_active:
         raise AuthenticationError("Usuario no encontrado o inactivo")
     
-    access_token = create_access_token(identity=current_user_id)
+    access_token = create_access_token(identity=str(current_user_id))
     
     return jsonify({
         'access_token': access_token

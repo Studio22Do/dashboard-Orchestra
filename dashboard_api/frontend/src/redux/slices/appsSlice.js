@@ -1,4 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 // Datos de ejemplo para las apps (simulamos datos que vendrían del backend)
 const MOCK_APPS_DATA = [
@@ -58,11 +61,71 @@ const MOCK_APPS_DATA = [
   }
 ];
 
+// Thunks
+export const fetchPurchasedApps = createAsyncThunk(
+  'apps/fetchPurchasedApps',
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const token = getState().auth.token || localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/apps/user/apps`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data.apps;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Error al obtener apps compradas');
+    }
+  }
+);
+
+export const fetchFavoriteApps = createAsyncThunk(
+  'apps/fetchFavoriteApps',
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const token = getState().auth.token || localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/apps/user/favorites`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data.apps;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Error al obtener apps favoritas');
+    }
+  }
+);
+
+export const purchaseApp = createAsyncThunk(
+  'apps/purchaseApp',
+  async (appId, { rejectWithValue, getState }) => {
+    try {
+      const token = getState().auth.token || localStorage.getItem('token');
+      const response = await axios.post(`${API_URL}/apps/user/apps/${appId}/purchase`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data.app;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Error al comprar app');
+    }
+  }
+);
+
+export const toggleFavoriteApp = createAsyncThunk(
+  'apps/toggleFavoriteApp',
+  async (appId, { rejectWithValue, getState }) => {
+    try {
+      const token = getState().auth.token || localStorage.getItem('token');
+      const response = await axios.post(`${API_URL}/apps/user/apps/${appId}/favorite`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data.app;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Error al actualizar favorito');
+    }
+  }
+);
+
 // Estado inicial
 const initialState = {
-  apps: [],
-  categories: [],
-  currentApp: null,
+  purchasedApps: [],
+  favoriteApps: [],
   loading: false,
   error: null,
 };
@@ -145,6 +208,50 @@ const appsSlice = createSlice({
       .addCase(fetchAppDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // Fetch purchased apps
+      .addCase(fetchPurchasedApps.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPurchasedApps.fulfilled, (state, action) => {
+        state.loading = false;
+        state.purchasedApps = action.payload;
+      })
+      .addCase(fetchPurchasedApps.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch favorite apps
+      .addCase(fetchFavoriteApps.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchFavoriteApps.fulfilled, (state, action) => {
+        state.loading = false;
+        state.favoriteApps = action.payload;
+      })
+      .addCase(fetchFavoriteApps.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Purchase app
+      .addCase(purchaseApp.fulfilled, (state, action) => {
+        state.purchasedApps.push(action.payload);
+      })
+      // Toggle favorite
+      .addCase(toggleFavoriteApp.fulfilled, (state, action) => {
+        // Actualiza el estado de favorito en purchasedApps
+        const idx = state.purchasedApps.findIndex(app => app.app_id === action.payload.app_id || app.id === action.payload.app_id);
+        if (idx !== -1) {
+          state.purchasedApps[idx].is_favorite = action.payload.is_favorite;
+        }
+        // Actualiza la lista de favoritas
+        if (action.payload.is_favorite) {
+          state.favoriteApps.push(action.payload);
+        } else {
+          state.favoriteApps = state.favoriteApps.filter(app => app.app_id !== action.payload.app_id && app.id !== action.payload.app_id);
+        }
       });
   },
 });
@@ -154,6 +261,8 @@ export const { clearCurrentApp, clearErrors } = appsSlice.actions;
 export const selectApps = (state) => state.apps.apps;
 export const selectCategories = (state) => state.apps.categories;
 export const selectCurrentApp = (state) => state.apps.currentApp;
+export const selectPurchasedApps = (state) => state.apps.purchasedApps;
+export const selectFavoriteApps = (state) => state.apps.favoriteApps;
 export const selectAppsLoading = (state) => state.apps.loading;
 export const selectAppsError = (state) => state.apps.error;
 

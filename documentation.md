@@ -11,6 +11,7 @@
 8. [Variables de Entorno Necesarias](#variables-de-entorno-necesarias)
 9. [Ejemplos de Uso](#ejemplos-de-uso)
 10. [Solución de Problemas](#solución-de-problemas)
+11. [Modo Desarrollo vs. Modo Producción: Acceso al Panel con o sin Login](#modo-desarrollo-vs-modo-producción-acceso-al-panel-con-o-sin-login)
 
 ## Descripción General
 
@@ -285,3 +286,65 @@ REACT_APP_ENV=development
 - Verificar que las claves de API externas sean válidas
 - Comprobar los límites de uso de las APIs
 - Revisar los logs de error para identificar problemas específicos
+
+## Modo Desarrollo vs. Modo Producción: Acceso al Panel con o sin Login
+
+En el desarrollo de Dashboard Orchestra, puedes alternar entre un modo donde el panel es accesible sin autenticación (ideal para pruebas rápidas o cuando el backend/base de datos no está disponible) y el modo seguro de producción donde solo los usuarios autenticados pueden acceder al panel.
+
+### 1. Acceso al Panel SIN Login (Modo Desarrollo)
+
+Para permitir el acceso al panel sin requerir autenticación:
+
+- **Archivo:** `dashboard_api/frontend/src/App.jsx`
+- **Acción:** Comenta la verificación de autenticación en el componente `ProtectedRoute` y fuerza el estado de autenticación a `true`.
+
+#### Ejemplo:
+```jsx
+// Protected Route wrapper
+const ProtectedRoute = ({ children }) => {
+  // const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  // if (!isAuthenticated) {
+  //   return <Navigate to="/login" />;
+  // }
+  return <Layout>{children}</Layout>;
+};
+
+// En el useEffect de App():
+useEffect(() => {
+  dispatch(setAuth(true)); // Fuerza autenticación
+}, [dispatch]);
+```
+
+Con esto, cualquier usuario podrá ver el panel y todas las rutas protegidas, sin necesidad de login ni base de datos.
+
+### 2. Acceso al Panel SOLO con Login (Modo Producción)
+
+Para requerir autenticación real:
+
+- **Archivo:** `dashboard_api/frontend/src/App.jsx`
+- **Acción:** Descomenta la verificación de autenticación en `ProtectedRoute` y elimina/comenta cualquier línea que fuerce la autenticación.
+
+#### Ejemplo:
+```jsx
+const ProtectedRoute = ({ children }) => {
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  return <Layout>{children}</Layout>;
+};
+
+// En el useEffect de App():
+useEffect(() => {
+  // dispatch(setAuth(true)); // No forzar autenticación
+}, [dispatch]);
+```
+
+Con esto, solo los usuarios autenticados podrán acceder al panel. Si no están autenticados, serán redirigidos a la pantalla de login.
+
+### 3. Notas adicionales
+- El estado de autenticación se maneja en `src/redux/slices/authSlice.js`.
+- El login real requiere que el backend y la base de datos estén funcionando correctamente.
+- Para pruebas rápidas, puedes alternar entre ambos modos según lo necesites.
+
+---

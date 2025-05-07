@@ -82,6 +82,31 @@ class ApiUsage(db.Model):
     def __repr__(self):
         return f'<ApiUsage {self.id}: {self.app_id} - {self.endpoint}>'
 
+class UserApp(db.Model):
+    """Modelo para asociar usuarios con apps compradas y favoritas"""
+    __tablename__ = 'user_apps'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    app_id = db.Column(db.String(50), db.ForeignKey('apps.id'), nullable=False)
+    is_favorite = db.Column(db.Boolean, default=False)
+    purchased_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relaciones
+    user = db.relationship('User', backref=db.backref('user_apps', lazy='dynamic'))
+    app = db.relationship('App', backref=db.backref('user_apps', lazy='dynamic'))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'app_id': self.app_id,
+            'is_favorite': self.is_favorite,
+            'purchased_at': self.purchased_at.isoformat() if self.purchased_at else None
+        }
+
+    def __repr__(self):
+        return f'<UserApp user_id={self.user_id} app_id={self.app_id} favorite={self.is_favorite}>'
+
 # Función para inicializar aplicaciones de ejemplo
 def create_sample_apps():
     """Crea aplicaciones de ejemplo si no existen"""

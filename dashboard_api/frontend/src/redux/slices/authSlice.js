@@ -13,8 +13,8 @@ const TEST_CREDENTIALS = {
 // Estado inicial
 const initialState = {
   user: null,
-  token: "dev_mock_token", // Token falso para desarrollo
-  isAuthenticated: true, // Siempre autenticado para desarrollo
+  token: "null", // Token falso para desarrollo
+  isAuthenticated: false, // Siempre autenticado para desarrollo
   loading: false,
   error: null,
   passwordChangeSuccess: false,

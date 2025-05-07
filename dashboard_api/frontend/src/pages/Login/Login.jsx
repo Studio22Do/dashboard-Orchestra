@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks/reduxHooks';
 import { loginUser, selectAuth, clearErrors } from '../../redux/slices/authSlice';
 import { addNotification } from '../../redux/slices/uiSlice';
+import { fetchPurchasedApps, fetchFavoriteApps } from '../../redux/slices/appsSlice';
 
 // Componentes estilizados para el nuevo diseño
 const StyledTextField = styled(TextField)(({ theme }) => ({
@@ -118,6 +119,9 @@ const Login = () => {
         message: '¡Inicio de sesión exitoso!',
         type: 'success'
       }));
+      // Fetch apps del usuario
+      dispatch(fetchPurchasedApps());
+      dispatch(fetchFavoriteApps());
     }
   };
 

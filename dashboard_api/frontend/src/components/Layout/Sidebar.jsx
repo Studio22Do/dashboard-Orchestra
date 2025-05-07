@@ -12,6 +12,9 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
+import { useAppSelector } from '../../redux/hooks/reduxHooks';
+import { selectFavoriteApps } from '../../redux/slices/appsSlice';
+import StarIcon from '@mui/icons-material/Star';
 
 const DRAWER_WIDTH = 240;
 
@@ -49,28 +52,23 @@ const NavButton = styled(ListItemButton)(({ theme }) => ({
   },
 }));
 
-const menuItems = [
+const staticMenuItems = [
   { text: 'Dashboard', icon: <Dashboard />, path: '/' },
   { text: 'Apps', icon: <Apps />, path: '/apps' },
-  { text: 'Instagram Stats', icon: <Instagram />, path: '/apps/instagram' },
-  { text: 'Google Trends', icon: <TrendingUp />, path: '/apps/trends' },
-  { text: 'Google Paid Search', icon: <MonetizationOn />, path: '/apps/paid-search' },
   { text: 'Analytics', icon: <Analytics />, path: '/analytics' },
-  { text: 'YouTube Media', icon: <YouTube />, path: '/youtube-media' },
-  { text: 'File Converter', icon: <Transform />, path: '/file-converter' },
-  { text: 'Web & SEO', icon: <Language />, path: '/apps?preselectedCategory=Web & SEO' },
 ];
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const favoriteApps = useAppSelector(selectFavoriteApps);
 
   return (
     <StyledDrawer variant="permanent">
       <LogoWrapper>
         <Typography 
           variant="h3" 
-      sx={{
+          sx={{
             fontWeight: 600, 
             fontSize: '2rem',
             color: 'white',
@@ -80,9 +78,9 @@ const Sidebar = () => {
           Sympho.
         </Typography>
       </LogoWrapper>
-      
       <List>
-        {menuItems.map((item) => (
+        {/* Menú estático */}
+        {staticMenuItems.map((item) => (
           <NavButton
             key={item.text}
             onClick={() => navigate(item.path)}
@@ -96,6 +94,32 @@ const Sidebar = () => {
               primaryTypographyProps={{
                 fontSize: '0.95rem',
                 fontWeight: location.pathname === item.path ? 600 : 400
+              }}
+            />
+          </NavButton>
+        ))}
+        {/* Apps favoritas dinámicas */}
+        {favoriteApps.length > 0 && (
+          <Box sx={{ mt: 2, mb: 1, px: 2 }}>
+            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
+              Favoritos
+            </Typography>
+          </Box>
+        )}
+        {favoriteApps.map((app) => (
+          <NavButton
+            key={app.app_id || app.id}
+            onClick={() => navigate(app.route)}
+            selected={location.pathname === app.route}
+          >
+            <ListItemIcon sx={{ minWidth: 40, color: '#FFD700' }}>
+              <StarIcon />
+            </ListItemIcon>
+            <ListItemText 
+              primary={app.title}
+              primaryTypographyProps={{
+                fontSize: '0.95rem',
+                fontWeight: location.pathname === app.route ? 600 : 400
               }}
             />
           </NavButton>

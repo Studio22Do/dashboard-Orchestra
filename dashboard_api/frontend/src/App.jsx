@@ -154,25 +154,24 @@ const createAppTheme = (mode) => createTheme({
 
 // Protected Route wrapper
 const ProtectedRoute = ({ children }) => {
-  // Desactivamos temporalmente la verificación de autenticación
-  // const isAuthenticated = useAppSelector(selectIsAuthenticated);
-  
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/login" />;
-  // }
-  
-  // Simplemente renderizamos el Layout con los children sin verificar autenticación
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
   return <Layout>{children}</Layout>;
 };
 
 function App() {
   const dispatch = useAppDispatch();
   const themeMode = useAppSelector(selectTheme);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   
   // Forzar estado de autenticación a true para desarrollo
   useEffect(() => {
     // Establecer autenticación a true aunque no haya token
-      dispatch(setAuth(true));
+      // dispatch(setAuth(true));
   }, [dispatch]);
   
   // Crear tema basado en el modo seleccionado
@@ -183,8 +182,13 @@ function App() {
       <CssBaseline />
       <Router>
         <Routes>
-          {/* Redirigir al dashboard si se intenta acceder a /login */}
-          <Route path="/login" element={<Navigate to="/" />} />
+          {/* Mostrar Login solo si no está autenticado */}
+          <Route
+            path="/login"
+            element={
+              isAuthenticated ? <Navigate to="/" /> : <Login />
+            }
+          />
           
           {/* Protected Routes */}
           <Route path="/" element={

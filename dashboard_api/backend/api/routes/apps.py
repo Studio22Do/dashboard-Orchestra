@@ -3,7 +3,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import ValidationError
 
 from api import db
-from api.models.app import App, ApiUsage
+from api.models.app import App, ApiUsage, UserApp
+from api.models.user import User
 from api.utils.schemas import AppSchema, ApiUsageSchema
 from api.utils.error_handlers import ResourceNotFoundError, ValidationError as ApiValidationError
 
@@ -45,13 +46,17 @@ def get_apps():
 @apps_bp.route('/<string:app_id>', methods=['GET'])
 @jwt_required()
 def get_app(app_id):
-    """Obtener detalles de una aplicación específica"""
+    """Obtener detalles de una aplicación específica, incluyendo si el usuario la tiene comprada y si es favorita"""
     app = App.query.get(app_id)
-    
     if not app or not app.is_active:
         raise ResourceNotFoundError(f"Aplicación {app_id} no encontrada")
-    
-    return jsonify(app_schema.dump(app)), 200
+    user_id = get_jwt_identity()
+    user_app = UserApp.query.filter_by(user_id=user_id, app_id=app_id).first()
+    app_data = app.to_dict()
+    app_data['is_purchased'] = bool(user_app)
+    app_data['is_favorite'] = user_app.is_favorite if user_app else False
+    app_data['purchased_at'] = user_app.purchased_at.isoformat() if user_app and user_app.purchased_at else None
+    return jsonify(app_data), 200
 
 @apps_bp.route('/', methods=['POST'])
 @jwt_required()
@@ -183,4 +188,66 @@ def record_usage(app_id):
         db.session.rollback()
         if isinstance(e, ResourceNotFoundError) or isinstance(e, ApiValidationError):
             raise e
-        raise ApiValidationError(str(e)) 
+        raise ApiValidationError(str(e))
+
+@apps_bp.route('/user/apps', methods=['GET'])
+@jwt_required()
+def get_user_apps():
+    """Obtener las apps compradas por el usuario autenticado"""
+    user_id = get_jwt_identity()
+    user_apps = UserApp.query.filter_by(user_id=user_id).all()
+    apps = [ua.app.to_dict() | {'is_favorite': ua.is_favorite, 'purchased_at': ua.purchased_at.isoformat() if ua.purchased_at else None} for ua in user_apps]
+    return jsonify({'apps': apps}), 200
+
+@apps_bp.route('/user/favorites', methods=['GET'])
+@jwt_required()
+def get_user_favorites():
+    """Obtener las apps favoritas del usuario autenticado"""
+    user_id = get_jwt_identity()
+    user_apps = UserApp.query.filter_by(user_id=user_id, is_favorite=True).all()
+    apps = [ua.app.to_dict() | {'is_favorite': ua.is_favorite, 'purchased_at': ua.purchased_at.isoformat() if ua.purchased_at else None} for ua in user_apps]
+    return jsonify({'apps': apps}), 200
+
+@apps_bp.route('/user/apps/<string:app_id>/purchase', methods=['POST'])
+@jwt_required()
+def purchase_app(app_id):
+    """Comprar una app (asociar app al usuario)"""
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    # Definir límites por plan
+    PLAN_LIMITS = {
+        'basic': 15,
+        'pro': 25,
+        'premium': 30
+    }
+    plan = getattr(user, 'plan', 'basic')
+    max_apps = PLAN_LIMITS.get(plan, 15)
+    # Contar apps compradas
+    current_count = UserApp.query.filter_by(user_id=user_id).count()
+    if current_count >= max_apps:
+        return jsonify({'error': f'Límite de apps alcanzado para tu plan ({plan}). Máximo permitido: {max_apps}'}), 403
+    # Verificar si ya la compró
+    existing = UserApp.query.filter_by(user_id=user_id, app_id=app_id).first()
+    if existing:
+        return jsonify({'message': 'Ya tienes esta app', 'app': existing.to_dict()}), 200
+    # Verificar que la app exista
+    app = App.query.get(app_id)
+    if not app:
+        raise ResourceNotFoundError(f"Aplicación {app_id} no encontrada")
+    user_app = UserApp(user_id=user_id, app_id=app_id)
+    db.session.add(user_app)
+    db.session.commit()
+    return jsonify({'message': 'App comprada exitosamente', 'app': user_app.to_dict()}), 201
+
+@apps_bp.route('/user/apps/<string:app_id>/favorite', methods=['POST'])
+@jwt_required()
+def toggle_favorite_app(app_id):
+    """Marcar o desmarcar una app como favorita"""
+    user_id = get_jwt_identity()
+    user_app = UserApp.query.filter_by(user_id=user_id, app_id=app_id).first()
+    if not user_app:
+        return jsonify({'error': 'Primero debes comprar la app'}), 400
+    # Alternar favorito
+    user_app.is_favorite = not user_app.is_favorite
+    db.session.commit()
+    return jsonify({'message': 'Estado de favorito actualizado', 'app': user_app.to_dict()}), 200 
