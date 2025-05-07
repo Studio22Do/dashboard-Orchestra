@@ -13,8 +13,8 @@ const TEST_CREDENTIALS = {
 // Estado inicial
 const initialState = {
   user: null,
-  token: null,
-  isAuthenticated: localStorage.getItem('token') ? true : false,
+  token: "dev_mock_token", // Token falso para desarrollo
+  isAuthenticated: true, // Siempre autenticado para desarrollo
   loading: false,
   error: null,
   passwordChangeSuccess: false,

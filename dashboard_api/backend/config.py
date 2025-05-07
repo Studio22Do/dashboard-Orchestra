@@ -23,12 +23,14 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Configuración de RapidAPI
-    RAPIDAPI_KEY = os.environ.get('RAPIDAPI_KEY', '')
+    RAPIDAPI_KEY = os.environ.get('RAPIDAPI_KEY', '9dc7412cabmsh04d2de9d55522bap1643f6jsn6e3113942f4a')
     RAPIDAPI_INSTAGRAM_HOST = os.environ.get('RAPIDAPI_INSTAGRAM_HOST', 'instagram-statistics-api.p.rapidapi.com')
     RAPIDAPI_INSTAGRAM_REALTIME_HOST = os.environ.get('RAPIDAPI_INSTAGRAM_REALTIME_HOST', 'instagram-realtimeapi.p.rapidapi.com')
     RAPIDAPI_GOOGLE_TRENDS_HOST = os.environ.get('RAPIDAPI_GOOGLE_TRENDS_HOST', 'google-trends.p.rapidapi.com')
     RAPIDAPI_GOOGLE_PAID_SEARCH_HOST = os.environ.get('RAPIDAPI_GOOGLE_PAID_SEARCH_HOST', 'google-paid-search-api.p.rapidapi.com')
     RAPIDAPI_SCRAPTIK_HOST = os.environ.get('RAPIDAPI_SCRAPTIK_HOST', 'scraptik.p.rapidapi.com')
+    RAPIDAPI_YOUTUBE_MEDIA_HOST = os.environ.get('RAPIDAPI_YOUTUBE_MEDIA_HOST', 'youtube-media-downloader.p.rapidapi.com')
+    RAPIDAPI_FILE_CONVERTER_HOST = os.environ.get('RAPIDAPI_FILE_CONVERTER_HOST', 'all-in-one-file-converter.p.rapidapi.com')
 
     # Instagram API config
     INSTAGRAM_API_BASE_URL = os.environ.get('INSTAGRAM_API_BASE_URL')

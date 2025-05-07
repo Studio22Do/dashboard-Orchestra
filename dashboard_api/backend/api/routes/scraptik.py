@@ -19,48 +19,28 @@ logger = logging.getLogger(__name__)
 @scraptik_bp.route('/user', methods=['GET'])
 @jwt_required()
 def get_user_info():
-    """Obtener información de un usuario de TikTok"""
-    try:
-        # Obtener parámetros
-        username = request.args.get('username')
-        
-        # Configurar la API directamente sin usar la utilidad
-        api_url = "https://scraptik.p.rapidapi.com/web/get-user"
-        
-        headers = {
-            "X-RapidAPI-Key": "9dc7412cabmsh04d2de9d55522bap1643f6jsn6e3113942f4a",  # Usar la clave directamente
-            "X-RapidAPI-Host": "scraptik.p.rapidapi.com"
-        }
-        
-        params = {"username": username}
-        
-        # Hacer la solicitud HTTP directamente
-        response = requests.get(api_url, headers=headers, params=params)
-        
-        # Si hay un error, mostrar detalles
-        if response.status_code != 200:
-            error_detail = {
-                "status_code": response.status_code,
-                "response_text": response.text,
-                "url": api_url,
-                "params": params
-            }
-            return jsonify({"error": "Error en la API", "details": error_detail}), 500
-        
-        # Intentar devolver los datos JSON
-        try:
-            result = response.json()
-            return jsonify(result), 200
-        except Exception as e:
-            return jsonify({"error": "Error al procesar JSON", "details": str(e), "text": response.text}), 500
-            
-    except Exception as e:
-        # Capturar cualquier excepción y mostrar detalles
-        error_detail = {
-            "error": str(e),
-            "traceback": traceback.format_exc()
-        }
-        return jsonify({"error": "Error en el servidor", "details": error_detail}), 500
+    """Obtener información de un usuario de TikTok usando sec_user_id (ScrapTik)"""
+    sec_user_id = request.args.get('sec_user_id')
+    current_user_id = get_jwt_identity()
+    
+    if not sec_user_id:
+        return jsonify({"error": "Se requiere el parámetro sec_user_id"}), 400
+
+    api_url = "https://scraptik.p.rapidapi.com/get-user"
+    headers = get_rapidapi_headers(current_app.config['RAPIDAPI_SCRAPTIK_HOST'])
+    params = {"sec_user_id": sec_user_id}
+    
+    # Realizar llamada a la API
+    result = call_rapidapi(
+        app_id=APP_ID,
+        user_id=current_user_id,
+        method="GET",
+        url=api_url,
+        params=params,
+        headers=headers
+    )
+    
+    return jsonify(result), 200
 
 @scraptik_bp.route('/user-posts', methods=['GET'])
 @jwt_required()
@@ -276,7 +256,7 @@ def search_hashtags():
         headers=headers
     )
     
-    return jsonify(result), 200
+    return jsonify(result), 200 
 
 @scraptik_bp.route('/trending-creators', methods=['GET'])
 @jwt_required()
@@ -366,4 +346,52 @@ def get_music():
         headers=headers
     )
     
-    return jsonify(result), 200 
+    return jsonify(result), 200
+
+@scraptik_bp.route('/user-by-username', methods=['GET'])
+@jwt_required()
+def get_user_by_username():
+    """Obtener información de un usuario de TikTok usando el username (flujo automático)"""
+    username = request.args.get('username')
+    current_user_id = get_jwt_identity()
+
+    if not username:
+        return jsonify({"error": "Se requiere el parámetro username"}), 400
+
+    # Paso 1: Buscar el usuario para obtener el sec_user_id
+    search_url = "https://scraptik.p.rapidapi.com/search-users"
+    headers = get_rapidapi_headers(current_app.config['RAPIDAPI_SCRAPTIK_HOST'])
+    params = {"keyword": username, "count": 1, "cursor": 0}
+
+    search_result = call_rapidapi(
+        app_id=APP_ID,
+        user_id=current_user_id,
+        method="GET",
+        url=search_url,
+        params=params,
+        headers=headers
+    )
+
+    # Extraer sec_user_id
+    users = search_result.get('users') or search_result.get('data') or []
+    if not users or not isinstance(users, list):
+        return jsonify({"error": "No se encontró el usuario en TikTok"}), 404
+
+    sec_user_id = users[0].get('secUid') or users[0].get('sec_user_id')
+    if not sec_user_id:
+        return jsonify({"error": "No se pudo obtener el sec_user_id del usuario"}), 404
+
+    # Paso 2: Consultar el perfil con sec_user_id
+    user_url = "https://scraptik.p.rapidapi.com/get-user"
+    user_params = {"sec_user_id": sec_user_id}
+
+    user_result = call_rapidapi(
+        app_id=APP_ID,
+        user_id=current_user_id,
+        method="GET",
+        url=user_url,
+        params=user_params,
+        headers=headers
+    )
+
+    return jsonify(user_result), 200 

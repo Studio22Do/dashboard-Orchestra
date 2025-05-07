@@ -69,3 +69,36 @@ def get_profile_by_id():
     )
     
     return jsonify(result), 200 
+
+@instagram_bp.route('/followers', methods=['GET'])
+@jwt_required()
+def get_followers():
+    """Obtener información de seguidores de un usuario de Instagram usando RapidAPI"""
+    username = request.args.get('username')
+    cid = request.args.get('cid')
+    current_user_id = get_jwt_identity()
+
+    api_url = f"https://{current_app.config['RAPIDAPI_INSTAGRAM_HOST']}/community"
+    headers = get_rapidapi_headers()
+    params = None
+
+    if username:
+        # Construir la URL de Instagram
+        profile_url = f"https://www.instagram.com/{username}/"
+        params = {"url": profile_url}
+    elif cid:
+        params = {"cid": cid}
+    else:
+        raise ValidationError("Debes proporcionar un username o un cid")
+
+    # Realizar llamada a la API
+    result = call_rapidapi(
+        app_id=APP_ID,
+        user_id=current_user_id,
+        method="GET",
+        url=api_url,
+        params=params,
+        headers=headers
+    )
+
+    return jsonify(result), 200 

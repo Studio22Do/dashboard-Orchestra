@@ -26,37 +26,51 @@ def create_app(config_name=None):
         else:
             config_name = 'default'
     
+    print(f"Inicializando aplicación Flask con configuración: {config_name}")
+    
     # Inicializar aplicación
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     
     # Habilitar CORS para todas las rutas con soporte para credenciales
     CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
+    print("CORS configurado para todas las rutas /api/*")
     
     # Inicializar JWT para autenticación
     jwt = JWTManager(app)
+    print("JWT inicializado")
     
     # Configurar logging
     configure_logging(app)
+    print("Logging configurado")
     
     # Registrar manejadores de errores
     register_error_handlers(app)
+    print("Manejadores de errores registrados")
     
     # Registrar blueprints
     register_blueprints(app)
+    print("Blueprints registrados desde blueprints/__init__.py")
     
     # Inicializar base de datos
     db.init_app(app)
+    print("Base de datos inicializada")
     
     # Ruta de estado para verificación de salud
     @app.route('/health')
     def health_check():
+        print("Accediendo a ruta /health")
         return {
             'status': 'online',
             'version': app.config['VERSION']
-        }
+        }    
+    # Listar todas las rutas registradas
+    print("Rutas registradas en la aplicación:")
+    for rule in app.url_map.iter_rules():
+        print(f"  {rule.endpoint} -> {rule.rule} [{', '.join(rule.methods)}]")
     
     logger.info(f"Aplicación inicializada en modo: {config_name}")
+    print(f"Aplicación Flask inicializada completamente en modo: {config_name}")
     
     return app
 
@@ -113,4 +127,5 @@ if os.environ.get('FLASK_ENV') == 'development' or not os.environ.get('FLASK_ENV
 """
 
 if __name__ == '__main__':
+    print(f"Iniciando servidor en: http://0.0.0.0:{os.environ.get('PORT', 5000)}")
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=app.config['DEBUG'])

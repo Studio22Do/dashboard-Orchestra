@@ -46,7 +46,7 @@ const UserSearch = ({ setError }) => {
     setLoading(true);
     
     try {
-      const response = await axios.get('/api/tiktok/user', {
+      const response = await axios.get('/api/tiktok/user-by-username', {
         params: { username: cleanUsername },
         headers: {
           'Authorization': `Bearer ${token}`

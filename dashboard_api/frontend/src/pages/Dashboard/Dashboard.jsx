@@ -15,7 +15,28 @@ import {
   Analytics,
   MonetizationOn,
   AlternateEmail,
-  Videocam
+  Videocam,
+  Transform,
+  PictureAsPdf,
+  AudioFile,
+  Image,
+  Mic,
+  Code,
+  ChatBubble,
+  Architecture,
+  Cloud,
+  Assessment,
+  Insights,
+  Summarize,
+  Storage,
+  BarChart,
+  Https,
+  Public,
+  Link,
+  DomainVerification,
+  ShoppingCart,
+  Visibility,
+  Settings
 } from '@mui/icons-material';
 
 const DashboardContainer = styled(Container)(({ theme }) => ({
@@ -77,15 +98,80 @@ const Dashboard = () => {
           id: 'youtube-downloader',
           title: 'YouTube Media Downloader',
           icon: YouTube,
-          onClick: () => console.log('YouTube Downloader clicked')
+          onClick: () => navigate('/youtube-media')
+        },
+        {
+          id: 'file-converter',
+          title: 'All-in-One File Converter',
+          icon: Transform,
+          onClick: () => navigate('/file-converter')
+        },
+        {
+          id: 'midjourney',
+          title: 'Midjourney Best Experience',
+          icon: Image,
+          onClick: () => navigate('/apps/midjourney-experience')
         },
         {
           id: 'word-count',
           title: 'Word Count',
           icon: Description,
-          onClick: () => console.log('Word Count clicked')
+          onClick: () => navigate('/apps/word-count')
         },
-        // Añade más herramientas aquí
+        {
+          id: 'pdf-to-text',
+          title: 'PDF to Text Converter',
+          icon: PictureAsPdf,
+          onClick: () => navigate('/apps/pdf-to-text')
+        },
+        {
+          id: 'snap-video',
+          title: 'Snap Video',
+          icon: Videocam,
+          onClick: () => navigate('/apps/snap-video')
+        },
+        {
+          id: 'gerwin-ai',
+          title: 'Gerwin AI Beta',
+          icon: Architecture,
+          onClick: () => navigate('/apps/gerwin-ai-beta')
+        },
+        {
+          id: 'openai-tts',
+          title: 'OpenAI Text to Speech',
+          icon: Mic,
+          onClick: () => navigate('/apps/openai-text-to-speech')
+        },
+        {
+          id: 'genie-ai',
+          title: 'GenieAI - ChatGPT-3 Model',
+          icon: ChatBubble,
+          onClick: () => navigate('/apps/genieai-chatgpt3')
+        },
+        {
+          id: 'ai-social-media',
+          title: 'AI Social Media Content Generator',
+          icon: Instagram,
+          onClick: () => navigate('/apps/ai-social-media-content-generator')
+        },
+        {
+          id: 'image-manipulation',
+          title: 'Advanced Image Manipulation API',
+          icon: Transform,
+          onClick: () => navigate('/apps/advanced-image-manipulation')
+        },
+        {
+          id: 'whisper-url',
+          title: 'Whisper: From URL',
+          icon: AudioFile,
+          onClick: () => navigate('/apps/whisper-from-url')
+        },
+        {
+          id: 'runwayml',
+          title: 'RunwayML',
+          icon: Cloud,
+          onClick: () => navigate('/apps/runwayml')
+        }
       ]
     },
     {
@@ -97,15 +183,68 @@ const Dashboard = () => {
           id: 'seo-analyzer',
           title: 'SEO Analyzer',
           icon: Analytics,
-          onClick: () => console.log('SEO Analyzer clicked')
+          onClick: () => navigate('/apps/seo-analyzer')
+        },
+        {
+          id: 'similar-web',
+          title: 'Similar Web Insights',
+          icon: Insights,
+          onClick: () => navigate('/apps/similar-web-insights')
+        },
+        {
+          id: 'google-keyword',
+          title: 'Google Keyword Insights',
+          icon: Search,
+          onClick: () => navigate('/apps/google-keyword-insights')
+        },
+        {
+          id: 'domain-metrics',
+          title: 'Domain Metrics Check',
+          icon: DomainVerification,
+          onClick: () => navigate('/apps/domain-metrics-check')
+        },
+        {
+          id: 'ahrefs-checker',
+          title: 'Ahrefs DR & Rank Checker',
+          icon: Assessment,
+          onClick: () => navigate('/apps/ahrefs-checker')
         },
         {
           id: 'page-speed',
           title: 'Page Speed Insights',
           icon: Speed,
-          onClick: () => console.log('Page Speed clicked')
+          onClick: () => navigate('/apps/page-speed-insights')
         },
-        // Añade más herramientas aquí
+        {
+          id: 'ecommerce-description',
+          title: 'AI eCommerce Product Description Generator',
+          icon: ShoppingCart,
+          onClick: () => navigate('/apps/ecommerce-description-generator')
+        },
+        {
+          id: 'ssl-checker',
+          title: 'SSL Checker',
+          icon: Https,
+          onClick: () => navigate('/apps/ssl-checker')
+        },
+        {
+          id: 'website-status',
+          title: 'Check if WEBSITE is UP or DOWN',
+          icon: Public,
+          onClick: () => navigate('/apps/website-status-checker')
+        },
+        {
+          id: 'url-shortener',
+          title: 'URL Link Shortener and QR Code Generator',
+          icon: Link,
+          onClick: () => navigate('/apps/url-shortener')
+        },
+        {
+          id: 'seo-mastermind',
+          title: 'SEO Mastermind – AI Keyword, Meta & Title Generator',
+          icon: Settings,
+          onClick: () => navigate('/apps/seo-mastermind')
+        }
       ]
     }
   ];
@@ -119,6 +258,14 @@ const Dashboard = () => {
             title={category.title}
             icon={category.icon}
             tools={category.tools}
+            onViewAll={() => {
+              // Navegar a la vista de apps con filtro preseleccionado
+              const categoryPath = category.id === 'social-listening' ? 'Social Media' :
+                                 category.id === 'ux-ui' ? 'Creative & Content' :
+                                 category.id === 'web-seo' ? 'Web & SEO' : '';
+              
+              navigate('/apps', { state: { preselectedCategory: categoryPath } });
+            }}
           />
         ))}
       </Box>

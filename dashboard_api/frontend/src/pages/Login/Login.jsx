@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { 
   Box, 
-  Card, 
-  CardContent, 
   TextField, 
   Button, 
   Typography, 
@@ -10,13 +8,53 @@ import {
   IconButton,
   useTheme,
   Alert,
-  CircularProgress
+  CircularProgress,
+  styled
 } from '@mui/material';
-import { Visibility, VisibilityOff, Email, Lock } from '@mui/icons-material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks/reduxHooks';
 import { loginUser, selectAuth, clearErrors } from '../../redux/slices/authSlice';
 import { addNotification } from '../../redux/slices/uiSlice';
+
+// Componentes estilizados para el nuevo diseño
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-root': {
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backdropFilter: 'blur(10px)',
+    '& fieldset': {
+      borderColor: 'rgba(255, 255, 255, 0.2)',
+    },
+    '&:hover fieldset': {
+      borderColor: '#837CF3',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#837CF3',
+    },
+  },
+  '& .MuiInputLabel-root': {
+    color: 'rgba(255, 255, 255, 0.7)',
+  },
+  '& .MuiInputBase-input': {
+    color: 'white',
+  },
+  '& .MuiInputAdornment-root .MuiSvgIcon-root': {
+    color: 'rgba(255, 255, 255, 0.7)',
+  },
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  backgroundColor: '#837CF3',
+  borderRadius: 12,
+  padding: '12px 0',
+  textTransform: 'none',
+  fontSize: '1rem',
+  fontWeight: 500,
+  '&:hover': {
+    backgroundColor: '#9256E2',
+  },
+}));
 
 const Login = () => {
   const theme = useTheme();
@@ -88,114 +126,106 @@ const Login = () => {
       sx={{
         minHeight: '100vh',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: theme.palette.background.default,
-        p: 2
+        // No establecemos el fondo aquí ya que el usuario lo colocará como plantilla
+        p: 2,
       }}
     >
-      <Card
+      <Box sx={{ textAlign: 'center', mb: 6 }}>
+        <Typography 
+          variant="h1" 
+          component="h1" 
+          sx={{ 
+            fontSize: '4rem', 
+            fontWeight: 500, 
+            color: 'white',
+            letterSpacing: '-0.5px',
+            mb: 4
+          }}
+        >
+          Sympho.
+        </Typography>
+      </Box>
+      
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
         sx={{
-          maxWidth: 400,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3,
           width: '100%',
-          borderRadius: 2,
-          boxShadow: '0 8px 40px rgba(0,0,0,0.12)',
+          maxWidth: 400,
         }}
       >
-        <CardContent sx={{ p: 4 }}>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 3
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        <Box>
+          <Typography sx={{ mb: 1, color: 'white' }}>Correo</Typography>
+          <StyledTextField
+            fullWidth
+            placeholder="Ingresa tu correo"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            variant="outlined"
+            InputProps={{
+              inputProps: {
+                style: { padding: '16px' }
+              }
             }}
-          >
-            <Box sx={{ textAlign: 'center', mb: 2 }}>
-              <Typography variant="h4" component="h1" gutterBottom>
-                Sympho
-              </Typography>
-              <Typography variant="subtitle1" color="primary" gutterBottom>
-                by Studio22
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Plataforma centralizada de inteligencia y automatización de marketing
-              </Typography>
-            </Box>
+          />
+        </Box>
 
-            {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
-              </Alert>
-            )}
+        <Box>
+          <Typography sx={{ mb: 1, color: 'white' }}>Contraseña</Typography>
+          <StyledTextField
+            fullWidth
+            placeholder="Ingresa tu contraseña"
+            name="password"
+            type={showPassword ? 'text' : 'password'}
+            value={formData.password}
+            onChange={handleChange}
+            variant="outlined"
+            InputProps={{
+              inputProps: {
+                style: { padding: '16px' }
+              },
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                    sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
 
-            <TextField
-              fullWidth
-              label="Email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Email color="action" />
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <TextField
-              fullWidth
-              label="Contraseña"
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              value={formData.password}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock color="action" />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              fullWidth
-              disabled={loading}
-              sx={{
-                mt: 2,
-                height: 48,
-                borderRadius: 2,
-                textTransform: 'none',
-                fontSize: '1.1rem',
-              }}
-            >
-              {loading ? <CircularProgress size={24} /> : 'Iniciar Sesión'}
-            </Button>
-
-            <Box sx={{ textAlign: 'center', mt: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-              </Typography>
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
+        <StyledButton
+          type="submit"
+          variant="contained"
+          fullWidth
+          disabled={loading}
+          sx={{
+            mt: 2,
+            boxShadow: '0 4px 10px rgba(131, 124, 243, 0.3)',
+          }}
+        >
+          {loading ? <CircularProgress size={24} /> : 'Iniciar Sesión'}
+        </StyledButton>
+      </Box>
     </Box>
   );
 };
