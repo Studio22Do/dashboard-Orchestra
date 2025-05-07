@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -38,6 +38,7 @@ import {
   Visibility,
   Settings
 } from '@mui/icons-material';
+import AppDetailDrawer from '../../components/AppDetailDrawer/AppDetailDrawer';
 
 const DashboardContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(4),
@@ -48,6 +49,8 @@ const DashboardContainer = styled(Container)(({ theme }) => ({
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [selectedApp, setSelectedApp] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Definición de las herramientas por categoría
   const categories = [
@@ -60,7 +63,18 @@ const Dashboard = () => {
           id: 'instagram-stats',
           title: 'Instagram Statistics API',
           icon: Instagram,
-          onClick: () => navigate('/apps/instagram')
+          onClick: () => {
+            setSelectedApp({
+              id: 'instagram-stats',
+              title: 'Instagram Statistics',
+              description: 'Analiza perfiles de Instagram, obtén estadísticas y monitorea crecimiento',
+              imageUrl: 'https://cdn.pixabay.com/photo/2016/08/09/17/52/instagram-1581266_960_720.jpg',
+              category: 'Social Media',
+              route: '/apps/instagram',
+              apiName: 'Instagram Statistics API',
+            });
+            setDrawerOpen(true);
+          }
         },
         {
           id: 'google-trends',
@@ -269,6 +283,11 @@ const Dashboard = () => {
           />
         ))}
       </Box>
+      <AppDetailDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        app={selectedApp}
+      />
     </DashboardContainer>
   );
 };

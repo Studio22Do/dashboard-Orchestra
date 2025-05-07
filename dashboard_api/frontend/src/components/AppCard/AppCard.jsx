@@ -6,12 +6,31 @@ import {
   Button, 
   Typography, 
   Chip, 
-  Box
+  Box, 
+  IconButton
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { purchaseApp, toggleFavoriteApp } from '../../redux/slices/appsSlice';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 
-const AppCard = ({ id, title, description, imageUrl, category, route, apiName }) => {
+const AppCard = ({ id, title, description, imageUrl, category, route, apiName, isPurchased, is_favorite, showFavorite }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleAction = () => {
+    if (isPurchased) {
+      navigate(route);
+    } else {
+      dispatch(purchaseApp(id));
+    }
+  };
+
+  const handleToggleFavorite = (e) => {
+    e.stopPropagation();
+    dispatch(toggleFavoriteApp(id));
+  };
 
   return (
     <Card 
@@ -23,9 +42,28 @@ const AppCard = ({ id, title, description, imageUrl, category, route, apiName })
         '&:hover': {
           transform: 'translateY(-4px)',
           boxShadow: '0 12px 20px rgba(0,0,0,0.1)',
-        }
+        },
+        position: 'relative'
       }}
     >
+      {/* Estrellita de favoritos */}
+      {showFavorite && (
+        <IconButton
+          onClick={handleToggleFavorite}
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            zIndex: 2,
+            color: is_favorite ? '#FFD600' : 'rgba(255,255,255,0.5)',
+            background: 'rgba(30,30,40,0.7)',
+            '&:hover': { color: '#FFD600', background: 'rgba(30,30,40,0.9)' }
+          }}
+          size="small"
+        >
+          {is_favorite ? <StarIcon /> : <StarBorderIcon />}
+        </IconButton>
+      )}
       <CardMedia
         component="img"
         height="140"
@@ -57,10 +95,11 @@ const AppCard = ({ id, title, description, imageUrl, category, route, apiName })
         <Button 
           size="small" 
           fullWidth 
-          variant="contained"
-          onClick={() => navigate(route)}
+          variant={isPurchased ? "contained" : "outlined"}
+          color={isPurchased ? "primary" : "success"}
+          onClick={handleAction}
         >
-          Abrir App
+          {isPurchased ? 'Abrir App' : 'Agregar'}
         </Button>
       </CardActions>
     </Card>

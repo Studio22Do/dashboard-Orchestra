@@ -92,11 +92,27 @@ export const fetchFavoriteApps = createAsyncThunk(
   }
 );
 
+// Helper para saber si estamos en modo mock (no hay backend o la respuesta es vacía)
+const isMockMode = () => {
+  // Si no hay backend o la respuesta de /apps es MOCK_APPS_DATA
+  return !window.localStorage.getItem('useRealBackend');
+};
+
 export const purchaseApp = createAsyncThunk(
   'apps/purchaseApp',
   async (appId, { rejectWithValue, getState }) => {
+    const state = getState();
+    const token = state.auth.token || localStorage.getItem('token');
+    // Si estamos en modo mock, simular la compra
+    if (isMockMode()) {
+      // Buscar la app en el mock
+      const app = MOCK_APPS_DATA.find(a => a.id === appId);
+      if (!app) return rejectWithValue('App no encontrada en mock');
+      // Simular la estructura de una app comprada
+      return { ...app, app_id: app.id, is_favorite: false, purchased_at: new Date().toISOString() };
+    }
+    // Si hay backend, llamar al endpoint real
     try {
-      const token = getState().auth.token || localStorage.getItem('token');
       const response = await axios.post(`${API_URL}/apps/user/apps/${appId}/purchase`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -122,8 +138,30 @@ export const toggleFavoriteApp = createAsyncThunk(
   }
 );
 
+// Thunk para obtener todas las apps disponibles (con fallback a mock)
+export const fetchAllApps = createAsyncThunk(
+  'apps/fetchAllApps',
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const token = getState().auth.token || localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/apps`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Si la respuesta es vacía, usar el mock
+      if (!response.data.apps || response.data.apps.length === 0) {
+        return MOCK_APPS_DATA;
+      }
+      return response.data.apps;
+    } catch (error) {
+      // Si hay error de red o backend, usar el mock
+      return MOCK_APPS_DATA;
+    }
+  }
+);
+
 // Estado inicial
 const initialState = {
+  allApps: [],
   purchasedApps: [],
   favoriteApps: [],
   loading: false,
@@ -252,6 +290,18 @@ const appsSlice = createSlice({
         } else {
           state.favoriteApps = state.favoriteApps.filter(app => app.app_id !== action.payload.app_id && app.id !== action.payload.app_id);
         }
+      })
+      .addCase(fetchAllApps.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllApps.fulfilled, (state, action) => {
+        state.loading = false;
+        state.allApps = action.payload;
+      })
+      .addCase(fetchAllApps.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
@@ -265,5 +315,6 @@ export const selectPurchasedApps = (state) => state.apps.purchasedApps;
 export const selectFavoriteApps = (state) => state.apps.favoriteApps;
 export const selectAppsLoading = (state) => state.apps.loading;
 export const selectAppsError = (state) => state.apps.error;
+export const selectAllApps = (state) => state.apps.allApps;
 
 export default appsSlice.reducer; 

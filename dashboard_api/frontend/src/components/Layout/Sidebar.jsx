@@ -65,19 +65,9 @@ const Sidebar = () => {
 
   return (
     <StyledDrawer variant="permanent">
-      <LogoWrapper>
-        <Typography 
-          variant="h3" 
-          sx={{
-            fontWeight: 600, 
-            fontSize: '2rem',
-            color: 'white',
-            fontFamily: "'Poppins', sans-serif"
-          }}
-        >
-          Sympho.
-        </Typography>
-      </LogoWrapper>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 3 }}>
+        <img src="/logo1.png" alt="Logo Sympho" style={{ width: 120, marginBottom: 16 }} />
+      </Box>
       <List>
         {/* Menú estático */}
         {staticMenuItems.map((item) => (

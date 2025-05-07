@@ -33,16 +33,14 @@ const AppCatalog = () => {
     if (preselectedCategory && CATEGORIES.includes(preselectedCategory)) {
       setActiveCategory(preselectedCategory);
     } else {
-      // Si no hay categoría preseleccionada, mostrar la primera por defecto
       setActiveCategory(CATEGORIES[0]);
     }
-    // eslint-disable-next-line
-  }, [location.state, purchasedApps.length]);
+  }, [location.state, CATEGORIES]);
 
   // Filtrar apps según búsqueda y categoría actual
   const filteredApps = purchasedApps.filter(app => {
-    const matchesSearch = app.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                        app.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = app.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                        app.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = activeCategory === 'All' || app.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
@@ -63,7 +61,7 @@ const AppCatalog = () => {
       </Box>
       
       <Typography variant="body1" color="text.secondary" paragraph>
-        Explora tus aplicaciones compradas para {activeCategory === 'All' ? 'todas las categorías' : activeCategory.toLowerCase()}
+        Explora tus aplicaciones agregadas para {activeCategory === 'All' ? 'todas las categorías' : activeCategory.toLowerCase()}
       </Typography>
 
       <Box sx={{ mb: 4 }}>
@@ -109,15 +107,17 @@ const AppCatalog = () => {
 
       <Grid container spacing={3}>
         {filteredApps.length > 0 ? (
-          filteredApps.map(app => (
-            <Grid item key={app.app_id || app.id} xs={12} sm={6} md={4}>
-              <AppCard {...app} />
-            </Grid>
-          ))
+          filteredApps
+            .filter(app => app && (app.id || app.app_id))
+            .map(app => (
+              <Grid item key={app.app_id || app.id} xs={12} sm={6} md={4}>
+                <AppCard {...app} isPurchased={true} showFavorite={true} is_favorite={app.is_favorite} />
+              </Grid>
+            ))
         ) : (
           <Box sx={{ py: 4, textAlign: 'center', width: '100%' }}>
             <Typography variant="body1" color="text.secondary">
-              No tienes aplicaciones compradas que coincidan con tu búsqueda.
+              Aún no has agregado ninguna aplicación. ¡Explora el Dashboard y agrega tus favoritas!
             </Typography>
           </Box>
         )}

@@ -12,6 +12,8 @@
 9. [Ejemplos de Uso](#ejemplos-de-uso)
 10. [Solución de Problemas](#solución-de-problemas)
 11. [Modo Desarrollo vs. Modo Producción: Acceso al Panel con o sin Login](#modo-desarrollo-vs-modo-producción-acceso-al-panel-con-o-sin-login)
+12. [Uso de Mock de Apps en el Frontend y Migración a Datos Reales](#uso-de-mock-de-apps-en-el-frontend-y-migración-a-datos-reales)
+13. [Transición de Mock a Producción: Catálogo y Características de Apps](#transición-de-mock-a-producción-catálogo-y-características-de-apps)
 
 ## Descripción General
 
@@ -346,5 +348,50 @@ Con esto, solo los usuarios autenticados podrán acceder al panel. Si no están 
 - El estado de autenticación se maneja en `src/redux/slices/authSlice.js`.
 - El login real requiere que el backend y la base de datos estén funcionando correctamente.
 - Para pruebas rápidas, puedes alternar entre ambos modos según lo necesites.
+
+## Uso de Mock de Apps en el Frontend y Migración a Datos Reales
+
+Durante el desarrollo, el frontend utiliza un mock de aplicaciones (`MOCK_APPS_DATA`) para simular la lista de apps disponibles en el Dashboard y Apps cuando la base de datos aún no tiene apps cargadas.
+
+### ¿Cómo funciona?
+- El thunk `fetchAllApps` en `appsSlice.js` primero intenta obtener las apps desde el backend (`/api/apps`).
+- Si la respuesta es vacía o hay un error de red/backend, automáticamente usa el mock (`MOCK_APPS_DATA`).
+- Así puedes desarrollar y probar toda la lógica de compra, favoritos, límites por plan, etc., aunque la base de datos esté vacía.
+
+### ¿Cómo migrar a datos reales?
+1. **Carga tus apps en la base de datos** (puedes usar un script, admin panel o insertarlas manualmente).
+2. **Verifica que el endpoint `/api/apps` del backend devuelva la lista de apps.**
+3. **¡Listo!** El frontend dejará de usar el mock y mostrará los datos reales automáticamente, sin necesidad de cambiar el código.
+
+> **Nota:** El mock es solo un fallback temporal. Cuando el backend esté listo, no tendrás que modificar el frontend para mostrar las apps reales.
+
+## Transición de Mock a Producción: Catálogo y Características de Apps
+
+Durante el desarrollo, el uso de datos mock (simulados) permite construir y probar la experiencia de usuario sin depender de la base de datos real ni de la integración completa con RapidAPI. Sin embargo, en la fase de producción, el flujo será el siguiente:
+
+### 1. Catálogo de Apps en Producción
+- El catálogo de aplicaciones (nombre, descripción, imagen, categoría, etc.) estará almacenado en la base de datos.
+- El backend servirá la lista de apps reales disponibles para los usuarios.
+- El frontend solo mostrará las apps que realmente existen y están activas en la base de datos.
+
+### 2. Características y Detalles de Apps
+- Toda la información detallada de cada app (características, funcionalidades, imágenes, etc.) se almacenará en la base de datos.
+- El usuario podrá ver esta información dinámica al abrir el detalle de una app.
+
+### 3. Integración con RapidAPI
+- Cada app tendrá su integración real con RapidAPI (o APIs propias).
+- El backend gestionará las llamadas a RapidAPI y servirá los datos al frontend.
+- El usuario solo podrá interactuar con las APIs que realmente estén disponibles y configuradas.
+
+### 4. Acciones del Usuario (Agregar, Favoritos, etc.)
+- Todas las acciones del usuario (agregar app, marcar como favorita, etc.) se reflejarán en la base de datos y serán persistentes.
+- El mock dejará de usarse y toda la lógica será real y sincronizada con el backend.
+
+### 5. Ventajas de este enfoque
+- Permite un desarrollo ágil y pruebas rápidas con mock.
+- Garantiza una transición fluida a producción, donde solo se muestran y gestionan apps reales.
+- La experiencia del usuario será profesional, consistente y sin inconsistencias entre frontend y backend.
+
+> **Nota:** Cuando el backend y la base de datos estén listos, simplemente elimina el uso de mocks en el frontend y asegúrate de que todos los endpoints y datos provengan del backend real.
 
 ---

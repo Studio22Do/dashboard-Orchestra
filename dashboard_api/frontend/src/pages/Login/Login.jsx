@@ -133,24 +133,13 @@ const Login = () => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        // No establecemos el fondo aquí ya que el usuario lo colocará como plantilla
+        // background: 'linear-gradient(180deg, #7A62BA 0%, #05041B 100%)', // Degradado claro arriba, oscuro abajo
+        background: 'linear-gradient(180deg, #05041B 0%, #7A62BA 100%)', // Degradado oscuro arriba, claro abajo
         p: 2,
       }}
     >
       <Box sx={{ textAlign: 'center', mb: 6 }}>
-        <Typography 
-          variant="h1" 
-          component="h1" 
-          sx={{ 
-            fontSize: '4rem', 
-            fontWeight: 500, 
-            color: 'white',
-            letterSpacing: '-0.5px',
-            mb: 4
-          }}
-        >
-          Sympho.
-        </Typography>
+        <img src="/logo1.png" alt="Logo Sympho" style={{ width: 290, marginBottom: 24 }} />
       </Box>
       
       <Box

@@ -20,6 +20,7 @@ import { selectTheme } from './redux/slices/uiSlice';
 import Analytics from './pages/Analytics/Analytics';
 import Profile from './pages/Profile/Profile';
 import ChangePassword from './pages/Profile/ChangePassword';
+import theme from './theme';
 
 // Theme configuration function
 const createAppTheme = (mode) => createTheme({
