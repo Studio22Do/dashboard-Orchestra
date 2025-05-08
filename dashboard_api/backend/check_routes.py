@@ -25,21 +25,8 @@ def check_routes():
     # Ordenar rutas por endpoint
     all_routes.sort(key=lambda x: x['endpoint'])
     
-    # Filtrar rutas de crypto
-    crypto_routes = [r for r in all_routes if 'crypto' in r['endpoint']]
-    
     # Mostrar estadísticas
     print(f"Total de rutas registradas: {len(all_routes)}")
-    print(f"Rutas de crypto: {len(crypto_routes)}")
-    
-    # Mostrar rutas de crypto
-    if crypto_routes:
-        print("\n----- RUTAS DE CRYPTO ENCONTRADAS -----")
-        for i, route in enumerate(crypto_routes, 1):
-            print(f"{i}. {route['endpoint']} -> {route['route']} [{route['methods']}]")
-    else:
-        print("\n¡ALERTA! No se encontraron rutas relacionadas con crypto")
-        print("Esto podría indicar que el blueprint de crypto no se registró correctamente.")
     
     # Mostrar información de los módulos importados
     print("\n----- VERIFICANDO MÓDULOS IMPORTADOS -----")
