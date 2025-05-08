@@ -31,6 +31,7 @@ class Config:
     RAPIDAPI_SCRAPTIK_HOST = os.environ.get('RAPIDAPI_SCRAPTIK_HOST', 'scraptik.p.rapidapi.com')
     RAPIDAPI_YOUTUBE_MEDIA_HOST = os.environ.get('RAPIDAPI_YOUTUBE_MEDIA_HOST', 'youtube-media-downloader.p.rapidapi.com')
     RAPIDAPI_FILE_CONVERTER_HOST = os.environ.get('RAPIDAPI_FILE_CONVERTER_HOST', 'all-in-one-file-converter.p.rapidapi.com')
+    
 
     # Instagram API config
     INSTAGRAM_API_BASE_URL = os.environ.get('INSTAGRAM_API_BASE_URL')
