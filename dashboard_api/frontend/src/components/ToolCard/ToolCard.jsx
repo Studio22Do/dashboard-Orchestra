@@ -2,22 +2,24 @@ import React from 'react';
 import { Card, CardContent, Typography, Box, Avatar } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-// Tarjeta con color de fondo oscuro y bordes redondeados
+// Tarjeta con gradiente vertical y borde solo en hover, animación suave
 const StyledCard = styled(Card)(({ theme }) => ({
   height: '100%',
   width: '100%',
   cursor: 'pointer',
   display: 'flex',
   flexDirection: 'column',
-  borderRadius: 12,
-  backgroundColor: '#272038', // Fondo morado oscuro
-  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+  borderRadius: 18,
+  background: 'linear-gradient(180deg, #342A5B 0%, #201C2E 100%)',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.10)',
   overflow: 'hidden',
-  transition: 'all 0.3s ease',
+  transition: 'border-color 0.35s cubic-bezier(.4,2,.3,1), background 0.5s cubic-bezier(.4,2,.3,1);',
   minHeight: 120,
+  border: '2px solid',
+  borderColor: 'transparent',
   '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
+    borderColor: '#AC9DFB',
+    background: 'linear-gradient(180deg, #201C2E 0%, #342A5B 100%)',
   },
 }));
 
