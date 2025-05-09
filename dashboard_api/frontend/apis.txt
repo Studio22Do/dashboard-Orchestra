@@ -1,0 +1,36 @@
+Social Listening (Implementadas ✅):
+Instagram Statistics API ✅
+Google Trends ✅
+Google Paid Search API ✅
+Instagram Realtime API ✅
+ScrapTik ✅
+
+Creative & Content (Parcialmente Implementadas):
+YouTube Media Downloader ✅
+All in One File Converter ✅
+Midjourney Best Experience ✅
+Word Count ✅
+PDF to Text Converter ✅
+Snap Video ✅
+Gerwin AI Beta ✅
+OpenAI Text to Speech ✅
+GenieAI - ChatGPT-3 Model ✅
+AI Social Media Content Generator ✅
+Advanced Image Manipulation API ✅
+Whisper: From URL ✅
+RunwayML ✅
+Web & SEO (No Implementada):
+SEO Analyzer ✅
+Similar Web Insights ✅
+Google Keyword Insights ✅
+Domain Metrics Check ✅
+Ahrefs DR & Rank Checker ✅
+Page Speed Insights ✅
+AI eCommerce Product Description Generator ✅
+SSL Checker ✅
+Check if WEBSITE is UP or DOWN ✅
+URL Link Shortener and QR Code Generator ✅
+SEO Mastermind – AI Keyword, Meta & Title Generator ✅
+
+
+ 

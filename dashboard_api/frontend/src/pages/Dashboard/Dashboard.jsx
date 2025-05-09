@@ -124,7 +124,7 @@ const Dashboard = () => {
           id: 'midjourney',
           title: 'Midjourney Best Experience',
           icon: Image,
-          onClick: () => navigate('/apps/midjourney-experience')
+          onClick: () => navigate('/apps/midjourney')
         },
         {
           id: 'word-count',
@@ -148,7 +148,7 @@ const Dashboard = () => {
           id: 'gerwin-ai',
           title: 'Gerwin AI Beta',
           icon: Architecture,
-          onClick: () => navigate('/apps/gerwin-ai-beta')
+          onClick: () => navigate('/apps/gerwin-ai')
         },
         {
           id: 'openai-tts',
@@ -160,25 +160,25 @@ const Dashboard = () => {
           id: 'genie-ai',
           title: 'GenieAI - ChatGPT-3 Model',
           icon: ChatBubble,
-          onClick: () => navigate('/apps/genieai-chatgpt3')
+          onClick: () => navigate('/apps/genie-ai')
         },
         {
           id: 'ai-social-media',
           title: 'AI Social Media Content Generator',
           icon: Instagram,
-          onClick: () => navigate('/apps/ai-social-media-content-generator')
+          onClick: () => navigate('/apps/ai-social-media')
         },
         {
           id: 'image-manipulation',
           title: 'Advanced Image Manipulation API',
           icon: Transform,
-          onClick: () => navigate('/apps/advanced-image-manipulation')
+          onClick: () => navigate('/apps/advanced-image')
         },
         {
           id: 'whisper-url',
           title: 'Whisper: From URL',
           icon: AudioFile,
-          onClick: () => navigate('/apps/whisper-from-url')
+          onClick: () => navigate('/apps/whisper-url')
         },
         {
           id: 'runwayml',
@@ -203,37 +203,37 @@ const Dashboard = () => {
           id: 'similar-web',
           title: 'Similar Web Insights',
           icon: Insights,
-          onClick: () => navigate('/apps/similar-web-insights')
+          onClick: () => navigate('/apps/similar-web')
         },
         {
           id: 'google-keyword',
           title: 'Google Keyword Insights',
           icon: Search,
-          onClick: () => navigate('/apps/google-keyword-insights')
+          onClick: () => navigate('/apps/keyword-insights')
         },
         {
           id: 'domain-metrics',
           title: 'Domain Metrics Check',
           icon: DomainVerification,
-          onClick: () => navigate('/apps/domain-metrics-check')
+          onClick: () => navigate('/apps/domain-metrics')
         },
         {
           id: 'ahrefs-checker',
           title: 'Ahrefs DR & Rank Checker',
           icon: Assessment,
-          onClick: () => navigate('/apps/ahrefs-checker')
+          onClick: () => navigate('/apps/ahrefs-rank')
         },
         {
           id: 'page-speed',
           title: 'Page Speed Insights',
           icon: Speed,
-          onClick: () => navigate('/apps/page-speed-insights')
+          onClick: () => navigate('/apps/page-speed')
         },
         {
           id: 'ecommerce-description',
           title: 'AI eCommerce Product Description Generator',
           icon: ShoppingCart,
-          onClick: () => navigate('/apps/ecommerce-description-generator')
+          onClick: () => navigate('/apps/product-description')
         },
         {
           id: 'ssl-checker',
@@ -245,7 +245,7 @@ const Dashboard = () => {
           id: 'website-status',
           title: 'Check if WEBSITE is UP or DOWN',
           icon: Public,
-          onClick: () => navigate('/apps/website-status-checker')
+          onClick: () => navigate('/apps/website-status')
         },
         {
           id: 'url-shortener',

@@ -2874,7 +2874,6 @@ LINE 1: ...e_time, created_at) VALUES ('google-paid-search', 'dev_user'...
 2025-05-09 09:40:51,962 DEBUG: https://scraptik.p.rapidapi.com:443 "GET /search-users?keyword=charlidamelio&count=1&cursor=0 HTTP/1.1" 200 None [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/urllib3/connectionpool.py:475]
 2025-05-09 09:40:52,482 ERROR: Error registrando uso de API: (psycopg2.errors.ForeignKeyViolation) insert or update on table "api_usage" violates foreign key constraint "api_usage_app_id_fkey"
 DETAIL:  Key (app_id)=(scraptik) is not present in table "apps".
-
 [SQL: INSERT INTO api_usage (app_id, user_id, endpoint, status_code, response_time, created_at) VALUES (%(app_id)s, %(user_id)s, %(endpoint)s, %(status_code)s, %(response_time)s, %(created_at)s) RETURNING api_usage.id]
 [parameters: {'app_id': 'scraptik', 'user_id': '2', 'endpoint': 'search-users?keyword=charlidamelio&count=1&cursor=0', 'status_code': 200, 'response_time': 1925.5940914154053, 'created_at': datetime.datetime(2025, 5, 9, 13, 40, 51, 967921)}]
 (Background on this error at: https://sqlalche.me/e/14/gkpj) [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/api/utils/rapidapi.py:33]
