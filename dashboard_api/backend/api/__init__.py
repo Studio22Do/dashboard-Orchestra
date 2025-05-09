@@ -31,9 +31,9 @@ def create_app(config_object):
     from api.routes.google_trends import google_trends_bp
     from api.routes.google_paid_search import google_paid_search_bp
     from api.routes.instagram_realtime import instagram_realtime_bp
-    from api.routes.scraptik import scraptik_bp
     from api.routes.youtube_media import youtube_media_bp
     from api.routes.file_converter import file_converter_bp
+    from api.routes.tiktok_api import tiktok_api_bp
     
     print("Registrando blueprint: auth_bp en /api/auth")
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -56,14 +56,15 @@ def create_app(config_object):
     print("Registrando blueprint: instagram_realtime_bp en /api/instagram-realtime")
     app.register_blueprint(instagram_realtime_bp, url_prefix='/api/instagram-realtime')
     
-    print("Registrando blueprint: scraptik_bp en /api/tiktok")
-    app.register_blueprint(scraptik_bp, url_prefix='/api/tiktok')
-    
     print("Registrando blueprint: youtube_media_bp en /api/youtube")
     app.register_blueprint(youtube_media_bp, url_prefix='/api/youtube')
     
     print("Registrando blueprint: file_converter_bp en /api/file-converter")
     app.register_blueprint(file_converter_bp, url_prefix='/api/file-converter')
+    
+    print("Registrando blueprint: tiktok_api_bp en /api/tiktok")
+    app.register_blueprint(tiktok_api_bp, url_prefix='/api/tiktok')
+    
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers
     register_error_handlers(app)
