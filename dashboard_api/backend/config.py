@@ -30,6 +30,8 @@ class Config:
     RAPIDAPI_GOOGLE_PAID_SEARCH_HOST = os.environ.get('RAPIDAPI_GOOGLE_PAID_SEARCH_HOST', 'google-paid-search-api.p.rapidapi.com')
     RAPIDAPI_YOUTUBE_MEDIA_HOST = os.environ.get('RAPIDAPI_YOUTUBE_MEDIA_HOST', 'youtube-media-downloader.p.rapidapi.com')
     RAPIDAPI_FILE_CONVERTER_HOST = os.environ.get('RAPIDAPI_FILE_CONVERTER_HOST', 'all-in-one-file-converter.p.rapidapi.com')
+    RAPIDAPI_TIKTOK_SCRAPER7_HOST = os.environ.get('RAPIDAPI_TIKTOK_SCRAPER7_HOST', 'tiktok-scraper7.p.rapidapi.com')
+    RAPIDAPI_TIKTOK_SCRAPER2_HOST = os.environ.get('RAPIDAPI_TIKTOK_SCRAPER2_HOST', 'tiktok-scraper2.p.rapidapi.com')
     
     # Instagram API config
     INSTAGRAM_API_BASE_URL = os.environ.get('INSTAGRAM_API_BASE_URL')

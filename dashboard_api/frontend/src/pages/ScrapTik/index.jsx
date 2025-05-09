@@ -13,26 +13,17 @@ import {
   Person, 
   Tag, 
   Explore, 
-  TrendingUp
+  TrendingUp,
+  Comment
 } from '@mui/icons-material';
 import Breadcrumbs from '../../components/common/Breadcrumbs';
 import UserSearch from './components/UserSearch';
+import TrendingVideos from './components/TrendingVideos';
+import HashtagSearch from './components/HashtagSearch';
+import PostSearch from './components/PostSearch';
+import VideoComments from './components/VideoComments';
 
 // Componentes temporales hasta que se implementen
-const PostSearch = () => (
-  <Box sx={{ textAlign: 'center', py: 5 }}>
-    <Typography variant="h6">Búsqueda de Publicaciones</Typography>
-    <Typography color="text.secondary">Esta funcionalidad estará disponible pronto.</Typography>
-  </Box>
-);
-
-const HashtagSearch = () => (
-  <Box sx={{ textAlign: 'center', py: 5 }}>
-    <Typography variant="h6">Búsqueda de Hashtags</Typography>
-    <Typography color="text.secondary">Esta funcionalidad estará disponible pronto.</Typography>
-  </Box>
-);
-
 const TrendingContent = () => (
   <Box sx={{ textAlign: 'center', py: 5 }}>
     <Typography variant="h6">Contenido en Tendencia</Typography>
@@ -86,11 +77,11 @@ const ScrapTik = () => {
             label="Perfiles" 
             iconPosition="start"
           />
-          <Tab 
+          {/* <Tab 
             icon={<Explore />} 
             label="Publicaciones" 
             iconPosition="start"
-          />
+          /> */}
           <Tab 
             icon={<Tag />} 
             label="Hashtags" 
@@ -101,14 +92,20 @@ const ScrapTik = () => {
             label="Tendencias" 
             iconPosition="start"
           />
+          {/* <Tab 
+            icon={<Comment />} 
+            label="Comentarios" 
+            iconPosition="start"
+          /> */}
         </Tabs>
       </Paper>
       
       <Box sx={{ mt: 3 }}>
         {activeTab === 0 && <UserSearch setError={setError} />}
-        {activeTab === 1 && <PostSearch />}
-        {activeTab === 2 && <HashtagSearch />}
-        {activeTab === 3 && <TrendingContent />}
+        {/* {activeTab === 1 && <PostSearch setError={setError} />} */}
+        {activeTab === 1 && <HashtagSearch setError={setError} />}
+        {activeTab === 2 && <TrendingVideos setError={setError} />}
+        {/* {activeTab === 4 && <VideoComments setError={setError} />} */}
       </Box>
     </Container>
   );

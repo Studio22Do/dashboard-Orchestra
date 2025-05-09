@@ -112,94 +112,69 @@ const UserSearch = ({ setError }) => {
         </Box>
       )}
 
-      {!loading && userData && (
+      {!loading && userData && userData.userInfo && (
         <Paper elevation={2} sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 200 }}>
               <Avatar 
-                src={userData.avatar_url || userData.avatar_thumb} 
-                alt={userData.username || username}
+                src={userData.userInfo.user.avatarLarger || userData.userInfo.user.avatarThumb} 
+                alt={userData.userInfo.user.uniqueId || username}
                 sx={{ width: 150, height: 150, mb: 2 }}
               />
-              
               <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                {userData.unique_id || userData.uniqueId}
-                {userData.verified && <Verified color="primary" fontSize="small" />}
+                {userData.userInfo.user.uniqueId}
+                {/* No hay campo verified en la respuesta, si lo agregan, descomentar: */}
+                {/* {userData.userInfo.user.verified && <Verified color="primary" fontSize="small" />} */}
               </Typography>
-              
-              {userData.nickname && (
+              {userData.userInfo.user.nickname && (
                 <Typography variant="body2" color="text.secondary">
-                  {userData.nickname}
+                  {userData.userInfo.user.nickname}
                 </Typography>
               )}
             </Box>
-            
             <Box sx={{ flex: 1 }}>
-              {userData.signature && (
+              {/* No hay signature en la respuesta, si lo agregan, descomentar: */}
+              {/* {userData.userInfo.user.signature && (
                 <Typography variant="body1" paragraph>
-                  {userData.signature}
+                  {userData.userInfo.user.signature}
                 </Typography>
-              )}
-              
+              )} */}
               <Stack direction="row" spacing={3} sx={{ mb: 2 }}>
                 <Box sx={{ textAlign: 'center' }}>
                   <Typography variant="h6">
-                    {formatNumber(userData.follower_count || userData.stats?.followerCount || 0)}
+                    {formatNumber(userData.userInfo.stats.followerCount || 0)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Seguidores
                   </Typography>
                 </Box>
-                
                 <Box sx={{ textAlign: 'center' }}>
                   <Typography variant="h6">
-                    {formatNumber(userData.following_count || userData.stats?.followingCount || 0)}
+                    {formatNumber(userData.userInfo.stats.followingCount || 0)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Siguiendo
                   </Typography>
                 </Box>
-                
                 <Box sx={{ textAlign: 'center' }}>
                   <Typography variant="h6">
-                    {formatNumber(userData.video_count || userData.stats?.videoCount || 0)}
+                    {formatNumber(userData.userInfo.stats.videoCount || 0)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Videos
                   </Typography>
                 </Box>
-                
                 <Box sx={{ textAlign: 'center' }}>
                   <Typography variant="h6">
-                    {formatNumber(userData.heart_count || userData.stats?.heartCount || 0)}
+                    {formatNumber(userData.userInfo.stats.heartCount || 0)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Me gusta
                   </Typography>
                 </Box>
               </Stack>
-              
               <Divider sx={{ my: 2 }} />
-              
-              <Grid container spacing={2}>
-                {userData.region && (
-                  <Grid item xs={12} sm={6}>
-                    <Chip 
-                      icon={<Public />} 
-                      label={userData.region}
-                      variant="outlined"
-                    />
-                  </Grid>
-                )}
-                
-                {userData.bio_url && (
-                  <Grid item xs={12}>
-                    <Typography variant="body2">
-                      <strong>Sitio web:</strong> {userData.bio_url}
-                    </Typography>
-                  </Grid>
-                )}
-              </Grid>
+              {/* Puedes agregar más campos aquí si la API los provee */}
             </Box>
           </Box>
         </Paper>
