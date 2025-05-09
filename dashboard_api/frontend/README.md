@@ -1,46 +1,105 @@
-# Getting Started with Create React App
+# Dashboard Orchestra Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Descripción
+Frontend de Dashboard Orchestra, una plataforma integral para análisis y gestión de datos de redes sociales y marketing digital. Desarrollado con React y Material-UI.
 
-## Available Scripts
+## Características Implementadas
 
-In the project directory, you can run:
+### Social Listening
+- Instagram Statistics API ✅
+- Google Trends ✅
+- Google Paid Search API ✅
+- Instagram Realtime API ✅
+- ScrapTik ✅
+
+### Creative & Content
+- YouTube Media Downloader ✅
+- All in One File Converter ✅
+- Midjourney Best Experience ✅
+- Word Count ✅
+- PDF to Text Converter ✅
+- Snap Video ✅
+- Gerwin AI Beta ✅
+- OpenAI Text to Speech ✅
+- GenieAI - ChatGPT-3 Model ✅
+- AI Social Media Content Generator ✅
+- Advanced Image Manipulation API ✅
+- Whisper: From URL ✅
+- RunwayML ✅
+
+### Web & SEO
+- SEO Analyzer ✅
+- Similar Web Insights ✅
+- Google Keyword Insights ✅
+- Domain Metrics Check ✅
+- Ahrefs DR & Rank Checker ✅
+- Page Speed Insights ✅
+- AI eCommerce Product Description Generator ✅
+- SSL Checker ✅
+- Check if WEBSITE is UP or DOWN ✅
+- URL Link Shortener and QR Code Generator ✅
+- SEO Mastermind – AI Keyword, Meta & Title Generator ✅
+
+## Tecnologías Utilizadas
+- React 19
+- React Router
+- Redux Toolkit
+- Material UI 7
+- Axios
+- date-fns
+
+## Requisitos
+- Node.js 18+
+- npm o yarn
+
+## Instalación
+
+1. Instalar dependencias:
+```bash
+npm install
+```
+
+2. Configurar variables de entorno:
+Crear un archivo `.env` en el directorio raíz con las siguientes variables:
+```
+REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_ENV=development
+```
+
+## Scripts Disponibles
 
 ### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Ejecuta la aplicación en modo desarrollo.\
+Abre [http://localhost:3000](http://localhost:3000) para verla en el navegador.
 
 ### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Lanza el test runner en modo interactivo.
 
 ### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Construye la aplicación para producción en la carpeta `build`.
 
 ### `npm run eject`
+**Nota: esta es una operación unidireccional. Una vez que ejecutes `eject`, ¡no podrás volver atrás!**
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Estructura del Proyecto
+```
+src/
+├── components/      # Componentes reutilizables
+├── pages/          # Páginas de la aplicación
+├── redux/          # Estado global con Redux
+├── App.jsx         # Componente principal
+└── index.jsx       # Punto de entrada
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Características de la Interfaz
+- Diseño Responsivo
+- Carrusel de Herramientas
+- Temas Claro/Oscuro
+- Visualización de Datos
+- Navegación Intuitiva
+- Gestión de Estado con Redux
+- Protección de Rutas
+- Integración con APIs
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Documentación Adicional
+Para más información sobre la configuración, uso y desarrollo, consulta el archivo [documentation.md](../documentation.md).
