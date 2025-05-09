@@ -66,4 +66,10 @@ try:
 except ImportError as e:
     print(f"Error importando módulo file_converter: {e}")
 
+try:
+    from . import tiktok_api
+    print("Módulo de rutas tiktok_api importado")
+except ImportError as e:
+    print(f"Error importando módulo tiktok_api: {e}")
+
 print("Finalizada inicialización de rutas de la API") 

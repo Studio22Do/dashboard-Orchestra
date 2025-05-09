@@ -10,8 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from api.routes.auth import auth_bp
 from api.routes.google_trends import google_trends_bp
 from api.routes.google_paid_search import google_paid_search_bp
-from api.routes.scraptik import scraptik_bp
 from api.routes.apps import apps_bp
+from api.routes.tiktok_api import tiktok_api_bp
 
 logger = logging.getLogger(__name__)
 
@@ -37,13 +37,13 @@ def register_blueprints(app):
     print("Registrando blueprint: google_paid_search_bp en /api/paid-search")
     app.register_blueprint(google_paid_search_bp, url_prefix='/api/paid-search')
     
-    # Registrar blueprint de TikTok
-    print("Registrando blueprint: scraptik_bp en /api/tiktok")
-    app.register_blueprint(scraptik_bp, url_prefix='/api/tiktok')
-    
     # Registrar blueprint de Apps
     print("Registrando blueprint: apps_bp en /api/apps")
     app.register_blueprint(apps_bp, url_prefix='/api/apps')
+    
+    # Registrar blueprint de TikTok
+    print("Registrando blueprint: tiktok_api_bp en /api/tiktok")
+    app.register_blueprint(tiktok_api_bp, url_prefix='/api/tiktok')
     
     # Agregar más blueprints aquí
     print("=== FIN DE REGISTRO DE BLUEPRINTS (desde blueprints/__init__.py) ===\n")

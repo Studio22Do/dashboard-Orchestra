@@ -1,78 +1,60 @@
-import { useState } from 'react';
-import { 
-  Box, 
-  Card, 
-  CardContent, 
-  TextField, 
-  Button, 
-  Grid, 
-  Typography, 
-  CircularProgress,
-  Paper,
-  Divider,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+import { useState, useEffect } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
   CardMedia,
   CardActions,
+  Typography,
+  Button,
+  Grid,
+  CircularProgress,
+  Paper,
   Chip,
   Stack,
-  IconButton,
-  Avatar
+  Avatar,
+  Divider
 } from '@mui/material';
-import { 
-  Search, 
-  Favorite, 
-  Comment, 
-  Share, 
+import {
+  Favorite,
+  Comment,
+  Share,
   PlayArrow,
   Person,
   Visibility,
-  Public,
-  Sort,
-  MusicNote
+  MusicNote,
+  Public
 } from '@mui/icons-material';
 import axios from 'axios';
 import { useAppSelector } from '../../../redux/hooks/reduxHooks';
 import { selectAuth } from '../../../redux/slices/authSlice';
 
-const sortOptions = [
-  { value: "0", label: "Relevancia" },
-  { value: "1", label: "Fecha (reciente)" },
-  { value: "2", label: "Más likes" }
-];
-
-const PostSearch = ({ setError }) => {
+const TrendingVideos = ({ setError }) => {
   const { token } = useAppSelector(selectAuth);
-  const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [videos, setVideos] = useState([]);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!username) {
-      setError && setError('Por favor ingresa un nombre de usuario');
-      return;
-    }
-    setLoading(true);
-    setVideos([]);
-    try {
-      const response = await axios.get('/api/tiktok/user-videos', {
-        params: { username },
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      setVideos(response.data?.data || []);
-      setError && setError(null);
-    } catch (err) {
-      setError && setError(err.response?.data?.message || 'Error al buscar publicaciones');
-      setVideos([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const fetchTrending = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get('/api/tiktok/trending-videos', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setVideos(response.data?.data || []);
+        setError && setError(null);
+      } catch (err) {
+        setError && setError(err.response?.data?.message || 'Error al obtener videos en tendencia');
+        setVideos([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTrending();
+    // eslint-disable-next-line
+  }, []);
 
   const formatNumber = (num) => {
     if (!num && num !== 0) return '0';
@@ -93,45 +75,17 @@ const PostSearch = ({ setError }) => {
 
   return (
     <Box>
-      <Card sx={{ mb: 4 }}>
-        <CardContent>
-          <Box component="form" onSubmit={handleSearch}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={9}>
-                <TextField
-                  fullWidth
-                  label="Nombre de usuario"
-                  placeholder="Ej: charlidamelio, khaby.lame (sin @)"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  InputProps={{
-                    startAdornment: <Person sx={{ mr: 1, color: 'action.active' }} />,
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  disabled={loading}
-                  sx={{ height: '56px' }}
-                >
-                  {loading ? <CircularProgress size={24} /> : 'Buscar Publicaciones'}
-                </Button>
-              </Grid>
-            </Grid>
-          </Box>
-        </CardContent>
-      </Card>
+      <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
+        Videos en Tendencia
+      </Typography>
       {loading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
           <CircularProgress />
         </Box>
       )}
-      {!loading && videos.length === 0 && username && (
+      {!loading && videos.length === 0 && (
         <Paper sx={{ p: 3, textAlign: 'center' }}>
-          <Typography variant="h6">No se encontraron publicaciones para este usuario</Typography>
+          <Typography variant="h6">No se encontraron videos en tendencia</Typography>
         </Paper>
       )}
       <Grid container spacing={3}>
@@ -154,6 +108,7 @@ const PostSearch = ({ setError }) => {
                   <Typography variant="subtitle1" noWrap>
                     {post.author?.nickname || 'Usuario de TikTok'}
                   </Typography>
+                  <Chip icon={<Public />} size="small" label={post.region || 'TikTok'} sx={{ ml: 1 }} />
                 </Box>
                 <Typography
                   variant="body2"
@@ -214,4 +169,4 @@ const PostSearch = ({ setError }) => {
   );
 };
 
-export default PostSearch; 
+export default TrendingVideos; 
