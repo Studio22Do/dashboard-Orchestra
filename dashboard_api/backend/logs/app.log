@@ -2852,3 +2852,32 @@ LINE 1: ...e_time, created_at) VALUES ('google-paid-search', 'dev_user'...
 2025-05-08 11:12:06,782 INFO: Aplicación inicializada en modo: development [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/app.py:72]
 2025-05-08 11:12:06,785 WARNING:  * Debugger is active! [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
 2025-05-08 11:12:06,785 INFO:  * Debugger PIN: 132-491-665 [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
+2025-05-09 09:39:44,145 INFO: Logging configurado con nivel: DEBUG [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/utils/logging_config.py:51]
+2025-05-09 09:39:44,169 INFO: Aplicación inicializada en modo: development [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/app.py:72]
+2025-05-09 09:39:44,254 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.13.75:5000 [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
+2025-05-09 09:39:44,255 INFO: [33mPress CTRL+C to quit[0m [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
+2025-05-09 09:39:44,262 INFO:  * Restarting with stat [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
+2025-05-09 09:39:44,561 INFO: Logging configurado con nivel: DEBUG [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/utils/logging_config.py:51]
+2025-05-09 09:39:44,577 INFO: Aplicación inicializada en modo: development [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/app.py:72]
+2025-05-09 09:39:44,580 WARNING:  * Debugger is active! [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
+2025-05-09 09:39:44,580 INFO:  * Debugger PIN: 141-338-907 [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
+2025-05-09 09:40:10,915 INFO: 127.0.0.1 - - [09/May/2025 09:40:10] "OPTIONS /api/auth/login HTTP/1.1" 200 - [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
+2025-05-09 09:40:11,082 INFO: 127.0.0.1 - - [09/May/2025 09:40:11] "POST /api/auth/login HTTP/1.1" 200 - [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
+2025-05-09 09:40:11,097 INFO: 127.0.0.1 - - [09/May/2025 09:40:11] "OPTIONS /api/apps/user/apps HTTP/1.1" 200 - [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
+2025-05-09 09:40:11,101 INFO: 127.0.0.1 - - [09/May/2025 09:40:11] "OPTIONS /api/apps/user/favorites HTTP/1.1" 200 - [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
+2025-05-09 09:40:11,133 INFO: 127.0.0.1 - - [09/May/2025 09:40:11] "GET /api/apps/user/apps HTTP/1.1" 200 - [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
+2025-05-09 09:40:11,170 INFO: 127.0.0.1 - - [09/May/2025 09:40:11] "GET /api/apps/user/favorites HTTP/1.1" 200 - [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
+2025-05-09 09:40:50,039 DEBUG: Starting new HTTPS connection (1): scraptik.p.rapidapi.com:443 [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/urllib3/connectionpool.py:1022]
+2025-05-09 09:40:51,962 DEBUG: https://scraptik.p.rapidapi.com:443 "GET /search-users?keyword=charlidamelio&count=1&cursor=0 HTTP/1.1" 200 None [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/urllib3/connectionpool.py:475]
+2025-05-09 09:40:52,482 ERROR: Error registrando uso de API: (psycopg2.errors.ForeignKeyViolation) insert or update on table "api_usage" violates foreign key constraint "api_usage_app_id_fkey"
+DETAIL:  Key (app_id)=(scraptik) is not present in table "apps".
+
+[SQL: INSERT INTO api_usage (app_id, user_id, endpoint, status_code, response_time, created_at) VALUES (%(app_id)s, %(user_id)s, %(endpoint)s, %(status_code)s, %(response_time)s, %(created_at)s) RETURNING api_usage.id]
+[parameters: {'app_id': 'scraptik', 'user_id': '2', 'endpoint': 'search-users?keyword=charlidamelio&count=1&cursor=0', 'status_code': 200, 'response_time': 1925.5940914154053, 'created_at': datetime.datetime(2025, 5, 9, 13, 40, 51, 967921)}]
+(Background on this error at: https://sqlalche.me/e/14/gkpj) [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/api/utils/rapidapi.py:33]
+2025-05-09 09:40:52,484 INFO: 127.0.0.1 - - [09/May/2025 09:40:52] "[33mGET /api/tiktok/user-by-username?username=charlidamelio HTTP/1.1[0m" 404 - [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
+2025-05-09 09:48:47,185 INFO:  * Detected change in '/home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/api/__init__.py', reloading [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
+2025-05-09 09:48:47,264 INFO:  * Restarting with stat [in /home/johngoyo/Desktop/dashboard-Orchestra/dashboard_api/backend/venv/lib/python3.10/site-packages/werkzeug/_internal.py:224]
