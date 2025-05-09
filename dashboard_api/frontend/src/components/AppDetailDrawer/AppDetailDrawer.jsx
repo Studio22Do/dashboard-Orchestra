@@ -23,7 +23,27 @@ const AppDetailDrawer = ({ open, onClose, app }) => {
   };
 
   return (
-    <Drawer anchor="right" open={open} onClose={onClose} PaperProps={{ sx: { width: 400, p: 0, background: '#1a1530', color: 'white' } }}>
+    <Drawer 
+      anchor="right" 
+      open={open} 
+      onClose={onClose}
+      PaperProps={{ 
+        sx: { 
+          width: 400, 
+          p: 0, 
+          background: '#1a1530', 
+          color: 'white',
+          '&:focus': {
+            outline: 'none'
+          }
+        } 
+      }}
+      ModalProps={{
+        keepMounted: true,
+        disableAutoFocus: true,
+        disableEnforceFocus: true
+      }}
+    >
       <Box
         sx={{
           height: '100%',
@@ -37,7 +57,17 @@ const AppDetailDrawer = ({ open, onClose, app }) => {
         <Box sx={{ width: '100%', maxWidth: 340 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             {app.imageUrl && (
-              <img src={app.imageUrl} alt={app.title} style={{ width: 56, height: 56, borderRadius: 12, marginRight: 16 }} />
+              <img 
+                src={app.imageUrl} 
+                alt={app.title} 
+                style={{ 
+                  width: 56, 
+                  height: 56, 
+                  borderRadius: 12, 
+                  marginRight: 16,
+                  objectFit: 'cover'
+                }} 
+              />
             )}
             <Typography variant="h5" sx={{ fontWeight: 600 }}>{app.title}</Typography>
           </Box>
@@ -55,6 +85,7 @@ const AppDetailDrawer = ({ open, onClose, app }) => {
             fullWidth
             sx={{ mt: 2 }}
             onClick={handleAction}
+            autoFocus={false}
           >
             {isPurchased ? 'Abrir' : 'Agregar'}
           </Button>

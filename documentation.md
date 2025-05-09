@@ -14,6 +14,7 @@
 11. [Modo Desarrollo vs. Modo Producción](#modo-desarrollo-vs-modo-producción)
 12. [Uso de Mock de Apps](#uso-de-mock-de-apps)
 13. [Transición a Producción](#transición-a-producción)
+14. [Sistema de Apps y Drawer](#sistema-de-apps-y-drawer)
 
 ## Descripción General
 
@@ -254,5 +255,155 @@ Para migrar de desarrollo a producción:
 - Validar claves de API
 - Comprobar límites de uso
 - Revisar logs de error
+
+## Sistema de Apps y Drawer
+
+### Estructura de Apps
+
+Cada app en el dashboard está definida con la siguiente estructura:
+
+```javascript
+{
+  id: 'unique-id',              // Identificador único de la app
+  title: 'App Title',           // Título de la app
+  description: 'Description',   // Descripción detallada
+  imageUrl: 'url-to-image',     // URL de la imagen de la app
+  category: 'Category',         // Categoría (Social Listening, Creative & Content, Web & SEO)
+  route: '/apps/route',         // Ruta de la app en el frontend
+  apiName: 'API Name'           // Nombre de la API asociada
+}
+```
+
+### Categorías de Apps
+
+El dashboard organiza las apps en tres categorías principales:
+
+1. **Social Listening**
+   - Instagram Statistics API
+   - Google Trends
+   - Google Paid Search API
+   - Instagram Realtime API
+   - TikTok Analytics
+
+2. **Creative & Content**
+   - YouTube Media Downloader
+   - File Converter
+   - Midjourney
+   - Word Count
+   - PDF to Text
+   - Snap Video
+   - Gerwin AI
+   - OpenAI TTS
+   - GenieAI
+   - AI Social Media
+   - Image Manipulation
+   - Whisper URL
+   - RunwayML
+
+3. **Web & SEO**
+   - SEO Analyzer
+   - Similar Web
+   - Keyword Insights
+   - Domain Metrics
+   - Ahrefs Checker
+   - Page Speed
+   - Product Description Generator
+   - SSL Checker
+   - Website Status
+   - URL Shortener
+   - SEO Mastermind
+
+### AppDetailDrawer
+
+El `AppDetailDrawer` es un componente que muestra los detalles de una app cuando se hace clic en ella. Características:
+
+- Se abre desde el lado derecho de la pantalla
+- Muestra:
+  - Imagen de la app
+  - Título
+  - Descripción
+  - Categoría
+  - API Name
+  - Botón de acción (Agregar/Abrir)
+
+#### Funcionamiento
+
+1. **Apertura del Drawer**
+   ```javascript
+   setSelectedApp({
+     id: 'app-id',
+     title: 'App Title',
+     description: 'Description',
+     imageUrl: 'url',
+     category: 'Category',
+     route: '/apps/route',
+     apiName: 'API Name'
+   });
+   setDrawerOpen(true);
+   ```
+
+2. **Acción de Agregar**
+   - Si la app no está comprada, muestra botón "Agregar"
+   - Al hacer clic, dispara la acción `purchaseApp` de Redux
+   - La app se agrega a `purchasedApps` en el estado de Redux
+
+3. **Acción de Abrir**
+   - Si la app está comprada, muestra botón "Abrir"
+   - Al hacer clic, navega a la ruta de la app
+
+### Estado de Redux
+
+El estado de las apps se maneja en `appsSlice.js` con las siguientes características:
+
+```javascript
+const initialState = {
+  allApps: [],          // Todas las apps disponibles
+  purchasedApps: [],    // Apps compradas por el usuario
+  favoriteApps: [],     // Apps marcadas como favoritas
+  loading: false,       // Estado de carga
+  error: null          // Errores
+};
+```
+
+#### Acciones Principales
+
+1. **fetchAllApps**: Obtiene todas las apps disponibles
+2. **purchaseApp**: Agrega una app a las compradas
+3. **toggleFavoriteApp**: Marca/desmarca una app como favorita
+4. **fetchPurchasedApps**: Obtiene las apps compradas
+5. **fetchFavoriteApps**: Obtiene las apps favoritas
+
+### Modo Mock vs. Producción
+
+El sistema soporta dos modos de operación:
+
+1. **Modo Mock**
+   - Usa `MOCK_APPS_DATA` para simular apps
+   - No requiere backend
+   - Ideal para desarrollo y pruebas
+
+2. **Modo Producción**
+   - Conecta con backend real
+   - Requiere autenticación
+   - Usa endpoints reales para operaciones
+
+### Integración con Backend
+
+Los endpoints principales para la gestión de apps son:
+
+```
+GET    /api/apps              - Lista todas las apps
+GET    /api/apps/user/apps    - Apps compradas
+GET    /api/apps/user/favorites - Apps favoritas
+POST   /api/apps/user/apps/{id}/purchase - Comprar app
+POST   /api/apps/user/apps/{id}/favorite - Marcar como favorita
+```
+
+### Variables de Entorno
+
+```env
+REACT_APP_API_URL=http://localhost:5000/api  # URL del backend
+REACT_APP_ENV=development                    # Modo de operación
+```
 
 ---

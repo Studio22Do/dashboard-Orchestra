@@ -5,6 +5,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 // Datos de ejemplo para las apps (simulamos datos que vendrían del backend)
 const MOCK_APPS_DATA = [
+  // Social Listening
   {
     id: 'instagram-stats',
     title: 'Instagram Statistics',
@@ -15,49 +16,258 @@ const MOCK_APPS_DATA = [
     apiName: 'Instagram Statistics API'
   },
   {
-    id: 'weather-forecast',
-    title: 'Weather Forecast',
-    description: 'Consulta el pronóstico del tiempo en cualquier ubicación del mundo',
-    imageUrl: 'https://cdn.pixabay.com/photo/2013/04/01/09/22/clouds-98536_960_720.png',
-    category: 'Weather',
-    route: '/apps/weather',
-    apiName: 'Weather Forecast API'
+    id: 'google-trends',
+    title: 'Google Trends',
+    description: 'Analiza tendencias de búsqueda en Google y obtén insights valiosos',
+    imageUrl: 'https://cdn.pixabay.com/photo/2015/11/03/09/03/google-1018443_960_720.jpg',
+    category: 'Social Listening',
+    route: '/apps/trends',
+    apiName: 'Google Trends API'
   },
   {
-    id: 'currency-converter',
-    title: 'Currency Converter',
-    description: 'Convierte divisas con tasas de cambio en tiempo real',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/23/13/44/currency-exchange-2672531_960_720.png',
-    category: 'Finance',
-    route: '/apps/currency',
-    apiName: 'Currency Exchange API'
+    id: 'google-paid-search',
+    title: 'Google Paid Search',
+    description: 'Analiza y optimiza tus campañas de búsqueda de pago en Google Ads',
+    imageUrl: 'https://cdn.pixabay.com/photo/2015/11/03/09/03/google-1018443_960_720.jpg',
+    category: 'Social Listening',
+    route: '/apps/paid-search',
+    apiName: 'Google Paid Search API'
   },
   {
-    id: 'stock-tracker',
-    title: 'Stock Market Tracker',
-    description: 'Sigue el rendimiento de acciones y mercados financieros en tiempo real',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/11/27/07/02/financial-2980349_960_720.jpg',
-    category: 'Finance',
-    route: '/apps/stocks',
-    apiName: 'Stock Market API'
+    id: 'instagram-realtime',
+    title: 'Instagram Realtime',
+    description: 'Monitorea en tiempo real la actividad de Instagram, hashtags y menciones',
+    imageUrl: 'https://cdn.pixabay.com/photo/2016/08/09/17/52/instagram-1581266_960_720.jpg',
+    category: 'Social Listening',
+    route: '/instagram-realtime',
+    apiName: 'Instagram Realtime API'
   },
   {
-    id: 'news-aggregator',
-    title: 'News Aggregator',
-    description: 'Recopila noticias de diferentes fuentes en un solo lugar',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/06/26/19/03/news-2444778_960_720.jpg',
-    category: 'News',
-    route: '/apps/news',
-    apiName: 'News API'
+    id: 'scraptik',
+    title: 'TikTok Analytics',
+    description: 'Analiza tendencias, hashtags y contenido viral en TikTok',
+    imageUrl: 'https://cdn.pixabay.com/photo/2021/06/15/12/14/tik-tok-6338431_960_720.jpg',
+    category: 'Social Listening',
+    route: '/tiktok',
+    apiName: 'TikTok API'
+  },
+  // Creative & Content
+  {
+    id: 'youtube-downloader',
+    title: 'YouTube Media Downloader',
+    description: 'Descarga videos y audio de YouTube en diferentes formatos y calidades',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/10/03/19/youtube-2625192_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/youtube-media',
+    apiName: 'YouTube Media API'
   },
   {
-    id: 'covid-tracker',
-    title: 'COVID-19 Tracker',
-    description: 'Monitorea estadísticas y tendencias de COVID-19 en todo el mundo',
-    imageUrl: 'https://cdn.pixabay.com/photo/2020/04/21/00/40/coronavirus-5071045_960_720.jpg',
-    category: 'Health',
-    route: '/apps/covid',
-    apiName: 'COVID-19 Statistics API'
+    id: 'file-converter',
+    title: 'File Converter',
+    description: 'Convierte archivos entre diferentes formatos de manera rápida y eficiente',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/file-converter',
+    apiName: 'File Converter API'
+  },
+  {
+    id: 'midjourney',
+    title: 'Midjourney',
+    description: 'Genera imágenes artísticas de alta calidad con IA',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/apps/midjourney',
+    apiName: 'Midjourney API'
+  },
+  {
+    id: 'word-count',
+    title: 'Word Count',
+    description: 'Analiza y cuenta palabras, caracteres y párrafos en tus textos',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/apps/word-count',
+    apiName: 'Word Count API'
+  },
+  {
+    id: 'pdf-to-text',
+    title: 'PDF to Text',
+    description: 'Convierte documentos PDF a texto editable',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/apps/pdf-to-text',
+    apiName: 'PDF to Text API'
+  },
+  {
+    id: 'snap-video',
+    title: 'Snap Video',
+    description: 'Crea y edita videos cortos con efectos y filtros',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/apps/snap-video',
+    apiName: 'Snap Video API'
+  },
+  {
+    id: 'gerwin-ai',
+    title: 'Gerwin AI',
+    description: 'Plataforma de IA avanzada para análisis y generación de contenido',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/apps/gerwin-ai',
+    apiName: 'Gerwin AI API'
+  },
+  {
+    id: 'openai-tts',
+    title: 'OpenAI TTS',
+    description: 'Convierte texto a voz natural usando la tecnología de OpenAI',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/apps/openai-text-to-speech',
+    apiName: 'OpenAI TTS API'
+  },
+  {
+    id: 'genie-ai',
+    title: 'GenieAI',
+    description: 'Asistente de IA basado en ChatGPT-3 para diversas tareas',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/apps/genie-ai',
+    apiName: 'GenieAI API'
+  },
+  {
+    id: 'ai-social-media',
+    title: 'AI Social Media',
+    description: 'Genera contenido optimizado para redes sociales usando IA',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/apps/ai-social-media',
+    apiName: 'AI Social Media API'
+  },
+  {
+    id: 'image-manipulation',
+    title: 'Image Manipulation',
+    description: 'Herramientas avanzadas para edición y manipulación de imágenes',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/apps/advanced-image',
+    apiName: 'Image Manipulation API'
+  },
+  {
+    id: 'whisper-url',
+    title: 'Whisper URL',
+    description: 'Transcribe audio desde URLs usando el modelo Whisper',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/apps/whisper-url',
+    apiName: 'Whisper API'
+  },
+  {
+    id: 'runwayml',
+    title: 'RunwayML',
+    description: 'Plataforma de IA para generación y edición de contenido multimedia',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/apps/runway-ml',
+    apiName: 'RunwayML API'
+  },
+  // Web & SEO
+  {
+    id: 'seo-analyzer',
+    title: 'SEO Analyzer',
+    description: 'Analiza y optimiza el SEO de tu sitio web',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Web & SEO',
+    route: '/apps/seo-analyzer',
+    apiName: 'SEO Analyzer API'
+  },
+  {
+    id: 'similar-web',
+    title: 'Similar Web',
+    description: 'Obtén insights detallados sobre el tráfico web y la competencia',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Web & SEO',
+    route: '/apps/similar-web',
+    apiName: 'Similar Web API'
+  },
+  {
+    id: 'google-keyword',
+    title: 'Keyword Insights',
+    description: 'Analiza palabras clave y tendencias de búsqueda',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Web & SEO',
+    route: '/apps/keyword-insights',
+    apiName: 'Google Keyword API'
+  },
+  {
+    id: 'domain-metrics',
+    title: 'Domain Metrics',
+    description: 'Verifica métricas y salud de dominios web',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Web & SEO',
+    route: '/apps/domain-metrics',
+    apiName: 'Domain Metrics API'
+  },
+  {
+    id: 'ahrefs-checker',
+    title: 'Ahrefs Checker',
+    description: 'Verifica el Domain Rating y ranking de sitios web',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Web & SEO',
+    route: '/apps/ahrefs-rank',
+    apiName: 'Ahrefs API'
+  },
+  {
+    id: 'page-speed',
+    title: 'Page Speed',
+    description: 'Analiza y optimiza la velocidad de carga de tu sitio web',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Web & SEO',
+    route: '/apps/page-speed',
+    apiName: 'Page Speed API'
+  },
+  {
+    id: 'ecommerce-description',
+    title: 'Product Description Generator',
+    description: 'Genera descripciones optimizadas para productos de eCommerce',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Web & SEO',
+    route: '/apps/product-description',
+    apiName: 'Product Description API'
+  },
+  {
+    id: 'ssl-checker',
+    title: 'SSL Checker',
+    description: 'Verifica el estado y validez de certificados SSL',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Web & SEO',
+    route: '/apps/ssl-checker',
+    apiName: 'SSL Checker API'
+  },
+  {
+    id: 'website-status',
+    title: 'Website Status',
+    description: 'Monitorea el estado y disponibilidad de sitios web',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Web & SEO',
+    route: '/apps/website-status',
+    apiName: 'Website Status API'
+  },
+  {
+    id: 'url-shortener',
+    title: 'URL Shortener',
+    description: 'Acorta URLs y genera códigos QR personalizados',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Web & SEO',
+    route: '/apps/url-shortener',
+    apiName: 'URL Shortener API'
+  },
+  {
+    id: 'seo-mastermind',
+    title: 'SEO Mastermind',
+    description: 'Genera keywords, meta tags y títulos optimizados con IA',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Web & SEO',
+    route: '/apps/seo-mastermind',
+    apiName: 'SEO Mastermind API'
   }
 ];
 
