@@ -39,6 +39,7 @@ import {
   Settings
 } from '@mui/icons-material';
 import AppDetailDrawer from '../../components/AppDetailDrawer/AppDetailDrawer';
+import AppSearchHeader from '../../components/app-search/AppSearchHeader';
 
 const DashboardContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(4),
@@ -51,6 +52,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [selectedApp, setSelectedApp] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Definición de las herramientas por categoría
   const categories = [
@@ -265,6 +267,7 @@ const Dashboard = () => {
 
   return (
     <DashboardContainer>
+      <AppSearchHeader searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <Box sx={{ mb: 4, width: '100%', overflowX: 'hidden' }}>
         {categories.map((category) => (
           <CategorySection
