@@ -395,3 +395,20 @@ Durante el desarrollo, el uso de datos mock (simulados) permite construir y prob
 > **Nota:** Cuando el backend y la base de datos estén listos, simplemente elimina el uso de mocks en el frontend y asegúrate de que todos los endpoints y datos provengan del backend real.
 
 ---
+
+### NOTA PARA ARRANCAR EL FRONT 
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+  "proxy": "http://localhost:5000"  ESTA LINEA SE DEBE DE BORRAR
+}
