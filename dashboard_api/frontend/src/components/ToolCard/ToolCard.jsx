@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Card, CardContent, Typography, Box, Avatar } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
@@ -8,31 +8,50 @@ const StyledCard = styled(Card)(({ theme }) => ({
   width: '100%',
   cursor: 'pointer',
   display: 'flex',
-  flexDirection: 'column',
+  flexDirection: 'row',
+  alignItems: 'center',
   borderRadius: 18,
-  background: 'linear-gradient(180deg, #342A5B 0%, #201C2E 100%)',
+  background: 'linear-gradient(180deg, #201C2E 0%, #342A5B 100%)',
   boxShadow: '0 4px 12px rgba(0,0,0,0.10)',
-  overflow: 'hidden',
-  transition: 'border-color 0.35s cubic-bezier(.4,2,.3,1), background 0.5s cubic-bezier(.4,2,.3,1);',
-  minHeight: 120,
+  overflow: 'visible',
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  minHeight: 130,
   border: '2px solid',
   borderColor: 'transparent',
+  transform: 'translateY(0)',
+  
   '&:hover': {
     borderColor: '#AC9DFB',
-    background: 'linear-gradient(180deg, #201C2E 0%, #342A5B 100%)',
+    background: 'linear-gradient(180deg, #342A5B 0%, #201C2E 100%)',
+    transform: 'translateY(-8px) scale(1.02)',
+    boxShadow: '0 8px 24px rgba(172, 157, 251, 0.15)',
+    '& .MuiAvatar-root': {
+      transform: 'scale(1.1)',
+      '& svg': {
+        transform: 'scale(1.1)',
+      }
+    }
   },
 }));
 
 // Contenedor del icono con color primario
 const IconContainer = styled(Avatar)(({ theme }) => ({
-  width: 60,
-  height: 60,
+  width: 80,
+  height: 80,
   borderRadius: 12,
+  overflow: 'visible',
   backgroundColor: 'transparent',
-  marginBottom: theme.spacing(1.5),
+  marginRight: theme.spacing(2.5),
+  marginBottom: 0,
+  marginLeft: theme.spacing(2.5),
+  transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   '& svg': {
-    fontSize: 40,
+    fontSize: 96,
     color: 'white',
+    transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   }
 }));
 
@@ -40,33 +59,75 @@ const IconContainer = styled(Avatar)(({ theme }) => ({
 const StyledContent = styled(CardContent)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  padding: theme.spacing(3),
+  justifyContent: 'center',
+  padding: `${theme.spacing(2)} 0`,
   height: '100%',
+  maxWidth: 180,
   '&:last-child': {
-    paddingBottom: theme.spacing(3),
+    paddingBottom: theme.spacing(2),
   },
 }));
 
+const CardContentFade = styled('div')(({ theme, isvisible }) => ({
+  opacity: isvisible ? 1 : 0,
+  transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+  pointerEvents: isvisible ? 'auto' : 'none',
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0 0px',
+  gap: '40px',
+}));
+
 const ToolCard = ({ title, icon: Icon, onClick }) => {
+  const cardRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const checkVisibility = () => {
+      if (!cardRef.current) return;
+      let parent = cardRef.current.parentElement;
+      while (parent) {
+        if (parent.classList && parent.classList.contains('swiper-slide-visible')) {
+          setIsVisible(true);
+          return;
+        }
+        parent = parent.parentElement;
+      }
+      setIsVisible(false);
+    };
+    checkVisibility();
+    // Swiper puede cambiar visibilidad por scroll, así que escucha cambios
+    const interval = setInterval(checkVisibility, 100);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <StyledCard onClick={onClick}>
-      <StyledContent>
+    <StyledCard onClick={onClick} ref={cardRef}>
+      <CardContentFade isvisible={isVisible ? 1 : 0}>
         <IconContainer>
           {Icon && <Icon />}
         </IconContainer>
-        <Typography 
-          variant="h6" 
-          component="h3" 
-          sx={{ 
-            fontWeight: 500, 
-            color: 'white',
-            fontSize: '1rem',
-            lineHeight: 1.3
-          }}
-        >
-          {title}
-        </Typography>
-      </StyledContent>
+        <StyledContent>
+          <Typography 
+            variant="h6" 
+            component="h3" 
+            sx={{ 
+              fontWeight: 600, 
+              color: 'white',
+              fontSize: '1.25rem',
+              lineHeight: 1.3,
+              textAlign: 'left',
+              wordBreak: 'break-word',
+            }}
+          >
+            {title}
+          </Typography>
+        </StyledContent>
+      </CardContentFade>
     </StyledCard>
   );
 };
