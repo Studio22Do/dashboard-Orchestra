@@ -140,6 +140,7 @@ const CategorySection = ({ title, icon: Icon, tools, onViewAll }) => {
                         navigation={true}
                         modules={[Navigation]}
                         className="mySwiper"
+                        watchSlidesProgress={true}
                     >
                         {tools.map((tool) => (
                             <SwiperSlide key={tool.id}>

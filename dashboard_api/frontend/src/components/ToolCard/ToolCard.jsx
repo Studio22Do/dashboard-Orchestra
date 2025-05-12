@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Card, CardContent, Typography, Box, Avatar } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
@@ -15,7 +15,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   boxShadow: '0 4px 12px rgba(0,0,0,0.10)',
   overflow: 'visible',
   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-  minHeight: 120,
+  minHeight: 130,
   border: '2px solid',
   borderColor: 'transparent',
   transform: 'translateY(0)',
@@ -38,6 +38,7 @@ const IconContainer = styled(Avatar)(({ theme }) => ({
   width: 80,
   height: 80,
   borderRadius: 12,
+  overflow: 'visible',
   backgroundColor: 'transparent',
   marginRight: theme.spacing(2.5),
   marginBottom: 0,
@@ -47,7 +48,7 @@ const IconContainer = styled(Avatar)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   '& svg': {
-    fontSize: 66,
+    fontSize: 96,
     color: 'white',
     transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   }
@@ -66,28 +67,66 @@ const StyledContent = styled(CardContent)(({ theme }) => ({
   },
 }));
 
+const CardContentFade = styled('div')(({ theme, isvisible }) => ({
+  opacity: isvisible ? 1 : 0,
+  transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+  pointerEvents: isvisible ? 'auto' : 'none',
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0 0px',
+  gap: '40px',
+}));
+
 const ToolCard = ({ title, icon: Icon, onClick }) => {
+  const cardRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const checkVisibility = () => {
+      if (!cardRef.current) return;
+      let parent = cardRef.current.parentElement;
+      while (parent) {
+        if (parent.classList && parent.classList.contains('swiper-slide-visible')) {
+          setIsVisible(true);
+          return;
+        }
+        parent = parent.parentElement;
+      }
+      setIsVisible(false);
+    };
+    checkVisibility();
+    // Swiper puede cambiar visibilidad por scroll, así que escucha cambios
+    const interval = setInterval(checkVisibility, 100);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <StyledCard onClick={onClick}>
-      <IconContainer>
-        {Icon && <Icon />}
-      </IconContainer>
-      <StyledContent>
-        <Typography 
-          variant="h6" 
-          component="h3" 
-          sx={{ 
-            fontWeight: 600, 
-            color: 'white',
-            fontSize: '1.25rem',
-            lineHeight: 1.3,
-            textAlign: 'left',
-            wordBreak: 'break-word',
-          }}
-        >
-          {title}
-        </Typography>
-      </StyledContent>
+    <StyledCard onClick={onClick} ref={cardRef}>
+      <CardContentFade isvisible={isVisible ? 1 : 0}>
+        <IconContainer>
+          {Icon && <Icon />}
+        </IconContainer>
+        <StyledContent>
+          <Typography 
+            variant="h6" 
+            component="h3" 
+            sx={{ 
+              fontWeight: 600, 
+              color: 'white',
+              fontSize: '1.25rem',
+              lineHeight: 1.3,
+              textAlign: 'left',
+              wordBreak: 'break-word',
+            }}
+          >
+            {title}
+          </Typography>
+        </StyledContent>
+      </CardContentFade>
     </StyledCard>
   );
 };
