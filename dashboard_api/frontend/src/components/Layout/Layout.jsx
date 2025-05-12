@@ -7,7 +7,7 @@ import { styled } from '@mui/material/styles';
 // Componente principal con fondo oscuro
 const MainContent = styled(Box)(({ theme }) => ({
   flexGrow: 1,
-  backgroundColor: '#1a1625', // Fondo oscuro como en la imagen
+  backgroundColor: '#1A1A1A', // Fondo oscuro solicitado
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
@@ -22,7 +22,7 @@ const ContentContainer = styled(Box)(({ theme }) => ({
   flexGrow: 1,
   overflowY: 'auto',
   // Gradiente sutil para mejorar la visibilidad del contenido
-  background: 'linear-gradient(180deg, #1a1625 0%, #1f1a2e 100%)',
+  background: 'linear-gradient(180deg, #1A1A1A 0%, #232323 100%)',
 }));
 
 const Layout = ({ children }) => {
