@@ -3,15 +3,15 @@ import { Box, Typography, Grid, IconButton, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { ArrowForward } from "@mui/icons-material";
 import ToolCard from "../ToolCard/ToolCard";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 
 // Contenedor principal de la categoría
 const CategoryContainer = styled(Box)(({ theme }) => ({
     marginBottom: theme.spacing(6),
-    
+
     width: "100%",
 }));
 
@@ -24,7 +24,6 @@ const CategoryTitle = styled(Box)(({ theme }) => ({
         color: "white",
         fontSize: 28,
     },
-    
 }));
 
 // Contenedor de herramientas con posición relativa para los botones de desplazamiento
@@ -33,14 +32,14 @@ const ToolsContainer = styled(Box)(({ theme }) => ({
     padding: `0 ${theme.spacing(4)}`,
     maxWidth: "100%",
     marginTop: theme.spacing(3),
-    
 }));
 
 // Contenedor de cada tarjeta
 const CardContainer = styled(Box)(({ theme }) => ({
     padding: theme.spacing(0.5),
     height: "100%",
-    
+    position: "relative",
+    zIndex: 0,
 }));
 
 // Contenedor del título y botón Ver todas
@@ -52,7 +51,6 @@ const TitleContainer = styled(Box)(({ theme }) => ({
     width: "100%",
     paddingLeft: theme.spacing(10),
     paddingRight: theme.spacing(2),
-    
 }));
 
 // Botón Ver todas estilizado
@@ -71,6 +69,8 @@ const ViewAllButton = styled(Button)(({ theme }) => ({
     "&:hover .MuiButton-endIcon": {
         transform: "translateX(3px)",
     },
+    zIndex: 20,
+    position: "relative",
 }));
 
 const StyledSwiper = styled(Swiper)(({ theme }) => ({
@@ -78,20 +78,19 @@ const StyledSwiper = styled(Swiper)(({ theme }) => ({
     "& .swiper-button-next, & .swiper-button-prev": {
         color: "white",
         fontSize: "34px",
-        
+
         width: "68px",
         height: "80%",
         borderRadius: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'absolute',
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "absolute",
         top: "23%",
-        zIndex: 2,
+        zIndex: 20,
         "&:after": {
             fontSize: "24px",
         },
-        
     },
     "& .swiper-button-next": {
         right: "-68px",
@@ -99,9 +98,7 @@ const StyledSwiper = styled(Swiper)(({ theme }) => ({
     "& .swiper-button-prev": {
         left: "-65px",
     },
-    "& .swiper-button-disabled": {
-        opacity: 0.35,
-    },
+
     overflow: "visible",
     width: "95%",
 }));

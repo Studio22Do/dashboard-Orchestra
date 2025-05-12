@@ -19,9 +19,10 @@ const StyledCard = styled(Card)(({ theme }) => ({
   border: '2px solid',
   borderColor: 'transparent',
   transform: 'translateY(0)',
+  
   '&:hover': {
     borderColor: '#AC9DFB',
-    background: 'linear-gradient(180deg, #201C2E 0%, #342A5B 100%)',
+    background: 'linear-gradient(180deg, #342A5B 0%, #201C2E 100%)',
     transform: 'translateY(-8px) scale(1.02)',
     boxShadow: '0 8px 24px rgba(172, 157, 251, 0.15)',
     '& .MuiAvatar-root': {

@@ -41,7 +41,7 @@ import {
 import AppDetailDrawer from '../../components/AppDetailDrawer/AppDetailDrawer';
 import AppSearchHeader from '../../components/app-search/AppSearchHeader';
 const DashboardContainer = styled(Container)(({ theme }) => ({
-  paddingTop: theme.spacing(4),
+  paddingTop: 0,
   paddingBottom: theme.spacing(4),
   overflowX: 'visible', // Prevenir scroll horizontal
   maxWidth: '100%', // Asegurar que no exceda el ancho de la ventana
