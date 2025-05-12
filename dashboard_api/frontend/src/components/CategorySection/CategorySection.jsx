@@ -87,6 +87,12 @@ const StyledSwiper = styled(Swiper)(({ theme }) => ({
         "&:hover": {
             backgroundColor: theme.palette.primary.main,
         },
+        "&.swiper-button-next": {
+            right: "-50px",
+        },
+        "&.swiper-button-prev": {
+            left: "-50px",
+        }
     },
     "& .swiper-button-disabled": {
         opacity: 0.35,

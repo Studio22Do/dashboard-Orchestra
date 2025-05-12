@@ -13,13 +13,22 @@ const StyledCard = styled(Card)(({ theme }) => ({
   background: 'linear-gradient(180deg, #342A5B 0%, #201C2E 100%)',
   boxShadow: '0 4px 12px rgba(0,0,0,0.10)',
   overflow: 'hidden',
-  transition: 'border-color 0.35s cubic-bezier(.4,2,.3,1), background 0.5s cubic-bezier(.4,2,.3,1);',
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   minHeight: 120,
   border: '2px solid',
   borderColor: 'transparent',
+  transform: 'translateY(0)',
   '&:hover': {
     borderColor: '#AC9DFB',
     background: 'linear-gradient(180deg, #201C2E 0%, #342A5B 100%)',
+    transform: 'translateY(-8px) scale(1.02)',
+    boxShadow: '0 8px 24px rgba(172, 157, 251, 0.15)',
+    '& .MuiAvatar-root': {
+      transform: 'scale(1.1)',
+      '& svg': {
+        transform: 'scale(1.1)',
+      }
+    }
   },
 }));
 
@@ -30,9 +39,11 @@ const IconContainer = styled(Avatar)(({ theme }) => ({
   borderRadius: 12,
   backgroundColor: 'transparent',
   marginBottom: theme.spacing(1.5),
+  transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   '& svg': {
     fontSize: 40,
     color: 'white',
+    transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   }
 }));
 
