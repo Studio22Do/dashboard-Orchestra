@@ -8,11 +8,12 @@ const StyledCard = styled(Card)(({ theme }) => ({
   width: '100%',
   cursor: 'pointer',
   display: 'flex',
-  flexDirection: 'column',
+  flexDirection: 'row',
+  alignItems: 'center',
   borderRadius: 18,
   background: 'linear-gradient(180deg, #342A5B 0%, #201C2E 100%)',
   boxShadow: '0 4px 12px rgba(0,0,0,0.10)',
-  overflow: 'hidden',
+  overflow: 'visible',
   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   minHeight: 120,
   border: '2px solid',
@@ -34,14 +35,19 @@ const StyledCard = styled(Card)(({ theme }) => ({
 
 // Contenedor del icono con color primario
 const IconContainer = styled(Avatar)(({ theme }) => ({
-  width: 60,
-  height: 60,
+  width: 80,
+  height: 80,
   borderRadius: 12,
   backgroundColor: 'transparent',
-  marginBottom: theme.spacing(1.5),
+  marginRight: theme.spacing(2.5),
+  marginBottom: 0,
+  marginLeft: theme.spacing(2.5),
   transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   '& svg': {
-    fontSize: 40,
+    fontSize: 66,
     color: 'white',
     transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   }
@@ -51,28 +57,32 @@ const IconContainer = styled(Avatar)(({ theme }) => ({
 const StyledContent = styled(CardContent)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  padding: theme.spacing(3),
+  justifyContent: 'center',
+  padding: `${theme.spacing(2)} 0`,
   height: '100%',
+  maxWidth: 180,
   '&:last-child': {
-    paddingBottom: theme.spacing(3),
+    paddingBottom: theme.spacing(2),
   },
 }));
 
 const ToolCard = ({ title, icon: Icon, onClick }) => {
   return (
     <StyledCard onClick={onClick}>
+      <IconContainer>
+        {Icon && <Icon />}
+      </IconContainer>
       <StyledContent>
-        <IconContainer>
-          {Icon && <Icon />}
-        </IconContainer>
         <Typography 
           variant="h6" 
           component="h3" 
           sx={{ 
-            fontWeight: 500, 
+            fontWeight: 600, 
             color: 'white',
-            fontSize: '1rem',
-            lineHeight: 1.3
+            fontSize: '1.25rem',
+            lineHeight: 1.3,
+            textAlign: 'left',
+            wordBreak: 'break-word',
           }}
         >
           {title}

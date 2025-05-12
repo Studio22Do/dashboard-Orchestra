@@ -77,27 +77,31 @@ const StyledSwiper = styled(Swiper)(({ theme }) => ({
     padding: theme.spacing(2),
     "& .swiper-button-next, & .swiper-button-prev": {
         color: "white",
-        backgroundColor: "rgba(20, 20, 30, 0.7)",
-        width: "40px",
-        height: "40px",
-        borderRadius: "50%",
+        fontSize: "34px",
+        
+        width: "68px",
+        height: "80%",
+        borderRadius: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'absolute',
+        top: "23%",
+        zIndex: 2,
         "&:after": {
-            fontSize: "20px",
+            fontSize: "24px",
         },
-        "&:hover": {
-            backgroundColor: theme.palette.primary.main,
-        },
-        "&.swiper-button-next": {
-            right: "-50px",
-        },
-        "&.swiper-button-prev": {
-            left: "-50px",
-        }
+        
+    },
+    "& .swiper-button-next": {
+        right: "-68px",
+    },
+    "& .swiper-button-prev": {
+        left: "-65px",
     },
     "& .swiper-button-disabled": {
         opacity: 0.35,
     },
-    
     overflow: "visible",
     width: "95%",
 }));

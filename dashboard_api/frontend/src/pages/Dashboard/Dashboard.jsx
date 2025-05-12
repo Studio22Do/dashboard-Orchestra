@@ -45,6 +45,7 @@ const DashboardContainer = styled(Container)(({ theme }) => ({
   paddingBottom: theme.spacing(4),
   overflowX: 'visible', // Prevenir scroll horizontal
   maxWidth: '100%', // Asegurar que no exceda el ancho de la ventana
+  border: '1px solid red'
 }));
 
 const Dashboard = () => {
