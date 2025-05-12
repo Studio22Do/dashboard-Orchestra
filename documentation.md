@@ -251,6 +251,32 @@ Para migrar de desarrollo a producción:
 - Verificar conexión con backend
 - Comprobar estado de Redux
 
+### Dependencias Faltantes
+Si después de un `git pull` encuentras errores como:
+```
+Module not found: Error: Can't resolve 'swiper/react'
+Module not found: Error: Can't resolve 'swiper/modules'
+Module not found: Error: Can't resolve 'swiper/css'
+```
+Esto significa que faltan dependencias que están siendo utilizadas en el código. Para solucionarlo:
+
+1. Instalar las dependencias faltantes:
+   ```bash
+   npm install swiper
+   # o
+   yarn add swiper
+   ```
+
+2. Si el error persiste, verifica el `package.json` y asegúrate de que todas las dependencias estén listadas.
+
+3. Después de cada `git pull`, siempre ejecuta:
+   ```bash
+   npm install
+   # o
+   yarn install
+   ```
+   para actualizar todas las dependencias.
+
 ### APIs Externas
 - Validar claves de API
 - Comprobar límites de uso
