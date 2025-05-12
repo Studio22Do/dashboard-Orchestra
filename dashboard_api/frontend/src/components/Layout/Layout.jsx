@@ -4,10 +4,6 @@ import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { styled } from '@mui/material/styles';
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
 // Componente principal con fondo oscuro
 const MainContent = styled(Box)(({ theme }) => ({
   flexGrow: 1,
@@ -15,7 +11,6 @@ const MainContent = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
-  border: "2px solid #AC1DFB",
 }));
 
 // Contenedor para el contenido principal
@@ -28,10 +23,9 @@ const ContentContainer = styled(Box)(({ theme }) => ({
   overflowY: 'auto',
   // Gradiente sutil para mejorar la visibilidad del contenido
   background: 'linear-gradient(180deg, #1a1625 0%, #1f1a2e 100%)',
-  border: "2px solid #AC1DFB",
 }));
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children }) => {
   const theme = useTheme();
 
   return (
@@ -47,4 +41,4 @@ const Layout = ({ children }: LayoutProps) => {
   );
 };
 
-export default Layout; 
+export default Layout;

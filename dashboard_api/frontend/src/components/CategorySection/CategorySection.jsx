@@ -11,7 +11,7 @@ import 'swiper/css/navigation';
 // Contenedor principal de la categoría
 const CategoryContainer = styled(Box)(({ theme }) => ({
     marginBottom: theme.spacing(6),
-    border: "2px solid #AC9DFB",
+    
     width: "100%",
 }));
 
@@ -40,6 +40,7 @@ const ToolsContainer = styled(Box)(({ theme }) => ({
 const CardContainer = styled(Box)(({ theme }) => ({
     padding: theme.spacing(0.5),
     height: "100%",
+    
 }));
 
 // Contenedor del título y botón Ver todas
@@ -49,6 +50,9 @@ const TitleContainer = styled(Box)(({ theme }) => ({
     alignItems: "center",
     marginBottom: theme.spacing(0.5),
     width: "100%",
+    paddingLeft: theme.spacing(10),
+    paddingRight: theme.spacing(2),
+    
 }));
 
 // Botón Ver todas estilizado
@@ -87,8 +91,9 @@ const StyledSwiper = styled(Swiper)(({ theme }) => ({
     "& .swiper-button-disabled": {
         opacity: 0.35,
     },
-    border: "2px solid #AC9DFB",
+    
     overflow: "visible",
+    width: "95%",
 }));
 
 const CategorySection = ({ title, icon: Icon, tools, onViewAll }) => {

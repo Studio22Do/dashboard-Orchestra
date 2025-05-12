@@ -572,11 +572,11 @@ const Dashboard = () => {
 
   return (
     <DashboardContainer
-      style={{ border: "2px solid red", padding: "0px", margin: "0px", width: "100%" }}
+      style={{ padding: "0px", margin: "0px", width: "100%" }}
       maxWidth={false}
       disableGutters
     >
-      <Box sx={{ mb: 4, width: '100%', overflowX: 'hidden', border: "2px solid #AC1DFB" }}>
+      <Box sx={{ mb: 4, width: '100%', overflowX: 'hidden' }}>
         <AppSearchHeader />
         {categories.map((category) => (
           <CategorySection
