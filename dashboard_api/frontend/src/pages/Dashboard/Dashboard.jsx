@@ -43,7 +43,7 @@ import AppSearchHeader from '../../components/app-search/AppSearchHeader';
 const DashboardContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(4),
   paddingBottom: theme.spacing(4),
-  overflowX: 'hidden', // Prevenir scroll horizontal
+  overflowX: 'visible', // Prevenir scroll horizontal
   maxWidth: '100%', // Asegurar que no exceda el ancho de la ventana
 }));
 
@@ -571,8 +571,12 @@ const Dashboard = () => {
   ];
 
   return (
-    <DashboardContainer>
-      <Box sx={{ mb: 4, width: '100%', overflowX: 'hidden' }}>
+    <DashboardContainer
+      style={{ border: "2px solid red", padding: "0px", margin: "0px", width: "100%" }}
+      maxWidth={false}
+      disableGutters
+    >
+      <Box sx={{ mb: 4, width: '100%', overflowX: 'hidden', border: "2px solid #AC1DFB" }}>
         <AppSearchHeader />
         {categories.map((category) => (
           <CategorySection
