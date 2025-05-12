@@ -11,7 +11,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
   borderRadius: 18,
-  background: 'linear-gradient(180deg, #342A5B 0%, #201C2E 100%)',
+  background: 'linear-gradient(180deg, #201C2E 0%, #342A5B 100%)',
   boxShadow: '0 4px 12px rgba(0,0,0,0.10)',
   overflow: 'visible',
   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
