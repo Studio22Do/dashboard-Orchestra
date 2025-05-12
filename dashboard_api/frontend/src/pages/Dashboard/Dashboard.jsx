@@ -39,7 +39,7 @@ import {
   Settings
 } from '@mui/icons-material';
 import AppDetailDrawer from '../../components/AppDetailDrawer/AppDetailDrawer';
-
+import AppSearchHeader from '../../components/app-search/AppSearchHeader';
 const DashboardContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(4),
   paddingBottom: theme.spacing(4),
@@ -573,6 +573,7 @@ const Dashboard = () => {
   return (
     <DashboardContainer>
       <Box sx={{ mb: 4, width: '100%', overflowX: 'hidden' }}>
+        <AppSearchHeader />
         {categories.map((category) => (
           <CategorySection
             key={category.id}
