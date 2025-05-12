@@ -29,12 +29,44 @@ import { addNotification } from '../../redux/slices/uiSlice';
 
 // AppBar estilizado con colores del diseño
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundColor: '#1a1625', // Fondo oscuro como en la imagen
-  borderBottom: 'none',
+  backgroundColor: '#231c36', // Morado oscuro
   boxShadow: 'none',
-  position: 'sticky',
-  zIndex: theme.zIndex.drawer + 1,
+  borderBottom: 'none',
+  height: 72, // Ajusta la altura
+  justifyContent: 'center',
 }));
+
+const NavbarContent = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+  padding: '0 40px', // Padding horizontal generoso
+  height: '72px',
+});
+
+const Title = styled(Typography)({
+  color: '#fff',
+  fontWeight: 400,
+  fontSize: 22,
+  letterSpacing: 0.5,
+  fontFamily: 'inherit',
+});
+
+const IconGroup = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 18,
+});
+
+const WhiteAvatar = styled(Avatar)({
+  backgroundColor: '#fff',
+  color: '#231c36',
+  width: 40,
+  height: 40,
+  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+  cursor: 'pointer',
+});
 
 // Campo de búsqueda estilizado
 const SearchField = styled(TextField)(({ theme }) => ({
@@ -117,123 +149,23 @@ const Navbar = () => {
   };
 
   return (
-    <StyledAppBar>
-      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography 
-          variant="h6" 
-          sx={{ 
-            fontWeight: 500, 
-            color: 'white',
-            display: { xs: 'none', sm: 'block' }
-          }}
-        >
+    <StyledAppBar position="static">
+      <NavbarContent>
+        <Title>
           Marketing Intelligence Console
-        </Typography>
-        
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          width: '100%', 
-          maxWidth: '800px',
-          mx: 'auto',
-          px: 2
-        }}>
-          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 1, display: { xs: 'none', md: 'block' } }}>
-            Explora nuestra colección de aplicaciones que utilizan APIs de RapidAPI
-          </Typography>
-          
-          <SearchField
-            placeholder="Buscar Apps..."
-            variant="outlined"
-            fullWidth
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Box>
-        
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        </Title>
+        <IconGroup>
           <IconButton size="medium" sx={{ color: 'white' }}>
             <Notifications />
           </IconButton>
           <IconButton size="medium" sx={{ color: 'white' }}>
             <Settings />
           </IconButton>
-          
-          {/* Avatar con menú desplegable */}
-          <Avatar 
-            onClick={handleOpenMenu}
-            sx={{ 
-              width: 36, 
-              height: 36,
-              cursor: 'pointer',
-              bgcolor: '#837CF3', // Color morado claro
-              '&:hover': { opacity: 0.9 }
-            }}
-          >
-            {getUserInitials()}
-          </Avatar>
-          
-          {/* Menú de usuario */}
-          <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleCloseMenu}
-            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            PaperProps={{
-              elevation: 3,
-              sx: { 
-                minWidth: 180,
-                mt: 1,
-                backgroundColor: '#242424',
-                color: 'white'
-              }
-            }}
-          >
-            <Box sx={{ px: 2, py: 1 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                {user?.name || 'Usuario'}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                {user?.email || 'usuario@ejemplo.com'}
-              </Typography>
-            </Box>
-            
-            <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-            
-            <MenuItem onClick={() => handleMenuOption('profile')}>
-              <ListItemIcon>
-                <AccountCircle fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
-              </ListItemIcon>
-              Mi Perfil
-            </MenuItem>
-            
-            <MenuItem onClick={() => handleMenuOption('password')}>
-              <ListItemIcon>
-                <Lock fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
-              </ListItemIcon>
-              Cambiar Contraseña
-            </MenuItem>
-            
-            <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-            
-            <MenuItem onClick={() => handleMenuOption('logout')}>
-              <ListItemIcon>
-                <Logout fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
-              </ListItemIcon>
-              Cerrar Sesión
-            </MenuItem>
-          </Menu>
-        </Box>
-      </Toolbar>
+          <WhiteAvatar>
+            <AccountCircle sx={{ fontSize: 30 }} />
+          </WhiteAvatar>
+        </IconGroup>
+      </NavbarContent>
     </StyledAppBar>
   );
 };
