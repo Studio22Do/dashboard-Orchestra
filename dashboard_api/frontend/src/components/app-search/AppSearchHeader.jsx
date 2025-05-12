@@ -9,7 +9,8 @@ const Container = styled(Box)({
   flexDirection: 'column',
   alignItems: 'center',
   margin: 0,
-  padding: 0,
+  paddingTop: 20,
+  paddingBottom: 0,
 });
 
 const SearchField = styled(TextField)(({ theme }) => ({
