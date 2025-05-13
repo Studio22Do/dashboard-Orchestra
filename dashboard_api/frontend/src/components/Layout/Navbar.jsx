@@ -9,9 +9,11 @@ import {
   Menu, 
   MenuItem, 
   ListItemIcon, 
+  ListItemText,
   Divider,
   TextField,
-  InputAdornment
+  InputAdornment,
+  Switch
 } from '@mui/material';
 import { 
   Notifications, 
@@ -19,7 +21,11 @@ import {
   AccountCircle, 
   Lock, 
   Logout,
-  Search
+  Search,
+  Person,
+  Palette,
+  Language,
+  ViewCompact
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -96,14 +102,17 @@ const Navbar = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   
-  // Estado para controlar el menú de usuario
+  // Estados para los menús
   const [anchorEl, setAnchorEl] = useState(null);
+  const [settingsAnchor, setSettingsAnchor] = useState(null);
   const open = Boolean(anchorEl);
+  const settingsOpen = Boolean(settingsAnchor);
   
-  // Estado para búsqueda
-  const [searchQuery, setSearchQuery] = useState('');
+  // Estados para las configuraciones
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [emailNotifications, setEmailNotifications] = useState(true);
   
-  // Controladores de eventos para el menú
+  // Controladores para el menú de usuario
   const handleOpenMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -111,7 +120,34 @@ const Navbar = () => {
   const handleCloseMenu = () => {
     setAnchorEl(null);
   };
-  
+
+  // Controladores para el menú de configuración
+  const handleSettingsOpen = (event) => {
+    setSettingsAnchor(event.currentTarget);
+  };
+
+  const handleSettingsClose = () => {
+    setSettingsAnchor(null);
+  };
+
+  // Manejadores de configuración
+  const handleThemeChange = () => {
+    setIsDarkMode(!isDarkMode);
+    // Aquí iría la lógica para cambiar el tema
+    dispatch(addNotification({
+      message: `Tema cambiado a ${!isDarkMode ? 'oscuro' : 'claro'}`,
+      type: 'info'
+    }));
+  };
+
+  const handleLanguageChange = () => {
+    // Aquí iría la lógica para cambiar el idioma
+    dispatch(addNotification({
+      message: 'Cambio de idioma próximamente',
+      type: 'info'
+    }));
+  };
+
   // Manejador de opciones del menú
   const handleMenuOption = (option) => {
     handleCloseMenu();
@@ -158,12 +194,116 @@ const Navbar = () => {
           <IconButton size="medium" sx={{ color: 'white' }}>
             <Notifications />
           </IconButton>
-          <IconButton size="medium" sx={{ color: 'white' }}>
+          <IconButton 
+            size="medium" 
+            sx={{ color: 'white' }}
+            onClick={handleSettingsOpen}
+          >
             <Settings />
           </IconButton>
-          <WhiteAvatar>
-            <AccountCircle sx={{ fontSize: 30 }} />
+          <WhiteAvatar onClick={handleOpenMenu}>
+            {getUserInitials()}
           </WhiteAvatar>
+
+          {/* Menú de Usuario existente */}
+          <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleCloseMenu}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                overflow: 'visible',
+                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                mt: 1.5,
+                '& .MuiAvatar-root': {
+                  width: 32,
+                  height: 32,
+                  ml: -0.5,
+                  mr: 1,
+                },
+              },
+            }}
+          >
+            <MenuItem onClick={() => handleMenuOption('profile')}>
+              <ListItemIcon>
+                <Person fontSize="small" />
+              </ListItemIcon>
+              Mi Perfil
+            </MenuItem>
+            <MenuItem onClick={() => handleMenuOption('password')}>
+              <ListItemIcon>
+                <Lock fontSize="small" />
+              </ListItemIcon>
+              Cambiar Contraseña
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={() => handleMenuOption('logout')}>
+              <ListItemIcon>
+                <Logout fontSize="small" />
+              </ListItemIcon>
+              Cerrar Sesión
+            </MenuItem>
+          </Menu>
+
+          {/* Nuevo Menú de Configuración */}
+          <Menu
+            anchorEl={settingsAnchor}
+            open={settingsOpen}
+            onClose={handleSettingsClose}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                width: 280,
+                maxHeight: 400,
+                overflow: 'auto',
+              },
+            }}
+          >
+            {/* Sección de Apariencia */}
+            <Box sx={{ px: 2, py: 1 }}>
+              <Typography variant="subtitle2" color="text.secondary">
+                Apariencia
+              </Typography>
+            </Box>
+            <MenuItem onClick={handleThemeChange}>
+              <ListItemIcon>
+                <Palette fontSize="small" />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Tema"
+                secondary={isDarkMode ? "Modo Oscuro" : "Modo Claro"}
+              />
+              <Switch checked={isDarkMode} />
+            </MenuItem>
+            
+            <MenuItem onClick={handleLanguageChange}>
+              <ListItemIcon>
+                <Language fontSize="small" />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Idioma"
+                secondary="Español"
+              />
+            </MenuItem>
+
+            {/* Sección de Interfaz */}
+            <Divider />
+            <Box sx={{ px: 2, py: 1 }}>
+              <Typography variant="subtitle2" color="text.secondary">
+                Interfaz
+              </Typography>
+            </Box>
+            <MenuItem>
+              <ListItemIcon>
+                <ViewCompact fontSize="small" />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Densidad"
+                secondary="Normal"
+              />
+            </MenuItem>
+          </Menu>
         </IconGroup>
       </NavbarContent>
     </StyledAppBar>
