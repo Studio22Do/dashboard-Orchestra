@@ -35,6 +35,7 @@ import {
   Brush,
   Lightbulb
 } from '@mui/icons-material';
+import axios from 'axios';
 
 const MidjourneyExperience = () => {
   const [promptData, setPromptData] = useState({
@@ -48,6 +49,7 @@ const MidjourneyExperience = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [generatedPrompt, setGeneratedPrompt] = useState(null);
+  const [taskId, setTaskId] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -67,12 +69,10 @@ const MidjourneyExperience = () => {
     
     setLoading(true);
     setError(null);
+    setTaskId(null);
     
     try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      // Construir el prompt real
       const stylePrompts = {
         realistic: 'photorealistic, highly detailed, 8k resolution',
         artistic: 'artistic, creative, unique style, masterpiece',
@@ -101,7 +101,15 @@ const MidjourneyExperience = () => {
         peaceful: 'calm, serene, peaceful atmosphere'
       };
 
-      const prompt = `/imagine prompt: ${promptData.subject}, ${stylePrompts[promptData.style]}, ${lightingPrompts[promptData.lighting]}, ${cameraPrompts[promptData.camera]}, ${moodPrompts[promptData.mood]}, ${promptData.additionalDetails} --ar 16:9 --v 5`;
+      const prompt = `${promptData.subject}, ${stylePrompts[promptData.style]}, ${lightingPrompts[promptData.lighting]}, ${cameraPrompts[promptData.camera]}, ${moodPrompts[promptData.mood]}, ${promptData.additionalDetails} --ar 16:9 --v 5`;
+
+      // Llamar al backend real
+      const response = await axios.post('/api/midjourney/generate-fast', { prompt });
+      if (response.data && response.data.data && response.data.data.task_id) {
+        setTaskId(response.data.data.task_id);
+      } else {
+        setError('No se pudo obtener el task_id de la API');
+      }
 
       setGeneratedPrompt({
         fullPrompt: prompt,
@@ -123,7 +131,7 @@ const MidjourneyExperience = () => {
       });
     } catch (err) {
       console.error('Error generating prompt:', err);
-      setError(err.message || 'Error al generar el prompt');
+      setError(err.response?.data?.error || err.message || 'Error al generar el prompt');
     } finally {
       setLoading(false);
     }
@@ -276,6 +284,13 @@ const MidjourneyExperience = () => {
       {!loading && error && (
         <Alert severity="error" sx={{ mb: 4 }}>
           {error}
+        </Alert>
+      )}
+
+      {taskId && (
+        <Alert severity="success" sx={{ mb: 4 }}>
+          <strong>¡Prompt enviado a Midjourney!</strong><br />
+          <span>Task ID: <code>{taskId}</code></span>
         </Alert>
       )}
 

@@ -28,12 +28,15 @@ import {
   Assessment,
   Speed
 } from '@mui/icons-material';
+import axios from 'axios';
 
 const WordCount = () => {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [analysis, setAnalysis] = useState(null);
+  const [url, setUrl] = useState('');
+  const [extracting, setExtracting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -117,6 +120,29 @@ const WordCount = () => {
     document.body.removeChild(element);
   };
 
+  const handleExtractFromUrl = async () => {
+    if (!url.trim()) {
+      setError('Por favor ingresa una URL válida');
+      return;
+    }
+    setExtracting(true);
+    setError(null);
+    try {
+      const response = await axios.post('/api/text-extract/extract', { url });
+      if (response.data && response.data.text) {
+        setText(response.data.text);
+      } else if (typeof response.data === 'string') {
+        setText(response.data);
+      } else {
+        setError('No se pudo extraer el texto de la URL');
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || err.message || 'Error al extraer el texto');
+    } finally {
+      setExtracting(false);
+    }
+  };
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
@@ -128,6 +154,35 @@ const WordCount = () => {
 
       <Card sx={{ mb: 4 }}>
         <CardContent>
+          <Box sx={{ mb: 2 }}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} md={9}>
+                <TextField
+                  fullWidth
+                  label="Extraer texto desde URL"
+                  value={url}
+                  onChange={e => setUrl(e.target.value)}
+                  placeholder="Pega aquí la URL de un artículo, blog, etc."
+                  InputProps={{
+                    startAdornment: (
+                      <TextFields color="action" sx={{ mr: 1 }} />
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={handleExtractFromUrl}
+                  disabled={extracting || loading}
+                  sx={{ height: '56px' }}
+                >
+                  {extracting ? <CircularProgress size={24} /> : 'Extraer Texto'}
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
           <Box component="form" onSubmit={handleSubmit}>
             <Grid container spacing={3}>
               <Grid item xs={12}>

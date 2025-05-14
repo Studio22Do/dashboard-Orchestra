@@ -34,6 +34,7 @@ def create_app(config_object):
     from api.routes.youtube_media import youtube_media_bp
     from api.routes.file_converter import file_converter_bp
     from api.routes.tiktok_api import tiktok_api_bp
+    from api.routes.ai_humanizer import ai_humanizer_bp
     
     print("Registrando blueprint: auth_bp en /api/auth")
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -64,6 +65,9 @@ def create_app(config_object):
     
     print("Registrando blueprint: tiktok_api_bp en /api/tiktok")
     app.register_blueprint(tiktok_api_bp, url_prefix='/api/tiktok')
+    
+    print("Registrando blueprint: ai_humanizer_bp en /api/ai-humanizer")
+    app.register_blueprint(ai_humanizer_bp, url_prefix='/api/ai-humanizer')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers

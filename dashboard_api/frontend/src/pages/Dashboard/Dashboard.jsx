@@ -255,18 +255,18 @@ const Dashboard = () => {
           }
         },
         {
-          id: 'gerwin-ai',
-          title: 'Gerwin AI Beta',
+          id: 'ai-humanizer',
+          title: 'AI Humanizer API',
           icon: Architecture,
           onClick: () => {
             setSelectedApp({
-              id: 'gerwin-ai',
-              title: 'Gerwin AI',
+              id: 'ai-humanizer',
+              title: 'AI Humanizer',
               description: 'Plataforma de IA avanzada para análisis y generación de contenido',
               imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
               category: 'Creative & Content',
-              route: '/apps/gerwin-ai',
-              apiName: 'Gerwin AI API',
+              route: '/apps/ai-humanizer',
+              apiName: 'AI Humanizer API',
             });
             setDrawerOpen(true);
           }

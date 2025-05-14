@@ -35,13 +35,13 @@ import MidjourneyExperience from './pages/MidjourneyExperience/MidjourneyExperie
 import WordCount from './pages/WordCount/WordCount';
 import PdfToText from './pages/PdfToText/PdfToText';
 import SnapVideo from './pages/SnapVideo/SnapVideo';
-import GerwinAI from './pages/GerwinAI/GerwinAI';
 import OpenAITextToSpeech from './pages/OpenAITextToSpeech/OpenAITextToSpeech';
 import GenieAI from './pages/GenieAI/GenieAI';
 import AISocialMediaContent from './pages/AISocialMediaContent/AISocialMediaContent';
 import AdvancedImageManipulation from './pages/AdvancedImageManipulation/AdvancedImageManipulation';
 import WhisperFromURL from './pages/WhisperFromURL/WhisperFromURL';
 import RunwayML from './pages/RunwayML/RunwayML';
+import AIHumanizer from './pages/AIHumanizer/AIHumanizer';
 import theme from './theme';
 
 // Theme configuration function
@@ -375,12 +375,6 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/apps/gerwin-ai" element={
-            <ProtectedRoute>
-              <GerwinAI />
-            </ProtectedRoute>
-          } />
-          
           <Route path="/apps/openai-text-to-speech" element={
             <ProtectedRoute>
               <OpenAITextToSpeech />
@@ -414,6 +408,12 @@ function App() {
           <Route path="/apps/runway-ml" element={
             <ProtectedRoute>
               <RunwayML />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/apps/ai-humanizer" element={
+            <ProtectedRoute>
+              <AIHumanizer />
             </ProtectedRoute>
           } />
           
