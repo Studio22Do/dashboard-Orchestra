@@ -73,44 +73,44 @@ const WhisperFromURL = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!url.trim()) {
       setError('Por favor ingresa una URL');
       return;
     }
-
     if (!validateUrl(url)) {
       setError('Por favor ingresa una URL válida');
       return;
     }
-    
     setLoading(true);
     setError(null);
-    
+    setTranscription(null);
     try {
-      // Simulación de llamada a API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      const response = await fetch('/api/whisper-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          audio_url: url,
+          language,
+          model
+        })
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al transcribir el audio');
+      }
+      const data = await response.json();
       const newTranscription = {
         url,
         language,
         model,
-        text: 'Esta es una transcripción simulada del audio. En una implementación real, esta transcripción vendría de la API de Whisper.',
-        metadata: {
-          duration: '2:30',
-          confidence: 0.95,
-          words: 150,
-          segments: 5
-        },
+        text: data.text || data.transcription || 'No se recibió transcripción',
+        metadata: data.metadata || {},
         timestamp: new Date().toLocaleString()
       };
-      
       setTranscription(newTranscription);
       setHistory(prev => [newTranscription, ...prev]);
       setUrl('');
-      
     } catch (err) {
-      console.error('Error transcribing audio:', err);
       setError(err.message || 'Error al transcribir el audio');
     } finally {
       setLoading(false);

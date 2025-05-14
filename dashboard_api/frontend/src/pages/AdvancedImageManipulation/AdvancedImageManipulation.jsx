@@ -41,74 +41,86 @@ import {
 } from '@mui/icons-material';
 
 const AdvancedImageManipulation = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [operation, setOperation] = useState('enhance');
+  const [imageUrl, setImageUrl] = useState('');
+  const [operation, setOperation] = useState('resize');
   const [parameters, setParameters] = useState({
-    brightness: 0,
-    contrast: 0,
-    saturation: 0,
-    sharpness: 0
+    width: '',
+    height: '',
+    blur: '',
+    angle: '',
+    left: '',
+    upper: '',
+    right: '',
+    lower: '',
+    method: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [processedImage, setProcessedImage] = useState(null);
+  const [processedImageUrl, setProcessedImageUrl] = useState(null);
   const [history, setHistory] = useState([]);
 
   const operations = [
-    { value: 'enhance', label: 'Mejorar Imagen', icon: <PhotoCamera /> },
-    { value: 'filter', label: 'Aplicar Filtro', icon: <Filter /> },
-    { value: 'crop', label: 'Recortar', icon: <Crop /> },
-    { value: 'adjust', label: 'Ajustar', icon: <Adjust /> },
-    { value: 'colorize', label: 'Colorizar', icon: <Palette /> }
+    { value: 'resize', label: 'Redimensionar (Resize)' },
+    { value: 'blur', label: 'Desenfocar (Blur)' },
+    { value: 'crop', label: 'Recortar (Crop)' },
+    { value: 'rotate', label: 'Rotar (Rotate)' },
+    { value: 'thumbnail', label: 'Miniatura (Thumbnail)' },
+    { value: 'transpose', label: 'Transponer (Transpose)' }
   ];
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        setError('Por favor selecciona un archivo de imagen válido');
-        return;
-      }
-      setSelectedFile(file);
-      setError(null);
-    }
-  };
+  const transposeMethods = [
+    'FLIP_LEFT_RIGHT',
+    'FLIP_TOP_BOTTOM',
+    'ROTATE_180',
+    'ROTATE_270',
+    'ROTATE_90',
+    'TRANSPOSE',
+    'TRANSVERSE'
+  ];
 
-  const handleParameterChange = (parameter) => (event, newValue) => {
+  const handleParameterChange = (parameter) => (event) => {
     setParameters(prev => ({
       ...prev,
-      [parameter]: newValue
+      [parameter]: event.target.value
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!selectedFile) {
-      setError('Por favor selecciona una imagen');
+    if (!imageUrl.trim()) {
+      setError('Por favor ingresa la URL de la imagen');
       return;
     }
-    
     setLoading(true);
     setError(null);
-    
+    setProcessedImageUrl(null);
     try {
-      // Simulación de procesamiento de imagen
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const newProcessedImage = {
-        operation,
-        parameters,
-        originalFile: selectedFile,
-        processedUrl: URL.createObjectURL(selectedFile), // En una implementación real, esto sería la URL de la imagen procesada
-        timestamp: new Date().toLocaleString()
-      };
-      
-      setProcessedImage(newProcessedImage);
-      setHistory(prev => [newProcessedImage, ...prev]);
-      
+      const response = await fetch('/api/image-manipulation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation,
+          source_url: imageUrl,
+          params: parameters
+        })
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al procesar la imagen');
+      }
+      const data = await response.json();
+      if (data.urls && data.urls.length > 0) {
+        setProcessedImageUrl(data.urls[0]);
+        setHistory(prev => [{
+          operation,
+          parameters,
+          processedUrl: data.urls[0],
+          timestamp: new Date().toLocaleString()
+        }, ...prev]);
+      } else {
+        setError('No se recibió una imagen procesada');
+      }
     } catch (err) {
-      console.error('Error processing image:', err);
       setError(err.message || 'Error al procesar la imagen');
     } finally {
       setLoading(false);
@@ -116,10 +128,10 @@ const AdvancedImageManipulation = () => {
   };
 
   const handleDownload = () => {
-    if (processedImage) {
+    if (processedImageUrl) {
       const link = document.createElement('a');
-      link.href = processedImage.processedUrl;
-      link.download = `processed_${selectedFile.name}`;
+      link.href = processedImageUrl;
+      link.download = 'processed_image.jpg';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -146,97 +158,168 @@ const AdvancedImageManipulation = () => {
               <Box component="form" onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
                   <Grid item xs={12}>
-                    <Button
-                      variant="outlined"
-                      component="label"
+                    <TextField
+                      label="URL de la Imagen"
+                      value={imageUrl}
+                      onChange={e => setImageUrl(e.target.value)}
                       fullWidth
-                      startIcon={<Upload />}
-                      sx={{ height: '100px', borderStyle: 'dashed' }}
-                    >
-                      {selectedFile ? selectedFile.name : 'Seleccionar Imagen'}
-                      <input
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        onChange={handleFileChange}
-                      />
-                    </Button>
+                      required
+                      placeholder="https://..."
+                    />
                   </Grid>
-                  
-                  <Grid item xs={12}>
+                  <Grid item xs={12} md={6}>
                     <FormControl fullWidth>
                       <InputLabel>Operación</InputLabel>
                       <Select
                         value={operation}
-                        onChange={(e) => setOperation(e.target.value)}
+                        onChange={e => setOperation(e.target.value)}
                         label="Operación"
                       >
                         {operations.map((op) => (
-                          <MenuItem key={op.value} value={op.value}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              {op.icon}
-                              {op.label}
-                            </Box>
-                          </MenuItem>
+                          <MenuItem key={op.value} value={op.value}>{op.label}</MenuItem>
                         ))}
                       </Select>
                     </FormControl>
                   </Grid>
-                  
-                  {operation === 'adjust' && (
+                  {/* Parámetros dinámicos según operación */}
+                  {operation === 'resize' && (
                     <>
-                      <Grid item xs={12}>
-                        <Typography gutterBottom>Brillo</Typography>
-                        <Slider
-                          value={parameters.brightness}
-                          onChange={handleParameterChange('brightness')}
-                          min={-100}
-                          max={100}
-                          valueLabelDisplay="auto"
+                      <Grid item xs={6} md={3}>
+                        <TextField
+                          label="Ancho (px)"
+                          type="number"
+                          value={parameters.width}
+                          onChange={handleParameterChange('width')}
+                          fullWidth
+                          required
                         />
                       </Grid>
-                      
-                      <Grid item xs={12}>
-                        <Typography gutterBottom>Contraste</Typography>
-                        <Slider
-                          value={parameters.contrast}
-                          onChange={handleParameterChange('contrast')}
-                          min={-100}
-                          max={100}
-                          valueLabelDisplay="auto"
-                        />
-                      </Grid>
-                      
-                      <Grid item xs={12}>
-                        <Typography gutterBottom>Saturación</Typography>
-                        <Slider
-                          value={parameters.saturation}
-                          onChange={handleParameterChange('saturation')}
-                          min={-100}
-                          max={100}
-                          valueLabelDisplay="auto"
-                        />
-                      </Grid>
-                      
-                      <Grid item xs={12}>
-                        <Typography gutterBottom>Nitidez</Typography>
-                        <Slider
-                          value={parameters.sharpness}
-                          onChange={handleParameterChange('sharpness')}
-                          min={0}
-                          max={100}
-                          valueLabelDisplay="auto"
+                      <Grid item xs={6} md={3}>
+                        <TextField
+                          label="Alto (px)"
+                          type="number"
+                          value={parameters.height}
+                          onChange={handleParameterChange('height')}
+                          fullWidth
+                          required
                         />
                       </Grid>
                     </>
                   )}
-                  
+                  {operation === 'blur' && (
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        label="Nivel de Desenfoque (opcional)"
+                        type="number"
+                        value={parameters.blur}
+                        onChange={handleParameterChange('blur')}
+                        fullWidth
+                      />
+                    </Grid>
+                  )}
+                  {operation === 'crop' && (
+                    <>
+                      <Grid item xs={6} md={3}>
+                        <TextField
+                          label="Left"
+                          type="number"
+                          value={parameters.left}
+                          onChange={handleParameterChange('left')}
+                          fullWidth
+                          required
+                        />
+                      </Grid>
+                      <Grid item xs={6} md={3}>
+                        <TextField
+                          label="Upper"
+                          type="number"
+                          value={parameters.upper}
+                          onChange={handleParameterChange('upper')}
+                          fullWidth
+                          required
+                        />
+                      </Grid>
+                      <Grid item xs={6} md={3}>
+                        <TextField
+                          label="Right"
+                          type="number"
+                          value={parameters.right}
+                          onChange={handleParameterChange('right')}
+                          fullWidth
+                          required
+                        />
+                      </Grid>
+                      <Grid item xs={6} md={3}>
+                        <TextField
+                          label="Lower"
+                          type="number"
+                          value={parameters.lower}
+                          onChange={handleParameterChange('lower')}
+                          fullWidth
+                          required
+                        />
+                      </Grid>
+                    </>
+                  )}
+                  {operation === 'rotate' && (
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        label="Ángulo (grados)"
+                        type="number"
+                        value={parameters.angle}
+                        onChange={handleParameterChange('angle')}
+                        fullWidth
+                        required
+                      />
+                    </Grid>
+                  )}
+                  {operation === 'thumbnail' && (
+                    <>
+                      <Grid item xs={6} md={3}>
+                        <TextField
+                          label="Ancho (px)"
+                          type="number"
+                          value={parameters.width}
+                          onChange={handleParameterChange('width')}
+                          fullWidth
+                          required
+                        />
+                      </Grid>
+                      <Grid item xs={6} md={3}>
+                        <TextField
+                          label="Alto (px)"
+                          type="number"
+                          value={parameters.height}
+                          onChange={handleParameterChange('height')}
+                          fullWidth
+                          required
+                        />
+                      </Grid>
+                    </>
+                  )}
+                  {operation === 'transpose' && (
+                    <Grid item xs={12} md={6}>
+                      <FormControl fullWidth>
+                        <InputLabel>Método</InputLabel>
+                        <Select
+                          value={parameters.method}
+                          onChange={handleParameterChange('method')}
+                          label="Método"
+                          required
+                        >
+                          {transposeMethods.map((m) => (
+                            <MenuItem key={m} value={m}>{m}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  )}
                   <Grid item xs={12}>
                     <Button
                       type="submit"
                       variant="contained"
                       fullWidth
-                      disabled={loading || !selectedFile}
+                      disabled={loading}
                       startIcon={<Image />}
                       sx={{ height: '56px' }}
                     >
@@ -263,7 +346,7 @@ const AdvancedImageManipulation = () => {
             </Alert>
           )}
 
-          {processedImage && (
+          {processedImageUrl && (
             <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h6">
@@ -280,17 +363,10 @@ const AdvancedImageManipulation = () => {
               
               <Box sx={{ textAlign: 'center', mb: 2 }}>
                 <img
-                  src={processedImage.processedUrl}
+                  src={processedImageUrl}
                   alt="Procesada"
                   style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain' }}
                 />
-              </Box>
-              
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                <Chip icon={operations.find(o => o.value === processedImage.operation)?.icon} 
-                      label={operations.find(o => o.value === processedImage.operation)?.label} 
-                      color="primary" />
-                <Chip label={processedImage.timestamp} variant="outlined" />
               </Box>
             </Paper>
           )}
@@ -361,36 +437,94 @@ const AdvancedImageManipulation = () => {
                   />
                 </ListItem>
                 <Divider />
-                {operation === 'adjust' && (
+                {operation === 'resize' && (
                   <>
                     <ListItem>
                       <ListItemText
-                        primary="Brillo"
-                        secondary={`${parameters.brightness}%`}
+                        primary="Ancho"
+                        secondary={parameters.width}
                       />
                     </ListItem>
                     <Divider />
                     <ListItem>
                       <ListItemText
-                        primary="Contraste"
-                        secondary={`${parameters.contrast}%`}
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemText
-                        primary="Saturación"
-                        secondary={`${parameters.saturation}%`}
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemText
-                        primary="Nitidez"
-                        secondary={`${parameters.sharpness}%`}
+                        primary="Alto"
+                        secondary={parameters.height}
                       />
                     </ListItem>
                   </>
+                )}
+                {operation === 'blur' && (
+                  <ListItem>
+                    <ListItemText
+                      primary="Nivel de Desenfoque"
+                      secondary={parameters.blur}
+                    />
+                  </ListItem>
+                )}
+                {operation === 'crop' && (
+                  <>
+                    <ListItem>
+                      <ListItemText
+                        primary="Left"
+                        secondary={parameters.left}
+                      />
+                    </ListItem>
+                    <Divider />
+                    <ListItem>
+                      <ListItemText
+                        primary="Upper"
+                        secondary={parameters.upper}
+                      />
+                    </ListItem>
+                    <Divider />
+                    <ListItem>
+                      <ListItemText
+                        primary="Right"
+                        secondary={parameters.right}
+                      />
+                    </ListItem>
+                    <Divider />
+                    <ListItem>
+                      <ListItemText
+                        primary="Lower"
+                        secondary={parameters.lower}
+                      />
+                    </ListItem>
+                  </>
+                )}
+                {operation === 'rotate' && (
+                  <ListItem>
+                    <ListItemText
+                      primary="Ángulo"
+                      secondary={parameters.angle}
+                    />
+                  </ListItem>
+                )}
+                {operation === 'thumbnail' && (
+                  <>
+                    <ListItem>
+                      <ListItemText
+                        primary="Ancho"
+                        secondary={parameters.width}
+                      />
+                    </ListItem>
+                    <Divider />
+                    <ListItem>
+                      <ListItemText
+                        primary="Alto"
+                        secondary={parameters.height}
+                      />
+                    </ListItem>
+                  </>
+                )}
+                {operation === 'transpose' && (
+                  <ListItem>
+                    <ListItemText
+                      primary="Método"
+                      secondary={parameters.method}
+                    />
+                  </ListItem>
                 )}
               </List>
             </CardContent>

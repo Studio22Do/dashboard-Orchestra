@@ -37,7 +37,7 @@ import {
   Translate
 } from '@mui/icons-material';
 
-const GerwinAI = () => {
+const AIHumanizer = () => {
   const [promptData, setPromptData] = useState({
     type: 'text',
     language: 'es',
@@ -59,47 +59,34 @@ const GerwinAI = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!promptData.prompt.trim()) {
       setError('Por favor ingresa un prompt');
       return;
     }
-    
     setLoading(true);
     setError(null);
-    
+    setGeneratedContent(null);
     try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const contentTypes = {
-        text: 'Texto generado por Gerwin AI',
-        code: 'Código generado por Gerwin AI',
-        article: 'Artículo generado por Gerwin AI',
-        translation: 'Traducción generada por Gerwin AI'
-      };
-
-      const tones = {
-        professional: 'Profesional y formal',
-        casual: 'Casual y amigable',
-        creative: 'Creativo y original',
-        technical: 'Técnico y detallado'
-      };
-
-      const lengths = {
-        short: 'Breve y conciso',
-        medium: 'Medio y equilibrado',
-        long: 'Extenso y detallado'
-      };
-
+      const response = await fetch('/api/ai-humanizer/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: promptData.prompt,
+          level: 'standard' // Puedes hacer esto dinámico si quieres
+        })
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al generar el contenido');
+      }
+      const data = await response.json();
       setGeneratedContent({
-        content: contentTypes[promptData.type],
+        content: data.humanized_text,
         metadata: {
           type: promptData.type,
           language: promptData.language,
-          tone: tones[promptData.tone],
-          length: lengths[promptData.length],
+          tone: promptData.tone,
+          length: promptData.length,
           timestamp: new Date().toLocaleString()
         },
         suggestions: [
@@ -110,7 +97,6 @@ const GerwinAI = () => {
         ]
       });
     } catch (err) {
-      console.error('Error generating content:', err);
       setError(err.message || 'Error al generar el contenido');
     } finally {
       setLoading(false);
@@ -134,10 +120,10 @@ const GerwinAI = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        Gerwin AI Beta
+        AI Humanizer API
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        Genera contenido inteligente con Gerwin AI
+        Genera contenido inteligente con AI Humanizer
       </Typography>
 
       <Card sx={{ mb: 4 }}>
@@ -241,7 +227,7 @@ const GerwinAI = () => {
         <Box sx={{ mb: 4 }}>
           <CircularProgress />
           <Typography variant="body1" sx={{ mt: 2 }}>
-            Generando contenido con Gerwin AI...
+            Generando contenido con AI Humanizer...
           </Typography>
         </Box>
       )}
@@ -269,7 +255,7 @@ const GerwinAI = () => {
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Descargar">
-                        <IconButton onClick={() => handleDownload(generatedContent.content, 'gerwin-ai-content.txt')}>
+                        <IconButton onClick={() => handleDownload(generatedContent.content, 'ai-humanizer-content.txt')}>
                           <Download />
                         </IconButton>
                       </Tooltip>
@@ -359,4 +345,4 @@ const GerwinAI = () => {
   );
 };
 
-export default GerwinAI; 
+export default AIHumanizer; 

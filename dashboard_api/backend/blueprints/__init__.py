@@ -12,6 +12,15 @@ from api.routes.google_trends import google_trends_bp
 from api.routes.google_paid_search import google_paid_search_bp
 from api.routes.apps import apps_bp
 from api.routes.tiktok_api import tiktok_api_bp
+from api.routes.file_converter import file_converter_bp
+from api.routes.midjourney import midjourney_bp
+from api.routes.text_extract import text_extract_bp
+from api.routes.pdf_converter import pdf_converter_bp
+from api.routes.snap_video import snap_video_bp
+from api.routes.ai_humanizer import ai_humanizer_bp
+from api.routes.advanced_image_manipulation import advanced_image_bp
+from api.routes.whisper_url import whisper_url_bp
+from api.routes.runwayml import runwayml_bp
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +53,42 @@ def register_blueprints(app):
     # Registrar blueprint de TikTok
     print("Registrando blueprint: tiktok_api_bp en /api/tiktok")
     app.register_blueprint(tiktok_api_bp, url_prefix='/api/tiktok')
+    
+    # Registrar blueprint de File Converter
+    print("Registrando blueprint: file_converter_bp en /api/file-converter")
+    app.register_blueprint(file_converter_bp, url_prefix='/api/file-converter')
+    
+    # Registrar blueprint de Midjourney
+    print("Registrando blueprint: midjourney_bp en /api/midjourney")
+    app.register_blueprint(midjourney_bp, url_prefix='/api/midjourney')
+    
+    # Registrar blueprint de Text Extract
+    print("Registrando blueprint: text_extract_bp en /api/text-extract")
+    app.register_blueprint(text_extract_bp, url_prefix='/api/text-extract')
+    
+    # Registrar blueprint de PDF Converter
+    print("Registrando blueprint: pdf_converter_bp en /api/pdf-converter")
+    app.register_blueprint(pdf_converter_bp, url_prefix='/api/pdf-converter')
+    
+    # Registrar blueprint de Snap Video
+    print("Registrando blueprint: snap_video_bp en /api/snap-video")
+    app.register_blueprint(snap_video_bp, url_prefix='/api/snap-video')
+    
+    # Registrar blueprint de AI Humanizer
+    print("Registrando blueprint: ai_humanizer_bp en /api/ai-humanizer")
+    app.register_blueprint(ai_humanizer_bp, url_prefix='/api/ai-humanizer')
+    
+    # Registrar blueprint de Advanced Image Manipulation
+    print("Registrando blueprint: advanced_image_bp en /api/image-manipulation")
+    app.register_blueprint(advanced_image_bp)
+    
+    # Registrar blueprint de Whisper URL
+    print("Registrando blueprint: whisper_url_bp en /api/whisper-url")
+    app.register_blueprint(whisper_url_bp)
+    
+    # Registrar blueprint de RunwayML
+    print("Registrando blueprint: runwayml_bp en /api/runwayml")
+    app.register_blueprint(runwayml_bp, url_prefix='/api/runwayml')
     
     # Agregar más blueprints aquí
     print("=== FIN DE REGISTRO DE BLUEPRINTS (desde blueprints/__init__.py) ===\n")

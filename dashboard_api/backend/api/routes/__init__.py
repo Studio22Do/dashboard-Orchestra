@@ -72,4 +72,12 @@ try:
 except ImportError as e:
     print(f"Error importando módulo tiktok_api: {e}")
 
+try:
+    from . import runwayml
+    print("Módulo de rutas runwayml importado")
+except ImportError as e:
+    print(f"Error importando módulo runwayml: {e}")
+
+from .ai_humanizer import ai_humanizer_bp
+
 print("Finalizada inicialización de rutas de la API") 

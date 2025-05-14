@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from 'react';
 import { 
   Container, 
@@ -16,7 +17,9 @@ import {
   ListItemText,
   Divider,
   IconButton,
-  Tooltip
+  Tooltip,
+  TextField,
+  MenuItem
 } from '@mui/material';
 import { 
   ContentCopy,
@@ -28,6 +31,7 @@ import {
   CheckCircle,
   Error
 } from '@mui/icons-material';
+import axios from 'axios';
 
 const PdfToText = () => {
   const [file, setFile] = useState(null);
@@ -35,6 +39,15 @@ const PdfToText = () => {
   const [error, setError] = useState(null);
   const [convertedText, setConvertedText] = useState(null);
   const [fileInfo, setFileInfo] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState('');
+  const [extracting, setExtracting] = useState(false);
+  const [extractedPages, setExtractedPages] = useState(null);
+  const [imgFile, setImgFile] = useState(null);
+  const [imgFormat, setImgFormat] = useState('jpeg');
+  const [imgLoading, setImgLoading] = useState(false);
+  const [imgError, setImgError] = useState(null);
+  const [imgResultUrl, setImgResultUrl] = useState(null);
+  const [imgResultType, setImgResultType] = useState(null);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -111,6 +124,71 @@ El proceso de conversión ha sido exitoso.`;
     document.body.removeChild(element);
   };
 
+  const handleExtractFromUrl = async () => {
+    if (!pdfUrl.trim()) {
+      setError('Por favor ingresa una URL de PDF válida');
+      return;
+    }
+    setExtracting(true);
+    setError(null);
+    setExtractedPages(null);
+    try {
+      const response = await axios.post('/api/pdf-converter/to-text', { pdfUrl });
+      if (response.data && response.data.status === 'Success' && Array.isArray(response.data.data)) {
+        setExtractedPages(response.data.data);
+      } else {
+        setError('No se pudo extraer el texto del PDF');
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || err.message || 'Error al extraer el texto del PDF');
+    } finally {
+      setExtracting(false);
+    }
+  };
+
+  const handleImgFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      if (selectedFile.type !== 'application/pdf') {
+        setImgError('Por favor selecciona un archivo PDF');
+        setImgFile(null);
+        return;
+      }
+      setImgFile(selectedFile);
+      setImgError(null);
+    }
+  };
+
+  const handlePdfToImage = async (e) => {
+    e.preventDefault();
+    if (!imgFile) {
+      setImgError('Por favor selecciona un archivo PDF');
+      return;
+    }
+    setImgLoading(true);
+    setImgError(null);
+    setImgResultUrl(null);
+    setImgResultType(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', imgFile);
+      formData.append('imgFormat', imgFormat);
+      // Puedes agregar startPage/endPage si lo deseas
+      const response = await axios.post('/api/pdf-converter/to-image', formData, {
+        responseType: 'blob',
+      });
+      const contentType = response.headers['content-type'];
+      const blob = new Blob([response.data], { type: contentType });
+      const url = URL.createObjectURL(blob);
+      setImgResultUrl(url);
+      setImgResultType(contentType);
+    } catch (err) {
+      setImgError('Error al convertir el PDF a imagen');
+    } finally {
+      setImgLoading(false);
+    }
+  };
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
@@ -122,6 +200,35 @@ El proceso de conversión ha sido exitoso.`;
 
       <Card sx={{ mb: 4 }}>
         <CardContent>
+          <Box sx={{ mb: 2 }}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} md={9}>
+                <TextField
+                  fullWidth
+                  label="Extraer texto desde URL de PDF"
+                  value={pdfUrl}
+                  onChange={e => setPdfUrl(e.target.value)}
+                  placeholder="Pega aquí la URL de un PDF público"
+                  InputProps={{
+                    startAdornment: (
+                      <Description color="action" sx={{ mr: 1 }} />
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={handleExtractFromUrl}
+                  disabled={extracting || loading}
+                  sx={{ height: '56px' }}
+                >
+                  {extracting ? <CircularProgress size={24} /> : 'Extraer Texto'}
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
           <Box component="form" onSubmit={handleSubmit}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
@@ -293,6 +400,122 @@ El proceso de conversión ha sido exitoso.`;
           </Grid>
         </Paper>
       )}
+
+      {extractedPages && (
+        <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Texto extraído por página
+          </Typography>
+          <List>
+            {extractedPages.map((page) => (
+              <React.Fragment key={page.pageNo}>
+                <ListItem alignItems="flex-start">
+                  <ListItemIcon>
+                    <TextFields />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`Página ${page.pageNo}`}
+                    secondary={
+                      <Box sx={{ whiteSpace: 'pre-line', fontFamily: 'monospace' }}>
+                        {page.content}
+                      </Box>
+                    }
+                  />
+                </ListItem>
+                <Divider />
+              </React.Fragment>
+            ))}
+          </List>
+        </Paper>
+      )}
+
+      {/* Sección PDF a Imagen */}
+      <Card sx={{ mb: 4 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Convertir PDF a Imagen
+          </Typography>
+          <Box component="form" onSubmit={handlePdfToImage}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} md={5}>
+                <Button
+                  variant="outlined"
+                  component="label"
+                  fullWidth
+                  startIcon={<Upload />}
+                  sx={{ height: '56px' }}
+                >
+                  Seleccionar PDF
+                  <input
+                    type="file"
+                    hidden
+                    accept=".pdf"
+                    onChange={handleImgFileChange}
+                  />
+                </Button>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  select
+                  fullWidth
+                  label="Formato de Imagen"
+                  value={imgFormat}
+                  onChange={e => setImgFormat(e.target.value)}
+                >
+                  <MenuItem value="jpeg">JPEG</MenuItem>
+                  <MenuItem value="tifflzw">TIFF (multi-página)</MenuItem>
+                  <MenuItem value="pnggray">PNG Gray</MenuItem>
+                  <MenuItem value="png256">PNG 256</MenuItem>
+                  <MenuItem value="png16">PNG 16</MenuItem>
+                  <MenuItem value="png16m">PNG 16M</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  disabled={imgLoading || !imgFile}
+                  startIcon={<AutoAwesome />}
+                  sx={{ height: '56px' }}
+                >
+                  {imgLoading ? <CircularProgress size={24} /> : 'Convertir a Imagen'}
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+          {imgError && (
+            <Alert severity="error" sx={{ mt: 2 }}>{imgError}</Alert>
+          )}
+          {imgResultUrl && imgResultType && imgResultType.startsWith('image') && (
+            <Box sx={{ mt: 3, textAlign: 'center' }}>
+              <Typography variant="subtitle1" gutterBottom>Imagen generada:</Typography>
+              <img src={imgResultUrl} alt="PDF convertido" style={{ maxWidth: '100%', maxHeight: 400 }} />
+              <Button
+                variant="outlined"
+                sx={{ mt: 2 }}
+                href={imgResultUrl}
+                download={`pdf-convertido.${imgFormat}`}
+              >
+                Descargar Imagen
+              </Button>
+            </Box>
+          )}
+          {imgResultUrl && imgResultType && !imgResultType.startsWith('image') && (
+            <Box sx={{ mt: 3, textAlign: 'center' }}>
+              <Typography variant="subtitle1" gutterBottom>Archivo generado (no visualizable):</Typography>
+              <Button
+                variant="outlined"
+                sx={{ mt: 2 }}
+                href={imgResultUrl}
+                download={`pdf-convertido.${imgFormat}`}
+              >
+                Descargar Archivo
+              </Button>
+            </Box>
+          )}
+        </CardContent>
+      </Card>
     </Container>
   );
 };

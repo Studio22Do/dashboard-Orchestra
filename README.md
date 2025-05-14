@@ -48,7 +48,7 @@ dashboard-Orchestra/
 - Word Count ✅
 - PDF to Text Converter ✅
 - Snap Video ✅
-- Gerwin AI Beta ✅
+- AI Humanizer API ✅
 - OpenAI Text to Speech ✅
 - GenieAI - ChatGPT-3 Model ✅
 - AI Social Media Content Generator ✅

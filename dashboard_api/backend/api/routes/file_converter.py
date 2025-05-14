@@ -196,29 +196,21 @@ def create_image_conversion_route(from_format, to_format):
             # Verificar si se subió un archivo
             if 'file' not in request.files:
                 return jsonify({"error": "No se envió ningún archivo"}), 400
-            
             file = request.files['file']
-            
-            # Verificar si el nombre del archivo está vacío
             if file.filename == '':
                 return jsonify({"error": "No se seleccionó ningún archivo"}), 400
-            
-            # Configurar API
-            api_url = f"https://all-in-one-file-converter.p.rapidapi.com/api/{from_format}-to-{to_format}"
-            
-            # Configurar headers
+
+            # Configurar API (usar endpoint general)
+            api_url = "https://all-in-one-file-converter.p.rapidapi.com/api/image-convert"
             headers = {
                 "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
                 "x-rapidapi-host": "all-in-one-file-converter.p.rapidapi.com"
             }
-            
-            # Preparar el archivo para enviar
             files = {"file": (file.filename, file.read(), file.content_type)}
-            
-            # Hacer solicitud a la API
-            response = requests.post(api_url, files=files, headers=headers)
-            
-            # Verificar respuesta
+            data = {"toFormat": to_format}
+
+            response = requests.post(api_url, files=files, data=data, headers=headers)
+
             if response.status_code != 200:
                 error_detail = {
                     "status_code": response.status_code,
@@ -226,7 +218,7 @@ def create_image_conversion_route(from_format, to_format):
                 }
                 logger.error(f"Error en la API de conversión de imagen: {error_detail}")
                 return jsonify({"error": "Error en la API de conversión", "details": error_detail}), response.status_code
-            
+
             # Determinar el tipo MIME correspondiente al formato de destino
             content_type_map = {
                 'jpg': 'image/jpeg',
@@ -237,29 +229,19 @@ def create_image_conversion_route(from_format, to_format):
                 'gif': 'image/gif',
                 'tiff': 'image/tiff'
             }
-            
-            # Normalizar el formato para el nombre del archivo
             display_to_format = to_format
             if to_format == 'jpeg':
                 display_to_format = 'jpg'
-                
             content_type = content_type_map.get(to_format, 'application/octet-stream')
-            
-            # Obtener el nombre base del archivo y añadir la nueva extensión
             filename_base = os.path.splitext(secure_filename(file.filename))[0]
             new_filename = f"{filename_base}.{display_to_format}"
-            
-            # Devolver el archivo convertido
             return response.content, 200, {
                 'Content-Type': content_type,
                 'Content-Disposition': f'attachment; filename={new_filename}'
             }
-            
         except Exception as e:
             logger.error(f"Error al convertir imagen: {str(e)}")
             return jsonify({"error": f"Error: {str(e)}"}), 500
-    
-    # Renombrar la función para evitar conflictos
     convert_image.__name__ = f"convert_{from_format}_to_{to_format}"
     return convert_image
 
