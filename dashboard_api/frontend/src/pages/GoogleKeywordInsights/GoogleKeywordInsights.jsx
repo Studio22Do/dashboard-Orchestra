@@ -32,45 +32,71 @@ const GoogleKeywordInsights = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [keywordData, setKeywordData] = useState(null);
+  const [endpoint, setEndpoint] = useState('keysuggest');
+  const [location, setLocation] = useState('US');
+  const [lang, setLang] = useState('en');
+  const [minSearchVol, setMinSearchVol] = useState('');
+  const [urlInput, setUrlInput] = useState('');
+  const [num, setNum] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!keyword) {
-      setError('Por favor ingresa una palabra clave para analizar');
-      return;
-    }
-    
     setLoading(true);
     setError(null);
-    
+    setKeywordData(null);
     try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setKeywordData({
-        searchVolume: '12.5K',
-        competition: 'Alto',
-        cpc: '$2.50',
-        trend: 'up',
-        relatedKeywords: [
-          { keyword: 'keyword 1', volume: '8.2K', trend: 'up' },
-          { keyword: 'keyword 2', volume: '5.1K', trend: 'down' },
-          { keyword: 'keyword 3', volume: '3.8K', trend: 'stable' },
-          { keyword: 'keyword 4', volume: '2.9K', trend: 'up' },
-          { keyword: 'keyword 5', volume: '1.5K', trend: 'down' }
-        ],
-        monthlyTrend: [
-          { month: 'Ene', volume: 12000 },
-          { month: 'Feb', volume: 11500 },
-          { month: 'Mar', volume: 13000 },
-          { month: 'Abr', volume: 12500 },
-          { month: 'May', volume: 14000 },
-          { month: 'Jun', volume: 13500 }
-        ]
+      let payload = {
+        endpoint,
+        lang,
+      };
+      if (endpoint === 'keysuggest' || endpoint === 'topkeys') {
+        if (!keyword) {
+          setError('Por favor ingresa una palabra clave para analizar');
+          setLoading(false);
+          return;
+        }
+        payload.keyword = keyword;
+        payload.location = location;
+      } else if (endpoint === 'urlkeysuggest') {
+        if (!urlInput) {
+          setError('Por favor ingresa una URL para analizar');
+          setLoading(false);
+          return;
+        }
+        payload.url = urlInput;
+        payload.location = location;
+      } else if (endpoint === 'globalkey') {
+        if (!keyword) {
+          setError('Por favor ingresa una palabra clave para analizar');
+          setLoading(false);
+          return;
+        }
+        payload.keyword = keyword;
+      } else if (endpoint === 'globalurl') {
+        if (!urlInput) {
+          setError('Por favor ingresa una URL para analizar');
+          setLoading(false);
+          return;
+        }
+        payload.url = urlInput;
+      }
+      if (minSearchVol) payload.min_search_vol = minSearchVol;
+      if (num && endpoint === 'topkeys') payload.num = num;
+      const response = await fetch('/api/keyword-insight', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        setError(data.error || 'Error al analizar la palabra clave');
+        setLoading(false);
+        return;
+      }
+      // Mapear la respuesta real a la UI (ejemplo para keysuggest)
+      setKeywordData(data);
+      console.log('Keyword Insight API response:', data);
     } catch (err) {
-      console.error('Error analyzing keyword:', err);
       setError(err.message || 'Error al analizar la palabra clave');
     } finally {
       setLoading(false);
@@ -87,6 +113,22 @@ const GoogleKeywordInsights = () => {
         return <TrendingFlat color="info" />;
     }
   };
+
+  // Calcular resumen principal
+  let resumen = {
+    searchVolume: '-',
+    competition: '-',
+    cpc: '-',
+  };
+  if (Array.isArray(keywordData) && keywordData.length > 0) {
+    resumen.searchVolume = keywordData[0].search_volume ?? '-';
+    resumen.competition = keywordData[0].competition_level ?? '-';
+    // Calcular CPC promedio de los primeros 10 resultados
+    const cpcs = keywordData.slice(0, 10).map(k => (k.cpc_min ?? 0) + (k.cpc_max ?? 0)).filter(v => v > 0);
+    if (cpcs.length > 0) {
+      resumen.cpc = `$${(cpcs.reduce((a, b) => a + b, 0) / (2 * cpcs.length)).toFixed(2)}`;
+    }
+  }
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -161,7 +203,7 @@ const GoogleKeywordInsights = () => {
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <BarChart sx={{ mr: 1, color: 'primary.main' }} />
                     <Typography variant="h4">
-                      {keywordData.searchVolume}
+                      {resumen.searchVolume}
                     </Typography>
                   </Box>
                 </CardContent>
@@ -176,8 +218,8 @@ const GoogleKeywordInsights = () => {
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Chip 
-                      label={keywordData.competition}
-                      color={keywordData.competition === 'Alto' ? 'error' : 'success'}
+                      label={resumen.competition}
+                      color={resumen.competition === 'HIGH' ? 'error' : resumen.competition === 'MEDIUM' ? 'warning' : 'success'}
                       sx={{ fontSize: '1.2rem', height: '2.5rem' }}
                     />
                   </Box>
@@ -193,21 +235,8 @@ const GoogleKeywordInsights = () => {
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Typography variant="h4">
-                      {keywordData.cpc}
+                      {resumen.cpc}
                     </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} md={3}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Tendencia
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {getTrendIcon(keywordData.trend)}
                   </Box>
                 </CardContent>
               </Card>
@@ -225,17 +254,19 @@ const GoogleKeywordInsights = () => {
                         <TableRow>
                           <TableCell>Palabra Clave</TableCell>
                           <TableCell align="right">Volumen</TableCell>
-                          <TableCell align="right">Tendencia</TableCell>
+                          <TableCell align="right">Competencia</TableCell>
+                          <TableCell align="right">CPC Mín</TableCell>
+                          <TableCell align="right">CPC Máx</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {keywordData.relatedKeywords.map((item, index) => (
+                        {Array.isArray(keywordData) && keywordData.slice(0, 5).map((item, index) => (
                           <TableRow key={index}>
                             <TableCell>{item.keyword}</TableCell>
-                            <TableCell align="right">{item.volume}</TableCell>
-                            <TableCell align="right">
-                              {getTrendIcon(item.trend)}
-                            </TableCell>
+                            <TableCell align="right">{item.search_volume ?? '-'}</TableCell>
+                            <TableCell align="right">{item.competition_level ?? '-'}</TableCell>
+                            <TableCell align="right">{item.cpc_min !== undefined ? `$${item.cpc_min}` : '-'}</TableCell>
+                            <TableCell align="right">{item.cpc_max !== undefined ? `$${item.cpc_max}` : '-'}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>

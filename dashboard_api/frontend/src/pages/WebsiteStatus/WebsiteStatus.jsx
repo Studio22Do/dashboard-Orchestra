@@ -10,10 +10,9 @@ import {
   Box, 
   CircularProgress,
   Alert,
-  Paper,
-  Chip
+  Paper
 } from '@mui/material';
-import { Language, CheckCircle, Cancel } from '@mui/icons-material';
+import { Public, CheckCircle, Cancel } from '@mui/icons-material';
 
 const WebsiteStatus = () => {
   const [url, setUrl] = useState('');
@@ -23,53 +22,42 @@ const WebsiteStatus = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!url) {
-      setError('Por favor ingresa una URL para verificar');
+      setError('Por favor ingresa un dominio para verificar');
       return;
     }
-    
     setLoading(true);
     setError(null);
-    
+    setStatusData(null);
     try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setStatusData({
-        isUp: true,
-        responseTime: 245,
-        statusCode: 200,
-        lastChecked: new Date().toISOString(),
-        serverInfo: 'nginx/1.18.0'
+      let domain = url.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
+      const response = await fetch('/api/website-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain })
       });
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        setError(data.message || data.error || 'Error al verificar el estado del sitio');
+        setLoading(false);
+        return;
+      }
+      setStatusData(data);
     } catch (err) {
-      console.error('Error checking website status:', err);
-      setError(err.message || 'Error al verificar el estado del sitio web');
+      setError(err.message || 'Error al verificar el estado del sitio');
     } finally {
       setLoading(false);
     }
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="sm" sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Website Status Checker
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        Verifica si un sitio web está en línea y obtén información sobre su estado
+        Verifica si un sitio web está <b>UP</b> o <b>DOWN</b> en tiempo real.
       </Typography>
-
       <Card sx={{ mb: 4 }}>
         <CardContent>
           <Box component="form" onSubmit={handleSubmit}>
@@ -77,8 +65,8 @@ const WebsiteStatus = () => {
               <Grid item xs={12} md={8}>
                 <TextField
                   fullWidth
-                  label="URL del sitio web"
-                  placeholder="https://ejemplo.com"
+                  label="Dominio"
+                  placeholder="ejemplo.com"
                   variant="outlined"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
@@ -86,7 +74,7 @@ const WebsiteStatus = () => {
                   helperText={error}
                   InputProps={{
                     startAdornment: (
-                      <Language color="action" sx={{ mr: 1 }} />
+                      <Public color="action" sx={{ mr: 1 }} />
                     ),
                   }}
                 />
@@ -106,98 +94,58 @@ const WebsiteStatus = () => {
           </Box>
         </CardContent>
       </Card>
-
       {loading && (
         <Box sx={{ mb: 4 }}>
           <CircularProgress />
           <Typography variant="body1" sx={{ mt: 2 }}>
-            Verificando estado del sitio web...
+            Verificando estado del sitio...
           </Typography>
         </Box>
       )}
-
       {!loading && error && (
         <Alert severity="error" sx={{ mb: 4 }}>
           {error}
         </Alert>
       )}
-
       {!loading && statusData && (
         <Paper elevation={2} sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Resultados de la Verificación
+            Resultado
           </Typography>
-          
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12}>
               <Card>
-                <CardContent>
-                  <Typography variant="subtitle1" color="text.secondary">
-                    Estado del Sitio
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-                    <Chip
-                      icon={statusData.isUp ? <CheckCircle /> : <Cancel />}
-                      label={statusData.isUp ? 'En Línea' : 'Fuera de Línea'}
-                      color={statusData.isUp ? 'success' : 'error'}
-                      sx={{ mr: 1 }}
-                    />
+                <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  {statusData.status?.toLowerCase() === 'up' ? (
+                    <CheckCircle color="success" sx={{ fontSize: 40 }} />
+                  ) : (
+                    <Cancel color="error" sx={{ fontSize: 40 }} />
+                  )}
+                  <Box>
+                    <Typography variant="h5" color={statusData.status?.toLowerCase() === 'up' ? 'success.main' : 'error.main'}>
+                      {statusData.status?.toUpperCase() || 'Desconocido'}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {statusData.message || ''}
+                    </Typography>
                   </Box>
                 </CardContent>
               </Card>
             </Grid>
-            
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="subtitle1" color="text.secondary">
-                    Tiempo de Respuesta
-                  </Typography>
-                  <Typography variant="h6">
-                    {statusData.responseTime} ms
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="subtitle1" color="text.secondary">
-                    Código de Estado
-                  </Typography>
-                  <Typography variant="h6">
-                    {statusData.statusCode}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="subtitle1" color="text.secondary">
-                    Servidor
-                  </Typography>
-                  <Typography variant="h6">
-                    {statusData.serverInfo}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Typography variant="subtitle1" color="text.secondary">
-                    Última Verificación
-                  </Typography>
-                  <Typography variant="h6">
-                    {formatDate(statusData.lastChecked)}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+            {statusData.domain && (
+              <Grid item xs={12}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="subtitle1" color="text.secondary">
+                      Dominio verificado
+                    </Typography>
+                    <Typography variant="h6">
+                      {statusData.domain}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            )}
           </Grid>
         </Paper>
       )}

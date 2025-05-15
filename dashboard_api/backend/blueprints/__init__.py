@@ -21,6 +21,13 @@ from api.routes.ai_humanizer import ai_humanizer_bp
 from api.routes.advanced_image_manipulation import advanced_image_bp
 from api.routes.whisper_url import whisper_url_bp
 from api.routes.runwayml import runwayml_bp
+from api.routes.similarweb import similarweb_bp
+from api.routes.google_keyword_insight import keyword_insight_bp
+from api.routes.domain_metrics import domain_metrics_bp
+from api.routes.ahrefs_dr import ahrefs_dr_bp
+from api.routes.pagespeed_insights import pagespeed_bp
+from api.routes.ssl_checker import ssl_checker_bp
+from api.routes.website_status import website_status_bp
 
 logger = logging.getLogger(__name__)
 
@@ -89,6 +96,34 @@ def register_blueprints(app):
     # Registrar blueprint de RunwayML
     print("Registrando blueprint: runwayml_bp en /api/runwayml")
     app.register_blueprint(runwayml_bp, url_prefix='/api/runwayml')
+    
+    # Registrar blueprint de Similarweb
+    print("Registrando blueprint: similarweb_bp en /api/similarweb")
+    app.register_blueprint(similarweb_bp, url_prefix='/api/similarweb')
+    
+    # Registrar blueprint de Google Keyword Insight
+    print("Registrando blueprint: keyword_insight_bp en /api/keyword-insight")
+    app.register_blueprint(keyword_insight_bp, url_prefix='/api/keyword-insight')
+    
+    # Registrar blueprint de Domain Metrics
+    print("Registrando blueprint: domain_metrics_bp en /api/domain-metrics")
+    app.register_blueprint(domain_metrics_bp, url_prefix='/api/domain-metrics')
+    
+    # Registrar blueprint de Ahrefs DR
+    print("Registrando blueprint: ahrefs_dr_bp en /api/ahrefs-dr")
+    app.register_blueprint(ahrefs_dr_bp, url_prefix='/api/ahrefs-dr')
+    
+    # Registrar blueprint de PageSpeed Insights
+    print("Registrando blueprint: pagespeed_bp en /api/pagespeed-insights")
+    app.register_blueprint(pagespeed_bp, url_prefix='/api/pagespeed-insights')
+    
+    # Registrar blueprint de SSL Checker
+    print("Registrando blueprint: ssl_checker_bp en /api/ssl-checker")
+    app.register_blueprint(ssl_checker_bp, url_prefix='/api/ssl-checker')
+    
+    # Registrar blueprint de Website Status
+    print("Registrando blueprint: website_status_bp en /api/website-status")
+    app.register_blueprint(website_status_bp, url_prefix='/api/website-status')
     
     # Agregar más blueprints aquí
     print("=== FIN DE REGISTRO DE BLUEPRINTS (desde blueprints/__init__.py) ===\n")

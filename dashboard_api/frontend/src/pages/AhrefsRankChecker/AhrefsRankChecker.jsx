@@ -29,7 +29,7 @@ import {
 } from '@mui/icons-material';
 
 const AhrefsRankChecker = () => {
-  const [domain, setDomain] = useState('');
+  const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [rankData, setRankData] = useState(null);
@@ -37,39 +37,49 @@ const AhrefsRankChecker = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!domain) {
-      setError('Por favor ingresa un dominio para analizar');
+    if (!url) {
+      setError('Por favor ingresa una URL para analizar');
       return;
     }
     
     setLoading(true);
     setError(null);
+    setRankData(null);
     
     try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch('/api/ahrefs-dr/authority', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      
+      const data = await response.json();
+      console.log('Ahrefs DR API response (frontend):', data);
+      
+      if (!response.ok || data.error) {
+        setError(data.error || 'Error al verificar el ranking del dominio');
+        setLoading(false);
+        return;
+      }
+
+      // Mapear la respuesta de la API a nuestro formato de UI
       setRankData({
-        domainRating: 65,
-        ahrefsRank: 12500,
+        domainRating: data.domain_rating || data.domainRating || 0,
+        ahrefsRank: data.ahrefs_rank || data.ahrefsRank || 0,
         backlinks: {
-          total: 25000,
-          dofollow: 18000,
-          nofollow: 7000,
-          unique: 15000
+          total: data.backlinks?.total || 0,
+          dofollow: data.backlinks?.dofollow || 0,
+          nofollow: data.backlinks?.nofollow || 0,
+          unique: data.backlinks?.unique || 0
         },
         referringDomains: {
-          total: 1200,
-          dofollow: 800,
-          nofollow: 400
+          total: data.referring_domains?.total || 0,
+          dofollow: data.referring_domains?.dofollow || 0,
+          nofollow: data.referring_domains?.nofollow || 0
         },
-        organicKeywords: 8500,
-        organicTraffic: 45000,
-        topKeywords: [
-          { keyword: 'keyword 1', position: 1, volume: '12.5K' },
-          { keyword: 'keyword 2', position: 3, volume: '8.2K' },
-          { keyword: 'keyword 3', position: 5, volume: '5.1K' }
-        ]
+        organicKeywords: data.organic_keywords || data.organicKeywords || 0,
+        organicTraffic: data.organic_traffic || data.organicTraffic || 0,
+        topKeywords: data.top_keywords || data.topKeywords || []
       });
     } catch (err) {
       console.error('Error checking domain rank:', err);
@@ -85,7 +95,7 @@ const AhrefsRankChecker = () => {
         Ahrefs DR & Rank Checker
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        Verifica el Domain Rating y ranking de cualquier dominio
+        Verifica el Domain Rating y métricas de cualquier sitio web
       </Typography>
 
       <Card sx={{ mb: 4 }}>
@@ -95,11 +105,11 @@ const AhrefsRankChecker = () => {
               <Grid item xs={12} md={8}>
                 <TextField
                   fullWidth
-                  label="Dominio"
-                  placeholder="ejemplo.com"
+                  label="URL"
+                  placeholder="https://ejemplo.com"
                   variant="outlined"
-                  value={domain}
-                  onChange={(e) => setDomain(e.target.value)}
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
                   error={!!error}
                   helperText={error}
                   InputProps={{
@@ -117,7 +127,7 @@ const AhrefsRankChecker = () => {
                   disabled={loading}
                   sx={{ height: '56px' }}
                 >
-                  {loading ? <CircularProgress size={24} /> : 'Verificar Ranking'}
+                  {loading ? <CircularProgress size={24} /> : 'Analizar URL'}
                 </Button>
               </Grid>
             </Grid>
@@ -129,7 +139,7 @@ const AhrefsRankChecker = () => {
         <Box sx={{ mb: 4 }}>
           <CircularProgress />
           <Typography variant="body1" sx={{ mt: 2 }}>
-            Verificando ranking del dominio...
+            Analizando URL...
           </Typography>
         </Box>
       )}
@@ -308,28 +318,30 @@ const AhrefsRankChecker = () => {
               </Card>
             </Grid>
 
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Palabras Clave Principales
-                  </Typography>
-                  <List>
-                    {rankData.topKeywords.map((keyword, index) => (
-                      <ListItem key={index}>
-                        <ListItemIcon>
-                          <TrendingUp />
-                        </ListItemIcon>
-                        <ListItemText 
-                          primary={keyword.keyword}
-                          secondary={`Posición #${keyword.position} • Volumen: ${keyword.volume}`}
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
+            {rankData.topKeywords && rankData.topKeywords.length > 0 && (
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Palabras Clave Principales
+                    </Typography>
+                    <List>
+                      {rankData.topKeywords.map((keyword, index) => (
+                        <ListItem key={index}>
+                          <ListItemIcon>
+                            <TrendingUp />
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary={keyword.keyword}
+                            secondary={`Posición #${keyword.position} • Volumen: ${keyword.volume}`}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </CardContent>
+                </Card>
+              </Grid>
+            )}
           </Grid>
         </Paper>
       )}
