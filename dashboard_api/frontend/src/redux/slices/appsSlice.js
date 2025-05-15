@@ -525,6 +525,6 @@ export const selectPurchasedApps = (state) => state.apps.purchasedApps;
 export const selectFavoriteApps = (state) => state.apps.favoriteApps;
 export const selectAppsLoading = (state) => state.apps.loading;
 export const selectAppsError = (state) => state.apps.error;
-export const selectAllApps = (state) => state.apps.allApps;
+export const selectAllApps = (state) => state.apps.allApps || state.apps.apps || [];
 
 export default appsSlice.reducer; 

@@ -42,6 +42,7 @@ import AdvancedImageManipulation from './pages/AdvancedImageManipulation/Advance
 import WhisperFromURL from './pages/WhisperFromURL/WhisperFromURL';
 import RunwayML from './pages/RunwayML/RunwayML';
 import AIHumanizer from './pages/AIHumanizer/AIHumanizer';
+import CategoryView from './pages/CategoryView/CategoryView';
 import theme from './theme';
 
 // Theme configuration function
@@ -414,6 +415,12 @@ function App() {
           <Route path="/apps/ai-humanizer" element={
             <ProtectedRoute>
               <AIHumanizer />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/category" element={
+            <ProtectedRoute>
+              <CategoryView />
             </ProtectedRoute>
           } />
           
