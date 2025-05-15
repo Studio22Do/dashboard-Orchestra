@@ -78,6 +78,30 @@ try:
 except ImportError as e:
     print(f"Error importando módulo runwayml: {e}")
 
+try:
+    from . import similarweb
+    print("Módulo de rutas similarweb importado")
+except ImportError as e:
+    print(f"Error importando módulo similarweb: {e}")
+
+try:
+    from . import google_keyword_insight
+    print("Módulo de rutas google_keyword_insight importado")
+except ImportError as e:
+    print(f"Error importando módulo google_keyword_insight: {e}")
+
+try:
+    from . import domain_metrics
+    print("Módulo de rutas domain_metrics importado")
+except ImportError as e:
+    print(f"Error importando módulo domain_metrics: {e}")
+
+try:
+    from . import ahrefs_dr
+    print("Módulo de rutas ahrefs_dr importado")
+except ImportError as e:
+    print(f"Error importando módulo ahrefs_dr: {e}")
+
 from .ai_humanizer import ai_humanizer_bp
 
 print("Finalizada inicialización de rutas de la API") 
