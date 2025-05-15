@@ -586,12 +586,12 @@ const Dashboard = () => {
             icon={category.icon}
             tools={category.tools}
             onViewAll={() => {
-              // Navegar a la vista de apps con filtro preseleccionado
+              // Navegar a la vista de categoría con filtro preseleccionado
               const categoryPath = category.id === 'social-listening' ? 'Social Media' :
                                  category.id === 'ux-ui' ? 'Creative & Content' :
                                  category.id === 'web-seo' ? 'Web & SEO' : '';
               
-              navigate('/apps', { state: { preselectedCategory: categoryPath } });
+              navigate('/category', { state: { preselectedCategory: categoryPath } });
             }}
           />
         ))}
