@@ -19,7 +19,6 @@ import {
   VideoFile
 } from '@mui/icons-material';
 import Breadcrumbs from '../../components/common/Breadcrumbs';
-import RarToZip from './components/RarToZip';
 import ImageConverter from './components/ImageConverter';
 import PdfToWord from './components/PdfToWord';
 
@@ -66,11 +65,6 @@ const FileConverter = () => {
           scrollButtons="auto"
         >
           <Tab 
-            icon={<Compress />} 
-            label="RAR a ZIP" 
-            iconPosition="start"
-          />
-          <Tab 
             icon={<Image />} 
             label="Convertidor de Imágenes" 
             iconPosition="start"
@@ -97,18 +91,14 @@ const FileConverter = () => {
       
       <Box sx={{ mt: 3 }}>
         {activeTab === 0 && (
-          <RarToZip setError={setError} />
-        )}
-        
-        {activeTab === 1 && (
           <ImageConverter setError={setError} />
         )}
         
-        {activeTab === 2 && (
+        {activeTab === 1 && (
           <PdfToWord setError={setError} />
         )}
         
-        {activeTab > 2 && (
+        {activeTab > 1 && (
           <Paper sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="h6">
               Esta funcionalidad estará disponible próximamente

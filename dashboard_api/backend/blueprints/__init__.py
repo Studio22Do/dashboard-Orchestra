@@ -28,6 +28,7 @@ from api.routes.ahrefs_dr import ahrefs_dr_bp
 from api.routes.pagespeed_insights import pagespeed_bp
 from api.routes.ssl_checker import ssl_checker_bp
 from api.routes.website_status import website_status_bp
+from api.routes.seo_mastermind import seo_mastermind_bp
 
 logger = logging.getLogger(__name__)
 
@@ -124,6 +125,10 @@ def register_blueprints(app):
     # Registrar blueprint de Website Status
     print("Registrando blueprint: website_status_bp en /api/website-status")
     app.register_blueprint(website_status_bp, url_prefix='/api/website-status')
+    
+    # Registrar blueprint de SEO Mastermind
+    print("Registrando blueprint: seo_mastermind_bp en /api/seo-mastermind")
+    app.register_blueprint(seo_mastermind_bp, url_prefix='/api/seo-mastermind')
     
     # Agregar más blueprints aquí
     print("=== FIN DE REGISTRO DE BLUEPRINTS (desde blueprints/__init__.py) ===\n")
