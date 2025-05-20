@@ -36,7 +36,8 @@ import {
   DomainVerification,
   ShoppingCart,
   Visibility,
-  Settings
+  Settings,
+  PhotoCamera
 } from '@mui/icons-material';
 import AppDetailDrawer from '../../components/AppDetailDrawer/AppDetailDrawer';
 import AppSearchHeader from '../../components/app-search/AppSearchHeader';
@@ -52,6 +53,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [selectedApp, setSelectedApp] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Definición de las herramientas por categoría
   const categories = [
@@ -566,10 +568,42 @@ const Dashboard = () => {
             });
             setDrawerOpen(true);
           }
+        },
+        {
+          id: 'image-optimizer',
+          title: 'Image Optimizer',
+          icon: PhotoCamera,
+          onClick: () => {
+            setSelectedApp({
+              id: 'image-optimizer',
+              title: 'Image Optimizer',
+              description: 'Optimiza y comprime imágenes JPEG, PNG y GIF para mejorar el rendimiento web',
+              imageUrl: 'https://cdn.pixabay.com/photo/2016/03/31/19/56/image-1295100_960_720.png',
+              category: 'Web & SEO',
+              route: '/apps/image-optimizer',
+              apiName: 'ShortPixel Image Optimiser',
+            });
+            setDrawerOpen(true);
+          }
         }
       ]
     }
   ];
+
+  // Filtrar apps de cada categoría según el searchQuery
+  const filteredCategories = categories
+    .map(category => {
+      const filteredTools = category.tools.filter(tool => {
+        const q = searchQuery.trim().toLowerCase();
+        if (!q) return true;
+        return (
+          tool.title.toLowerCase().includes(q) ||
+          (tool.description && tool.description.toLowerCase().includes(q))
+        );
+      });
+      return { ...category, tools: filteredTools };
+    })
+    .filter(category => category.tools.length > 0);
 
   return (
     <DashboardContainer
@@ -578,23 +612,28 @@ const Dashboard = () => {
       disableGutters
     >
       <Box sx={{ mb: 4, width: '100%', overflowX: 'hidden' }}>
-        <AppSearchHeader />
-        {categories.map((category) => (
-          <CategorySection
-            key={category.id}
-            title={category.title}
-            icon={category.icon}
-            tools={category.tools}
-            onViewAll={() => {
-              // Navegar a la vista de categoría con filtro preseleccionado
-              const categoryPath = category.id === 'social-listening' ? 'Social Media' :
-                                 category.id === 'ux-ui' ? 'Creative & Content' :
-                                 category.id === 'web-seo' ? 'Web & SEO' : '';
-              
-              navigate('/category', { state: { preselectedCategory: categoryPath } });
-            }}
-          />
-        ))}
+        <AppSearchHeader searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        {filteredCategories.length > 0 ? (
+          filteredCategories.map((category) => (
+            <CategorySection
+              key={category.id}
+              title={category.title}
+              icon={category.icon}
+              tools={category.tools}
+              onViewAll={() => {
+                const categoryPath = category.id === 'social-listening' ? 'Social Media' :
+                  category.id === 'ux-ui' ? 'Creative & Content' :
+                  category.id === 'web-seo' ? 'Web & SEO' : '';
+                navigate('/category', { state: { preselectedCategory: categoryPath } });
+              }}
+            />
+          ))
+        ) : (
+          <Box sx={{ py: 8, textAlign: 'center', width: '100%' }}>
+            <h2 style={{ color: '#fff', fontWeight: 700 }}>No se encontraron resultados</h2>
+            <p style={{ color: '#aaa' }}>Intenta con otro término de búsqueda.</p>
+          </Box>
+        )}
       </Box>
       <AppDetailDrawer
         open={drawerOpen}

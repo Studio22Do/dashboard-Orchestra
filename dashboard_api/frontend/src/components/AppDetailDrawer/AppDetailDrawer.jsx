@@ -10,7 +10,10 @@ const AppDetailDrawer = ({ open, onClose, app }) => {
   const purchasedApps = useSelector(selectPurchasedApps);
   if (!app) return null;
 
+  // Debug logs
+  console.log('AppDetailDrawer - app:', app);
   const isPurchased = purchasedApps.some(a => a.id === app.id || a.app_id === app.id);
+  console.log('AppDetailDrawer - isPurchased:', isPurchased, 'app.id:', app.id);
 
   const handleAction = () => {
     if (isPurchased) {

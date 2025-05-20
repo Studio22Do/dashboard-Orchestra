@@ -132,14 +132,14 @@ const SSLChecker = () => {
             Resultados de la Verificación SSL
           </Typography>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            {/* <Grid item xs={12} md={6}>
               <Card>
                 <CardContent>
                   <Typography variant="subtitle1" color="text.secondary">
                     Estado del Certificado
                   </Typography>
                   <Typography variant="h6" color={sslData.isValidCertificate ? 'success.main' : 'error.main'}>
-                    {sslData.isValidCertificate ? 'Válido' : 'Inválido'}
+                    {sslData.isValidCertificate ? 'Válido' : 'válido'}
                   </Typography>
                   {sslData.isExpired && (
                     <Typography color="error.main">Expirado</Typography>
@@ -152,7 +152,7 @@ const SSLChecker = () => {
                   )}
                 </CardContent>
               </Card>
-            </Grid>
+            </Grid> */}
             <Grid item xs={12} md={6}>
               <Card>
                 <CardContent>

@@ -145,6 +145,7 @@ const CategorySection = ({ title, icon: Icon, tools, onViewAll }) => {
                                     <ToolCard
                                         title={tool.title}
                                         icon={tool.icon}
+                                        imageUrl={tool.imageUrl}
                                         onClick={tool.onClick}
                                     />
                                 </CardContainer>
@@ -159,6 +160,7 @@ const CategorySection = ({ title, icon: Icon, tools, onViewAll }) => {
                             <ToolCard
                                 title={tool.title}
                                 icon={tool.icon}
+                                imageUrl={tool.imageUrl}
                                 onClick={tool.onClick}
                             />
                         </Grid>
