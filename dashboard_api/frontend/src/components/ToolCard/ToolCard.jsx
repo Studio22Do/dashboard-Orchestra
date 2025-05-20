@@ -82,7 +82,7 @@ const CardContentFade = styled('div')(({ theme, isvisible }) => ({
   gap: '40px',
 }));
 
-const ToolCard = ({ title, icon: Icon, onClick }) => {
+const ToolCard = ({ title, icon: Icon, imageUrl, onClick }) => {
   const cardRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -109,7 +109,11 @@ const ToolCard = ({ title, icon: Icon, onClick }) => {
     <StyledCard onClick={onClick} ref={cardRef}>
       <CardContentFade isvisible={isVisible ? 1 : 0}>
         <IconContainer>
-          {Icon && <Icon />}
+          {imageUrl ? (
+            <img src={imageUrl} alt={title} style={{ width: 64, height: 64, borderRadius: 12, objectFit: 'cover' }} />
+          ) : (
+            Icon && <Icon />
+          )}
         </IconContainer>
         <StyledContent>
           <Typography 

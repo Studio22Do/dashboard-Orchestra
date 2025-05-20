@@ -102,6 +102,12 @@ try:
 except ImportError as e:
     print(f"Error importando módulo ahrefs_dr: {e}")
 
+try:
+    from . import image_optimizer
+    print("Módulo de rutas image_optimizer importado")
+except ImportError as e:
+    print(f"Error importando módulo image_optimizer: {e}")
+
 from .ai_humanizer import ai_humanizer_bp
 
 print("Finalizada inicialización de rutas de la API") 

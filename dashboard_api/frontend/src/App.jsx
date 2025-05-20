@@ -43,6 +43,7 @@ import WhisperFromURL from './pages/WhisperFromURL/WhisperFromURL';
 import RunwayML from './pages/RunwayML/RunwayML';
 import AIHumanizer from './pages/AIHumanizer/AIHumanizer';
 import CategoryView from './pages/CategoryView/CategoryView';
+import ImageOptimizer from './pages/ImageOptimizer/ImageOptimizer';
 import theme from './theme';
 
 // Theme configuration function
@@ -421,6 +422,12 @@ function App() {
           <Route path="/category" element={
             <ProtectedRoute>
               <CategoryView />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/apps/image-optimizer" element={
+            <ProtectedRoute>
+              <ImageOptimizer />
             </ProtectedRoute>
           } />
           

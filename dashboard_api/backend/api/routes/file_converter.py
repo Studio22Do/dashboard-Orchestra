@@ -395,3 +395,124 @@ def pdf_to_word():
     except Exception as e:
         print(f"Error en PDF to Word: {str(e)}")
         return jsonify({"error": f"Error: {str(e)}"}), 500 
+
+# Ejemplo para PNG a WEBP
+@file_converter_bp.route('/png-to-webp', methods=['POST'])
+def png_to_webp():
+    try:
+        if 'file' not in request.files:
+            return jsonify({"error": "No se envió ningún archivo"}), 400
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "No se seleccionó ningún archivo"}), 400
+        api_url = "https://all-in-one-image-converter.p.rapidapi.com/api/png-to-webp"
+        headers = {
+            "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
+            "x-rapidapi-host": "all-in-one-image-converter.p.rapidapi.com"
+        }
+        files = {"file": (file.filename, file.read(), file.content_type)}
+        response = requests.post(api_url, files=files, headers=headers)
+        if response.status_code != 200:
+            return jsonify({"error": "Error en la API de conversión", "details": response.text}), response.status_code
+        return response.content, 200, {
+            'Content-Type': 'image/webp',
+            'Content-Disposition': f'attachment; filename={file.filename.rsplit(".", 1)[0]}.webp'
+        }
+    except Exception as e:
+        return jsonify({"error": f"Error: {str(e)}"}), 500
+
+@file_converter_bp.route('/jpg-to-webp', methods=['POST'])
+def jpg_to_webp():
+    try:
+        if 'file' not in request.files:
+            return jsonify({"error": "No se envió ningún archivo"}), 400
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "No se seleccionó ningún archivo"}), 400
+        api_url = "https://all-in-one-image-converter.p.rapidapi.com/api/jpg-to-webp"
+        headers = {
+            "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
+            "x-rapidapi-host": "all-in-one-image-converter.p.rapidapi.com"
+        }
+        files = {"file": (file.filename, file.read(), file.content_type)}
+        response = requests.post(api_url, files=files, headers=headers)
+        if response.status_code != 200:
+            return jsonify({"error": "Error en la API de conversión", "details": response.text}), response.status_code
+        return response.content, 200, {
+            'Content-Type': 'image/webp',
+            'Content-Disposition': f'attachment; filename={file.filename.rsplit(".", 1)[0]}.webp'
+        }
+    except Exception as e:
+        return jsonify({"error": f"Error: {str(e)}"}), 500
+
+@file_converter_bp.route('/jpg-to-png', methods=['POST'])
+def jpg_to_png():
+    try:
+        if 'file' not in request.files:
+            return jsonify({"error": "No se envió ningún archivo"}), 400
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "No se seleccionó ningún archivo"}), 400
+        api_url = "https://all-in-one-image-converter.p.rapidapi.com/api/jpg-to-png"
+        headers = {
+            "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
+            "x-rapidapi-host": "all-in-one-image-converter.p.rapidapi.com"
+        }
+        files = {"file": (file.filename, file.read(), file.content_type)}
+        response = requests.post(api_url, files=files, headers=headers)
+        if response.status_code != 200:
+            return jsonify({"error": "Error en la API de conversión", "details": response.text}), response.status_code
+        return response.content, 200, {
+            'Content-Type': 'image/png',
+            'Content-Disposition': f'attachment; filename={file.filename.rsplit(".", 1)[0]}.png'
+        }
+    except Exception as e:
+        return jsonify({"error": f"Error: {str(e)}"}), 500
+
+@file_converter_bp.route('/png-to-jpg', methods=['POST'])
+def png_to_jpg():
+    try:
+        if 'file' not in request.files:
+            return jsonify({"error": "No se envió ningún archivo"}), 400
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "No se seleccionó ningún archivo"}), 400
+        api_url = "https://all-in-one-image-converter.p.rapidapi.com/api/png-to-jpg"
+        headers = {
+            "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
+            "x-rapidapi-host": "all-in-one-image-converter.p.rapidapi.com"
+        }
+        files = {"file": (file.filename, file.read(), file.content_type)}
+        response = requests.post(api_url, files=files, headers=headers)
+        if response.status_code != 200:
+            return jsonify({"error": "Error en la API de conversión", "details": response.text}), response.status_code
+        return response.content, 200, {
+            'Content-Type': 'image/jpeg',
+            'Content-Disposition': f'attachment; filename={file.filename.rsplit(".", 1)[0]}.jpg'
+        }
+    except Exception as e:
+        return jsonify({"error": f"Error: {str(e)}"}), 500
+
+@file_converter_bp.route('/gif-to-mp4', methods=['POST'])
+def gif_to_mp4():
+    try:
+        if 'file' not in request.files:
+            return jsonify({"error": "No se envió ningún archivo"}), 400
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "No se seleccionó ningún archivo"}), 400
+        api_url = "https://all-in-one-image-converter.p.rapidapi.com/api/gif-to-mp4"
+        headers = {
+            "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
+            "x-rapidapi-host": "all-in-one-image-converter.p.rapidapi.com"
+        }
+        files = {"file": (file.filename, file.read(), file.content_type)}
+        response = requests.post(api_url, files=files, headers=headers)
+        if response.status_code != 200:
+            return jsonify({"error": "Error en la API de conversión", "details": response.text}), response.status_code
+        return response.content, 200, {
+            'Content-Type': 'video/mp4',
+            'Content-Disposition': f'attachment; filename={file.filename.rsplit(".", 1)[0]}.mp4'
+        }
+    except Exception as e:
+        return jsonify({"error": f"Error: {str(e)}"}), 500 

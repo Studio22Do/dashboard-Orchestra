@@ -1,6 +1,6 @@
 import logging
 from flask import Blueprint
-from .instagram import instagram_bp
+from api.routes.instagram import instagram_bp
 from .instagram_realtime import instagram_blueprint as instagram_realtime_bp
 import sys
 import os
@@ -28,6 +28,8 @@ from api.routes.ahrefs_dr import ahrefs_dr_bp
 from api.routes.pagespeed_insights import pagespeed_bp
 from api.routes.ssl_checker import ssl_checker_bp
 from api.routes.website_status import website_status_bp
+from api.routes.seo_mastermind import seo_mastermind_bp
+from api.routes.image_optimizer import image_optimizer_bp
 
 logger = logging.getLogger(__name__)
 
@@ -124,6 +126,14 @@ def register_blueprints(app):
     # Registrar blueprint de Website Status
     print("Registrando blueprint: website_status_bp en /api/website-status")
     app.register_blueprint(website_status_bp, url_prefix='/api/website-status')
+    
+    # Registrar blueprint de SEO Mastermind
+    print("Registrando blueprint: seo_mastermind_bp en /api/seo-mastermind")
+    app.register_blueprint(seo_mastermind_bp, url_prefix='/api/seo-mastermind')
+    
+    # Registrar blueprint de Image Optimizer
+    print("Registrando blueprint: image_optimizer_bp en /api/image-optimize")
+    app.register_blueprint(image_optimizer_bp, url_prefix='/api/image-optimize')
     
     # Agregar más blueprints aquí
     print("=== FIN DE REGISTRO DE BLUEPRINTS (desde blueprints/__init__.py) ===\n")
