@@ -35,12 +35,15 @@ const PlaylistDetails = ({ setError, selectedPlaylist, setSelectedPlaylist, onSe
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    
     if (!playlistId) {
       setError('Por favor ingresa un ID de lista de reproducción');
       return;
     }
-    
+    // Validar que no sea una URL de video
+    if (playlistId.includes('watch?v=')) {
+      setError('Por favor ingresa un ID o URL de lista de reproducción, no de video.');
+      return;
+    }
     // Extraer el ID de la playlist si el usuario ingresa una URL completa
     let cleanId = playlistId;
     if (playlistId.includes('list=')) {
@@ -49,19 +52,20 @@ const PlaylistDetails = ({ setError, selectedPlaylist, setSelectedPlaylist, onSe
         cleanId = match[1];
       }
     }
-    
+    console.log('ID de playlist enviado al backend:', cleanId);
     setLoading(true);
-    
     try {
       const response = await axios.get('/api/youtube/playlist/details', {
         params: { playlistId: cleanId }
       });
-      
       setPlaylistData(response.data);
       setSelectedPlaylist(response.data);
       setError(null);
     } catch (err) {
       console.error('Error obteniendo detalles de la lista de reproducción:', err);
+      if (err.response) {
+        console.error('Respuesta de la API:', err.response.data);
+      }
       setError(err.response?.data?.error || 'Error al obtener detalles de la lista de reproducción');
       setPlaylistData(null);
       setSelectedPlaylist(null);
@@ -132,7 +136,7 @@ const PlaylistDetails = ({ setError, selectedPlaylist, setSelectedPlaylist, onSe
           <Grid container>
             <Grid item xs={12} md={4} sx={{ p: 2 }}>
               <Box component="img" 
-                src={playlistData.thumbnail?.url || 'https://via.placeholder.com/480x360?text=Playlist+sin+imagen'} 
+                src={playlistData.thumbnails?.[playlistData.thumbnails.length-1]?.url || 'https://via.placeholder.com/480x360?text=Playlist+sin+imagen'} 
                 alt={playlistData.title}
                 sx={{ width: '100%', borderRadius: 1 }}
               />
@@ -142,20 +146,21 @@ const PlaylistDetails = ({ setError, selectedPlaylist, setSelectedPlaylist, onSe
                 <Typography variant="h5" gutterBottom>
                   {playlistData.title}
                 </Typography>
-                
-                <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-                  {playlistData.channel?.title}
-                </Typography>
-                
+                <Box display="flex" alignItems="center" mb={1}>
+                  <Avatar src={playlistData.channel?.avatar?.[0]?.url} alt={playlistData.channel?.name} sx={{ width: 40, height: 40, mr: 1 }} />
+                  <Typography variant="subtitle1" color="text.secondary">
+                    {playlistData.channel?.name}
+                  </Typography>
+                </Box>
                 <Typography variant="body2" paragraph>
                   {playlistData.description || 'Sin descripción disponible'}
                 </Typography>
-                
                 <Typography variant="subtitle2" gutterBottom>
-                  {playlistData.videoCount || '0'} videos • 
-                  {playlistData.viewCount ? ` ${Number(playlistData.viewCount).toLocaleString()} vistas` : ''}
+                  {playlistData.videoCount || '0'} videos • {playlistData.viewCountText || ''}
                 </Typography>
-                
+                <Typography variant="caption" color="text.secondary">
+                  {playlistData.publishedTimeText}
+                </Typography>
                 <Button
                   variant="contained"
                   startIcon={<PlayArrow />}
@@ -168,29 +173,26 @@ const PlaylistDetails = ({ setError, selectedPlaylist, setSelectedPlaylist, onSe
               </CardContent>
             </Grid>
           </Grid>
-          
           <Divider />
-          
           <Box sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
-              Videos en esta lista ({playlistData.videos?.length || 0})
+              Videos en esta lista ({playlistData.videos?.items?.length || 0})
             </Typography>
-            
-            {playlistData.videos && playlistData.videos.length > 0 ? (
+            {playlistData.videos?.items && playlistData.videos.items.length > 0 ? (
               <List>
-                {playlistData.videos.map((video, index) => (
-                  <ListItem key={index} divider={index < playlistData.videos.length - 1} button onClick={() => onSelectVideo({
+                {playlistData.videos.items.map((video, index) => (
+                  <ListItem key={video.id} divider={index < playlistData.videos.items.length - 1} button onClick={() => onSelectVideo({
                     id: video.id,
                     title: video.title,
-                    thumbnail: video.thumbnail?.url,
-                    channelTitle: video.channel?.title,
+                    thumbnail: video.thumbnails?.[video.thumbnails.length-1]?.url,
+                    channelTitle: video.channel?.name,
                     description: video.description,
-                    publishedAt: video.published
+                    publishedAt: video.publishedTimeText
                   })}>
                     <ListItemAvatar>
                       <Avatar 
                         variant="rounded" 
-                        src={video.thumbnail?.url || 'https://via.placeholder.com/120x90?text=Sin+imagen'} 
+                        src={video.thumbnails?.[video.thumbnails.length-1]?.url || 'https://via.placeholder.com/120x90?text=Sin+imagen'} 
                         alt={video.title}
                         sx={{ width: 120, height: 68, mr: 1 }}
                       />
@@ -199,54 +201,15 @@ const PlaylistDetails = ({ setError, selectedPlaylist, setSelectedPlaylist, onSe
                       primary={video.title} 
                       secondary={
                         <>
-                          {video.channel?.title}
-                          {video.duration ? ` • ${formatDuration(video.duration)}` : ''}
+                          <Typography variant="body2" color="text.secondary">{video.channel?.name}</Typography>
+                          <Typography variant="caption" color="text.secondary">{video.lengthText}</Typography>
                         </>
                       }
-                      primaryTypographyProps={{
-                        sx: {
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 1,
-                          WebkitBoxOrient: 'vertical'
-                        }
-                      }}
                     />
                     <ListItemSecondaryAction>
-                      <Tooltip title="Ver detalles del video">
-                        <IconButton edge="end" onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectVideo({
-                            id: video.id,
-                            title: video.title,
-                            thumbnail: video.thumbnail?.url,
-                            channelTitle: video.channel?.title,
-                            description: video.description,
-                            publishedAt: video.published
-                          });
-                        }}>
-                          <VideoLibrary />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Descargar video">
-                        <IconButton edge="end" sx={{ ml: 1 }} onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectVideo({
-                            id: video.id,
-                            title: video.title,
-                            thumbnail: video.thumbnail?.url,
-                            channelTitle: video.channel?.title,
-                            description: video.description,
-                            publishedAt: video.published
-                          });
-                          // Simular clic en la pestaña de descarga
-                          setTimeout(() => {
-                            const tab = document.querySelector('[role="tab"][aria-label="Opciones de Descarga"]');
-                            if (tab) tab.click();
-                          }, 100);
-                        }}>
-                          <Download />
+                      <Tooltip title="Ver en YouTube">
+                        <IconButton edge="end" onClick={() => window.open(`https://www.youtube.com/watch?v=${video.id}`, '_blank')}>
+                          <PlayArrow />
                         </IconButton>
                       </Tooltip>
                     </ListItemSecondaryAction>
@@ -254,9 +217,7 @@ const PlaylistDetails = ({ setError, selectedPlaylist, setSelectedPlaylist, onSe
                 ))}
               </List>
             ) : (
-              <Typography variant="body1" color="text.secondary" align="center">
-                No se encontraron videos en esta lista de reproducción
-              </Typography>
+              <Typography variant="body2" color="text.secondary">No hay videos en esta lista.</Typography>
             )}
           </Box>
         </Card>
