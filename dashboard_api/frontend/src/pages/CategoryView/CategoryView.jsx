@@ -55,6 +55,9 @@ import {
     selectAllApps,
     selectAppsLoading,
     fetchAllApps,
+    toggleFavoriteApp,
+    selectPurchasedApps,
+    purchaseApp
 } from "../../redux/slices/appsSlice";
 import AppDetailDrawer from "../../components/AppDetailDrawer/AppDetailDrawer";
 
@@ -119,6 +122,7 @@ const CategoryView = () => {
     const dispatch = useAppDispatch();
     const allApps = useAppSelector(selectAllApps) || [];
     const loading = useAppSelector(selectAppsLoading);
+    const purchasedApps = useAppSelector(selectPurchasedApps);
 
     // Obtener la categoría desde el estado de ubicación
     const categoryFromState = location.state?.preselectedCategory || "";
@@ -215,9 +219,21 @@ const CategoryView = () => {
     }, [categoryApps, searchQuery, selectedSubcategory, filterStatus, sortBy]);
 
     // Manejar favoritos
-    const toggleFavorite = (appId, event) => {
+    const toggleFavorite = async (appId, event) => {
         event.stopPropagation();
-        // Aquí iría la lógica para marcar como favorito
+        const isPurchased = purchasedApps.some(a => a.id === appId || a.app_id === appId);
+        if (!isPurchased) {
+            // Espera a que la app esté realmente agregada
+            const result = await dispatch(purchaseApp(appId));
+            if (purchaseApp.fulfilled.match(result)) {
+                await dispatch(toggleFavoriteApp(appId));
+            } else {
+                // Opcional: muestra un error al usuario
+                return;
+            }
+        } else {
+            dispatch(toggleFavoriteApp(appId));
+        }
     };
 
     // Manejar compra

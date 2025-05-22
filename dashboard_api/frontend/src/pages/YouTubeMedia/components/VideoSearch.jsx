@@ -125,10 +125,9 @@ const VideoSearch = ({ setError, onSelectVideo }) => {
           <Typography variant="h6" gutterBottom>
             Resultados para "{searchTerm}"
           </Typography>
-          
           <Grid container spacing={3}>
             {searchResults.items.map((item) => (
-              <Grid item xs={12} sm={6} md={4} key={item.id.videoId || item.id}>
+              <Grid item xs={12} sm={6} md={4} key={item.id}>
                 <Card 
                   sx={{ 
                     height: '100%', 
@@ -140,20 +139,20 @@ const VideoSearch = ({ setError, onSelectVideo }) => {
                     cursor: 'pointer'
                   }}
                   onClick={() => onSelectVideo({
-                    id: item.id.videoId || item.id,
-                    title: item.snippet.title,
-                    description: item.snippet.description,
-                    thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
-                    channelTitle: item.snippet.channelTitle,
-                    channelId: item.snippet.channelId,
-                    publishedAt: item.snippet.publishedAt
+                    id: item.id,
+                    title: item.title,
+                    description: item.description,
+                    thumbnail: item.thumbnails?.[0]?.url || '',
+                    channelTitle: item.channel?.name,
+                    channelId: item.channel?.id,
+                    publishedAt: item.publishedTimeText
                   })}
                 >
                   <CardMedia
                     component="img"
                     height={140}
-                    image={item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url}
-                    alt={item.snippet.title}
+                    image={item.thumbnails?.[0]?.url || 'https://via.placeholder.com/360x202?text=Sin+Imagen'}
+                    alt={item.title}
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography 
@@ -169,17 +168,15 @@ const VideoSearch = ({ setError, onSelectVideo }) => {
                         height: '2.4em'
                       }}
                     >
-                      {item.snippet.title}
+                      {item.title}
                     </Typography>
-                    
                     <Typography 
                       variant="body2" 
                       color="text.secondary"
                       sx={{ mb: 1 }}
                     >
-                      {item.snippet.channelTitle}
+                      {item.channel?.name}
                     </Typography>
-                    
                     <Typography 
                       variant="body2" 
                       color="text.secondary"
@@ -192,7 +189,7 @@ const VideoSearch = ({ setError, onSelectVideo }) => {
                         height: '2.4em'
                       }}
                     >
-                      {item.snippet.description || 'Sin descripción'}
+                      {item.description || 'Sin descripción'}
                     </Typography>
                   </CardContent>
                   <Divider />
@@ -202,7 +199,7 @@ const VideoSearch = ({ setError, onSelectVideo }) => {
                       startIcon={<PlayArrow />}
                       onClick={(e) => {
                         e.stopPropagation();
-                        window.open(`https://www.youtube.com/watch?v=${item.id.videoId || item.id}`, '_blank');
+                        window.open(`https://www.youtube.com/watch?v=${item.id}`, '_blank');
                       }}
                     >
                       Ver en YouTube

@@ -4,6 +4,7 @@ from api.routes.instagram import instagram_bp
 from .instagram_realtime import instagram_blueprint as instagram_realtime_bp
 import sys
 import os
+from api.routes.youtube_media import youtube_media_bp
 
 # Añadir el directorio raíz al path de Python para importar correctamente
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -134,6 +135,10 @@ def register_blueprints(app):
     # Registrar blueprint de Image Optimizer
     print("Registrando blueprint: image_optimizer_bp en /api/image-optimize")
     app.register_blueprint(image_optimizer_bp, url_prefix='/api/image-optimize')
+    
+    # Registrar blueprint de YouTube Media
+    print("Registrando blueprint: youtube_media_bp en /api/youtube")
+    app.register_blueprint(youtube_media_bp, url_prefix='/api/youtube')
     
     # Agregar más blueprints aquí
     print("=== FIN DE REGISTRO DE BLUEPRINTS (desde blueprints/__init__.py) ===\n")
