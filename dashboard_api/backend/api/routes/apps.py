@@ -239,15 +239,37 @@ def purchase_app(app_id):
     db.session.commit()
     return jsonify({'message': 'App comprada exitosamente', 'app': user_app.to_dict()}), 201
 
+# @jwt_required()
 @apps_bp.route('/user/apps/<string:app_id>/favorite', methods=['POST'])
-@jwt_required()
 def toggle_favorite_app(app_id):
     """Marcar o desmarcar una app como favorita"""
-    user_id = get_jwt_identity()
+    # En desarrollo, usamos un user_id fijo (por ejemplo, 1)
+    user_id = 1
+    
+    # Verificar si el usuario existe, si no, crearlo
+    user = User.query.get(user_id)
+    if not user:
+        user = User(id=user_id, email=f'dev_user_{user_id}@example.com', username=f'dev_user_{user_id}')
+        db.session.add(user)
+        db.session.commit()
+    
+    # Verificar si la app existe
+    app = App.query.get(app_id)
+    if not app:
+        return jsonify({'error': f'App {app_id} no encontrada'}), 404
+    
+    # Verificar si el usuario tiene la app, si no, comprarla
     user_app = UserApp.query.filter_by(user_id=user_id, app_id=app_id).first()
     if not user_app:
-        return jsonify({'error': 'Primero debes comprar la app'}), 400
+        user_app = UserApp(user_id=user_id, app_id=app_id)
+        db.session.add(user_app)
+        db.session.commit()
+    
     # Alternar favorito
     user_app.is_favorite = not user_app.is_favorite
     db.session.commit()
-    return jsonify({'message': 'Estado de favorito actualizado', 'app': user_app.to_dict()}), 200 
+    
+    return jsonify({
+        'message': 'Estado de favorito actualizado',
+        'app': user_app.to_dict()
+    }), 200 
