@@ -115,6 +115,33 @@ def update_apps_command():
             db.session.commit()
             print("Aplicación Google Trends actualizada correctamente")
 
+        # Añadir o actualizar SimilarWeb
+        similarweb_app = App.query.filter_by(id='similar-web').first()
+        
+        if not similarweb_app:
+            # Crear si no existe
+            similarweb_app = App(
+                id='similar-web',
+                title='Similar Web Insights',
+                description='Obtén insights detallados sobre el tráfico web y la competencia',
+                image_url='https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+                category='Web & SEO',
+                route='/apps/similar-web',
+                api_name='Similar Web API'
+            )
+            db.session.add(similarweb_app)
+            db.session.commit()
+            print("Aplicación SimilarWeb añadida correctamente")
+        else:
+            # Actualizar si ya existe
+            similarweb_app.title = 'Similar Web Insights'
+            similarweb_app.description = 'Obtén insights detallados sobre el tráfico web y la competencia'
+            similarweb_app.category = 'Web & SEO'
+            similarweb_app.route = '/apps/similar-web'
+            similarweb_app.api_name = 'Similar Web API'
+            db.session.commit()
+            print("Aplicación SimilarWeb actualizada correctamente")
+
 # Inicializar base de datos si estamos en entorno de desarrollo (deshabilitado temporalmente)
 """
 if os.environ.get('FLASK_ENV') == 'development' or not os.environ.get('FLASK_ENV'):
