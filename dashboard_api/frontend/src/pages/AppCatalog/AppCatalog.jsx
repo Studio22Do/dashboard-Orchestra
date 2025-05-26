@@ -46,8 +46,8 @@ const AppCatalog = () => {
   });
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+    <Box sx={{ width: '100%', px: 0, py: 4 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, px: { xs: 2, md: 6 } }}>
         <Button 
           startIcon={<ArrowBack />} 
           onClick={() => navigate('/')}
@@ -60,11 +60,11 @@ const AppCatalog = () => {
         </Typography>
       </Box>
       
-      <Typography variant="body1" color="text.secondary" paragraph>
+      <Typography variant="body1" color="text.secondary" paragraph sx={{ px: { xs: 2, md: 6 } }}>
         Explora tus aplicaciones agregadas para {activeCategory === 'All' ? 'todas las categorías' : activeCategory.toLowerCase()}
       </Typography>
 
-      <Box sx={{ mb: 4 }}>
+      <Box sx={{ mb: 4, px: { xs: 2, md: 6 } }}>
         <TextField
           fullWidth
           placeholder="Buscar herramientas..."
@@ -105,24 +105,24 @@ const AppCatalog = () => {
         <Divider />
       </Box>
 
-      <Grid container spacing={3}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', width: '100%', gap: '24px', px: '50px' }}>
         {filteredApps.length > 0 ? (
           filteredApps
             .filter(app => app && (app.id || app.app_id))
             .map(app => (
-              <Grid item key={app.app_id || app.id} xs={12} sm={6} md={4}>
+              <Box key={app.app_id || app.id} sx={{ width: { xs: '100%', sm: 'calc(50% - 12px)' }, boxSizing: 'border-box' }}>
                 <AppCard {...app} isPurchased={true} showFavorite={true} is_favorite={app.is_favorite} />
-              </Grid>
+              </Box>
             ))
         ) : (
-          <Box sx={{ py: 4, textAlign: 'center', width: '100%' }}>
+          <Box>
             <Typography variant="body1" color="text.secondary">
               Aún no has agregado ninguna aplicación. ¡Explora el Dashboard y agrega tus favoritas!
             </Typography>
           </Box>
         )}
-      </Grid>
-    </Container>
+      </Box>
+    </Box>
   );
 };
 
