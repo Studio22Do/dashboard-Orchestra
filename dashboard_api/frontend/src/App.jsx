@@ -30,7 +30,7 @@ import DomainMetrics from './pages/DomainMetrics/DomainMetrics';
 import AhrefsRankChecker from './pages/AhrefsRankChecker/AhrefsRankChecker';
 import PageSpeedInsights from './pages/PageSpeedInsights/PageSpeedInsights';
 import ProductDescriptionGenerator from './pages/ProductDescriptionGenerator/ProductDescriptionGenerator';
-import SeoMastermind from './pages/SeoMastermind/SeoMastermind';
+import SeoMastermind from './pages/SEOMastermind/SEOMastermind';
 import MidjourneyExperience from './pages/MidjourneyExperience/MidjourneyExperience';
 import WordCount from './pages/WordCount/WordCount';
 import PdfToText from './pages/PdfToText/PdfToText';
