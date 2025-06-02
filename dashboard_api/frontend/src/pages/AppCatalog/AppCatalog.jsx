@@ -18,8 +18,6 @@ import { useAppSelector } from '../../redux/hooks/reduxHooks';
 import { selectPurchasedApps } from '../../redux/slices/appsSlice';
 
 const AppCatalog = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
   const purchasedApps = useAppSelector(selectPurchasedApps);
@@ -27,13 +25,14 @@ const AppCatalog = () => {
   // Obtener categorías únicas de las apps compradas
   const CATEGORIES = ['All', ...Array.from(new Set(purchasedApps.map(app => app.category)))];
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
+
   // Verificar si hay una categoría preseleccionada (desde Dashboard)
   useEffect(() => {
     const preselectedCategory = location.state?.preselectedCategory;
     if (preselectedCategory && CATEGORIES.includes(preselectedCategory)) {
       setActiveCategory(preselectedCategory);
-    } else {
-      setActiveCategory(CATEGORIES[0]);
     }
   }, [location.state, CATEGORIES]);
 
