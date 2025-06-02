@@ -156,13 +156,24 @@ const CategorySection = ({ title, icon: Icon, tools, onViewAll }) => {
             ) : (
                 <Grid container spacing={3} sx={{ mt: 3 }}>
                     {tools.map((tool) => (
-                        <Grid item xs={12} sm={6} md={4} key={tool.id}>
-                            <ToolCard
-                                title={tool.title}
-                                icon={tool.icon}
-                                imageUrl={tool.imageUrl}
-                                onClick={tool.onClick}
-                            />
+                        <Grid key={tool.id}>
+                            <Box
+                                sx={{
+                                    minWidth: 340,
+                                    maxWidth: 400,
+                                    width: '100%',
+                                    flex: '1 1 340px',
+                                    boxSizing: 'border-box',
+                                    mb: 3,
+                                }}
+                            >
+                                <ToolCard
+                                    title={tool.title}
+                                    icon={tool.icon}
+                                    imageUrl={tool.imageUrl}
+                                    onClick={tool.onClick}
+                                />
+                            </Box>
                         </Grid>
                     ))}
                 </Grid>

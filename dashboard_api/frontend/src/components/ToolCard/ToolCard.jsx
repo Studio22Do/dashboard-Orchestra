@@ -52,6 +52,12 @@ const IconContainer = styled(Avatar)(({ theme }) => ({
     fontSize: 96,
     color: 'white',
     transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  },
+  '& img': {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    borderRadius: 12
   }
 }));
 
@@ -85,11 +91,26 @@ const CardContentFade = styled('div')(({ theme, isvisible }) => ({
 const ToolCard = ({ title, icon: Icon, imageUrl, onClick }) => {
   const cardRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
     const checkVisibility = () => {
       if (!cardRef.current) return;
       let parent = cardRef.current.parentElement;
+      let isInSwiper = false;
+      while (parent) {
+        if (parent.classList && parent.classList.contains('swiper-slide')) {
+          isInSwiper = true;
+          break;
+        }
+        parent = parent.parentElement;
+      }
+      if (!isInSwiper) {
+        setIsVisible(true); // Siempre visible si no está en Swiper
+        return;
+      }
+      // Si está en Swiper, solo visible si es visible en el slide
+      parent = cardRef.current.parentElement;
       while (parent) {
         if (parent.classList && parent.classList.contains('swiper-slide-visible')) {
           setIsVisible(true);
@@ -100,7 +121,6 @@ const ToolCard = ({ title, icon: Icon, imageUrl, onClick }) => {
       setIsVisible(false);
     };
     checkVisibility();
-    // Swiper puede cambiar visibilidad por scroll, así que escucha cambios
     const interval = setInterval(checkVisibility, 100);
     return () => clearInterval(interval);
   }, []);
@@ -109,8 +129,12 @@ const ToolCard = ({ title, icon: Icon, imageUrl, onClick }) => {
     <StyledCard onClick={onClick} ref={cardRef}>
       <CardContentFade isvisible={isVisible ? 1 : 0}>
         <IconContainer>
-          {imageUrl ? (
-            <img src={imageUrl} alt={title} style={{ width: 64, height: 64, borderRadius: 12, objectFit: 'cover' }} />
+          {imageUrl && !imgError ? (
+            <img 
+              src={imageUrl} 
+              alt={title} 
+              onError={() => setImgError(true)}
+            />
           ) : (
             Icon && <Icon />
           )}
