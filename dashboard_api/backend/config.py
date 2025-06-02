@@ -23,7 +23,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Configuración de RapidAPI
-    RAPIDAPI_KEY = os.environ.get('RAPIDAPI_KEY', '9dc7412cabmsh04d2de9d55522bap1643f6jsn6e3113942f4a')
+    RAPIDAPI_KEY = os.environ.get('RAPIDAPI_KEY')
+    RAPIDAPI_HOST = os.environ.get('RAPIDAPI_HOST', 'pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com')
+    RAPIDAPI_URL = os.environ.get('RAPIDAPI_URL', 'https://pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com/v1/reducer.php')
     RAPIDAPI_INSTAGRAM_HOST = os.environ.get('RAPIDAPI_INSTAGRAM_HOST', 'instagram-statistics-api.p.rapidapi.com')
     RAPIDAPI_INSTAGRAM_REALTIME_HOST = os.environ.get('RAPIDAPI_INSTAGRAM_REALTIME_HOST', 'instagram-realtimeapi.p.rapidapi.com')
     RAPIDAPI_GOOGLE_TRENDS_HOST = os.environ.get('RAPIDAPI_GOOGLE_TRENDS_HOST', 'google-trends.p.rapidapi.com')
