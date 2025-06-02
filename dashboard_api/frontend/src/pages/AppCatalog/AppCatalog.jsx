@@ -64,9 +64,9 @@ const AppCatalog = () => {
         Explora tus aplicaciones agregadas para {activeCategory === 'All' ? 'todas las categorías' : activeCategory.toLowerCase()}
       </Typography>
 
-      <Box sx={{ mb: 4, px: { xs: 2, md: 6 } }}>
+      <Box sx={{ mb: 4, px: { xs: 2, md: 6 } }} style={{  }}>
         <TextField
-          fullWidth
+          
           placeholder="Buscar herramientas..."
           variant="outlined"
           size="small"
