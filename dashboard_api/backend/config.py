@@ -72,10 +72,12 @@ config_by_name = {
     'default': DevelopmentConfig
 }
 
-# Configuración activa según la variable de entorno FLASK_ENV
+# Configuración activa según la variable de entorno FLASK_DEBUG
 def get_config():
-    env = os.environ.get('FLASK_ENV', 'default')
-    return config_by_name[env]
+    """Determina la configuración a usar basada en FLASK_DEBUG"""
+    if os.environ.get('FLASK_DEBUG') == '1':
+        return config_by_name['development']
+    return config_by_name['default']
 
 # Exportar config para compatibilidad con importaciones existentes
 config = config_by_name
