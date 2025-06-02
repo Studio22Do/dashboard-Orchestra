@@ -109,7 +109,7 @@ const AppCatalog = () => {
           filteredApps
             .filter(app => app && (app.id || app.app_id))
             .map(app => (
-              <Box key={app.app_id || app.id} sx={{ width: { xs: '100%', sm: 'calc(50% - 12px)' }, boxSizing: 'border-box' }}>
+              <Box key={app.app_id || app.id} sx={{ width: { xs: '100%', sm: 'calc(50% - 12px)' }, boxSizing: 'border-box'}}>
                 <AppCard {...app} isPurchased={true} showFavorite={true} is_favorite={app.is_favorite} />
               </Box>
             ))

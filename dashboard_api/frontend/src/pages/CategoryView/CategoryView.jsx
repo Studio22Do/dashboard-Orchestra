@@ -30,6 +30,7 @@ import {
     Tab,
     Breadcrumbs,
     Link,
+    Skeleton,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
@@ -532,7 +533,7 @@ const CategoryView = () => {
             </Box>
 
             {/* Breadcrumbs */}
-            <Box sx={{ px: 3, py: 1 }}>
+            <Box sx={{ px: 3, py: 1 }} >
                 <Breadcrumbs aria-label="breadcrumb" sx={{ color: "grey.500" }}>
                     <Link
                         color="inherit"
@@ -592,74 +593,26 @@ const CategoryView = () => {
             <CategoryContainer maxWidth="xl">
                 {loading ? (
                     // Skeleton loader
-                    <Grid container spacing={3}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', width: '100%', gap: '24px' }}>
                         {[1, 2, 3, 4, 5, 6].map((item) => (
-                            <Grid 
+                            <Box 
                                 key={item} 
-                                columns={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+                                sx={{ 
+                                    width: { xs: '100%', sm: 'calc(50% - 12px)' }, 
+                                    boxSizing: 'border-box' 
+                                }}
                             >
                                 <StyledCard>
-                                    <Box
-                                        sx={{ height: 200, bgcolor: "#3a3045" }}
-                                    />
-                                    <CardContent>
-                                        <Box
-                                            sx={{
-                                                height: 24,
-                                                width: "70%",
-                                                bgcolor: "#3a3045",
-                                                mb: 1,
-                                            }}
-                                        />
-                                        <Box
-                                            sx={{
-                                                height: 16,
-                                                width: "100%",
-                                                bgcolor: "#3a3045",
-                                                mb: 1,
-                                            }}
-                                        />
-                                        <Box
-                                            sx={{
-                                                height: 16,
-                                                width: "90%",
-                                                bgcolor: "#3a3045",
-                                                mb: 2,
-                                            }}
-                                        />
-                                        <Box sx={{ display: "flex", gap: 1 }}>
-                                            <Box
-                                                sx={{
-                                                    height: 24,
-                                                    width: 60,
-                                                    bgcolor: "#3a3045",
-                                                    borderRadius: 1,
-                                                }}
-                                            />
-                                            <Box
-                                                sx={{
-                                                    height: 24,
-                                                    width: 80,
-                                                    bgcolor: "#3a3045",
-                                                    borderRadius: 1,
-                                                }}
-                                            />
-                                        </Box>
-                                    </CardContent>
-                                    <Box sx={{ mt: "auto", p: 2 }}>
-                                        <Box
-                                            sx={{
-                                                height: 36,
-                                                width: 120,
-                                                bgcolor: "#3a3045",
-                                                borderRadius: 1,
-                                            }}
-                                        />
+                                    <Skeleton variant="rectangular" height={140} />
+                                    <Box sx={{ p: 2 }}>
+                                        <Skeleton variant="text" height={24} width="60%" />
+                                        <Skeleton variant="text" height={20} width="40%" />
+                                        <Skeleton variant="text" height={20} width="80%" />
                                     </Box>
                                 </StyledCard>
-                            </Grid>
+                            </Box>
                         ))}
-                    </Grid>
+                    </Box>
                 ) : filteredApps.length === 0 ? (
                     // Mensaje de no resultados
                     <Box
@@ -717,24 +670,18 @@ const CategoryView = () => {
                     </Box>
                 ) : (
                     // Grid de apps
-                    <Grid container spacing={3}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', width: '100%', gap: '24px' }}>
                         {filteredApps.map((app) => (
-                            <Grid
+                            <Box
                                 key={app.id}
-                                columns={{
-                                    xs: 12,
-                                    sm: viewMode === "list" ? 12 : 6,
-                                    md: viewMode === "list" ? 12 : 4,
-                                    lg: viewMode === "list" ? 12 : 3
+                                sx={{ 
+                                    width: { xs: '100%', sm: 'calc(50% - 12px)' }, 
+                                    boxSizing: 'border-box' 
                                 }}
                             >
                                 <StyledCard
                                     onClick={() => handleAppClick(app)}
                                     sx={{
-                                        flexDirection:
-                                            viewMode === "list"
-                                                ? "row"
-                                                : "column",
                                         cursor: "pointer",
                                     }}
                                 >
@@ -898,9 +845,9 @@ const CategoryView = () => {
                                         </CardActions>
                                     </Box>
                                 </StyledCard>
-                            </Grid>
+                            </Box>
                         ))}
-                    </Grid>
+                    </Box>
                 )}
             </CategoryContainer>
 
