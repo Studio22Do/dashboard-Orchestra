@@ -36,45 +36,28 @@ const DomainMetrics = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!domain) {
       setError('Por favor ingresa un dominio para analizar');
       return;
     }
-    
     setLoading(true);
     setError(null);
-    
+    setMetricsData(null);
     try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setMetricsData({
-        domainAuthority: 45,
-        pageAuthority: 38,
-        spamScore: 2,
-        backlinks: {
-          total: 12500,
-          dofollow: 9800,
-          nofollow: 2700
-        },
-        performance: {
-          loadTime: 1.8,
-          score: 85
-        },
-        security: {
-          ssl: true,
-          malware: false,
-          phishing: false
-        },
-        server: {
-          type: 'Apache',
-          location: 'United States',
-          ip: '192.168.1.1'
-        }
+      const response = await fetch('/api/domain-metrics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain })
       });
+      const data = await response.json();
+      setMetricsData(data);
+      console.log('Domain Metrics API response (frontend):', data);
+      if (!response.ok || data.error) {
+        setError(data.error || 'Error al analizar el dominio');
+        setLoading(false);
+        return;
+      }
     } catch (err) {
-      console.error('Error analyzing domain:', err);
       setError(err.message || 'Error al analizar el dominio');
     } finally {
       setLoading(false);
@@ -145,197 +128,146 @@ const DomainMetrics = () => {
       {!loading && metricsData && (
         <Paper elevation={2} sx={{ p: 3 }}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            {/* Moz & Majestic Authority */}
+            <Grid item xs={12} md={3}>
               <Card>
                 <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Domain Authority
-                  </Typography>
+                  <Typography variant="h6" gutterBottom>Domain Authority (Moz)</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                     <Domain sx={{ mr: 1, color: 'primary.main' }} />
-                    <Typography variant="h4">
-                      {metricsData.domainAuthority}
-                    </Typography>
+                    <Typography variant="h4">{metricsData.mozDA ?? '-'}</Typography>
                   </Box>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={metricsData.domainAuthority} 
-                    sx={{ height: 10, borderRadius: 5 }}
-                  />
+                  <LinearProgress variant="determinate" value={Number(metricsData.mozDA) || 0} sx={{ height: 10, borderRadius: 5 }} />
                 </CardContent>
               </Card>
             </Grid>
-
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={3}>
               <Card>
                 <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Page Authority
-                  </Typography>
+                  <Typography variant="h6" gutterBottom>Page Authority (Moz)</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                     <Link sx={{ mr: 1, color: 'primary.main' }} />
-                    <Typography variant="h4">
-                      {metricsData.pageAuthority}
-                    </Typography>
+                    <Typography variant="h4">{metricsData.mozPA ?? '-'}</Typography>
                   </Box>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={metricsData.pageAuthority} 
-                    sx={{ height: 10, borderRadius: 5 }}
-                  />
+                  <LinearProgress variant="determinate" value={Number(metricsData.mozPA) || 0} sx={{ height: 10, borderRadius: 5 }} />
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>Trust Flow (Majestic)</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <Security sx={{ mr: 1, color: 'primary.main' }} />
+                    <Typography variant="h4">{metricsData.majesticTF ?? '-'}</Typography>
+                  </Box>
+                  <LinearProgress variant="determinate" value={Number(metricsData.majesticTF) || 0} sx={{ height: 10, borderRadius: 5 }} />
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>Citation Flow (Majestic)</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <Speed sx={{ mr: 1, color: 'primary.main' }} />
+                    <Typography variant="h4">{metricsData.majesticCF ?? '-'}</Typography>
+                  </Box>
+                  <LinearProgress variant="determinate" value={Number(metricsData.majesticCF) || 0} sx={{ height: 10, borderRadius: 5 }} />
                 </CardContent>
               </Card>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            {/* Moz & Majestic Links */}
+            <Grid item xs={12} md={3}>
               <Card>
                 <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Backlinks
-                  </Typography>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <Link />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Total" 
-                        secondary={metricsData.backlinks.total.toLocaleString()} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Link />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Dofollow" 
-                        secondary={metricsData.backlinks.dofollow.toLocaleString()} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Link />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Nofollow" 
-                        secondary={metricsData.backlinks.nofollow.toLocaleString()} 
-                      />
-                    </ListItem>
-                  </List>
+                  <Typography variant="h6" gutterBottom>Moz Links</Typography>
+                  <Typography variant="h5">{metricsData.mozLinks ?? '-'}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>Majestic Backlinks</Typography>
+                  <Typography variant="h5">{metricsData.majesticLinks ?? '-'}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>Referring Domains</Typography>
+                  <Typography variant="h5">{metricsData.majesticRefDomains ?? '-'}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>Ref. EDU / GOV</Typography>
+                  <Typography variant="body1">EDU: {metricsData.majesticRefEDU ?? '-'}</Typography>
+                  <Typography variant="body1">GOV: {metricsData.majesticRefGov ?? '-'}</Typography>
                 </CardContent>
               </Card>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            {/* Social Signals */}
+            <Grid item xs={12} md={3}>
               <Card>
                 <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Rendimiento
-                  </Typography>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <Speed />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Tiempo de Carga" 
-                        secondary={`${metricsData.performance.loadTime}s`} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Speed />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Puntuación" 
-                        secondary={`${metricsData.performance.score}/100`} 
-                      />
-                    </ListItem>
-                  </List>
+                  <Typography variant="h6" gutterBottom>Facebook Shares</Typography>
+                  <Typography variant="h5">{metricsData.FB_shares ?? '-'}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>Facebook Comments</Typography>
+                  <Typography variant="h5">{metricsData.FB_comments ?? '-'}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>Pinterest Pins</Typography>
+                  <Typography variant="h5">{metricsData.pinterest_pins ?? '-'}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>Stumbles</Typography>
+                  <Typography variant="h5">{metricsData.stumbles ?? '-'}</Typography>
                 </CardContent>
               </Card>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            {/* Topical Trust Flow */}
+            <Grid item xs={12}>
               <Card>
                 <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Seguridad
-                  </Typography>
+                  <Typography variant="h6" gutterBottom>Topical Trust Flow</Typography>
                   <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <Security />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="SSL" 
-                        secondary={metricsData.security.ssl ? 'Activo' : 'Inactivo'} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Security />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Malware" 
-                        secondary={metricsData.security.malware ? 'Detectado' : 'No detectado'} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Security />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Phishing" 
-                        secondary={metricsData.security.phishing ? 'Detectado' : 'No detectado'} 
-                      />
-                    </ListItem>
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Información del Servidor
-                  </Typography>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <Storage />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Tipo" 
-                        secondary={metricsData.server.type} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Language />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Ubicación" 
-                        secondary={metricsData.server.location} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Storage />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="IP" 
-                        secondary={metricsData.server.ip} 
-                      />
-                    </ListItem>
+                    {metricsData.majesticTTF0Name && (
+                      <ListItem>
+                        <ListItemText primary={metricsData.majesticTTF0Name} secondary={metricsData.majesticTTF0Value ?? '-'} />
+                      </ListItem>
+                    )}
+                    {metricsData.majesticTTF1Name && (
+                      <ListItem>
+                        <ListItemText primary={metricsData.majesticTTF1Name} secondary={metricsData.majesticTTF1Value ?? '-'} />
+                      </ListItem>
+                    )}
+                    {metricsData.majesticTTF2Name && (
+                      <ListItem>
+                        <ListItemText primary={metricsData.majesticTTF2Name} secondary={metricsData.majesticTTF2Value ?? '-'} />
+                      </ListItem>
+                    )}
                   </List>
                 </CardContent>
               </Card>

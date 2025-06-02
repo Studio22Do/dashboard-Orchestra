@@ -30,18 +30,20 @@ import DomainMetrics from './pages/DomainMetrics/DomainMetrics';
 import AhrefsRankChecker from './pages/AhrefsRankChecker/AhrefsRankChecker';
 import PageSpeedInsights from './pages/PageSpeedInsights/PageSpeedInsights';
 import ProductDescriptionGenerator from './pages/ProductDescriptionGenerator/ProductDescriptionGenerator';
-import SeoMastermind from './pages/SeoMastermind/SeoMastermind';
+import SeoMastermind from './pages/SEOMastermind/SEOMastermind';
 import MidjourneyExperience from './pages/MidjourneyExperience/MidjourneyExperience';
 import WordCount from './pages/WordCount/WordCount';
 import PdfToText from './pages/PdfToText/PdfToText';
 import SnapVideo from './pages/SnapVideo/SnapVideo';
-import GerwinAI from './pages/GerwinAI/GerwinAI';
 import OpenAITextToSpeech from './pages/OpenAITextToSpeech/OpenAITextToSpeech';
 import GenieAI from './pages/GenieAI/GenieAI';
 import AISocialMediaContent from './pages/AISocialMediaContent/AISocialMediaContent';
 import AdvancedImageManipulation from './pages/AdvancedImageManipulation/AdvancedImageManipulation';
 import WhisperFromURL from './pages/WhisperFromURL/WhisperFromURL';
 import RunwayML from './pages/RunwayML/RunwayML';
+import AIHumanizer from './pages/AIHumanizer/AIHumanizer';
+import CategoryView from './pages/CategoryView/CategoryView';
+import ImageOptimizer from './pages/ImageOptimizer/ImageOptimizer';
 import theme from './theme';
 
 // Theme configuration function
@@ -375,12 +377,6 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/apps/gerwin-ai" element={
-            <ProtectedRoute>
-              <GerwinAI />
-            </ProtectedRoute>
-          } />
-          
           <Route path="/apps/openai-text-to-speech" element={
             <ProtectedRoute>
               <OpenAITextToSpeech />
@@ -414,6 +410,24 @@ function App() {
           <Route path="/apps/runway-ml" element={
             <ProtectedRoute>
               <RunwayML />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/apps/ai-humanizer" element={
+            <ProtectedRoute>
+              <AIHumanizer />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/category" element={
+            <ProtectedRoute>
+              <CategoryView />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/apps/image-optimizer" element={
+            <ProtectedRoute>
+              <ImageOptimizer />
             </ProtectedRoute>
           } />
           

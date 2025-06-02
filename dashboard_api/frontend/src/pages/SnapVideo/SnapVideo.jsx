@@ -28,6 +28,7 @@ import {
   Info,
   Warning
 } from '@mui/icons-material';
+import axios from 'axios';
 
 const SnapVideo = () => {
   const [url, setUrl] = useState('');
@@ -39,40 +40,29 @@ const SnapVideo = () => {
     e.preventDefault();
     
     if (!url) {
-      setError('Por favor ingresa la URL del video de Snapchat');
-      return;
-    }
-    
-    if (!url.includes('snapchat.com')) {
-      setError('Por favor ingresa una URL válida de Snapchat');
+      setError('Por favor ingresa la URL del video');
       return;
     }
     
     setLoading(true);
     setError(null);
+    setVideoInfo(null);
     
     try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setVideoInfo({
-        title: 'Video de Snapchat',
-        duration: '00:15',
-        size: '2.5 MB',
-        quality: '720p',
-        thumbnail: 'https://via.placeholder.com/320x180',
-        downloadUrl: '#',
-        metadata: {
-          author: 'Usuario de Snapchat',
-          date: new Date().toLocaleDateString(),
-          views: '1.2K',
-          likes: '150'
-        }
-      });
+      const response = await axios.post('/api/snap-video/download', { url });
+      if (response.data && response.data.medias && response.data.medias.length > 0) {
+        setVideoInfo({
+          title: response.data.title,
+          duration: response.data.duration,
+          thumbnail: response.data.thumbnail,
+          source: response.data.source,
+          medias: response.data.medias
+        });
+      } else {
+        setError('No se encontraron enlaces de descarga para esta URL.');
+      }
     } catch (err) {
-      console.error('Error downloading video:', err);
-      setError(err.message || 'Error al descargar el video');
+      setError(err.response?.data?.error || err.message || 'Error al obtener el video');
     } finally {
       setLoading(false);
     }
@@ -183,109 +173,48 @@ const SnapVideo = () => {
                     <Divider />
                     <ListItem>
                       <ListItemIcon>
-                        <VideoLibrary />
+                        <Info />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="Tamaño" 
-                        secondary={videoInfo.size} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <VideoLibrary />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Calidad" 
-                        secondary={videoInfo.quality} 
+                        primary="Fuente" 
+                        secondary={videoInfo.source} 
                       />
                     </ListItem>
                   </List>
                 </CardContent>
               </Card>
             </Grid>
-
             <Grid item xs={12} md={6}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
-                    Información del Video
+                    Enlaces de descarga
                   </Typography>
                   <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <Info />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Autor" 
-                        secondary={videoInfo.metadata.author} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Info />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Fecha" 
-                        secondary={videoInfo.metadata.date} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Info />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Vistas" 
-                        secondary={videoInfo.metadata.views} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Info />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Me gusta" 
-                        secondary={videoInfo.metadata.likes} 
-                      />
-                    </ListItem>
+                    {videoInfo.medias.map((media, idx) => (
+                      <ListItem key={idx} alignItems="flex-start">
+                        <ListItemIcon>
+                          <Download />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={`${media.quality ? media.quality.toUpperCase() : media.extension.toUpperCase()} (${media.extension})`}
+                          secondary={media.url}
+                        />
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          href={media.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          startIcon={<Download />}
+                        >
+                          Descargar
+                        </Button>
+                      </ListItem>
+                    ))}
                   </List>
                 </CardContent>
               </Card>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Box>
-                      <Typography variant="h6" gutterBottom>
-                        Descargar Video
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Haz clic en el botón para descargar el video
-                      </Typography>
-                    </Box>
-                    <Button
-                      variant="contained"
-                      startIcon={<Download />}
-                      onClick={handleDownload}
-                    >
-                      Descargar
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Alert severity="info" sx={{ mt: 2 }}>
-                <Typography variant="body2">
-                  <strong>Nota:</strong> Asegúrate de tener permiso para descargar el video y respetar los derechos de autor.
-                </Typography>
-              </Alert>
             </Grid>
           </Grid>
         </Paper>

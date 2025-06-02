@@ -7,7 +7,8 @@ import {
   Tabs, 
   Tab, 
   Alert,
-  AlertTitle
+  AlertTitle,
+  Button
 } from '@mui/material';
 import { 
   YouTube, 
@@ -21,14 +22,18 @@ import VideoSearch from './components/VideoSearch';
 import VideoDetails from './components/VideoDetails';
 import PlaylistDetails from './components/PlaylistDetails';
 import DownloadOptions from './components/DownloadOptions';
+import ChannelVideos from './components/ChannelVideos';
 
 const YouTubeMedia = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [error, setError] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  const [channelId, setChannelId] = useState('');
+  const [showChannelVideos, setShowChannelVideos] = useState(false);
 
   const handleTabChange = (event, newValue) => {
+    console.log('Tab cambiado a:', newValue);
     setActiveTab(newValue);
     setError(null);
   };
@@ -70,23 +75,26 @@ const YouTubeMedia = () => {
             label="Buscar Videos" 
             iconPosition="start"
           />
-          {selectedVideo && (
-            <Tab 
-              icon={<VideoLibrary />} 
-              label="Detalles del Video" 
-              iconPosition="start"
-            />
-          )}
-          {selectedVideo && (
-            <Tab 
-              icon={<DownloadForOffline />} 
-              label="Opciones de Descarga" 
-              iconPosition="start"
-            />
-          )}
+          <Tab 
+            icon={<VideoLibrary />} 
+            label="Detalles del Video" 
+            iconPosition="start"
+            disabled={!selectedVideo}
+          />
+          <Tab 
+            icon={<DownloadForOffline />} 
+            label="Opciones de Descarga" 
+            iconPosition="start"
+            disabled={!selectedVideo}
+          />
           <Tab 
             icon={<PlaylistPlay />} 
             label="Listas de Reproducción" 
+            iconPosition="start"
+          />
+          <Tab 
+            icon={<VideoLibrary />} 
+            label="Videos de Canal" 
             iconPosition="start"
           />
         </Tabs>
@@ -98,24 +106,33 @@ const YouTubeMedia = () => {
             setError={setError} 
             setSelectedVideo={setSelectedVideo} 
             onSelectVideo={(video) => {
+              console.log('Video seleccionado desde búsqueda:', video);
               setSelectedVideo(video);
               setActiveTab(1);
             }}
           />
         )}
         
-        {activeTab === 1 && selectedVideo && (
-          <VideoDetails 
-            video={selectedVideo} 
-            setError={setError}
-          />
+        {activeTab === 1 && (
+          selectedVideo ? (
+            <VideoDetails 
+              video={selectedVideo} 
+              setError={setError}
+            />
+          ) : (
+            <Typography variant="body2" color="text.secondary">Selecciona un video para ver los detalles.</Typography>
+          )
         )}
         
-        {activeTab === 2 && selectedVideo && (
-          <DownloadOptions 
-            videoId={selectedVideo.id} 
-            setError={setError}
-          />
+        {activeTab === 2 && (
+          selectedVideo ? (
+            <DownloadOptions 
+              videoId={selectedVideo.id} 
+              setError={setError}
+            />
+          ) : (
+            <Typography variant="body2" color="text.secondary">Selecciona un video para ver las opciones de descarga.</Typography>
+          )
         )}
         
         {activeTab === 3 && (
@@ -124,14 +141,53 @@ const YouTubeMedia = () => {
             selectedPlaylist={selectedPlaylist}
             setSelectedPlaylist={setSelectedPlaylist}
             onSelectVideo={(video) => {
+              console.log('Video seleccionado desde playlist:', video);
               setSelectedVideo(video);
               setActiveTab(1);
             }}
           />
         )}
+        
+        {activeTab === 4 && (
+          <Box>
+            <Paper sx={{ p: 3, mb: 3 }}>
+              <Typography variant="h6" gutterBottom>Explora videos de un canal</Typography>
+              <Box component="form" onSubmit={e => { e.preventDefault(); setShowChannelVideos(true); }} sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                <input
+                  type="text"
+                  placeholder="Pega el ID o URL del canal de YouTube"
+                  value={channelId}
+                  onChange={e => setChannelId(e.target.value)}
+                  style={{ flex: 1, padding: 8, borderRadius: 4, border: '1px solid #444', background: '#181828', color: '#fff' }}
+                />
+                <Button type="submit" variant="contained">Ver Videos</Button>
+              </Box>
+              <Typography variant="caption" color="text.secondary">
+                Ejemplo de ID: <b>UCeY0bbntWzzVIaj2z3QigXg</b> &nbsp;|&nbsp; Ejemplo de URL: <b>https://www.youtube.com/@CNN</b>
+              </Typography>
+            </Paper>
+            {showChannelVideos && channelId && (
+              <ChannelVideos channelId={extractChannelId(channelId)} />
+            )}
+          </Box>
+        )}
       </Box>
     </Container>
   );
 };
+
+function extractChannelId(input) {
+  // Si es una URL de canal, extrae el ID o handle
+  if (input.includes('youtube.com')) {
+    // URL tipo /channel/ID
+    const matchId = input.match(/channel\/([\w-]+)/);
+    if (matchId) return matchId[1];
+    // URL tipo /@handle
+    const matchHandle = input.match(/\/@([\w-]+)/);
+    if (matchHandle) return matchHandle[1];
+  }
+  // Si es un ID directo
+  return input.trim();
+}
 
 export default YouTubeMedia; 

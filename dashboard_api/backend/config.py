@@ -32,6 +32,7 @@ class Config:
     RAPIDAPI_FILE_CONVERTER_HOST = os.environ.get('RAPIDAPI_FILE_CONVERTER_HOST', 'all-in-one-file-converter.p.rapidapi.com')
     RAPIDAPI_TIKTOK_SCRAPER7_HOST = os.environ.get('RAPIDAPI_TIKTOK_SCRAPER7_HOST', 'tiktok-scraper7.p.rapidapi.com')
     RAPIDAPI_TIKTOK_SCRAPER2_HOST = os.environ.get('RAPIDAPI_TIKTOK_SCRAPER2_HOST', 'tiktok-scraper2.p.rapidapi.com')
+    RAPIDAPI_AHREFS_HOST = os.environ.get('RAPIDAPI_AHREFS_HOST', 'ahrefs2.p.rapidapi.com')
     
     # Instagram API config
     INSTAGRAM_API_BASE_URL = os.environ.get('INSTAGRAM_API_BASE_URL')

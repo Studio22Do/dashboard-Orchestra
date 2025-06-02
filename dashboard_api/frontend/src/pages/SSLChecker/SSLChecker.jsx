@@ -30,18 +30,22 @@ const SSLChecker = () => {
     
     setLoading(true);
     setError(null);
-    
+    setSslData(null);
     try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSslData({
-        valid: true,
-        issuer: 'Example CA',
-        validFrom: new Date().toISOString(),
-        validTo: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-        protocol: 'TLS 1.3'
+      // Extraer solo el dominio (sin https://)
+      let domain = url.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
+      const response = await fetch('/api/ssl-checker', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain })
       });
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        setError(data.message || data.error || 'Error al verificar el certificado SSL');
+        setLoading(false);
+        return;
+      }
+      setSslData(data);
     } catch (err) {
       console.error('Error checking SSL:', err);
       setError(err.message || 'Error al verificar el certificado SSL');
@@ -51,10 +55,13 @@ const SSLChecker = () => {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -124,21 +131,28 @@ const SSLChecker = () => {
           <Typography variant="h6" gutterBottom>
             Resultados de la Verificación SSL
           </Typography>
-          
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            {/* <Grid item xs={12} md={6}>
               <Card>
                 <CardContent>
                   <Typography variant="subtitle1" color="text.secondary">
                     Estado del Certificado
                   </Typography>
-                  <Typography variant="h6" color={sslData.valid ? 'success.main' : 'error.main'}>
-                    {sslData.valid ? 'Válido' : 'Inválido'}
+                  <Typography variant="h6" color={sslData.isValidCertificate ? 'success.main' : 'error.main'}>
+                    {sslData.isValidCertificate ? 'Válido' : 'válido'}
                   </Typography>
+                  {sslData.isExpired && (
+                    <Typography color="error.main">Expirado</Typography>
+                  )}
+                  {sslData.isSelfSigned && (
+                    <Typography color="warning.main">Self-Signed</Typography>
+                  )}
+                  {sslData.isWildcard && (
+                    <Typography color="info.main">Wildcard</Typography>
+                  )}
                 </CardContent>
               </Card>
-            </Grid>
-            
+            </Grid> */}
             <Grid item xs={12} md={6}>
               <Card>
                 <CardContent>
@@ -146,12 +160,11 @@ const SSLChecker = () => {
                     Emitido por
                   </Typography>
                   <Typography variant="h6">
-                    {sslData.issuer}
+                    {sslData.issuer || sslData.issuerDetails || '-'}
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
-
             <Grid item xs={12} md={6}>
               <Card>
                 <CardContent>
@@ -159,12 +172,11 @@ const SSLChecker = () => {
                     Válido desde
                   </Typography>
                   <Typography variant="h6">
-                    {formatDate(sslData.validFrom)}
+                    {formatDate(sslData.validFromDate || sslData.certDetails?.validFrom_time_t * 1000)}
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
-
             <Grid item xs={12} md={6}>
               <Card>
                 <CardContent>
@@ -172,20 +184,55 @@ const SSLChecker = () => {
                     Válido hasta
                   </Typography>
                   <Typography variant="h6">
-                    {formatDate(sslData.validTo)}
+                    {formatDate(sslData.expiry || sslData.certDetails?.validTo_time_t * 1000)}
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
-
-            <Grid item xs={12}>
+            <Grid item xs={12} md={6}>
               <Card>
                 <CardContent>
                   <Typography variant="subtitle1" color="text.secondary">
-                    Protocolo
+                    Días restantes
                   </Typography>
                   <Typography variant="h6">
-                    {sslData.protocol}
+                    {sslData.daysLeft ?? '-'}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardContent>
+                  <Typography variant="subtitle1" color="text.secondary">
+                    Lifespan (días)
+                  </Typography>
+                  <Typography variant="h6">
+                    {sslData.lifespanInDays ?? '-'}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardContent>
+                  <Typography variant="subtitle1" color="text.secondary">
+                    Dominio analizado
+                  </Typography>
+                  <Typography variant="h6">
+                    {sslData.final_url || sslData.original_url || '-'}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardContent>
+                  <Typography variant="subtitle1" color="text.secondary">
+                    Puerto
+                  </Typography>
+                  <Typography variant="h6">
+                    {sslData.port || '-'}
                   </Typography>
                 </CardContent>
               </Card>

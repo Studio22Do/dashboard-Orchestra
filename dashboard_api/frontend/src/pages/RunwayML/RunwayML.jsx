@@ -53,6 +53,14 @@ const RunwayML = () => {
   const [error, setError] = useState(null);
   const [generatedVideo, setGeneratedVideo] = useState(null);
   const [history, setHistory] = useState([]);
+  const [imgPrompt, setImgPrompt] = useState('');
+  const [width, setWidth] = useState(1344);
+  const [height, setHeight] = useState(768);
+  const [motion, setMotion] = useState(5);
+  const [seed, setSeed] = useState(0);
+  const [time, setTime] = useState(4);
+  const [imageAsEndFrame, setImageAsEndFrame] = useState(false);
+  const [flip, setFlip] = useState(false);
 
   const operations = [
     { value: 'generate', label: 'Generar Video', icon: <Movie /> },
@@ -92,47 +100,119 @@ const RunwayML = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (operation === 'generate' && !prompt.trim()) {
-      setError('Por favor ingresa un prompt para generar el video');
-      return;
-    }
-    
-    if ((operation === 'edit' || operation === 'enhance') && !selectedFile) {
-      setError('Por favor selecciona un video para editar');
-      return;
-    }
-    
     setLoading(true);
     setError(null);
-    
+    setGeneratedVideo(null);
+
+    let payload = {};
+    let op = '';
+    if (operation === 'generate') {
+      op = 'generate_by_text';
+      if (!prompt.trim()) {
+        setError('Por favor ingresa un prompt para generar el video');
+        setLoading(false);
+        return;
+      }
+      payload = {
+        operation: op,
+        text_prompt: prompt,
+        model,
+        width,
+        height,
+        motion,
+        seed,
+        time
+      };
+    } else if (operation === 'edit') {
+      op = imgPrompt && prompt ? 'generate_by_image_and_text' : 'generate_by_image';
+      if (!imgPrompt) {
+        setError('Por favor ingresa la URL de la imagen/video a editar');
+        setLoading(false);
+        return;
+      }
+      payload = {
+        operation: op,
+        img_prompt: imgPrompt,
+        model,
+        image_as_end_frame: imageAsEndFrame,
+        flip,
+        motion,
+        seed,
+        time
+      };
+      if (op === 'generate_by_image_and_text') {
+        payload.text_prompt = prompt;
+      }
+    } else if (operation === 'enhance') {
+      op = imgPrompt && prompt ? 'generate_by_image_and_text' : 'generate_by_image';
+      if (!imgPrompt) {
+        setError('Por favor ingresa la URL de la imagen/video a mejorar');
+        setLoading(false);
+        return;
+      }
+      payload = {
+        operation: op,
+        img_prompt: imgPrompt,
+        model,
+        image_as_end_frame: imageAsEndFrame,
+        flip,
+        motion,
+        seed,
+        time
+      };
+      if (op === 'generate_by_image_and_text') {
+        payload.text_prompt = prompt;
+      }
+    }
+
     try {
-      // Simulación de llamada a API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const newVideo = {
-        operation,
+      const res = await fetch('/api/runwayml/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setError(data.error || 'Error al procesar el video');
+        setLoading(false);
+        return;
+      }
+      // Suponemos que la respuesta contiene una URL del video generado
+      setGeneratedVideo({
+        videoUrl: data.result_url || data.url || data.video_url || '',
+        raw: data,
+        operation: op,
         model,
         prompt,
-        parameters,
-        originalFile: selectedFile,
-        videoUrl: selectedFile ? URL.createObjectURL(selectedFile) : 'https://ejemplo.com/video.mp4',
-        metadata: {
-          duration: `${parameters.duration}s`,
-          fps: parameters.fps,
-          quality: parameters.quality,
-          size: '10MB',
-          resolution: '1920x1080'
-        },
+        imgPrompt,
+        width,
+        height,
+        motion,
+        seed,
+        time,
+        imageAsEndFrame,
+        flip,
         timestamp: new Date().toLocaleString()
-      };
-      
-      setGeneratedVideo(newVideo);
-      setHistory(prev => [newVideo, ...prev]);
+      });
+      setHistory(prev => [{
+        videoUrl: data.result_url || data.url || data.video_url || '',
+        raw: data,
+        operation: op,
+        model,
+        prompt,
+        imgPrompt,
+        width,
+        height,
+        motion,
+        seed,
+        time,
+        imageAsEndFrame,
+        flip,
+        timestamp: new Date().toLocaleString()
+      }, ...prev]);
       setPrompt('');
-      
+      setImgPrompt('');
     } catch (err) {
-      console.error('Error processing video:', err);
       setError(err.message || 'Error al procesar el video');
     } finally {
       setLoading(false);
@@ -191,21 +271,16 @@ const RunwayML = () => {
                   
                   {(operation === 'edit' || operation === 'enhance') && (
                     <Grid item xs={12}>
-                      <Button
-                        variant="outlined"
-                        component="label"
+                      <TextField
                         fullWidth
-                        startIcon={<Upload />}
-                        sx={{ height: '100px', borderStyle: 'dashed' }}
-                      >
-                        {selectedFile ? selectedFile.name : 'Seleccionar Video'}
-                        <input
-                          type="file"
-                          hidden
-                          accept="video/*"
-                          onChange={handleFileChange}
-                        />
-                      </Button>
+                        label="URL de la imagen/video"
+                        value={imgPrompt}
+                        onChange={(e) => setImgPrompt(e.target.value)}
+                        multiline
+                        rows={4}
+                        required={operation === 'edit' || operation === 'enhance'}
+                        placeholder={operation === 'edit' || operation === 'enhance' ? 'Ingrese la URL de la imagen/video...' : ''}
+                      />
                     </Grid>
                   )}
                   
@@ -288,7 +363,7 @@ const RunwayML = () => {
                       type="submit"
                       variant="contained"
                       fullWidth
-                      disabled={loading || (operation === 'generate' && !prompt.trim()) || ((operation === 'edit' || operation === 'enhance') && !selectedFile)}
+                      disabled={loading || (operation === 'generate' && !prompt.trim()) || ((operation === 'edit' || operation === 'enhance') && !imgPrompt)}
                       startIcon={<VideoFile />}
                       sx={{ height: '56px' }}
                     >

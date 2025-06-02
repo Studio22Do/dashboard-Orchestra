@@ -32,48 +32,98 @@ const SimilarWebInsights = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [insightsData, setInsightsData] = useState(null);
+  const [websiteDetails, setWebsiteDetails] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!url) {
       setError('Por favor ingresa una URL para analizar');
       return;
     }
-    
     setLoading(true);
     setError(null);
-    
+    setInsightsData(null);
+    setWebsiteDetails(null);
     try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Extraer dominio de la URL ingresada
+      let domain = url;
+      try {
+        domain = new URL(url).hostname;
+      } catch (e) {
+        // Si no es una URL válida, usar el texto tal cual
+      }
+      // 1. Obtener detalles del sitio
+      const detailsRes = await fetch('/api/similarweb/website-details', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain })
+      });
+      const detailsData = await detailsRes.json();
+      setWebsiteDetails(detailsData);
+      // 2. Obtener insights
+      const response = await fetch('/api/similarweb/insights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain })
+      });
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        setError(data.error || 'Error al analizar el sitio web');
+        setLoading(false);
+        return;
+      }
+      // Mapear la respuesta real a la estructura de insightsData para la UI
+      const visits = data.Traffic?.Visits;
+      const totalVisits = visits ? Object.values(visits).slice(-1)[0] : 'N/A';
+      const avgVisitDuration = data.Traffic?.Engagement?.TimeOnSite && data.Traffic.Engagement.TimeOnSite > 0
+        ? `${Math.floor(data.Traffic.Engagement.TimeOnSite / 60)}:${String(Math.round(data.Traffic.Engagement.TimeOnSite % 60)).padStart(2, '0')} min`
+        : 'N/A';
+      const pagesPerVisit = data.Traffic?.Engagement?.PagesPerVisit && data.Traffic.Engagement.PagesPerVisit > 0
+        ? data.Traffic.Engagement.PagesPerVisit
+        : 'N/A';
+      const bounceRate = data.Traffic?.Engagement?.BounceRate && data.Traffic.Engagement.BounceRate > 0
+        ? `${Math.round(data.Traffic.Engagement.BounceRate * 100)}%`
+        : 'N/A';
+      const topCountries = data.Traffic?.TopCountryShares && Object.keys(data.Traffic.TopCountryShares).length > 0
+        ? Object.entries(data.Traffic.TopCountryShares)
+            .sort((a, b) => b[1] - a[1])
+            .map(([country, share]) => ({
+              country,
+              percentage: `${Math.round(share * 100)}%`
+            }))
+        : [];
+      const trafficSources = data.Traffic?.Sources && Object.values(data.Traffic.Sources).some(v => v > 0)
+        ? data.Traffic.Sources
+        : null;
+      const topKeywords = data.SEOInsights?.TopKeywords && Object.keys(data.SEOInsights.TopKeywords).length > 0
+        ? Object.entries(data.SEOInsights.TopKeywords).map(([keyword, value]) => ({ keyword, ...value }))
+        : [];
+      const globalRank = data.Rank?.GlobalRank ?? 'N/A';
+      const countryRank = data.Rank?.CountryRank?.Rank ?? 'N/A';
+      const countryRankCountry = data.Rank?.CountryRank?.Country ?? '';
+      const categoryRank = data.Rank?.CategoryRank?.Rank ?? 'N/A';
+      const categoryRankCategory = data.Rank?.CategoryRank?.Category ?? '';
+      const title = data.WebsiteDetails?.Title || 'No disponible';
+      const description = data.WebsiteDetails?.Description || 'No disponible';
+      const category = data.WebsiteDetails?.Category || 'No disponible';
+      const images = data.WebsiteDetails?.Images ?? {};
       setInsightsData({
-        totalVisits: '1.2M',
-        avgVisitDuration: '3:45',
-        pagesPerVisit: 4.2,
-        bounceRate: '42%',
-        trafficSources: {
-          direct: '35%',
-          search: '45%',
-          social: '12%',
-          referral: '8%'
-        },
-        topCountries: [
-          { country: 'Estados Unidos', percentage: '45%' },
-          { country: 'Reino Unido', percentage: '15%' },
-          { country: 'Alemania', percentage: '10%' }
-        ],
-        deviceSplit: {
-          desktop: '55%',
-          mobile: '40%',
-          tablet: '5%'
-        },
-        topReferrers: [
-          { site: 'google.com', percentage: '35%' },
-          { site: 'facebook.com', percentage: '20%' },
-          { site: 'twitter.com', percentage: '15%' }
-        ]
+        totalVisits,
+        avgVisitDuration,
+        pagesPerVisit,
+        bounceRate,
+        topCountries,
+        trafficSources,
+        topKeywords,
+        globalRank,
+        countryRank,
+        countryRankCountry,
+        categoryRank,
+        categoryRankCategory,
+        title,
+        description,
+        category,
+        images
       });
     } catch (err) {
       console.error('Error analyzing website:', err);
@@ -84,7 +134,7 @@ const SimilarWebInsights = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 0 }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Similar Web Insights
       </Typography>
@@ -92,7 +142,7 @@ const SimilarWebInsights = () => {
         Analiza el tráfico y las métricas de cualquier sitio web
       </Typography>
 
-      <Card sx={{ mb: 4 }}>
+      <Card sx={{ mb: 1 }}>
         <CardContent>
           <Box component="form" onSubmit={handleSubmit}>
             <Grid container spacing={2} alignItems="center">
@@ -144,66 +194,101 @@ const SimilarWebInsights = () => {
         </Alert>
       )}
 
+      {!loading && websiteDetails && (
+        <Paper elevation={3} sx={{ p: 1, mb: 1 }}>
+          <Box display="flex" alignItems="center" gap={1}>
+            <img
+              src={websiteDetails.Images?.Favicon}
+              alt="favicon"
+              width={32}
+              height={32}
+              style={{ borderRadius: 8, background: '#fff', boxShadow: '0 2px 8px #0002' }}
+              onError={e => e.target.style.display = 'none'}
+            />
+            <Box>
+              <Typography variant="h6" fontWeight={700} gutterBottom sx={{ mb: 0.5 }}>
+                {websiteDetails.Title || websiteDetails.Domain}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mb: 0.5 }}>
+                {websiteDetails.Description || 'Sin descripción disponible'}
+              </Typography>
+              <Typography variant="caption" color="primary">
+                {websiteDetails.Category || 'Sin categoría'}
+              </Typography>
+            </Box>
+            {websiteDetails.Images?.Desktop && (
+              <Box ml="auto">
+                <img
+                  src={websiteDetails.Images.Desktop}
+                  alt="preview desktop"
+                  width={70}
+                  height={45}
+                  style={{ borderRadius: 8, objectFit: 'cover', boxShadow: '0 2px 8px #0002' }}
+                  onError={e => e.target.style.display = 'none'}
+                />
+              </Box>
+            )}
+          </Box>
+        </Paper>
+      )}
+
       {!loading && insightsData && (
-        <Paper elevation={2} sx={{ p: 3 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
+        <Paper elevation={2} sx={{ p: 1 }}>
+          <Grid container spacing={1}>
+            <Grid item xs={12} md={3}>
+              <Card sx={{ mb: 0 }}>
+                <CardContent sx={{ p: 1 }}>
+                  <Typography variant="subtitle1" gutterBottom sx={{ mb: 0.5 }}>
                     Visitas Totales
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <TrendingUp sx={{ mr: 1, color: 'primary.main' }} />
-                    <Typography variant="h4">
+                    <TrendingUp sx={{ mr: 1, color: 'primary.main', fontSize: 22 }} />
+                    <Typography variant="h6">
                       {insightsData.totalVisits}
                     </Typography>
                   </Box>
                 </CardContent>
               </Card>
             </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
+            <Grid item xs={12} md={3}>
+              <Card sx={{ mb: 0 }}>
+                <CardContent sx={{ p: 1 }}>
+                  <Typography variant="subtitle1" gutterBottom sx={{ mb: 0.5 }}>
                     Duración Promedio
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Timer sx={{ mr: 1, color: 'primary.main' }} />
-                    <Typography variant="h4">
+                    <Timer sx={{ mr: 1, color: 'primary.main', fontSize: 22 }} />
+                    <Typography variant="h6">
                       {insightsData.avgVisitDuration}
                     </Typography>
                   </Box>
                 </CardContent>
               </Card>
             </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
+            <Grid item xs={12} md={3}>
+              <Card sx={{ mb: 0 }}>
+                <CardContent sx={{ p: 1 }}>
+                  <Typography variant="subtitle1" gutterBottom sx={{ mb: 0.5 }}>
                     Páginas por Visita
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Language sx={{ mr: 1, color: 'primary.main' }} />
-                    <Typography variant="h4">
+                    <Language sx={{ mr: 1, color: 'primary.main', fontSize: 22 }} />
+                    <Typography variant="h6">
                       {insightsData.pagesPerVisit}
                     </Typography>
                   </Box>
                 </CardContent>
               </Card>
             </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
+            <Grid item xs={12} md={3}>
+              <Card sx={{ mb: 0 }}>
+                <CardContent sx={{ p: 1 }}>
+                  <Typography variant="subtitle1" gutterBottom sx={{ mb: 0.5 }}>
                     Tasa de Rebote
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <People sx={{ mr: 1, color: 'primary.main' }} />
-                    <Typography variant="h4">
+                    <People sx={{ mr: 1, color: 'primary.main', fontSize: 22 }} />
+                    <Typography variant="h6">
                       {insightsData.bounceRate}
                     </Typography>
                   </Box>
@@ -211,46 +296,79 @@ const SimilarWebInsights = () => {
               </Card>
             </Grid>
 
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Distribución de Dispositivos
-                  </Typography>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <Devices />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Desktop" 
-                        secondary={insightsData.deviceSplit.desktop} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Devices />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Móvil" 
-                        secondary={insightsData.deviceSplit.mobile} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Devices />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Tablet" 
-                        secondary={insightsData.deviceSplit.tablet} 
-                      />
-                    </ListItem>
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
+            {/* Distribución de Dispositivos ahora muestra Fuentes de Tráfico */}
+            {insightsData.trafficSources && Object.keys(insightsData.trafficSources).length > 0 && (
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Fuentes de Tráfico
+                    </Typography>
+                    <List>
+                      <ListItem>
+                        <ListItemIcon>
+                          <Devices />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary="Directo" 
+                          secondary={insightsData.trafficSources.Direct !== undefined ? `${Math.round(insightsData.trafficSources.Direct * 100)}%` : 'N/A'} 
+                        />
+                      </ListItem>
+                      <Divider />
+                      <ListItem>
+                        <ListItemIcon>
+                          <Devices />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary="Búsqueda" 
+                          secondary={insightsData.trafficSources.Search !== undefined ? `${Math.round(insightsData.trafficSources.Search * 100)}%` : 'N/A'} 
+                        />
+                      </ListItem>
+                      <Divider />
+                      <ListItem>
+                        <ListItemIcon>
+                          <Devices />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary="Social" 
+                          secondary={insightsData.trafficSources.Social !== undefined ? `${Math.round(insightsData.trafficSources.Social * 100)}%` : 'N/A'} 
+                        />
+                      </ListItem>
+                      <Divider />
+                      <ListItem>
+                        <ListItemIcon>
+                          <Devices />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary="Referidos" 
+                          secondary={insightsData.trafficSources.Referrals !== undefined ? `${Math.round(insightsData.trafficSources.Referrals * 100)}%` : 'N/A'} 
+                        />
+                      </ListItem>
+                      <Divider />
+                      <ListItem>
+                        <ListItemIcon>
+                          <Devices />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary="Email" 
+                          secondary={insightsData.trafficSources.Mail !== undefined ? `${Math.round(insightsData.trafficSources.Mail * 100)}%` : 'N/A'} 
+                        />
+                      </ListItem>
+                      <Divider />
+                      <ListItem>
+                        <ListItemIcon>
+                          <Devices />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary="Paid Referrals" 
+                          secondary={insightsData.trafficSources['Paid Referrals'] !== undefined ? `${Math.round(insightsData.trafficSources['Paid Referrals'] * 100)}%` : 'N/A'} 
+                        />
+                      </ListItem>
+                    </List>
+                  </CardContent>
+                </Card>
+              </Grid>
+            )}
 
             <Grid item xs={12} md={6}>
               <Card>
@@ -259,7 +377,7 @@ const SimilarWebInsights = () => {
                     Principales Países
                   </Typography>
                   <List>
-                    {insightsData.topCountries.map((country, index) => (
+                    {Array.isArray(insightsData.topCountries) && insightsData.topCountries.map((country, index) => (
                       <ListItem key={index}>
                         <ListItemIcon>
                           <LocationOn />
@@ -267,29 +385,6 @@ const SimilarWebInsights = () => {
                         <ListItemText 
                           primary={country.country} 
                           secondary={country.percentage} 
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Principales Referentes
-                  </Typography>
-                  <List>
-                    {insightsData.topReferrers.map((referrer, index) => (
-                      <ListItem key={index}>
-                        <ListItemIcon>
-                          <Language />
-                        </ListItemIcon>
-                        <ListItemText 
-                          primary={referrer.site} 
-                          secondary={referrer.percentage} 
                         />
                       </ListItem>
                     ))}

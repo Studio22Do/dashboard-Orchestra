@@ -9,9 +9,11 @@ import {
   Menu, 
   MenuItem, 
   ListItemIcon, 
+  ListItemText,
   Divider,
   TextField,
-  InputAdornment
+  InputAdornment,
+  Switch
 } from '@mui/material';
 import { 
   Notifications, 
@@ -19,7 +21,11 @@ import {
   AccountCircle, 
   Lock, 
   Logout,
-  Search
+  Search,
+  Person,
+  Palette,
+  Language,
+  ViewCompact
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -29,12 +35,44 @@ import { addNotification } from '../../redux/slices/uiSlice';
 
 // AppBar estilizado con colores del diseño
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundColor: '#1a1625', // Fondo oscuro como en la imagen
-  borderBottom: 'none',
+  backgroundColor: '#231c36', // Morado oscuro
   boxShadow: 'none',
-  position: 'sticky',
-  zIndex: theme.zIndex.drawer + 1,
+  borderBottom: 'none',
+  height: 72, // Ajusta la altura
+  justifyContent: 'center',
 }));
+
+const NavbarContent = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+  padding: '0 40px', // Padding horizontal generoso
+  height: '72px',
+});
+
+const Title = styled(Typography)({
+  color: '#fff',
+  fontWeight: 400,
+  fontSize: 22,
+  letterSpacing: 0.5,
+  fontFamily: 'inherit',
+});
+
+const IconGroup = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 18,
+});
+
+const WhiteAvatar = styled(Avatar)({
+  backgroundColor: '#fff',
+  color: '#231c36',
+  width: 40,
+  height: 40,
+  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+  cursor: 'pointer',
+});
 
 // Campo de búsqueda estilizado
 const SearchField = styled(TextField)(({ theme }) => ({
@@ -64,14 +102,17 @@ const Navbar = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   
-  // Estado para controlar el menú de usuario
+  // Estados para los menús
   const [anchorEl, setAnchorEl] = useState(null);
+  const [settingsAnchor, setSettingsAnchor] = useState(null);
   const open = Boolean(anchorEl);
+  const settingsOpen = Boolean(settingsAnchor);
   
-  // Estado para búsqueda
-  const [searchQuery, setSearchQuery] = useState('');
+  // Estados para las configuraciones
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [emailNotifications, setEmailNotifications] = useState(true);
   
-  // Controladores de eventos para el menú
+  // Controladores para el menú de usuario
   const handleOpenMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -79,7 +120,34 @@ const Navbar = () => {
   const handleCloseMenu = () => {
     setAnchorEl(null);
   };
-  
+
+  // Controladores para el menú de configuración
+  const handleSettingsOpen = (event) => {
+    setSettingsAnchor(event.currentTarget);
+  };
+
+  const handleSettingsClose = () => {
+    setSettingsAnchor(null);
+  };
+
+  // Manejadores de configuración
+  const handleThemeChange = () => {
+    setIsDarkMode(!isDarkMode);
+    // Aquí iría la lógica para cambiar el tema
+    dispatch(addNotification({
+      message: `Tema cambiado a ${!isDarkMode ? 'oscuro' : 'claro'}`,
+      type: 'info'
+    }));
+  };
+
+  const handleLanguageChange = () => {
+    // Aquí iría la lógica para cambiar el idioma
+    dispatch(addNotification({
+      message: 'Cambio de idioma próximamente',
+      type: 'info'
+    }));
+  };
+
   // Manejador de opciones del menú
   const handleMenuOption = (option) => {
     handleCloseMenu();
@@ -117,123 +185,127 @@ const Navbar = () => {
   };
 
   return (
-    <StyledAppBar>
-      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography 
-          variant="h6" 
-          sx={{ 
-            fontWeight: 500, 
-            color: 'white',
-            display: { xs: 'none', sm: 'block' }
-          }}
-        >
+    <StyledAppBar position="static">
+      <NavbarContent>
+        <Title>
           Marketing Intelligence Console
-        </Typography>
-        
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          width: '100%', 
-          maxWidth: '800px',
-          mx: 'auto',
-          px: 2
-        }}>
-          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 1, display: { xs: 'none', md: 'block' } }}>
-            Explora nuestra colección de aplicaciones que utilizan APIs de RapidAPI
-          </Typography>
-          
-          <SearchField
-            placeholder="Buscar Apps..."
-            variant="outlined"
-            fullWidth
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Box>
-        
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        </Title>
+        <IconGroup>
           <IconButton size="medium" sx={{ color: 'white' }}>
             <Notifications />
           </IconButton>
-          <IconButton size="medium" sx={{ color: 'white' }}>
+          <IconButton 
+            size="medium" 
+            sx={{ color: 'white' }}
+            onClick={handleSettingsOpen}
+          >
             <Settings />
           </IconButton>
-          
-          {/* Avatar con menú desplegable */}
-          <Avatar 
-            onClick={handleOpenMenu}
-            sx={{ 
-              width: 36, 
-              height: 36,
-              cursor: 'pointer',
-              bgcolor: '#837CF3', // Color morado claro
-              '&:hover': { opacity: 0.9 }
-            }}
-          >
+          <WhiteAvatar onClick={handleOpenMenu}>
             {getUserInitials()}
-          </Avatar>
-          
-          {/* Menú de usuario */}
+          </WhiteAvatar>
+
+          {/* Menú de Usuario existente */}
           <Menu
             anchorEl={anchorEl}
             open={open}
             onClose={handleCloseMenu}
-            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             PaperProps={{
-              elevation: 3,
-              sx: { 
-                minWidth: 180,
-                mt: 1,
-                backgroundColor: '#242424',
-                color: 'white'
-              }
+              elevation: 0,
+              sx: {
+                overflow: 'visible',
+                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                mt: 1.5,
+                '& .MuiAvatar-root': {
+                  width: 32,
+                  height: 32,
+                  ml: -0.5,
+                  mr: 1,
+                },
+              },
             }}
           >
-            <Box sx={{ px: 2, py: 1 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                {user?.name || 'Usuario'}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                {user?.email || 'usuario@ejemplo.com'}
-              </Typography>
-            </Box>
-            
-            <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-            
             <MenuItem onClick={() => handleMenuOption('profile')}>
               <ListItemIcon>
-                <AccountCircle fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+                <Person fontSize="small" />
               </ListItemIcon>
               Mi Perfil
             </MenuItem>
-            
             <MenuItem onClick={() => handleMenuOption('password')}>
               <ListItemIcon>
-                <Lock fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+                <Lock fontSize="small" />
               </ListItemIcon>
               Cambiar Contraseña
             </MenuItem>
-            
-            <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-            
+            <Divider />
             <MenuItem onClick={() => handleMenuOption('logout')}>
               <ListItemIcon>
-                <Logout fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+                <Logout fontSize="small" />
               </ListItemIcon>
               Cerrar Sesión
             </MenuItem>
           </Menu>
-        </Box>
-      </Toolbar>
+
+          {/* Nuevo Menú de Configuración */}
+          <Menu
+            anchorEl={settingsAnchor}
+            open={settingsOpen}
+            onClose={handleSettingsClose}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                width: 280,
+                maxHeight: 400,
+                overflow: 'auto',
+              },
+            }}
+          >
+            {/* Sección de Apariencia */}
+            <Box sx={{ px: 2, py: 1 }}>
+              <Typography variant="subtitle2" color="text.secondary">
+                Apariencia
+              </Typography>
+            </Box>
+            <MenuItem onClick={handleThemeChange}>
+              <ListItemIcon>
+                <Palette fontSize="small" />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Tema"
+                secondary={isDarkMode ? "Modo Oscuro" : "Modo Claro"}
+              />
+              <Switch checked={isDarkMode} />
+            </MenuItem>
+            
+            <MenuItem onClick={handleLanguageChange}>
+              <ListItemIcon>
+                <Language fontSize="small" />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Idioma"
+                secondary="Español"
+              />
+            </MenuItem>
+
+            {/* Sección de Interfaz */}
+            <Divider />
+            <Box sx={{ px: 2, py: 1 }}>
+              <Typography variant="subtitle2" color="text.secondary">
+                Interfaz
+              </Typography>
+            </Box>
+            <MenuItem>
+              <ListItemIcon>
+                <ViewCompact fontSize="small" />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Densidad"
+                secondary="Normal"
+              />
+            </MenuItem>
+          </Menu>
+        </IconGroup>
+      </NavbarContent>
     </StyledAppBar>
   );
 };

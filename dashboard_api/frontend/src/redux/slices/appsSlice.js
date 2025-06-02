@@ -107,13 +107,13 @@ const MOCK_APPS_DATA = [
     apiName: 'Snap Video API'
   },
   {
-    id: 'gerwin-ai',
-    title: 'Gerwin AI',
+    id: 'ai-humanizer',
+    title: 'AI Humanizer',
     description: 'Plataforma de IA avanzada para análisis y generación de contenido',
     imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
     category: 'Creative & Content',
-    route: '/apps/gerwin-ai',
-    apiName: 'Gerwin AI API'
+    route: '/apps/ai-humanizer',
+    apiName: 'AI Humanizer API'
   },
   {
     id: 'openai-tts',
@@ -268,6 +268,15 @@ const MOCK_APPS_DATA = [
     category: 'Web & SEO',
     route: '/apps/seo-mastermind',
     apiName: 'SEO Mastermind API'
+  },
+  {
+    id: 'image-optimizer',
+    title: 'Image Optimizer',
+    description: 'Optimiza y comprime imágenes JPEG, PNG y GIF para mejorar el rendimiento web',
+    imageUrl: 'https://cdn.pixabay.com/photo/2016/03/31/19/56/image-1295100_960_720.png',
+    category: 'Web & SEO',
+    route: '/apps/image-optimizer',
+    apiName: 'Image Optimizer API'
   }
 ];
 
@@ -372,7 +381,7 @@ export const fetchAllApps = createAsyncThunk(
 // Estado inicial
 const initialState = {
   allApps: [],
-  purchasedApps: [],
+  purchasedApps: JSON.parse(localStorage.getItem('purchasedApps') || '[]'),
   favoriteApps: [],
   loading: false,
   error: null,
@@ -486,6 +495,9 @@ const appsSlice = createSlice({
       // Purchase app
       .addCase(purchaseApp.fulfilled, (state, action) => {
         state.purchasedApps.push(action.payload);
+        // Guardar en localStorage
+        const purchasedApps = [...state.purchasedApps];
+        localStorage.setItem('purchasedApps', JSON.stringify(purchasedApps));
       })
       // Toggle favorite
       .addCase(toggleFavoriteApp.fulfilled, (state, action) => {
@@ -525,6 +537,6 @@ export const selectPurchasedApps = (state) => state.apps.purchasedApps;
 export const selectFavoriteApps = (state) => state.apps.favoriteApps;
 export const selectAppsLoading = (state) => state.apps.loading;
 export const selectAppsError = (state) => state.apps.error;
-export const selectAllApps = (state) => state.apps.allApps;
+export const selectAllApps = (state) => state.apps.allApps || state.apps.apps || [];
 
 export default appsSlice.reducer; 
