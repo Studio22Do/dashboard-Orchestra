@@ -594,7 +594,10 @@ const CategoryView = () => {
                     // Skeleton loader
                     <Grid container spacing={3}>
                         {[1, 2, 3, 4, 5, 6].map((item) => (
-                            <Grid item xs={12} sm={6} md={4} lg={3} key={item}>
+                            <Grid 
+                                key={item} 
+                                columns={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+                            >
                                 <StyledCard>
                                     <Box
                                         sx={{ height: 200, bgcolor: "#3a3045" }}
@@ -717,12 +720,13 @@ const CategoryView = () => {
                     <Grid container spacing={3}>
                         {filteredApps.map((app) => (
                             <Grid
-                                item
-                                xs={12}
-                                sm={viewMode === "list" ? 12 : 6}
-                                md={viewMode === "list" ? 12 : 4}
-                                lg={viewMode === "list" ? 12 : 3}
                                 key={app.id}
+                                columns={{
+                                    xs: 12,
+                                    sm: viewMode === "list" ? 12 : 6,
+                                    md: viewMode === "list" ? 12 : 4,
+                                    lg: viewMode === "list" ? 12 : 3
+                                }}
                             >
                                 <StyledCard
                                     onClick={() => handleAppClick(app)}
