@@ -6,6 +6,7 @@ from .instagram_realtime import instagram_blueprint as instagram_realtime_bp
 import sys
 import os
 from api.routes.youtube_media import youtube_media_bp
+from api.routes.auth_google import auth_google_bp
 
 # Añadir el directorio raíz al path de Python para importar correctamente
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -62,7 +63,8 @@ BLUEPRINT_MAPPING = {
     website_status_bp: '/api/website-status',
     seo_mastermind_bp: '/api/seo-mastermind',
     image_optimizer_bp: '/api/image-optimize',
-    youtube_media_bp: '/api/youtube'
+    youtube_media_bp: '/api/youtube',
+    auth_google_bp: '/api/auth/google'
 }
 
 def register_blueprints(app):
