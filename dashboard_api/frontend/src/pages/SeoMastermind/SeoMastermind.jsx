@@ -1,405 +1,411 @@
-import { useState } from 'react';
-import { 
-  Container, 
-  Typography, 
-  TextField, 
-  Button, 
-  Card, 
-  CardContent, 
-  Grid, 
-  Box, 
+import { useState, useEffect } from 'react';
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  Box,
   CircularProgress,
   Alert,
   Paper,
+  Divider,
   List,
   ListItem,
-  ListItemIcon,
   ListItemText,
-  Divider,
+  ListItemIcon,
+  Chip,
+  Tabs,
+  Tab,
   IconButton,
-  Tooltip,
-  Select,
+  Menu,
   MenuItem,
-  FormControl,
-  InputLabel,
-  Chip
+  LinearProgress,
+  Tooltip
 } from '@mui/material';
-import { 
-  ContentCopy,
-  Download,
-  AutoAwesome,
+import {
   Search,
   Title,
   Description,
   Tag,
-  Language
+  ContentCopy,
+  CheckCircle,
+  Error,
+  History,
+  FileDownload,
+  MoreVert,
+  Refresh
 } from '@mui/icons-material';
 
-const SeoMastermind = () => {
-  const [seoData, setSeoData] = useState({
-    topic: '',
-    targetKeyword: '',
-    language: 'es',
-    tone: 'professional',
-    industry: '',
-    targetAudience: ''
-  });
+const SEOMastermind = () => {
+  const [topic, setTopic] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [generatedContent, setGeneratedContent] = useState(null);
+  const [seoData, setSeoData] = useState(null);
+  const [copied, setCopied] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
+  const [history, setHistory] = useState([]);
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historyTotal, setHistoryTotal] = useState(0);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [usage, setUsage] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setSeoData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  // Cargar historial
+  const loadHistory = async (page = 1) => {
+    setHistoryLoading(true);
+    try {
+      const response = await fetch(`/api/seo-mastermind/history?page=${page}&per_page=10`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      setHistory(data.items);
+      setHistoryTotal(data.total);
+      setHistoryPage(data.current_page);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setHistoryLoading(false);
+    }
   };
+
+  useEffect(() => {
+    if (activeTab === 1) {
+      loadHistory();
+    }
+  }, [activeTab]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!seoData.topic || !seoData.targetKeyword) {
-      setError('Por favor completa los campos requeridos');
+    if (!topic.trim()) {
+      setError('Por favor ingresa un tema para generar el SEO');
       return;
     }
-    
     setLoading(true);
     setError(null);
-    
+    setSeoData(null);
     try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setGeneratedContent({
-        title: `${seoData.topic} - Guía Completa y Actualizada [${new Date().getFullYear()}]`,
-        metaDescription: `Descubre todo sobre ${seoData.topic}. Aprende las mejores prácticas, consejos expertos y estrategias actualizadas para dominar ${seoData.targetKeyword}.`,
-        h1: `Guía Definitiva: ${seoData.topic}`,
-        keywords: [
-          seoData.targetKeyword,
-          `${seoData.topic} guía`,
-          `${seoData.topic} tutorial`,
-          `${seoData.topic} consejos`,
-          `${seoData.topic} mejores prácticas`,
-          `${seoData.topic} ${new Date().getFullYear()}`
-        ],
-        relatedKeywords: [
-          { keyword: 'keyword 1', volume: '12.5K', difficulty: 'Media' },
-          { keyword: 'keyword 2', volume: '8.2K', difficulty: 'Baja' },
-          { keyword: 'keyword 3', volume: '5.1K', difficulty: 'Alta' },
-          { keyword: 'keyword 4', volume: '3.8K', difficulty: 'Media' },
-          { keyword: 'keyword 5', volume: '2.9K', difficulty: 'Baja' }
-        ],
-        contentStructure: [
-          'Introducción',
-          '¿Qué es ' + seoData.topic + '?',
-          'Beneficios principales',
-          'Mejores prácticas',
-          'Consejos expertos',
-          'Preguntas frecuentes',
-          'Conclusión'
-        ],
-        seoRecommendations: [
-          'Optimizar la densidad de palabras clave',
-          'Incluir enlaces internos relevantes',
-          'Agregar imágenes con alt text',
-          'Estructurar el contenido con H2 y H3',
-          'Incluir una tabla de contenidos'
-        ]
+      const response = await fetch('/api/seo-mastermind', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic: topic.trim() })
       });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al generar el SEO');
+      }
+      setSeoData(data);
+      setUsage(data.usage);
+      if (activeTab === 1) {
+        loadHistory();
+      }
     } catch (err) {
-      console.error('Error generating SEO content:', err);
-      setError(err.message || 'Error al generar el contenido SEO');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCopy = (text) => {
+  const copyToClipboard = (text, type) => {
     navigator.clipboard.writeText(text);
+    setCopied(type);
+    setTimeout(() => setCopied(null), 2000);
   };
 
-  const handleDownload = (content, filename) => {
-    const element = document.createElement('a');
-    const file = new Blob([content], {type: 'text/plain'});
-    element.href = URL.createObjectURL(file);
-    element.download = filename;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+  const handleExport = async (format) => {
+    try {
+      const response = await fetch(`/api/seo-mastermind/export?format=${format}`);
+      if (!response.ok) throw new Error('Error al exportar');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `seo_history_${new Date().toISOString().split('T')[0]}.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      setError(err.message);
+    }
+    setAnchorEl(null);
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        SEO Mastermind – AI Keyword, Meta & Title Generator
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Genera contenido SEO optimizado usando IA
-      </Typography>
-
-      <Card sx={{ mb: 4 }}>
-        <CardContent>
-          <Box component="form" onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Tema Principal"
-                  name="topic"
-                  value={seoData.topic}
-                  onChange={handleInputChange}
-                  required
-                  InputProps={{
-                    startAdornment: (
-                      <Search color="action" sx={{ mr: 1 }} />
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Palabra Clave Objetivo"
-                  name="targetKeyword"
-                  value={seoData.targetKeyword}
-                  onChange={handleInputChange}
-                  required
-                  InputProps={{
-                    startAdornment: (
-                      <Tag color="action" sx={{ mr: 1 }} />
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Idioma</InputLabel>
-                  <Select
-                    name="language"
-                    value={seoData.language}
-                    onChange={handleInputChange}
-                    label="Idioma"
-                  >
-                    <MenuItem value="es">Español</MenuItem>
-                    <MenuItem value="en">English</MenuItem>
-                    <MenuItem value="fr">Français</MenuItem>
-                    <MenuItem value="de">Deutsch</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Tono</InputLabel>
-                  <Select
-                    name="tone"
-                    value={seoData.tone}
-                    onChange={handleInputChange}
-                    label="Tono"
-                  >
-                    <MenuItem value="professional">Profesional</MenuItem>
-                    <MenuItem value="casual">Casual</MenuItem>
-                    <MenuItem value="technical">Técnico</MenuItem>
-                    <MenuItem value="friendly">Amigable</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Industria"
-                  name="industry"
-                  value={seoData.industry}
-                  onChange={handleInputChange}
-                  InputProps={{
-                    startAdornment: (
-                      <Language color="action" sx={{ mr: 1 }} />
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Audiencia Objetivo"
-                  name="targetAudience"
-                  value={seoData.targetAudience}
-                  onChange={handleInputChange}
-                  InputProps={{
-                    startAdornment: (
-                      <Language color="action" sx={{ mr: 1 }} />
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  disabled={loading}
-                  startIcon={<AutoAwesome />}
-                  sx={{ height: '56px' }}
-                >
-                  {loading ? <CircularProgress size={24} /> : 'Generar Contenido SEO'}
-                </Button>
-              </Grid>
-            </Grid>
-          </Box>
-        </CardContent>
-      </Card>
-
-      {loading && (
-        <Box sx={{ mb: 4 }}>
-          <CircularProgress />
-          <Typography variant="body1" sx={{ mt: 2 }}>
-            Generando contenido SEO optimizado...
-          </Typography>
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h4" component="h1">
+          SEO Mastermind
+        </Typography>
+        <Box>
+          <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
+            <MoreVert />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={() => setAnchorEl(null)}
+          >
+            <MenuItem onClick={() => handleExport('json')}>
+              <FileDownload sx={{ mr: 1 }} /> Exportar JSON
+            </MenuItem>
+            <MenuItem onClick={() => handleExport('csv')}>
+              <FileDownload sx={{ mr: 1 }} /> Exportar CSV
+            </MenuItem>
+          </Menu>
         </Box>
+      </Box>
+
+      <Typography variant="body1" color="text.secondary" paragraph>
+        Genera palabras clave, meta descripciones y títulos optimizados para SEO usando IA.
+      </Typography>
+
+      {usage && (
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="subtitle1">
+                Uso diario: {usage.daily_usage} / {usage.daily_limit} ({usage.plan.toUpperCase()})
+              </Typography>
+              <Chip label={usage.plan.toUpperCase()} color="primary" size="small" />
+            </Box>
+            <LinearProgress 
+              variant="determinate" 
+              value={(usage.daily_usage / usage.daily_limit) * 100} 
+              color={usage.daily_usage >= usage.daily_limit ? "error" : "primary"}
+            />
+          </CardContent>
+        </Card>
       )}
 
-      {!loading && error && (
-        <Alert severity="error" sx={{ mb: 4 }}>
-          {error}
-        </Alert>
-      )}
+      <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)} sx={{ mb: 3 }}>
+        <Tab label="Generar SEO" />
+        <Tab label="Historial" />
+      </Tabs>
 
-      {!loading && generatedContent && (
-        <Paper elevation={2} sx={{ p: 3 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6">
-                      Título SEO
+      {activeTab === 0 ? (
+        <>
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <Box component="form" onSubmit={handleSubmit}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} md={8}>
+                    <TextField
+                      fullWidth
+                      label="Tema o Palabra Clave"
+                      placeholder="Ej: Cómo perder peso rápidamente"
+                      variant="outlined"
+                      value={topic}
+                      onChange={(e) => setTopic(e.target.value)}
+                      error={!!error}
+                      helperText={error}
+                      InputProps={{
+                        startAdornment: (
+                          <Search color="action" sx={{ mr: 1 }} />
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      fullWidth
+                      disabled={loading}
+                      sx={{ height: '56px' }}
+                    >
+                      {loading ? <CircularProgress size={24} /> : 'Generar SEO'}
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Box>
+            </CardContent>
+          </Card>
+
+          {loading && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 4 }}>
+              <CircularProgress />
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                Generando contenido SEO optimizado...
+              </Typography>
+            </Box>
+          )}
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 4 }}>
+              {error}
+            </Alert>
+          )}
+
+          {seoData && (
+            <Paper elevation={2} sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Resultados SEO
+              </Typography>
+              <Grid container spacing={3}>
+                {/* Títulos */}
+                <Grid item xs={12}>
+                  <Card>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <Title color="primary" sx={{ mr: 1 }} />
+                        <Typography variant="h6">Títulos Sugeridos</Typography>
+                      </Box>
+                      <List>
+                        {seoData.titles?.map((title, index) => (
+                          <ListItem
+                            key={index}
+                            secondaryAction={
+                              <Button
+                                startIcon={copied === `title-${index}` ? <CheckCircle /> : <ContentCopy />}
+                                onClick={() => copyToClipboard(title, `title-${index}`)}
+                              >
+                                {copied === `title-${index}` ? 'Copiado' : 'Copiar'}
+                              </Button>
+                            }
+                          >
+                            <ListItemText primary={title} />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                {/* Meta Descripción */}
+                <Grid item xs={12}>
+                  <Card>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <Description color="primary" sx={{ mr: 1 }} />
+                        <Typography variant="h6">Meta Descripción</Typography>
+                      </Box>
+                      <Typography variant="body1" paragraph>
+                        {seoData.meta_description}
+                      </Typography>
+                      <Button
+                        startIcon={copied === 'meta' ? <CheckCircle /> : <ContentCopy />}
+                        onClick={() => copyToClipboard(seoData.meta_description, 'meta')}
+                      >
+                        {copied === 'meta' ? 'Copiado' : 'Copiar Meta Descripción'}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                {/* Palabras Clave */}
+                <Grid item xs={12}>
+                  <Card>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <Tag color="primary" sx={{ mr: 1 }} />
+                        <Typography variant="h6">Palabras Clave</Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                        {seoData.keywords?.map((keyword, index) => (
+                          <Chip
+                            key={index}
+                            label={keyword}
+                            onClick={() => copyToClipboard(keyword, `keyword-${index}`)}
+                            icon={copied === `keyword-${index}` ? <CheckCircle /> : <Tag />}
+                          />
+                        ))}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+            </Paper>
+          )}
+        </>
+      ) : (
+        <>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="h6">
+              Historial de Búsquedas
+            </Typography>
+            <Button
+              startIcon={<Refresh />}
+              onClick={() => loadHistory(historyPage)}
+              disabled={historyLoading}
+            >
+              Actualizar
+            </Button>
+          </Box>
+
+          {historyLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : history.length === 0 ? (
+            <Alert severity="info">
+              No hay búsquedas en el historial
+            </Alert>
+          ) : (
+            <List>
+              {history.map((item) => (
+                <Card key={item.id} sx={{ mb: 2 }}>
+                  <CardContent>
+                    <Typography variant="subtitle1" gutterBottom>
+                      {item.topic}
                     </Typography>
-                    <Box>
-                      <Tooltip title="Copiar">
-                        <IconButton onClick={() => handleCopy(generatedContent.title)}>
-                          <ContentCopy />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Descargar">
-                        <IconButton onClick={() => handleDownload(generatedContent.title, 'titulo-seo.txt')}>
-                          <Download />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </Box>
-                  <Typography variant="body1">
-                    {generatedContent.title}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6">
-                      Meta Descripción
+                    <Typography variant="caption" color="text.secondary">
+                      {new Date(item.created_at).toLocaleString()}
                     </Typography>
-                    <Box>
-                      <Tooltip title="Copiar">
-                        <IconButton onClick={() => handleCopy(generatedContent.metaDescription)}>
-                          <ContentCopy />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Descargar">
-                        <IconButton onClick={() => handleDownload(generatedContent.metaDescription, 'meta-descripcion.txt')}>
-                          <Download />
-                        </IconButton>
-                      </Tooltip>
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Meta Descripción:
+                      </Typography>
+                      <Typography variant="body1" paragraph>
+                        {item.meta_description}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Palabras Clave:
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                        {item.keywords?.map((keyword, index) => (
+                          <Chip
+                            key={index}
+                            label={keyword}
+                            size="small"
+                            onClick={() => copyToClipboard(keyword, `history-keyword-${index}`)}
+                          />
+                        ))}
+                      </Box>
                     </Box>
-                  </Box>
-                  <Typography variant="body1">
-                    {generatedContent.metaDescription}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+                  </CardContent>
+                </Card>
+              ))}
+            </List>
+          )}
 
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Palabras Clave Principales
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                    {generatedContent.keywords.map((keyword, index) => (
-                      <Chip key={index} label={keyword} />
-                    ))}
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Palabras Clave Relacionadas
-                  </Typography>
-                  <List>
-                    {generatedContent.relatedKeywords.map((item, index) => (
-                      <ListItem key={index}>
-                        <ListItemText 
-                          primary={item.keyword}
-                          secondary={`Volumen: ${item.volume} • Dificultad: ${item.difficulty}`}
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Estructura del Contenido
-                  </Typography>
-                  <List>
-                    {generatedContent.contentStructure.map((section, index) => (
-                      <ListItem key={index}>
-                        <ListItemIcon>
-                          <Title />
-                        </ListItemIcon>
-                        <ListItemText primary={section} />
-                      </ListItem>
-                    ))}
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Recomendaciones SEO
-                  </Typography>
-                  <List>
-                    {generatedContent.seoRecommendations.map((recommendation, index) => (
-                      <ListItem key={index}>
-                        <ListItemIcon>
-                          <Description />
-                        </ListItemIcon>
-                        <ListItemText primary={recommendation} />
-                      </ListItem>
-                    ))}
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        </Paper>
+          {historyTotal > 10 && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+              <Button
+                disabled={historyPage === 1}
+                onClick={() => loadHistory(historyPage - 1)}
+                sx={{ mr: 2 }}
+              >
+                Anterior
+              </Button>
+              <Typography variant="body1" sx={{ mx: 2 }}>
+                Página {historyPage} de {Math.ceil(historyTotal / 10)}
+              </Typography>
+              <Button
+                disabled={historyPage >= Math.ceil(historyTotal / 10)}
+                onClick={() => loadHistory(historyPage + 1)}
+                sx={{ ml: 2 }}
+              >
+                Siguiente
+              </Button>
+            </Box>
+          )}
+        </>
       )}
     </Container>
   );
 };
 
-export default SeoMastermind; 
+export default SEOMastermind; 

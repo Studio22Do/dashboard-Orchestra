@@ -43,7 +43,8 @@ const AppCard = ({ id, title, description, imageUrl, category, route, apiName, i
           transform: 'translateY(-4px)',
           boxShadow: '0 12px 20px rgba(0,0,0,0.1)',
         },
-        position: 'relative'
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
       {/* Estrellita de favoritos */}
