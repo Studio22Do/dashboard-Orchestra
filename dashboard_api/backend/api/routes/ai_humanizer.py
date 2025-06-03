@@ -1,8 +1,10 @@
+"""Módulo para humanización de texto AI"""
 from flask import Blueprint, request, jsonify
 import requests
 import os
+import logging
 
-print("Cargando ai_humanizer.py")
+logger = logging.getLogger(__name__)
 
 ai_humanizer_bp = Blueprint('ai_humanizer', __name__)
 
@@ -31,6 +33,8 @@ def ai_humanizer():
         response.raise_for_status()
         return jsonify(response.json()), response.status_code
     except requests.exceptions.HTTPError as errh:
+        logger.error(f"Error HTTP en AI Humanizer: {str(errh)}")
         return jsonify({'error': str(errh), 'details': response.text}), response.status_code
     except requests.exceptions.RequestException as err:
+        logger.error(f"Error de conexión en AI Humanizer: {str(err)}")
         return jsonify({'error': 'Error de conexión con la API externa', 'details': str(err)}), 502 

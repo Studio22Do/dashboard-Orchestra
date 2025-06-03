@@ -1,113 +1,33 @@
 """Rutas para la API"""
 import logging
+from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-print("Inicializando rutas de la API en dashboard_api/backend/api/routes/__init__.py")
+# Configuración de logging
+logger.setLevel(logging.INFO)
 
-# Importar todas las rutas para asegurar que están disponibles
-try:
-    from . import auth
-    print("Módulo de rutas auth importado")
-except ImportError as e:
-    print(f"Error importando módulo auth: {e}")
+def import_blueprints():
+    """Importa los blueprints de manera silenciosa"""
+    try:
+        # Importar blueprints directamente desde el módulo blueprints
+        from ..blueprints import (
+            instagram_bp, instagram_realtime_bp, auth_bp, google_trends_bp,
+            google_paid_search_bp, apps_bp, tiktok_api_bp, file_converter_bp,
+            midjourney_bp, text_extract_bp, pdf_converter_bp, snap_video_bp,
+            ai_humanizer_bp, advanced_image_bp, whisper_url_bp, runwayml_bp,
+            similarweb_bp, keyword_insight_bp, domain_metrics_bp, ahrefs_dr_bp,
+            pagespeed_bp, ssl_checker_bp, website_status_bp, seo_mastermind_bp,
+            image_optimizer_bp, youtube_media_bp
+        )
+        return True
+    except ImportError as e:
+        logger.error(f"Error importando blueprints: {str(e)}")
+        return False
 
-try:
-    from . import apps
-    print("Módulo de rutas apps importado")
-except ImportError as e:
-    print(f"Error importando módulo apps: {e}")
-
-try:
-    from . import stats
-    print("Módulo de rutas stats importado")
-except ImportError as e:
-    print(f"Error importando módulo stats: {e}")
-
-try:
-    from . import instagram
-    print("Módulo de rutas instagram importado")
-except ImportError as e:
-    print(f"Error importando módulo instagram: {e}")
-
-try:
-    from . import instagram_realtime
-    print("Módulo de rutas instagram_realtime importado")
-except ImportError as e:
-    print(f"Error importando módulo instagram_realtime: {e}")
-
-try:
-    from . import google_trends
-    print("Módulo de rutas google_trends importado")
-except ImportError as e:
-    print(f"Error importando módulo google_trends: {e}")
-
-try:
-    from . import google_paid_search
-    print("Módulo de rutas google_paid_search importado")
-except ImportError as e:
-    print(f"Error importando módulo google_paid_search: {e}")
-
-try:
-    from . import scraptik
-    print("Módulo de rutas scraptik importado")
-except ImportError as e:
-    print(f"Error importando módulo scraptik: {e}")
-
-try:
-    from . import youtube_media
-    print("Módulo de rutas youtube_media importado")
-except ImportError as e:
-    print(f"Error importando módulo youtube_media: {e}")
-
-try:
-    from . import file_converter
-    print("Módulo de rutas file_converter importado")
-except ImportError as e:
-    print(f"Error importando módulo file_converter: {e}")
-
-try:
-    from . import tiktok_api
-    print("Módulo de rutas tiktok_api importado")
-except ImportError as e:
-    print(f"Error importando módulo tiktok_api: {e}")
-
-try:
-    from . import runwayml
-    print("Módulo de rutas runwayml importado")
-except ImportError as e:
-    print(f"Error importando módulo runwayml: {e}")
-
-try:
-    from . import similarweb
-    print("Módulo de rutas similarweb importado")
-except ImportError as e:
-    print(f"Error importando módulo similarweb: {e}")
-
-try:
-    from . import google_keyword_insight
-    print("Módulo de rutas google_keyword_insight importado")
-except ImportError as e:
-    print(f"Error importando módulo google_keyword_insight: {e}")
-
-try:
-    from . import domain_metrics
-    print("Módulo de rutas domain_metrics importado")
-except ImportError as e:
-    print(f"Error importando módulo domain_metrics: {e}")
-
-try:
-    from . import ahrefs_dr
-    print("Módulo de rutas ahrefs_dr importado")
-except ImportError as e:
-    print(f"Error importando módulo ahrefs_dr: {e}")
-
-try:
-    from . import image_optimizer
-    print("Módulo de rutas image_optimizer importado")
-except ImportError as e:
-    print(f"Error importando módulo image_optimizer: {e}")
-
-from .ai_humanizer import ai_humanizer_bp
-
-print("Finalizada inicialización de rutas de la API") 
+# Importar blueprints
+success = import_blueprints()
+if success:
+    logger.info("Blueprints importados exitosamente")
+else:
+    logger.error("Error al importar blueprints") 

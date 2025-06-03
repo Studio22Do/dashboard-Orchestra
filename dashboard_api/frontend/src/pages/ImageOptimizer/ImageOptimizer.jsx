@@ -3,9 +3,10 @@ import { Container, Typography, Box, Button, Paper, CircularProgress, Alert, For
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import axios from 'axios';
 
-const API_URL = 'https://pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com/v1/reducer.php';
-const API_KEY = '9dc7412cabmsh04d2de9d55522bap1643f6jsn6e3113942f4a';
-const API_HOST = 'pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com';
+// Eliminar las constantes de API que ya no se usarán
+// const API_URL = 'https://pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com/v1/reducer.php';
+// const API_KEY = '9dc7412cabmsh04d2de9d55522bap1643f6jsn6e3113942f4a';
+// const API_HOST = 'pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com';
 
 // --- COMPONENTE DEMO PARA URL ---
 const UrlOptimizerDemo = () => {
@@ -114,14 +115,14 @@ const ImageOptimizer = () => {
       formData.append('file', file);
       formData.append('lossy', lossy ? '1' : '0');
       formData.append('wait', '1');
-      const response = await axios.post(API_URL, formData, {
+      const response = await axios.post('/api/image-optimize', formData, {
         headers: {
-          'x-rapidapi-key': API_KEY,
-          'x-rapidapi-host': API_HOST,
           'Content-Type': 'multipart/form-data',
         },
+        responseType: 'blob' // Importante para manejar la respuesta binaria
       });
-      setResult(response.data);
+      const imageUrl = URL.createObjectURL(new Blob([response.data], { type: response.headers['content-type'] }));
+      setResult({ optimized_url: imageUrl });
     } catch (err) {
       setError('No se pudo optimizar la imagen. Intenta de nuevo.');
     } finally {
