@@ -18,8 +18,6 @@ import { useAppSelector } from '../../redux/hooks/reduxHooks';
 import { selectPurchasedApps } from '../../redux/slices/appsSlice';
 
 const AppCatalog = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
   const purchasedApps = useAppSelector(selectPurchasedApps);
@@ -27,13 +25,14 @@ const AppCatalog = () => {
   // Obtener categorías únicas de las apps compradas
   const CATEGORIES = ['All', ...Array.from(new Set(purchasedApps.map(app => app.category)))];
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
+
   // Verificar si hay una categoría preseleccionada (desde Dashboard)
   useEffect(() => {
     const preselectedCategory = location.state?.preselectedCategory;
     if (preselectedCategory && CATEGORIES.includes(preselectedCategory)) {
       setActiveCategory(preselectedCategory);
-    } else {
-      setActiveCategory(CATEGORIES[0]);
     }
   }, [location.state, CATEGORIES]);
 
@@ -64,9 +63,9 @@ const AppCatalog = () => {
         Explora tus aplicaciones agregadas para {activeCategory === 'All' ? 'todas las categorías' : activeCategory.toLowerCase()}
       </Typography>
 
-      <Box sx={{ mb: 4, px: { xs: 2, md: 6 } }}>
+      <Box sx={{ mb: 4, px: { xs: 2, md: 6 } }} style={{  }}>
         <TextField
-          fullWidth
+          
           placeholder="Buscar herramientas..."
           variant="outlined"
           size="small"
@@ -110,7 +109,7 @@ const AppCatalog = () => {
           filteredApps
             .filter(app => app && (app.id || app.app_id))
             .map(app => (
-              <Box key={app.app_id || app.id} sx={{ width: { xs: '100%', sm: 'calc(50% - 12px)' }, boxSizing: 'border-box' }}>
+              <Box key={app.app_id || app.id} sx={{ width: { xs: '100%', sm: 'calc(50% - 12px)' }, boxSizing: 'border-box'}}>
                 <AppCard {...app} isPurchased={true} showFavorite={true} is_favorite={app.is_favorite} />
               </Box>
             ))
