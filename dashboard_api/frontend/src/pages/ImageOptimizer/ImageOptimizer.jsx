@@ -3,9 +3,10 @@ import { Container, Typography, Box, Button, Paper, CircularProgress, Alert, For
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import axios from 'axios';
 
-const API_URL = 'https://pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com/v1/reducer.php';
-const API_KEY = '9dc7412cabmsh04d2de9d55522bap1643f6jsn6e3113942f4a';
-const API_HOST = 'pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com';
+const API_URL = 'https://api.shortpixel.com/v2/post-reducer.php';
+const RAPIDAPI_KEY = 'df691d20b4msh32aad51e7524288p15f391jsn3180d06b6e53';
+const RAPIDAPI_HOST = 'shortpixel.p.rapidapi.com';
+const SHORTPIXEL_KEY = 'cwacrDK1bRtJNO1BeLsF';
 
 // --- COMPONENTE DEMO PARA URL ---
 const UrlOptimizerDemo = () => {
@@ -20,16 +21,31 @@ const UrlOptimizerDemo = () => {
     setError(null);
     setResult(null);
     try {
-      const res = await fetch('/api/image-optimize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: url.trim(), lossy: lossy ? 1 : 0, wait: 1 })
+      console.log('Iniciando optimización por URL');
+      
+      const params = {
+        key: SHORTPIXEL_KEY,
+        lossy: lossy ? '1' : '0',
+        wait: '30',
+        url: url.trim()
+      };
+      
+      console.log('Parámetros:', params);
+      
+      const response = await axios.get(API_URL, {
+        headers: {
+          'X-RapidAPI-Key': RAPIDAPI_KEY,
+          'X-RapidAPI-Host': RAPIDAPI_HOST
+        },
+        params: params
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al optimizar la imagen');
-      setResult(data);
+
+      console.log('Respuesta:', response.data);
+      setResult(response.data);
     } catch (err) {
-      setError(err.message);
+      console.error('Error completo:', err);
+      console.error('Respuesta de error:', err.response?.data);
+      setError(err.response?.data?.message || err.message || 'Error al optimizar la imagen');
     } finally {
       setLoading(false);
     }
@@ -64,22 +80,30 @@ const UrlOptimizerDemo = () => {
           </Box>
           <Box mb={2}>
             <strong>Optimizada:</strong>
-            {result.optimized_url ? (
-              <img src={result.optimized_url} alt="optimizada" style={{ width: '100%', borderRadius: 8, marginBottom: 8 }} />
+            {result.LossyURL ? (
+              <>
+                <img src={result.LossyURL} alt="optimizada" style={{ width: '100%', borderRadius: 8, marginBottom: 8 }} />
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  href={result.LossyURL}
+                  target="_blank"
+                  rel="noopener"
+                  fullWidth
+                >
+                  Descargar Imagen Optimizada
+                </Button>
+                {result.LossySize && (
+                  <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
+                    Tamaño optimizado: {(result.LossySize/1024).toFixed(2)} KB
+                    {result.OriginalSize && (
+                      <span> (Reducción: {((1 - result.LossySize/result.OriginalSize) * 100).toFixed(1)}%)</span>
+                    )}
+                  </Typography>
+                )}
+              </>
             ) : (
               <Alert severity="warning">No se pudo obtener la imagen optimizada.</Alert>
-            )}
-            {result.optimized_url && (
-              <Button
-                variant="outlined"
-                color="primary"
-                href={result.optimized_url}
-                target="_blank"
-                rel="noopener"
-                fullWidth
-              >
-                Descargar Imagen Optimizada
-              </Button>
             )}
           </Box>
         </Box>
@@ -110,20 +134,37 @@ const ImageOptimizer = () => {
     setError(null);
     setResult(null);
     try {
+      console.log('Preparando datos para enviar:', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type
+      });
+
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('key', SHORTPIXEL_KEY);
       formData.append('lossy', lossy ? '1' : '0');
-      formData.append('wait', '1');
+      formData.append('wait', '30');
+
+      console.log('Headers:', {
+        'X-RapidAPI-Key': RAPIDAPI_KEY,
+        'X-RapidAPI-Host': RAPIDAPI_HOST
+      });
+
       const response = await axios.post(API_URL, formData, {
         headers: {
-          'x-rapidapi-key': API_KEY,
-          'x-rapidapi-host': API_HOST,
           'Content-Type': 'multipart/form-data',
-        },
+          'X-RapidAPI-Key': RAPIDAPI_KEY,
+          'X-RapidAPI-Host': RAPIDAPI_HOST
+        }
       });
+
+      console.log('Respuesta:', response.data);
       setResult(response.data);
     } catch (err) {
-      setError('No se pudo optimizar la imagen. Intenta de nuevo.');
+      console.error('Error completo:', err);
+      console.error('Respuesta de error:', err.response?.data);
+      setError('Error al optimizar la imagen: ' + (err.response?.data?.message || err.message || 'Intenta de nuevo'));
     } finally {
       setLoading(false);
     }
@@ -188,27 +229,30 @@ const ImageOptimizer = () => {
             </Grid>
             <Grid item xs={12} md={6}>
               <Typography variant="subtitle2">Optimizada</Typography>
-              {result.optimized_url ? (
-                <img src={result.optimized_url} alt="optimizada" style={{ width: '100%', borderRadius: 8, marginBottom: 8 }} />
+              {result.LossyURL ? (
+                <>
+                  <img src={result.LossyURL} alt="optimizada" style={{ width: '100%', borderRadius: 8, marginBottom: 8 }} />
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    href={result.LossyURL}
+                    target="_blank"
+                    rel="noopener"
+                    fullWidth
+                  >
+                    Descargar Imagen Optimizada
+                  </Button>
+                  {result.LossySize && (
+                    <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
+                      Tamaño optimizado: {(result.LossySize/1024).toFixed(2)} KB
+                      {result.OriginalSize && (
+                        <span> (Reducción: {((1 - result.LossySize/result.OriginalSize) * 100).toFixed(1)}%)</span>
+                      )}
+                    </Typography>
+                  )}
+                </>
               ) : (
                 <Alert severity="warning">No se pudo obtener la imagen optimizada.</Alert>
-              )}
-              {result.optimized_url && (
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  href={result.optimized_url}
-                  target="_blank"
-                  rel="noopener"
-                  fullWidth
-                >
-                  Descargar Imagen Optimizada
-                </Button>
-              )}
-              {result.optimized_size && (
-                <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
-                  Tamaño optimizado: {(result.optimized_size/1024).toFixed(2)} KB
-                </Typography>
               )}
             </Grid>
           </Grid>
