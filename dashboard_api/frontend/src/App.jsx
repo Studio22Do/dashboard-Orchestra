@@ -4,6 +4,8 @@ import { ThemeProvider, createTheme } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import Layout from './components/Layout/Layout';
 import Login from './pages/Login/Login';
+import Register from './pages/Login/Register';
+import EmailVerification from './pages/Login/EmailVerification';
 import AppCatalog from './pages/AppCatalog/AppCatalog';
 import InstagramStats from './pages/InstagramStats/InstagramStats';
 import InstagramRealtime from './pages/InstagramRealtime';
@@ -210,6 +212,22 @@ function App() {
             path="/login"
             element={
               isAuthenticated ? <Navigate to="/" /> : <Login />
+            }
+          />
+          
+          {/* Ruta de registro */}
+          <Route
+            path="/register"
+            element={
+              isAuthenticated ? <Navigate to="/" /> : <Register />
+            }
+          />
+          
+          {/* Ruta de verificación de email */}
+          <Route
+            path="/verify-email"
+            element={
+              isAuthenticated ? <Navigate to="/" /> : <EmailVerification />
             }
           />
           

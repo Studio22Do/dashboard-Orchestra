@@ -12,7 +12,7 @@ import {
   styled
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks/reduxHooks';
 import { loginUser, selectAuth, clearErrors } from '../../redux/slices/authSlice';
 import { addNotification } from '../../redux/slices/uiSlice';
@@ -218,6 +218,23 @@ const Login = () => {
         >
           {loading ? <CircularProgress size={24} /> : 'Iniciar Sesión'}
         </StyledButton>
+
+        {/* Link al registro */}
+        <Box sx={{ textAlign: 'center', mt: 3 }}>
+          <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            ¿No tienes cuenta?{' '}
+            <Link 
+              to="/register" 
+              style={{ 
+                color: '#837CF3', 
+                textDecoration: 'none', 
+                fontWeight: 500 
+              }}
+            >
+              Crear Cuenta
+            </Link>
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );
