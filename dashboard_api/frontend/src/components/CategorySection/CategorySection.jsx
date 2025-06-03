@@ -104,8 +104,6 @@ const StyledSwiper = styled(Swiper)(({ theme }) => ({
 }));
 
 const CategorySection = ({ title, icon: Icon, tools, onViewAll }) => {
-    const hasMultipleTools = tools.length > 3;
-
     return (
         <CategoryContainer>
             <TitleContainer>
@@ -129,44 +127,29 @@ const CategorySection = ({ title, icon: Icon, tools, onViewAll }) => {
                 </ViewAllButton>
             </TitleContainer>
 
-            {hasMultipleTools ? (
-                <ToolsContainer>
-                    <StyledSwiper
-                        slidesPerView={3}
-                        spaceBetween={20}
-                        navigation={true}
-                        modules={[Navigation]}
-                        className="mySwiper"
-                        watchSlidesProgress={true}
-                    >
-                        {tools.map((tool) => (
-                            <SwiperSlide key={tool.id}>
-                                <CardContainer>
-                                    <ToolCard
-                                        title={tool.title}
-                                        icon={tool.icon}
-                                        imageUrl={tool.imageUrl}
-                                        onClick={tool.onClick}
-                                    />
-                                </CardContainer>
-                            </SwiperSlide>
-                        ))}
-                    </StyledSwiper>
-                </ToolsContainer>
-            ) : (
-                <Grid container spacing={3} sx={{ mt: 3 }}>
+            <ToolsContainer>
+                <StyledSwiper
+                    slidesPerView={3}
+                    spaceBetween={20}
+                    navigation={true}
+                    modules={[Navigation]}
+                    className="mySwiper"
+                    watchSlidesProgress={true}
+                >
                     {tools.map((tool) => (
-                        <Grid item xs={12} sm={6} md={4} key={tool.id}>
-                            <ToolCard
-                                title={tool.title}
-                                icon={tool.icon}
-                                imageUrl={tool.imageUrl}
-                                onClick={tool.onClick}
-                            />
-                        </Grid>
+                        <SwiperSlide key={tool.id}>
+                            <CardContainer>
+                                <ToolCard
+                                    title={tool.title}
+                                    icon={tool.icon}
+                                    imageUrl={tool.imageUrl}
+                                    onClick={tool.onClick}
+                                />
+                            </CardContainer>
+                        </SwiperSlide>
                     ))}
-                </Grid>
-            )}
+                </StyledSwiper>
+            </ToolsContainer>
         </CategoryContainer>
     );
 };

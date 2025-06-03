@@ -597,13 +597,27 @@ const Dashboard = () => {
         const q = searchQuery.trim().toLowerCase();
         if (!q) return true;
         return (
-          tool.title.toLowerCase().includes(q) ||
+          tool.title?.toLowerCase().includes(q) ||
           (tool.description && tool.description.toLowerCase().includes(q))
         );
+      })
+      // Asegurar que cada tool tenga las props necesarias para ToolCard
+      .map(tool => {
+        const mappedTool = {
+          ...tool,
+          title: tool.title || tool.name || 'Sin título',
+          imageUrl: tool.imageUrl || tool.img || 'https://via.placeholder.com/400x200',
+          icon: tool.icon || undefined,
+          onClick: tool.onClick || (() => {}),
+        };
+        console.log('Tool después del mapeo:', mappedTool);
+        return mappedTool;
       });
       return { ...category, tools: filteredTools };
     })
     .filter(category => category.tools.length > 0);
+
+  console.log('filteredCategories:', filteredCategories);
 
   return (
     <DashboardContainer

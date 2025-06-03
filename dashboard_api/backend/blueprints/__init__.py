@@ -1,3 +1,4 @@
+"""Registro de blueprints para la aplicación"""
 import logging
 from flask import Blueprint
 from api.routes.instagram import instagram_bp
@@ -5,6 +6,7 @@ from .instagram_realtime import instagram_blueprint as instagram_realtime_bp
 import sys
 import os
 from api.routes.youtube_media import youtube_media_bp
+from api.routes.auth_google import auth_google_bp
 
 # Añadir el directorio raíz al path de Python para importar correctamente
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -34,113 +36,43 @@ from api.routes.image_optimizer import image_optimizer_bp
 
 logger = logging.getLogger(__name__)
 
+# Mapeo de blueprints a sus prefijos de URL
+BLUEPRINT_MAPPING = {
+    instagram_bp: '/api/instagram',
+    instagram_realtime_bp: '/api/instagram-realtime',
+    auth_bp: '/api/auth',
+    google_trends_bp: '/api/trends',
+    google_paid_search_bp: '/api/paid-search',
+    apps_bp: '/api/apps',
+    tiktok_api_bp: '/api/tiktok',
+    file_converter_bp: '/api/file-converter',
+    midjourney_bp: '/api/midjourney',
+    text_extract_bp: '/api/text-extract',
+    pdf_converter_bp: '/api/pdf-converter',
+    snap_video_bp: '/api/snap-video',
+    ai_humanizer_bp: '/api/ai-humanizer',
+    advanced_image_bp: '/api/image-manipulation',
+    whisper_url_bp: '/api/whisper-url',
+    runwayml_bp: '/api/runwayml',
+    similarweb_bp: '/api/similarweb',
+    keyword_insight_bp: '/api/keyword-insight',
+    domain_metrics_bp: '/api/domain-metrics',
+    ahrefs_dr_bp: '/api/ahrefs-dr',
+    pagespeed_bp: '/api/pagespeed-insights',
+    ssl_checker_bp: '/api/ssl-checker',
+    website_status_bp: '/api/website-status',
+    seo_mastermind_bp: '/api/seo-mastermind',
+    image_optimizer_bp: '/api/image-optimize',
+    youtube_media_bp: '/api/youtube',
+    auth_google_bp: '/api/auth/google'
+}
+
 def register_blueprints(app):
     """Registra todos los blueprints en la aplicación."""
-    print("\n=== REGISTRANDO BLUEPRINTS (desde blueprints/__init__.py) ===")
+    logger.info("Registrando blueprints...")
     
-    print("Registrando blueprint: instagram_bp en /api/instagram")
-    app.register_blueprint(instagram_bp, url_prefix='/api/instagram')
+    for blueprint, url_prefix in BLUEPRINT_MAPPING.items():
+        app.register_blueprint(blueprint, url_prefix=url_prefix)
     
-    print("Registrando blueprint: instagram_realtime_bp en /api/instagram-realtime")
-    app.register_blueprint(instagram_realtime_bp, url_prefix='/api/instagram-realtime')
-    
-    # Registrar blueprint de autenticación
-    print("Registrando blueprint: auth_bp en /api/auth")
-    app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    
-    # Registrar blueprint de Google Trends
-    print("Registrando blueprint: google_trends_bp en /api/trends")
-    app.register_blueprint(google_trends_bp, url_prefix='/api/trends')
-    
-    # Registrar blueprint de Google Paid Search
-    print("Registrando blueprint: google_paid_search_bp en /api/paid-search")
-    app.register_blueprint(google_paid_search_bp, url_prefix='/api/paid-search')
-    
-    # Registrar blueprint de Apps
-    print("Registrando blueprint: apps_bp en /api/apps")
-    app.register_blueprint(apps_bp, url_prefix='/api/apps')
-    
-    # Registrar blueprint de TikTok
-    print("Registrando blueprint: tiktok_api_bp en /api/tiktok")
-    app.register_blueprint(tiktok_api_bp, url_prefix='/api/tiktok')
-    
-    # Registrar blueprint de File Converter
-    print("Registrando blueprint: file_converter_bp en /api/file-converter")
-    app.register_blueprint(file_converter_bp, url_prefix='/api/file-converter')
-    
-    # Registrar blueprint de Midjourney
-    print("Registrando blueprint: midjourney_bp en /api/midjourney")
-    app.register_blueprint(midjourney_bp, url_prefix='/api/midjourney')
-    
-    # Registrar blueprint de Text Extract
-    print("Registrando blueprint: text_extract_bp en /api/text-extract")
-    app.register_blueprint(text_extract_bp, url_prefix='/api/text-extract')
-    
-    # Registrar blueprint de PDF Converter
-    print("Registrando blueprint: pdf_converter_bp en /api/pdf-converter")
-    app.register_blueprint(pdf_converter_bp, url_prefix='/api/pdf-converter')
-    
-    # Registrar blueprint de Snap Video
-    print("Registrando blueprint: snap_video_bp en /api/snap-video")
-    app.register_blueprint(snap_video_bp, url_prefix='/api/snap-video')
-    
-    # Registrar blueprint de AI Humanizer
-    print("Registrando blueprint: ai_humanizer_bp en /api/ai-humanizer")
-    app.register_blueprint(ai_humanizer_bp, url_prefix='/api/ai-humanizer')
-    
-    # Registrar blueprint de Advanced Image Manipulation
-    print("Registrando blueprint: advanced_image_bp en /api/image-manipulation")
-    app.register_blueprint(advanced_image_bp)
-    
-    # Registrar blueprint de Whisper URL
-    print("Registrando blueprint: whisper_url_bp en /api/whisper-url")
-    app.register_blueprint(whisper_url_bp)
-    
-    # Registrar blueprint de RunwayML
-    print("Registrando blueprint: runwayml_bp en /api/runwayml")
-    app.register_blueprint(runwayml_bp, url_prefix='/api/runwayml')
-    
-    # Registrar blueprint de Similarweb
-    print("Registrando blueprint: similarweb_bp en /api/similarweb")
-    app.register_blueprint(similarweb_bp, url_prefix='/api/similarweb')
-    
-    # Registrar blueprint de Google Keyword Insight
-    print("Registrando blueprint: keyword_insight_bp en /api/keyword-insight")
-    app.register_blueprint(keyword_insight_bp, url_prefix='/api/keyword-insight')
-    
-    # Registrar blueprint de Domain Metrics
-    print("Registrando blueprint: domain_metrics_bp en /api/domain-metrics")
-    app.register_blueprint(domain_metrics_bp, url_prefix='/api/domain-metrics')
-    
-    # Registrar blueprint de Ahrefs DR
-    print("Registrando blueprint: ahrefs_dr_bp en /api/ahrefs-dr")
-    app.register_blueprint(ahrefs_dr_bp, url_prefix='/api/ahrefs-dr')
-    
-    # Registrar blueprint de PageSpeed Insights
-    print("Registrando blueprint: pagespeed_bp en /api/pagespeed-insights")
-    app.register_blueprint(pagespeed_bp, url_prefix='/api/pagespeed-insights')
-    
-    # Registrar blueprint de SSL Checker
-    print("Registrando blueprint: ssl_checker_bp en /api/ssl-checker")
-    app.register_blueprint(ssl_checker_bp, url_prefix='/api/ssl-checker')
-    
-    # Registrar blueprint de Website Status
-    print("Registrando blueprint: website_status_bp en /api/website-status")
-    app.register_blueprint(website_status_bp, url_prefix='/api/website-status')
-    
-    # Registrar blueprint de SEO Mastermind
-    print("Registrando blueprint: seo_mastermind_bp en /api/seo-mastermind")
-    app.register_blueprint(seo_mastermind_bp, url_prefix='/api/seo-mastermind')
-    
-    # Registrar blueprint de Image Optimizer
-    print("Registrando blueprint: image_optimizer_bp en /api/image-optimize")
-    app.register_blueprint(image_optimizer_bp, url_prefix='/api/image-optimize')
-    
-    # Registrar blueprint de YouTube Media
-    print("Registrando blueprint: youtube_media_bp en /api/youtube")
-    app.register_blueprint(youtube_media_bp, url_prefix='/api/youtube')
-    
-    # Agregar más blueprints aquí
-    print("=== FIN DE REGISTRO DE BLUEPRINTS (desde blueprints/__init__.py) ===\n")
-    
+    logger.info(f"Registrados {len(BLUEPRINT_MAPPING)} blueprints")
     return app 

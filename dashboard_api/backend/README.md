@@ -53,10 +53,9 @@ pip install -r requirements.txt
 Crea un archivo `.env` en la carpeta `backend` con el siguiente contenido:
 
 ```
-# Entorno de Flask
-FLASK_ENV=development
+# Configuración de Flask
 FLASK_APP=app.py
-FLASK_DEBUG=1
+FLASK_DEBUG=1  # 1 para desarrollo, 0 para producción
 
 # Configuración de seguridad
 SECRET_KEY=dev-secret-key-change-in-production
@@ -78,9 +77,8 @@ PORT=5000
 2. Ejecuta el servidor de desarrollo:
    ```bash
    # Configurar variables de entorno (si no están en .env)
-   export FLASK_ENV=development
    export FLASK_APP=app.py
-   export FLASK_DEBUG=1
+   export FLASK_DEBUG=1  # Para desarrollo
 
    # Iniciar el servidor
    flask run

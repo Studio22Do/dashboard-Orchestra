@@ -3,10 +3,10 @@ import { Container, Typography, Box, Button, Paper, CircularProgress, Alert, For
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import axios from 'axios';
 
-const API_URL = 'https://api.shortpixel.com/v2/post-reducer.php';
-const RAPIDAPI_KEY = 'df691d20b4msh32aad51e7524288p15f391jsn3180d06b6e53';
-const RAPIDAPI_HOST = 'shortpixel.p.rapidapi.com';
-const SHORTPIXEL_KEY = 'cwacrDK1bRtJNO1BeLsF';
+// Eliminar las constantes de API que ya no se usarán
+// const API_URL = 'https://pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com/v1/reducer.php';
+// const API_KEY = '9dc7412cabmsh04d2de9d55522bap1643f6jsn6e3113942f4a';
+// const API_HOST = 'pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com';
 
 // --- COMPONENTE DEMO PARA URL ---
 const UrlOptimizerDemo = () => {
@@ -144,23 +144,15 @@ const ImageOptimizer = () => {
       formData.append('file', file);
       formData.append('key', SHORTPIXEL_KEY);
       formData.append('lossy', lossy ? '1' : '0');
-      formData.append('wait', '30');
-
-      console.log('Headers:', {
-        'X-RapidAPI-Key': RAPIDAPI_KEY,
-        'X-RapidAPI-Host': RAPIDAPI_HOST
-      });
-
-      const response = await axios.post(API_URL, formData, {
+      formData.append('wait', '1');
+      const response = await axios.post('/api/image-optimize', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'X-RapidAPI-Key': RAPIDAPI_KEY,
-          'X-RapidAPI-Host': RAPIDAPI_HOST
-        }
+        },
+        responseType: 'blob' // Importante para manejar la respuesta binaria
       });
-
-      console.log('Respuesta:', response.data);
-      setResult(response.data);
+      const imageUrl = URL.createObjectURL(new Blob([response.data], { type: response.headers['content-type'] }));
+      setResult({ optimized_url: imageUrl });
     } catch (err) {
       console.error('Error completo:', err);
       console.error('Respuesta de error:', err.response?.data);
