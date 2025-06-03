@@ -18,6 +18,8 @@ const initialState = {
   loading: false,
   error: null,
   passwordChangeSuccess: false,
+  registrationSuccess: false,
+  emailVerificationSent: false,
 };
 
 // Configuración de axios con token
@@ -55,6 +57,111 @@ export const loginUser = createAsyncThunk(
         return rejectWithValue(error.response.data.message || 'Credenciales incorrectas');
       }
       return rejectWithValue(error.message || 'Error al iniciar sesión');
+    }
+  }
+);
+
+export const registerUser = createAsyncThunk(
+  'auth/register',
+  async ({ name, email, password }, { rejectWithValue }) => {
+    try {
+      // Realizar petición al backend para registro
+      const response = await axios.post(`${API_URL}/auth/register`, {
+        name,
+        email,
+        password
+      });
+      
+      return response.data;
+    } catch (error) {
+      // Manejar diferentes tipos de errores
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data.message || 'Error en el registro');
+      }
+      return rejectWithValue(error.message || 'Error al registrar usuario');
+    }
+  }
+);
+
+export const registerWithGoogle = createAsyncThunk(
+  'auth/registerWithGoogle',
+  async (_, { rejectWithValue }) => {
+    try {
+      // Inicializar Google OAuth (esto se implementará con el SDK de Google)
+      return new Promise((resolve, reject) => {
+        if (window.google && window.google.accounts) {
+          window.google.accounts.id.initialize({
+            client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+            callback: async (response) => {
+              try {
+                // Enviar el token de Google al backend
+                const backendResponse = await axios.post(`${API_URL}/auth/google-register`, {
+                  google_token: response.credential
+                });
+                
+                const { user, access_token } = backendResponse.data;
+                
+                // Guardar en localStorage para persistencia
+                localStorage.setItem('token', access_token);
+                
+                // Configurar token para futuras peticiones
+                setAuthToken(access_token);
+                
+                resolve({ user, token: access_token });
+              } catch (error) {
+                reject(error);
+              }
+            }
+          });
+          
+          window.google.accounts.id.prompt();
+        } else {
+          reject(new Error('Google OAuth no está disponible'));
+        }
+      });
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data.message || 'Error en el registro con Google');
+      }
+      return rejectWithValue(error.message || 'Error al registrar con Google');
+    }
+  }
+);
+
+export const verifyEmail = createAsyncThunk(
+  'auth/verifyEmail',
+  async ({ token }, { rejectWithValue }) => {
+    try {
+      // Verificar el email con el token
+      const response = await axios.post(`${API_URL}/auth/verify-email`, {
+        verification_token: token
+      });
+      
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data.message || 'Error al verificar el email');
+      }
+      return rejectWithValue(error.message || 'Error al verificar el email');
+    }
+  }
+);
+
+export const resendVerificationEmail = createAsyncThunk(
+  'auth/resendVerificationEmail',
+  async ({ email }, { rejectWithValue }) => {
+    try {
+      // Reenviar email de verificación
+      const response = await axios.post(`${API_URL}/auth/resend-verification`, {
+        email
+      });
+      
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data.message || 'Error al reenviar el email');
+      }
+      return rejectWithValue(error.message || 'Error al reenviar el email');
     }
   }
 );
@@ -120,6 +227,10 @@ const authSlice = createSlice({
     clearPasswordChangeStatus: (state) => {
       state.passwordChangeSuccess = false;
     },
+    clearRegistrationStatus: (state) => {
+      state.registrationSuccess = false;
+      state.emailVerificationSent = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -136,6 +247,69 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Register
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.registrationSuccess = false;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.registrationSuccess = true;
+        state.emailVerificationSent = true;
+        state.error = null;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.registrationSuccess = false;
+      })
+      // Register with Google
+      .addCase(registerWithGoogle.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerWithGoogle.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.error = null;
+      })
+      .addCase(registerWithGoogle.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Email Verification
+      .addCase(verifyEmail.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyEmail.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.error = null;
+      })
+      .addCase(verifyEmail.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Resend Verification Email
+      .addCase(resendVerificationEmail.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(resendVerificationEmail.fulfilled, (state) => {
+        state.loading = false;
+        state.emailVerificationSent = true;
+        state.error = null;
+      })
+      .addCase(resendVerificationEmail.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -172,11 +346,13 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearErrors, setAuth, clearPasswordChangeStatus } = authSlice.actions;
+export const { clearErrors, setAuth, clearPasswordChangeStatus, clearRegistrationStatus } = authSlice.actions;
 
 export const selectAuth = (state) => state.auth;
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectUser = (state) => state.auth.user;
 export const selectPasswordChangeStatus = (state) => state.auth.passwordChangeSuccess;
+export const selectRegistrationStatus = (state) => state.auth.registrationSuccess;
+export const selectEmailVerificationStatus = (state) => state.auth.emailVerificationSent;
 
 export default authSlice.reducer; 
