@@ -4,9 +4,10 @@ import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import axios from 'axios';
 
 // Eliminar las constantes de API que ya no se usarán
-// const API_URL = 'https://pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com/v1/reducer.php';
-// const API_KEY = '9dc7412cabmsh04d2de9d55522bap1643f6jsn6e3113942f4a';
-// const API_HOST = 'pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com';
+const API_URL = 'https://pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com/v1/reducer.php';
+const API_KEY = '9dc7412cabmsh04d2de9d55522bap1643f6jsn6e3113942f4a';
+const API_HOST = 'pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com';
+const SHORTPIXEL_KEY = 'cwacrDK1bRtJNO1BeLsF';
 
 // --- COMPONENTE DEMO PARA URL ---
 const UrlOptimizerDemo = () => {
