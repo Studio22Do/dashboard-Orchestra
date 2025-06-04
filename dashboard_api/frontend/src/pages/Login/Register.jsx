@@ -61,8 +61,8 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 const GoogleButton = styled(Button)(({ theme }) => ({
-  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-  color: '#333',
+  backgroundColor: '#4285F4',
+  color: 'white',
   borderRadius: 12,
   padding: '12px 0',
   textTransform: 'none',
@@ -70,9 +70,9 @@ const GoogleButton = styled(Button)(({ theme }) => ({
   fontWeight: 500,
   border: '1px solid rgba(255, 255, 255, 0.3)',
   '&:hover': {
-    backgroundColor: 'rgba(255, 255, 255, 1)',
+    backgroundColor: '#3367D6',
     transform: 'translateY(-1px)',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+    boxShadow: '0 4px 12px rgba(66, 133, 244, 0.3)',
   },
 }));
 
@@ -269,10 +269,21 @@ const Register = () => {
           variant="contained"
           onClick={handleGoogleRegister}
           disabled={loading || !isGoogleLoaded}
-          startIcon={<Google />}
+          startIcon={
+            <Box
+              component="img"
+              src="/google.svg"
+              alt="Google"
+              sx={{
+                width: 20,
+                height: 20,
+                
+              }}
+            />
+          }
           sx={{
             mb: 2,
-            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 4px 10px rgba(66, 133, 244, 0.3)',
           }}
         >
           {!isGoogleLoaded ? 'Cargando Google...' : 'Continuar con Google'}
