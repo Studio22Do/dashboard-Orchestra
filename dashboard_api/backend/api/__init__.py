@@ -2,7 +2,6 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
-from flask_cors import CORS
 
 # Inicializar extensiones
 db = SQLAlchemy()
@@ -19,9 +18,6 @@ def create_app(config_object):
     migrate.init_app(app, db)
     jwt.init_app(app)
     
-    # Configurar CORS
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
-    
     print("\n=== REGISTRANDO BLUEPRINTS (desde api/__init__.py) ===")
     # Registrar blueprints
     from api.routes.auth import auth_bp
@@ -35,6 +31,7 @@ def create_app(config_object):
     from api.routes.file_converter import file_converter_bp
     from api.routes.tiktok_api import tiktok_api_bp
     from api.routes.ai_humanizer import ai_humanizer_bp
+    from api.routes.seo_mastermind import seo_mastermind_bp
     
     print("Registrando blueprint: auth_bp en /api/auth")
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -68,6 +65,9 @@ def create_app(config_object):
     
     print("Registrando blueprint: ai_humanizer_bp en /api/ai-humanizer")
     app.register_blueprint(ai_humanizer_bp, url_prefix='/api/ai-humanizer')
+    
+    print("Registrando blueprint: seo_mastermind_bp en /api/seo-mastermind")
+    app.register_blueprint(seo_mastermind_bp, url_prefix='/api/seo-mastermind')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers

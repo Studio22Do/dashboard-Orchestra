@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Card, CardContent, Typography, Box, Avatar } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import PropTypes from 'prop-types';
 
 // Tarjeta con gradiente vertical y borde solo en hover, animación suave
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -88,76 +89,139 @@ const CardContentFade = styled('div')(({ theme, isvisible }) => ({
   gap: '40px',
 }));
 
-const ToolCard = ({ title, icon: Icon, imageUrl, onClick }) => {
+const ToolCard = ({ 
+  title = 'Sin título', 
+  icon: Icon, 
+  imageUrl = 'https://placehold.co/400x200/1a1a1a/ffffff?text=No+Image', 
+  onClick = () => {} 
+}) => {
   const cardRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
   const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
-    const checkVisibility = () => {
-      if (!cardRef.current) return;
-      let parent = cardRef.current.parentElement;
-      let isInSwiper = false;
-      while (parent) {
-        if (parent.classList && parent.classList.contains('swiper-slide')) {
-          isInSwiper = true;
-          break;
-        }
-        parent = parent.parentElement;
-      }
-      if (!isInSwiper) {
-        setIsVisible(true); // Siempre visible si no está en Swiper
-        return;
-      }
-      // Si está en Swiper, solo visible si es visible en el slide
-      parent = cardRef.current.parentElement;
-      while (parent) {
-        if (parent.classList && parent.classList.contains('swiper-slide-visible')) {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
           setIsVisible(true);
-          return;
+          observer.disconnect();
         }
-        parent = parent.parentElement;
+      },
+      { threshold: 0.1 }
+    );
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
+
+    return () => {
+      if (cardRef.current) {
+        observer.unobserve(cardRef.current);
       }
-      setIsVisible(false);
     };
-    checkVisibility();
-    const interval = setInterval(checkVisibility, 100);
-    return () => clearInterval(interval);
   }, []);
 
+  const handleClick = (e) => {
+    e.preventDefault();
+    onClick();
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <StyledCard onClick={onClick} ref={cardRef}>
-      <CardContentFade isvisible={isVisible ? 1 : 0}>
-        <IconContainer>
-          {imageUrl && !imgError ? (
-            <img 
-              src={imageUrl} 
-              alt={title} 
+    <StyledCard
+      ref={cardRef}
+      className={isVisible ? 'visible' : ''}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-label={`Abrir ${title}`}
+    >
+      <CardContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}>
+          {!imgError ? (
+            <img
+              src={imageUrl}
+              alt={title}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                borderRadius: '12px 12px 0 0',
+              }}
               onError={() => setImgError(true)}
             />
           ) : (
-            Icon && <Icon />
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#1a1a1a',
+                borderRadius: '12px 12px 0 0',
+              }}
+            >
+              {Icon ? (
+                <Icon sx={{ fontSize: 40, color: '#ffffff' }} />
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  {title}
+                </Typography>
+              )}
+            </Box>
           )}
-        </IconContainer>
-        <StyledContent>
-          <Typography 
-            variant="h6" 
-            component="h3" 
-            sx={{ 
-              fontWeight: 600, 
+        </Box>
+        <Box sx={{ p: 2, flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+          {Icon && (
+            <Avatar
+              sx={{
+                bgcolor: 'primary.main',
+                width: 32,
+                height: 32,
+                mr: 1,
+              }}
+            >
+              <Icon sx={{ fontSize: 20 }} />
+            </Avatar>
+          )}
+          <Typography
+            variant="h6"
+            component="h3"
+            sx={{
+              fontWeight: 500,
+              fontSize: '1rem',
+              lineHeight: 1.2,
               color: 'white',
-              fontSize: '1.25rem',
-              lineHeight: 1.3,
-              textAlign: 'left',
-              wordBreak: 'break-word',
+              flexGrow: 1,
             }}
           >
             {title}
           </Typography>
-        </StyledContent>
-      </CardContentFade>
+        </Box>
+      </CardContent>
     </StyledCard>
   );
+};
+
+ToolCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  icon: PropTypes.elementType,
+  imageUrl: PropTypes.string,
+  onClick: PropTypes.func
 };
 
 export default ToolCard; 

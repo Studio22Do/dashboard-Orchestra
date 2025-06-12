@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Container,
@@ -18,24 +18,25 @@ import {
   useTheme,
   styled,
   alpha,
-  useMediaQuery
+  useMediaQuery,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel
 } from '@mui/material';
 import {
   Search as SearchIcon,
   ContentCopy as CopyIcon,
   Refresh as RefreshIcon,
   Info as InfoIcon,
-  CheckCircle as CheckCircleIcon,
-  Error as ErrorIcon,
-  Warning as WarningIcon,
-  Speed as SpeedIcon,
-  Devices as DevicesIcon,
-  Description as DescriptionIcon,
-  Link as LinkIcon,
-  Image as ImageIcon,
-  Title as TitleIcon
+  TrendingUp as TrendingUpIcon,
+  TrendingDown as TrendingDownIcon,
+  QuestionAnswer as QuestionAnswerIcon
 } from '@mui/icons-material';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks/reduxHooks';
+import { useAppDispatch } from '../../redux/hooks/reduxHooks';
 import { addNotification } from '../../redux/slices/uiSlice';
 import { APP_CONFIG } from '../../config/constants';
 
@@ -116,19 +117,13 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const ScoreChip = styled(Chip)(({ theme, score }) => ({
-  backgroundColor: score >= 90 
-    ? alpha(theme.palette.success.main, 0.9)
-    : score >= 70 
-    ? alpha(theme.palette.warning.main, 0.9)
-    : alpha(theme.palette.error.main, 0.9),
-  color: theme.palette.common.white,
-  fontWeight: 600,
-  borderRadius: theme.shape.borderRadius * 2,
-  padding: theme.spacing(0.5, 1),
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    transform: 'scale(1.05)',
+const KeywordTable = styled(Table)(({ theme }) => ({
+  '& .MuiTableCell-root': {
+    borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+  },
+  '& .MuiTableHead-root .MuiTableCell-root': {
+    backgroundColor: alpha(theme.palette.primary.main, 0.05),
+    fontWeight: 600,
   },
 }));
 
@@ -136,27 +131,17 @@ const SEOMastermind = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const dispatch = useAppDispatch();
-  const [url, setUrl] = useState('');
+  const [keyword, setKeyword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [seoData, setSeoData] = useState(null);
+  const [keywordData, setKeywordData] = useState(null);
   const [error, setError] = useState(null);
-
-  // Estados para diferentes métricas SEO
-  const [pageMetrics, setPageMetrics] = useState({
-    title: { score: 0, issues: [] },
-    metaDescription: { score: 0, issues: [] },
-    headings: { score: 0, issues: [] },
-    images: { score: 0, issues: [] },
-    links: { score: 0, issues: [] },
-    content: { score: 0, issues: [] },
-    mobile: { score: 0, issues: [] },
-    performance: { score: 0, issues: [] },
-  });
+  const [orderBy, setOrderBy] = useState('difficulty');
+  const [order, setOrder] = useState('asc');
 
   const handleAnalyze = async () => {
-    if (!url) {
+    if (!keyword) {
       dispatch(addNotification({
-        message: 'Por favor ingresa una URL válida',
+        message: 'Por favor ingresa una keyword',
         type: 'error'
       }));
       return;
@@ -166,32 +151,59 @@ const SEOMastermind = () => {
     setError(null);
 
     try {
-      // Aquí irá la llamada a la API
-      const response = await fetch(`${APP_CONFIG.API_URL}/api/seo-mastermind/analyze`, {
+      const apiUrl = `${APP_CONFIG.API_URL}/seo-mastermind`;
+      console.log('Llamando a la API:', apiUrl);
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ url })
+        mode: 'cors',
+        credentials: 'include',
+        redirect: 'follow',
+        body: JSON.stringify({ keyword })
       });
 
-      if (!response.ok) {
-        throw new Error('Error al analizar la URL');
+      // Manejar redirecciones manualmente si es necesario
+      if (response.redirected) {
+        console.log('Redirigiendo a:', response.url);
+        const redirectResponse = await fetch(response.url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          credentials: 'include',
+          body: JSON.stringify({ keyword })
+        });
+        
+        if (!redirectResponse.ok) {
+          throw new Error(`Error ${redirectResponse.status}: ${redirectResponse.statusText}`);
+        }
+        
+        const data = await redirectResponse.json();
+        setKeywordData(data);
+      } else if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Error ${response.status}: ${response.statusText}`);
+      } else {
+        const data = await response.json();
+        setKeywordData(data);
       }
 
-      const data = await response.json();
-      setSeoData(data);
-      setPageMetrics(data.metrics);
-
       dispatch(addNotification({
-        message: 'Análisis SEO completado exitosamente',
+        message: 'Análisis de keywords completado exitosamente',
         type: 'success'
       }));
     } catch (err) {
+      console.error('Error en la llamada a la API:', err);
       setError(err.message);
       dispatch(addNotification({
-        message: 'Error al realizar el análisis SEO',
+        message: `Error al realizar el análisis de keywords: ${err.message}`,
         type: 'error'
       }));
     } finally {
@@ -199,229 +211,153 @@ const SEOMastermind = () => {
     }
   };
 
-  const getScoreColor = (score) => {
-    if (score >= 90) return theme.palette.success.main;
-    if (score >= 70) return theme.palette.warning.main;
-    return theme.palette.error.main;
+  const handleSort = (property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
   };
 
-  const getScoreIcon = (score) => {
-    if (score >= 90) return <CheckCircleIcon color="success" />;
-    if (score >= 70) return <WarningIcon color="warning" />;
-    return <ErrorIcon color="error" />;
-  };
-
-  const MetricSection = ({ title, score, issues, icon }) => {
-    const IconComponent = {
-      'Título y Meta Descripción': TitleIcon,
-      'Estructura de Encabezados': DescriptionIcon,
-      'Imágenes': ImageIcon,
-      'Enlaces': LinkIcon,
-      'Contenido': DescriptionIcon,
-      'Móvil': DevicesIcon,
-      'Rendimiento': SpeedIcon,
-    }[title] || InfoIcon;
+  const KeywordSection = ({ title, data, icon }) => {
+    if (!data || data.length === 0) return null;
 
     return (
       <MetricCard elevation={2}>
         <CardContent>
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            mb: 2,
-            flexWrap: isMobile ? 'wrap' : 'nowrap',
-            gap: 1
-          }}>
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              flex: 1,
-              minWidth: 0
-            }}>
-              <IconComponent 
-                color="primary" 
-                sx={{ 
-                  mr: 1,
-                  fontSize: isMobile ? '1.5rem' : '2rem'
-                }} 
-              />
-              <Typography 
-                variant={isMobile ? "subtitle1" : "h6"} 
-                sx={{ 
-                  fontWeight: 600,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                {title}
-              </Typography>
-            </Box>
-            <ScoreChip
-              score={score}
-              label={`${score}/100`}
-            />
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            {icon}
+            <Typography variant="h6" sx={{ ml: 1 }}>
+              {title}
+            </Typography>
           </Box>
-          <Divider sx={{ my: 1.5 }} />
-          <Box sx={{ mt: 2 }}>
-            {issues.length > 0 ? (
-              issues.map((issue, index) => (
-                <Typography
-                  key={index}
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ 
-                    mb: 1,
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    '&::before': {
-                      content: '"•"',
-                      mr: 1,
-                      color: theme.palette.primary.main
-                    }
-                  }}
-                >
-                  {issue}
-                </Typography>
-              ))
-            ) : (
-              <Typography 
-                variant="body2" 
-                color="success.main"
-                sx={{ 
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5
-                }}
-              >
-                <CheckCircleIcon fontSize="small" />
-                No se encontraron problemas
-              </Typography>
-            )}
-          </Box>
+          <TableContainer>
+            <KeywordTable>
+              <TableHead>
+                <TableRow>
+                  <TableCell>
+                    <TableSortLabel
+                      active={orderBy === 'keyword'}
+                      direction={orderBy === 'keyword' ? order : 'asc'}
+                      onClick={() => handleSort('keyword')}
+                    >
+                      Keyword
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell align="right">
+                    <TableSortLabel
+                      active={orderBy === 'difficulty'}
+                      direction={orderBy === 'difficulty' ? order : 'asc'}
+                      onClick={() => handleSort('difficulty')}
+                    >
+                      Dificultad
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell align="right">
+                    <TableSortLabel
+                      active={orderBy === 'volume'}
+                      direction={orderBy === 'volume' ? order : 'asc'}
+                      onClick={() => handleSort('volume')}
+                    >
+                      Volumen
+                    </TableSortLabel>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.map(([keyword, difficulty, volume], index) => (
+                  <TableRow key={index}>
+                    <TableCell>{keyword}</TableCell>
+                    <TableCell align="right">
+                      <Chip
+                        label={difficulty}
+                        color={difficulty <= 50 ? 'success' : 'warning'}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell align="right">{volume}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </KeywordTable>
+          </TableContainer>
         </CardContent>
       </MetricCard>
     );
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 } }}>
-      <Typography 
-        variant="h4" 
-        component="h1" 
-        gutterBottom 
-        sx={{ 
-          mb: { xs: 2, md: 4 },
-          fontWeight: 700,
-          color: theme.palette.primary.main,
-          textAlign: { xs: 'center', md: 'left' }
-        }}
-      >
-        SEO Mastermind
-      </Typography>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <StyledPaper>
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" gutterBottom>
+            SEO Mastermind - Análisis de Keywords
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Analiza keywords y descubre oportunidades de contenido
+          </Typography>
+        </Box>
 
-      <StyledPaper sx={{ mb: { xs: 2, md: 4 } }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={9}>
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} md={8}>
             <StyledTextField
               fullWidth
-              label="URL del sitio web"
-              variant="outlined"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://ejemplo.com"
-              error={!!error}
-              helperText={error}
+              label="Ingresa una keyword"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="Ej: marketing digital"
               InputProps={{
-                startAdornment: <SearchIcon color="action" sx={{ mr: 1 }} />,
+                endAdornment: (
+                  <IconButton onClick={handleAnalyze} disabled={loading}>
+                    {loading ? <CircularProgress size={24} /> : <SearchIcon />}
+                  </IconButton>
+                ),
               }}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <StyledButton
               fullWidth
               variant="contained"
-              size="large"
               onClick={handleAnalyze}
-              disabled={loading || !url}
+              disabled={loading}
               startIcon={loading ? <CircularProgress size={20} /> : <SearchIcon />}
-              sx={{ 
-                height: { xs: 48, md: 56 },
-                fontSize: { xs: '0.875rem', md: '1rem' }
-              }}
             >
-              {loading ? 'Analizando...' : 'Analizar SEO'}
+              {loading ? 'Analizando...' : 'Analizar Keyword'}
             </StyledButton>
           </Grid>
         </Grid>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
+
+        {keywordData && (
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <KeywordSection
+                title="Keywords Fáciles (0-50)"
+                data={keywordData.keywords0_50}
+                icon={<TrendingUpIcon color="success" />}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <KeywordSection
+                title="Keywords Competitivas (50-100)"
+                data={keywordData.keywords50_100}
+                icon={<TrendingDownIcon color="warning" />}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <KeywordSection
+                title="Preguntas Relacionadas"
+                data={keywordData.questions}
+                icon={<QuestionAnswerIcon color="primary" />}
+              />
+            </Grid>
+          </Grid>
+        )}
       </StyledPaper>
-
-      {seoData && (
-        <Grid container spacing={{ xs: 2, md: 3 }}>
-          <Grid item xs={12} md={6}>
-            <MetricSection
-              title="Título y Meta Descripción"
-              score={pageMetrics.title.score}
-              issues={pageMetrics.title.issues}
-              icon={<InfoIcon color="primary" />}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <MetricSection
-              title="Estructura de Encabezados"
-              score={pageMetrics.headings.score}
-              issues={pageMetrics.headings.issues}
-              icon={<InfoIcon color="primary" />}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <MetricSection
-              title="Imágenes"
-              score={pageMetrics.images.score}
-              issues={pageMetrics.images.issues}
-              icon={<InfoIcon color="primary" />}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <MetricSection
-              title="Enlaces"
-              score={pageMetrics.links.score}
-              issues={pageMetrics.links.issues}
-              icon={<InfoIcon color="primary" />}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <MetricSection
-              title="Contenido"
-              score={pageMetrics.content.score}
-              issues={pageMetrics.content.issues}
-              icon={<InfoIcon color="primary" />}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <MetricSection
-              title="Optimización Móvil"
-              score={pageMetrics.mobile.score}
-              issues={pageMetrics.mobile.issues}
-              icon={<InfoIcon color="primary" />}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <MetricSection
-              title="Rendimiento"
-              score={pageMetrics.performance.score}
-              issues={pageMetrics.performance.issues}
-              icon={<InfoIcon color="primary" />}
-            />
-          </Grid>
-        </Grid>
-      )}
-
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
     </Container>
   );
 };

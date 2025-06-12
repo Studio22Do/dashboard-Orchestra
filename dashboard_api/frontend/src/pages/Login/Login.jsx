@@ -209,28 +209,21 @@ const Login = () => {
         <StyledButton
           type="submit"
           variant="contained"
+          color="primary"
           fullWidth
           disabled={loading}
-          sx={{
-            mt: 2,
-            boxShadow: '0 4px 10px rgba(131, 124, 243, 0.3)',
-          }}
+          sx={{ mt: 1 }}
         >
-          {loading ? <CircularProgress size={24} /> : 'Iniciar Sesión'}
+          {loading ? <CircularProgress size={24} color="inherit" /> : 'Iniciar Sesión'}
         </StyledButton>
 
-        {/* Link al registro */}
-        <Box sx={{ textAlign: 'center', mt: 3 }}>
-          <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 2 }}>
+          <Link to="/forgot-password" style={{ color: '#837CF3', fontSize: 14, marginBottom: 8 }}>
+            ¿Olvidaste tu contraseña?
+          </Link>
+          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
             ¿No tienes cuenta?{' '}
-            <Link 
-              to="/register" 
-              style={{ 
-                color: '#837CF3', 
-                textDecoration: 'none', 
-                fontWeight: 500 
-              }}
-            >
+            <Link to="/register" style={{ color: '#837CF3', fontWeight: 500 }}>
               Crear Cuenta
             </Link>
           </Typography>

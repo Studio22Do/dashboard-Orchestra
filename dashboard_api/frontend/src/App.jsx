@@ -47,6 +47,8 @@ import AIHumanizer from './pages/AIHumanizer/AIHumanizer';
 import CategoryView from './pages/CategoryView/CategoryView';
 import ImageOptimizer from './pages/ImageOptimizer/ImageOptimizer';
 import theme from './theme';
+import ForgotPassword from './pages/Login/ForgotPassword';
+import ResetPassword from './pages/Login/ResetPassword';
 
 // Theme configuration function
 const createAppTheme = (mode) => createTheme({
@@ -230,6 +232,10 @@ function App() {
               isAuthenticated ? <Navigate to="/" /> : <EmailVerification />
             }
           />
+          
+          {/* Rutas públicas de recuperación de contraseña */}
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           
           {/* Protected Routes */}
           <Route path="/" element={
