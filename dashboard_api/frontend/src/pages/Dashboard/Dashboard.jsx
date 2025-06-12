@@ -606,18 +606,15 @@ const Dashboard = () => {
         const mappedTool = {
           ...tool,
           title: tool.title || tool.name || 'Sin título',
-          imageUrl: tool.imageUrl || tool.img || 'https://via.placeholder.com/400x200',
+          imageUrl: tool.imageUrl || tool.img || 'https://placehold.co/400x200/1a1a1a/ffffff?text=No+Image',
           icon: tool.icon || undefined,
           onClick: tool.onClick || (() => {}),
         };
-        console.log('Tool después del mapeo:', mappedTool);
         return mappedTool;
       });
       return { ...category, tools: filteredTools };
     })
     .filter(category => category.tools.length > 0);
-
-  console.log('filteredCategories:', filteredCategories);
 
   return (
     <DashboardContainer

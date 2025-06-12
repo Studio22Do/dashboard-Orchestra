@@ -5,6 +5,7 @@ import { ArrowForward } from "@mui/icons-material";
 import ToolCard from "../ToolCard/ToolCard";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
+import PropTypes from 'prop-types';
 import "swiper/css";
 import "swiper/css/navigation";
 
@@ -103,55 +104,94 @@ const StyledSwiper = styled(Swiper)(({ theme }) => ({
     width: "95%",
 }));
 
-const CategorySection = ({ title, icon: Icon, tools, onViewAll }) => {
-    return (
-        <CategoryContainer>
-            <TitleContainer>
-                <CategoryTitle>
-                    {Icon && <Icon className="category-icon" />}
-                    <Typography
-                        variant="h5"
-                        component="h2"
-                        sx={{
-                            fontWeight: 500,
-                            color: "white",
-                            fontSize: "1.4rem",
-                        }}
-                    >
-                        {title}
-                    </Typography>
-                </CategoryTitle>
+const CategorySection = ({ 
+  title = 'Sin título', 
+  icon: Icon, 
+  tools = [], 
+  onViewAll = () => {} 
+}) => {
+  // Validar que tools sea un array y tenga elementos
+  if (!Array.isArray(tools) || tools.length === 0) {
+    return null;
+  }
 
-                <ViewAllButton endIcon={<ArrowForward />} onClick={onViewAll}>
-                    Ver todas
-                </ViewAllButton>
-            </TitleContainer>
+  // Filtrar herramientas inválidas
+  const validTools = tools.filter(tool => 
+    tool && 
+    typeof tool === 'object' && 
+    tool.id && 
+    (tool.title || tool.name)
+  );
 
-            <ToolsContainer>
-                <StyledSwiper
-                    slidesPerView={3}
-                    spaceBetween={20}
-                    navigation={true}
-                    modules={[Navigation]}
-                    className="mySwiper"
-                    watchSlidesProgress={true}
-                >
-                    {tools.map((tool) => (
-                        <SwiperSlide key={tool.id}>
-                            <CardContainer>
-                                <ToolCard
-                                    title={tool.title}
-                                    icon={tool.icon}
-                                    imageUrl={tool.imageUrl}
-                                    onClick={tool.onClick}
-                                />
-                            </CardContainer>
-                        </SwiperSlide>
-                    ))}
-                </StyledSwiper>
-            </ToolsContainer>
-        </CategoryContainer>
-    );
+  if (validTools.length === 0) {
+    return null;
+  }
+
+  return (
+    <CategoryContainer>
+      <TitleContainer>
+        <CategoryTitle>
+          {Icon && <Icon className="category-icon" />}
+          <Typography
+            variant="h5"
+            component="h2"
+            sx={{
+              fontWeight: 500,
+              color: "white",
+              fontSize: "1.4rem",
+            }}
+          >
+            {title}
+          </Typography>
+        </CategoryTitle>
+
+        <ViewAllButton endIcon={<ArrowForward />} onClick={onViewAll}>
+          Ver todas
+        </ViewAllButton>
+      </TitleContainer>
+
+      <ToolsContainer>
+        <StyledSwiper
+          slidesPerView={3}
+          spaceBetween={20}
+          navigation={true}
+          modules={[Navigation]}
+          className="mySwiper"
+          watchSlidesProgress={true}
+        >
+          {validTools.map((tool) => (
+            <SwiperSlide key={tool.id}>
+              <CardContainer>
+                <ToolCard
+                  title={tool.title || tool.name || 'Sin título'}
+                  icon={tool.icon}
+                  imageUrl={tool.imageUrl || tool.img}
+                  onClick={tool.onClick || (() => {})}
+                />
+              </CardContainer>
+            </SwiperSlide>
+          ))}
+        </StyledSwiper>
+      </ToolsContainer>
+    </CategoryContainer>
+  );
+};
+
+CategorySection.propTypes = {
+  title: PropTypes.string.isRequired,
+  icon: PropTypes.elementType,
+  tools: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      title: PropTypes.string,
+      name: PropTypes.string,
+      icon: PropTypes.elementType,
+      imageUrl: PropTypes.string,
+      img: PropTypes.string,
+      onClick: PropTypes.func
+    })
+  ),
+  onViewAll: PropTypes.func
 };
 
 export default CategorySection;
