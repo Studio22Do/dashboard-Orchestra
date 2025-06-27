@@ -54,7 +54,7 @@ const NavButton = styled(ListItemButton)(({ theme }) => ({
 
 const staticMenuItems = [
   { text: 'Apps', icon: <Dashboard />, path: '/' },
-  { text: 'ToolsBox', icon: <Apps />, path: '/apps' },
+  { text: 'ToolBox', icon: <Apps />, path: '/apps' },
   { text: 'Analytics', icon: <Analytics />, path: '/analytics' },
 ];
 
