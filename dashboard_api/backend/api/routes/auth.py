@@ -6,6 +6,8 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 from marshmallow import ValidationError
+import secrets
+import datetime
 
 from api import db
 from api.models.user import User
@@ -19,6 +21,10 @@ auth_bp = Blueprint('auth', __name__)
 user_schema = UserSchema()
 login_schema = LoginSchema()
 change_password_schema = ChangePasswordSchema()
+
+# Diccionarios para almacenar tokens temporalmente (solo para desarrollo)
+verification_tokens = {}  # {token: user_id}
+reset_password_tokens = {}  # {token: {user_id: id, expires: datetime}}
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -36,7 +42,7 @@ def register():
         if User.query.filter_by(email=user_data['email']).first():
             raise ApiValidationError("El correo electrónico ya está registrado")
         
-        # Crear usuario
+        # Crear usuario (activo por defecto para desarrollo)
         user = User(
             email=user_data['email'],
             password=user_data['password'],
@@ -44,15 +50,18 @@ def register():
             role=user_data.get('role', 'user')
         )
         
+        # En desarrollo, el usuario se crea activo
+        user.is_active = True
+        
         # Guardar en la base de datos
         db.session.add(user)
         db.session.commit()
         
-        # Generar tokens
+        # Generar tokens de acceso inmediatamente
         access_token = create_access_token(identity=str(user.id))
         refresh_token = create_refresh_token(identity=str(user.id))
         
-        # Retornar respuesta
+        # Retornar respuesta con tokens
         return jsonify({
             'message': 'Usuario registrado exitosamente',
             'user': user_schema.dump(user),
@@ -65,6 +74,100 @@ def register():
     except Exception as e:
         db.session.rollback()
         raise ApiValidationError(str(e))
+
+@auth_bp.route('/verify-email', methods=['GET'])
+def verify_email():
+    """Verificar email del usuario"""
+    token = request.args.get('token')
+    if not token or token not in verification_tokens:
+        raise AuthenticationError("Token de verificación inválido o expirado")
+    
+    user_id = verification_tokens.pop(token)
+    user = User.query.get(user_id)
+    
+    if not user:
+        raise AuthenticationError("Usuario no encontrado")
+    
+    user.is_active = True
+    db.session.commit()
+    
+    # Generar tokens
+    access_token = create_access_token(identity=str(user.id))
+    refresh_token = create_refresh_token(identity=str(user.id))
+    
+    return jsonify({
+        'message': 'Email verificado exitosamente',
+        'user': user_schema.dump(user),
+        'access_token': access_token,
+        'refresh_token': refresh_token
+    }), 200
+
+@auth_bp.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    """Iniciar proceso de recuperación de contraseña"""
+    data = request.get_json()
+    if not data or 'email' not in data:
+        raise ApiValidationError("Se requiere el email")
+    
+    user = User.query.filter_by(email=data['email']).first()
+    if not user:
+        # Por seguridad, no revelamos si el email existe o no
+        return jsonify({
+            'message': 'Si el email existe en nuestra base de datos, recibirás instrucciones para restablecer tu contraseña'
+        }), 200
+    
+    # Generar token de reset con expiración (24 horas)
+    reset_token = secrets.token_urlsafe(32)
+    expires = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+    reset_password_tokens[reset_token] = {'user_id': user.id, 'expires': expires}
+    
+    # Simular envío de email (print para desarrollo)
+    reset_url = f"/reset-password?token={reset_token}"
+    print("\n=== EMAIL DE RECUPERACIÓN DE CONTRASEÑA ===")
+    print(f"Para: {user.email}")
+    print(f"Asunto: Recupera tu contraseña en Dashboard Orchestra")
+    print("\nContenido:")
+    print(f"Hola {user.name},")
+    print("Has solicitado restablecer tu contraseña. Usa el siguiente enlace para crear una nueva contraseña:")
+    print(f"URL de recuperación: {reset_url}")
+    print("Este enlace expirará en 24 horas.")
+    print("Si no solicitaste este cambio, ignora este mensaje.")
+    print("=====================================\n")
+    
+    return jsonify({
+        'message': 'Si el email existe en nuestra base de datos, recibirás instrucciones para restablecer tu contraseña'
+    }), 200
+
+@auth_bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    """Restablecer contraseña con token"""
+    data = request.get_json()
+    if not data or 'token' not in data or 'new_password' not in data:
+        raise ApiValidationError("Se requieren token y nueva contraseña")
+    
+    token = data['token']
+    if token not in reset_password_tokens:
+        raise AuthenticationError("Token inválido o expirado")
+    
+    token_data = reset_password_tokens[token]
+    if datetime.datetime.utcnow() > token_data['expires']:
+        reset_password_tokens.pop(token)
+        raise AuthenticationError("Token expirado")
+    
+    user = User.query.get(token_data['user_id'])
+    if not user:
+        raise AuthenticationError("Usuario no encontrado")
+    
+    # Actualizar contraseña
+    user.password = data['new_password']
+    db.session.commit()
+    
+    # Eliminar token usado
+    reset_password_tokens.pop(token)
+    
+    return jsonify({
+        'message': 'Contraseña actualizada exitosamente'
+    }), 200
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
