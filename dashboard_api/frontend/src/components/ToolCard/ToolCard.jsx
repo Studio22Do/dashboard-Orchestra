@@ -92,33 +92,41 @@ const CardContentFade = styled('div')(({ theme, isvisible }) => ({
 const ToolCard = ({ 
   title = 'Sin título', 
   icon: Icon, 
-  imageUrl = 'https://placehold.co/400x200/1a1a1a/ffffff?text=No+Image', 
   onClick = () => {} 
 }) => {
   const cardRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
-  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
+    const checkVisibility = () => {
+      if (!cardRef.current) return;
+      let parent = cardRef.current.parentElement;
+      let isInSwiper = false;
+      while (parent) {
+        if (parent.classList && parent.classList.contains('swiper-slide')) {
+          isInSwiper = true;
+          break;
         }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (cardRef.current) {
-      observer.observe(cardRef.current);
-    }
-
-    return () => {
-      if (cardRef.current) {
-        observer.unobserve(cardRef.current);
+        parent = parent.parentElement;
       }
+      if (!isInSwiper) {
+        setIsVisible(true); // Siempre visible si no está en Swiper
+        return;
+      }
+      // Si está en Swiper, solo visible si es visible en el slide
+      parent = cardRef.current.parentElement;
+      while (parent) {
+        if (parent.classList && parent.classList.contains('swiper-slide-visible')) {
+          setIsVisible(true);
+          return;
+        }
+        parent = parent.parentElement;
+      }
+      setIsVisible(false);
     };
+    checkVisibility();
+    const interval = setInterval(checkVisibility, 100);
+    return () => clearInterval(interval);
   }, []);
 
   const handleClick = (e) => {
@@ -134,85 +142,35 @@ const ToolCard = ({
   };
 
   return (
-    <StyledCard
-      ref={cardRef}
-      className={isVisible ? 'visible' : ''}
-      onClick={handleClick}
+    <StyledCard 
+      onClick={handleClick} 
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="button"
       aria-label={`Abrir ${title}`}
+      ref={cardRef}
     >
-      <CardContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <Box sx={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}>
-          {!imgError ? (
-            <img
-              src={imageUrl}
-              alt={title}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                borderRadius: '12px 12px 0 0',
-              }}
-              onError={() => setImgError(true)}
-            />
-          ) : (
-            <Box
-              sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#1a1a1a',
-                borderRadius: '12px 12px 0 0',
-              }}
-            >
-              {Icon ? (
-                <Icon sx={{ fontSize: 40, color: '#ffffff' }} />
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  {title}
-                </Typography>
-              )}
-            </Box>
-          )}
-        </Box>
-        <Box sx={{ p: 2, flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-          {Icon && (
-            <Avatar
-              sx={{
-                bgcolor: 'primary.main',
-                width: 32,
-                height: 32,
-                mr: 1,
-              }}
-            >
-              <Icon sx={{ fontSize: 20 }} />
-            </Avatar>
-          )}
-          <Typography
-            variant="h6"
-            component="h3"
-            sx={{
-              fontWeight: 500,
-              fontSize: '1rem',
-              lineHeight: 1.2,
+      <CardContentFade isvisible={isVisible ? 1 : 0}>
+        <IconContainer>
+          {Icon && <Icon />}
+        </IconContainer>
+        <StyledContent>
+          <Typography 
+            variant="h6" 
+            component="h3" 
+            sx={{ 
+              fontWeight: 600, 
               color: 'white',
-              flexGrow: 1,
+              fontSize: '1.25rem',
+              lineHeight: 1.3,
+              textAlign: 'left',
+              wordBreak: 'break-word',
             }}
           >
             {title}
           </Typography>
-        </Box>
-      </CardContent>
+        </StyledContent>
+      </CardContentFade>
     </StyledCard>
   );
 };
@@ -220,7 +178,6 @@ const ToolCard = ({
 ToolCard.propTypes = {
   title: PropTypes.string.isRequired,
   icon: PropTypes.elementType,
-  imageUrl: PropTypes.string,
   onClick: PropTypes.func
 };
 
