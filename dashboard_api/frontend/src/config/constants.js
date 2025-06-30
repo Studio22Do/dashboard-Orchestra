@@ -55,4 +55,26 @@ export const MESSAGES = {
   }
 };
 
+export const APPS = {
+    // ... existing apps ...
+    OPENAI_TTS: {
+        id: 'openai-tts',
+        name: 'OpenAI Text to Speech',
+        description: 'Convierte texto a voz natural usando la tecnología de OpenAI',
+        category: 'Creative & Content',
+        icon: 'record_voice_over',
+        path: '/openai-tts',
+        features: [
+            'Múltiples voces disponibles (alloy, echo, fable, onyx, nova, shimmer)',
+            'Soporte para más de 60 idiomas',
+            'Control de tono y estilo de voz',
+            'Múltiples formatos de salida (MP3, Opus, AAC, FLAC)',
+            'Instrucciones personalizadas de entonación'
+        ],
+        api_key_required: true,
+        subscription_required: true
+    },
+    // ... existing apps ...
+};
+
 export default APP_CONFIG; 

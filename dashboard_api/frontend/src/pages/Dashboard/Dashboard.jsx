@@ -37,7 +37,8 @@ import {
   ShoppingCart,
   Visibility,
   Settings,
-  PhotoCamera
+  PhotoCamera,
+  Psychology
 } from '@mui/icons-material';
 import AppDetailDrawer from '../../components/AppDetailDrawer/AppDetailDrawer';
 import AppSearchHeader from '../../components/app-search/AppSearchHeader';
@@ -371,6 +372,23 @@ const Dashboard = () => {
               category: 'Creative & Content',
               route: '/apps/runway-ml',
               apiName: 'RunwayML API',
+            });
+            setDrawerOpen(true);
+          }
+        },
+        {
+          id: 'prlabs',
+          title: 'PR Labs',
+          icon: Psychology,
+          onClick: () => {
+            setSelectedApp({
+              id: 'prlabs',
+              title: 'PR Labs',
+              description: 'Suite de herramientas de IA para generación de texto e imágenes',
+              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              category: 'Creative & Content',
+              route: '/prlabs',
+              apiName: 'PR Labs API',
             });
             setDrawerOpen(true);
           }

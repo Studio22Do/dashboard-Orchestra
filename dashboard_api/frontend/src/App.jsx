@@ -49,6 +49,13 @@ import ImageOptimizer from './pages/ImageOptimizer/ImageOptimizer';
 import theme from './theme';
 import ForgotPassword from './pages/Login/ForgotPassword';
 import ResetPassword from './pages/Login/ResetPassword';
+import PRLabsDashboard from './pages/PRLabs/Dashboard';
+import PRLabsChat from './pages/PRLabs/Chat';
+import PRLabsImage from './pages/PRLabs/Image';
+import PRLabsText from './pages/PRLabs/Text';
+import PRLabsVoice from './pages/PRLabs/Voice';
+import PRLabsChatbot from './pages/PRLabs/Chatbot';
+import PRLabsTools from './pages/PRLabs/Tools';
 
 // Theme configuration function
 const createAppTheme = (mode) => createTheme({
@@ -454,6 +461,15 @@ function App() {
               <ImageOptimizer />
             </ProtectedRoute>
           } />
+          
+          {/* PR Labs Routes */}
+          <Route path="/prlabs" element={<ProtectedRoute><PRLabsDashboard /></ProtectedRoute>} />
+          <Route path="/prlabs/chat" element={<ProtectedRoute><PRLabsChat /></ProtectedRoute>} />
+          <Route path="/prlabs/image" element={<ProtectedRoute><PRLabsImage /></ProtectedRoute>} />
+          <Route path="/prlabs/text" element={<ProtectedRoute><PRLabsText /></ProtectedRoute>} />
+          <Route path="/prlabs/voice" element={<ProtectedRoute><PRLabsVoice /></ProtectedRoute>} />
+          <Route path="/prlabs/chatbot" element={<ProtectedRoute><PRLabsChatbot /></ProtectedRoute>} />
+          <Route path="/prlabs/tools" element={<ProtectedRoute><PRLabsTools /></ProtectedRoute>} />
           
         </Routes>
         <NotificationManager />

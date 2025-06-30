@@ -33,6 +33,7 @@ from api.routes.ssl_checker import ssl_checker_bp
 from api.routes.website_status import website_status_bp
 from api.routes.seo_mastermind import seo_mastermind_bp
 from api.routes.image_optimizer import image_optimizer_bp
+from api.routes.prlabs import prlabs_bp
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +65,8 @@ BLUEPRINT_MAPPING = {
     seo_mastermind_bp: '/api/seo-mastermind',
     image_optimizer_bp: '/api/image-optimize',
     youtube_media_bp: '/api/youtube',
-    auth_google_bp: '/api/auth/google'
+    auth_google_bp: '/api/auth/google',
+    prlabs_bp: '/api/prlabs'
 }
 
 def register_blueprints(app):

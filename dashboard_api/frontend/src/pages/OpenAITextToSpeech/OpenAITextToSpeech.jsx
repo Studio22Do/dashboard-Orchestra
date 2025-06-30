@@ -1,261 +1,131 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Container,
-  Typography,
-  TextField,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  Box,
-  CircularProgress,
-  Alert,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  IconButton,
-  Tooltip,
-  Paper,
-  Slider,
-  Stack
+    Box,
+    TextField,
+    Button,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    Typography,
+    Paper,
+    CircularProgress
 } from '@mui/material';
-import {
-  PlayArrow,
-  Stop,
-  VolumeUp,
-  Speed,
-  RecordVoiceOver,
-  Download,
-  ContentCopy
-} from '@mui/icons-material';
+import { openaiTTSService } from '../../services/openaiTTS';
 
 const OpenAITextToSpeech = () => {
-  const [text, setText] = useState('');
-  const [voice, setVoice] = useState('alloy');
-  const [speed, setSpeed] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [audioUrl, setAudioUrl] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [audioElement, setAudioElement] = useState(null);
+    const [text, setText] = useState('');
+    const [voice, setVoice] = useState('alloy');
+    const [instructions, setInstructions] = useState('Speak in a natural tone.');
+    const [format, setFormat] = useState('mp3');
+    const [audioUrl, setAudioUrl] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-  const voices = [
-    { value: 'alloy', label: 'Alloy' },
-    { value: 'echo', label: 'Echo' },
-    { value: 'fable', label: 'Fable' },
-    { value: 'onyx', label: 'Onyx' },
-    { value: 'nova', label: 'Nova' },
-    { value: 'shimmer', label: 'Shimmer' }
-  ];
+    const handleSubmit = async () => {
+        if (!text) {
+            setError('Por favor ingresa un texto para convertir');
+            return;
+        }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!text.trim()) {
-      setError('Por favor ingresa un texto para convertir a voz');
-      return;
-    }
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Simulamos una URL de audio
-      const mockAudioUrl = 'https://example.com/audio.mp3';
-      setAudioUrl(mockAudioUrl);
-      
-      // Crear elemento de audio
-      const audio = new Audio(mockAudioUrl);
-      audio.playbackRate = speed;
-      setAudioElement(audio);
-      
-    } catch (err) {
-      console.error('Error generating speech:', err);
-      setError(err.message || 'Error al generar el audio');
-    } finally {
-      setLoading(false);
-    }
-  };
+        setLoading(true);
+        setError('');
+        try {
+            const response = await openaiTTSService.textToSpeech(text, {
+                voice,
+                instructions,
+                format
+            });
+            setAudioUrl(response.audio_url);
+        } catch (err) {
+            setError(err.message || 'Error al generar el audio');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const handlePlay = () => {
-    if (audioElement) {
-      if (isPlaying) {
-        audioElement.pause();
-        audioElement.currentTime = 0;
-      } else {
-        audioElement.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
+    return (
+        <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
+            <Typography variant="h4" gutterBottom>
+                OpenAI Text to Speech
+            </Typography>
+            <Typography variant="body1" color="text.secondary" gutterBottom>
+                Convierte texto a voz natural usando la tecnología de OpenAI. Soporta múltiples voces e idiomas.
+            </Typography>
 
-  const handleSpeedChange = (event, newValue) => {
-    setSpeed(newValue);
-    if (audioElement) {
-      audioElement.playbackRate = newValue;
-    }
-  };
-
-  const handleDownload = () => {
-    if (audioUrl) {
-      const link = document.createElement('a');
-      link.href = audioUrl;
-      link.download = 'text-to-speech.mp3';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(text);
-  };
-
-  return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        OpenAI Text to Speech
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Convierte texto a voz natural usando la tecnología de OpenAI
-      </Typography>
-
-      <Card sx={{ mb: 4 }}>
-        <CardContent>
-          <Box component="form" onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Texto a convertir"
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  multiline
-                  rows={4}
-                  required
-                  placeholder="Ingresa el texto que deseas convertir a voz..."
-                />
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Voz</InputLabel>
-                  <Select
-                    value={voice}
-                    onChange={(e) => setVoice(e.target.value)}
-                    label="Voz"
-                  >
-                    {voices.map((voice) => (
-                      <MenuItem key={voice.value} value={voice.value}>
-                        {voice.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
-                <Box sx={{ px: 2 }}>
-                  <Typography gutterBottom>
-                    Velocidad de reproducción
-                  </Typography>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Speed />
-                    <Slider
-                      value={speed}
-                      onChange={handleSpeedChange}
-                      min={0.5}
-                      max={2}
-                      step={0.1}
-                      marks
-                      valueLabelDisplay="auto"
+            <Paper sx={{ p: 3, mt: 3 }}>
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                    <TextField
+                        label="Texto a convertir"
+                        multiline
+                        rows={4}
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        error={!text && error}
+                        helperText={!text && error ? error : ''}
+                        required
                     />
-                  </Stack>
+                </FormControl>
+
+                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                    <FormControl sx={{ minWidth: 120 }}>
+                        <InputLabel>Voz</InputLabel>
+                        <Select value={voice} onChange={(e) => setVoice(e.target.value)} label="Voz">
+                            <MenuItem value="alloy">Alloy</MenuItem>
+                            <MenuItem value="echo">Echo</MenuItem>
+                            <MenuItem value="fable">Fable</MenuItem>
+                            <MenuItem value="onyx">Onyx</MenuItem>
+                            <MenuItem value="nova">Nova</MenuItem>
+                            <MenuItem value="shimmer">Shimmer</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                    <FormControl sx={{ minWidth: 120 }}>
+                        <InputLabel>Formato</InputLabel>
+                        <Select value={format} onChange={(e) => setFormat(e.target.value)} label="Formato">
+                            <MenuItem value="mp3">MP3</MenuItem>
+                            <MenuItem value="opus">Opus</MenuItem>
+                            <MenuItem value="aac">AAC</MenuItem>
+                            <MenuItem value="flac">FLAC</MenuItem>
+                        </Select>
+                    </FormControl>
                 </Box>
-              </Grid>
-              
-              <Grid item xs={12}>
+
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                    <TextField
+                        label="Instrucciones de tono"
+                        value={instructions}
+                        onChange={(e) => setInstructions(e.target.value)}
+                        placeholder="Speak in a natural tone."
+                    />
+                </FormControl>
+
                 <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  disabled={loading}
-                  startIcon={<RecordVoiceOver />}
-                  sx={{ height: '56px' }}
+                    variant="contained"
+                    onClick={handleSubmit}
+                    disabled={loading || !text}
+                    sx={{ mb: 2 }}
                 >
-                  {loading ? <CircularProgress size={24} /> : 'Convertir a Voz'}
+                    {loading ? <CircularProgress size={24} /> : 'Generar Audio'}
                 </Button>
-              </Grid>
-            </Grid>
-          </Box>
-        </CardContent>
-      </Card>
 
-      {loading && (
-        <Box sx={{ mb: 4, textAlign: 'center' }}>
-          <CircularProgress />
-          <Typography variant="body1" sx={{ mt: 2 }}>
-            Generando audio...
-          </Typography>
-        </Box>
-      )}
-
-      {!loading && error && (
-        <Alert severity="error" sx={{ mb: 4 }}>
-          {error}
-        </Alert>
-      )}
-
-      {!loading && audioUrl && (
-        <Paper elevation={2} sx={{ p: 3 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6">
-                      Audio Generado
+                {error && (
+                    <Typography color="error" sx={{ mb: 2 }}>
+                        {error}
                     </Typography>
-                    <Box>
-                      <Tooltip title="Copiar texto">
-                        <IconButton onClick={handleCopy}>
-                          <ContentCopy />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Descargar audio">
-                        <IconButton onClick={handleDownload}>
-                          <Download />
-                        </IconButton>
-                      </Tooltip>
+                )}
+
+                {audioUrl && (
+                    <Box sx={{ mt: 2 }}>
+                        <Typography variant="subtitle1" gutterBottom>
+                            Audio generado:
+                        </Typography>
+                        <audio controls src={audioUrl} style={{ width: '100%' }} />
                     </Box>
-                  </Box>
-                  
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <IconButton 
-                      onClick={handlePlay}
-                      color="primary"
-                      size="large"
-                    >
-                      {isPlaying ? <Stop /> : <PlayArrow />}
-                    </IconButton>
-                    <VolumeUp color="primary" />
-                    <Typography variant="body1">
-                      {isPlaying ? 'Reproduciendo...' : 'Audio listo para reproducir'}
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        </Paper>
-      )}
-    </Container>
-  );
+                )}
+            </Paper>
+        </Box>
+    );
 };
 
 export default OpenAITextToSpeech; 
