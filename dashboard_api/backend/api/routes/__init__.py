@@ -18,7 +18,7 @@ def import_blueprints():
             ai_humanizer_bp, advanced_image_bp, whisper_url_bp, runwayml_bp,
             similarweb_bp, keyword_insight_bp, domain_metrics_bp, ahrefs_dr_bp,
             pagespeed_bp, ssl_checker_bp, website_status_bp, seo_mastermind_bp,
-            image_optimizer_bp, youtube_media_bp
+            image_optimizer_bp, youtube_media_bp, prlabs_bp
         )
         return True
     except ImportError as e:

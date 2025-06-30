@@ -1,14 +1,9 @@
+import React from 'react';
 import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Box, Typography } from '@mui/material';
-import { 
-  Dashboard, 
-  Apps, 
-  Instagram, 
-  Analytics, 
-  TrendingUp, 
-  MonetizationOn, 
-  YouTube,
-  Transform,
-  Language
+import {
+  Dashboard,
+  Apps,
+  Analytics
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
@@ -29,12 +24,6 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
     color: 'white',
     borderRight: 'none',
   },
-}));
-
-// Logo estilizado
-const LogoWrapper = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(4, 3),
-  marginBottom: theme.spacing(3),
 }));
 
 // Botón de navegación estilizado
@@ -68,53 +57,56 @@ const Sidebar = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 3 }}>
         <img src="/logo1.png" alt="Logo Sympho" style={{ width: 120, marginBottom: 16 }} />
       </Box>
-      <List>
-        {/* Menú estático */}
-        {staticMenuItems.map((item) => (
-          <NavButton
-            key={item.text}
-            onClick={() => navigate(item.path)}
-            selected={location.pathname === item.path}
-          >
-            <ListItemIcon sx={{ minWidth: 40, color: 'rgba(255, 255, 255, 0.7)' }}>
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText 
-              primary={item.text} 
-              primaryTypographyProps={{
-                fontSize: '0.95rem',
-                fontWeight: location.pathname === item.path ? 600 : 400
-              }}
-            />
-          </NavButton>
-        ))}
-        {/* Apps favoritas dinámicas */}
-        {favoriteApps.length > 0 && (
-          <Box sx={{ mt: 2, mb: 1, px: 2 }}>
-            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
-              Favoritos
-            </Typography>
-          </Box>
-        )}
-        {favoriteApps.map((app) => (
-          <NavButton
-            key={app.app_id || app.id}
-            onClick={() => navigate(app.route)}
-            selected={location.pathname === app.route}
-          >
-            <ListItemIcon sx={{ minWidth: 40, color: '#FFD700' }}>
-              <StarIcon />
-            </ListItemIcon>
-            <ListItemText 
-              primary={app.title}
-              primaryTypographyProps={{
-                fontSize: '0.95rem',
-                fontWeight: location.pathname === app.route ? 600 : 400
-              }}
-            />
-          </NavButton>
-        ))}
-      </List>
+      <Box sx={{ overflow: 'auto' }}>
+        <List>
+          {/* Menú estático */}
+          {staticMenuItems.map((item) => (
+            <NavButton
+              key={item.text}
+              onClick={() => navigate(item.path)}
+              selected={location.pathname === item.path}
+            >
+              <ListItemIcon sx={{ minWidth: 40, color: 'rgba(255, 255, 255, 0.7)' }}>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText 
+                primary={item.text} 
+                primaryTypographyProps={{
+                  fontSize: '0.95rem',
+                  fontWeight: location.pathname === item.path ? 600 : 400
+                }}
+              />
+            </NavButton>
+          ))}
+
+          {/* Apps favoritas dinámicas */}
+          {favoriteApps.length > 0 && (
+            <Box sx={{ mt: 2, mb: 1, px: 2 }}>
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
+                Favoritos
+              </Typography>
+            </Box>
+          )}
+          {favoriteApps.map((app) => (
+            <NavButton
+              key={app.app_id || app.id}
+              onClick={() => navigate(app.route)}
+              selected={location.pathname === app.route}
+            >
+              <ListItemIcon sx={{ minWidth: 40, color: '#FFD700' }}>
+                <StarIcon />
+              </ListItemIcon>
+              <ListItemText 
+                primary={app.title}
+                primaryTypographyProps={{
+                  fontSize: '0.95rem',
+                  fontWeight: location.pathname === app.route ? 600 : 400
+                }}
+              />
+            </NavButton>
+          ))}
+        </List>
+      </Box>
     </StyledDrawer>
   );
 };

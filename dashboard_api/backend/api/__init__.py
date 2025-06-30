@@ -32,6 +32,8 @@ def create_app(config_object):
     from api.routes.tiktok_api import tiktok_api_bp
     from api.routes.ai_humanizer import ai_humanizer_bp
     from api.routes.seo_mastermind import seo_mastermind_bp
+    from api.routes.prlabs import prlabs_bp
+    from api.routes.openai_tts import openai_tts_bp
     
     print("Registrando blueprint: auth_bp en /api/auth")
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -54,8 +56,8 @@ def create_app(config_object):
     print("Registrando blueprint: instagram_realtime_bp en /api/instagram-realtime")
     app.register_blueprint(instagram_realtime_bp, url_prefix='/api/instagram-realtime')
     
-    print("Registrando blueprint: youtube_media_bp en /api/youtube")
-    app.register_blueprint(youtube_media_bp, url_prefix='/api/youtube')
+    print("Registrando blueprint: youtube_media_bp en /api/youtube-media")
+    app.register_blueprint(youtube_media_bp, url_prefix='/api/youtube-media')
     
     print("Registrando blueprint: file_converter_bp en /api/file-converter")
     app.register_blueprint(file_converter_bp, url_prefix='/api/file-converter')
@@ -68,6 +70,12 @@ def create_app(config_object):
     
     print("Registrando blueprint: seo_mastermind_bp en /api/seo-mastermind")
     app.register_blueprint(seo_mastermind_bp, url_prefix='/api/seo-mastermind')
+    
+    print("Registrando blueprint: prlabs_bp en /api/prlabs")
+    app.register_blueprint(prlabs_bp, url_prefix='/api/prlabs')
+
+    print("Registrando blueprint: openai_tts_bp en /api/openai-tts")
+    app.register_blueprint(openai_tts_bp, url_prefix='/api/openai-tts')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers
