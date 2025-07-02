@@ -17,7 +17,6 @@ from api.routes.google_paid_search import google_paid_search_bp
 from api.routes.apps import apps_bp
 from api.routes.tiktok_api import tiktok_api_bp
 from api.routes.file_converter import file_converter_bp
-from api.routes.midjourney import midjourney_bp
 from api.routes.text_extract import text_extract_bp
 from api.routes.pdf_converter import pdf_converter_bp
 from api.routes.snap_video import snap_video_bp
@@ -48,7 +47,6 @@ BLUEPRINT_MAPPING = {
     apps_bp: '/api/apps',
     tiktok_api_bp: '/api/tiktok',
     file_converter_bp: '/api/file-converter',
-    midjourney_bp: '/api/midjourney',
     text_extract_bp: '/api/text-extract',
     pdf_converter_bp: '/api/pdf-converter',
     snap_video_bp: '/api/snap-video',

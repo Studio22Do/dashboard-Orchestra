@@ -189,23 +189,7 @@ const Dashboard = () => {
             setDrawerOpen(true);
           }
         },
-        {
-          id: 'midjourney',
-          title: 'Midjourney Best Experience',
-          icon: Image,
-          onClick: () => {
-            setSelectedApp({
-              id: 'midjourney',
-              title: 'Midjourney',
-              description: 'Genera imágenes artísticas de alta calidad con IA',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-              category: 'Creative & Content',
-              route: '/apps/midjourney',
-              apiName: 'Midjourney API',
-            });
-            setDrawerOpen(true);
-          }
-        },
+
         {
           id: 'word-count',
           title: 'Word Count',

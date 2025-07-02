@@ -84,7 +84,6 @@ El dashboard incluye tres categorías principales de apps:
 2. **Creative & Content**
    - YouTube Media Downloader
    - File Converter
-   - Midjourney
    - Word Count
    - PDF to Text
    - Snap Video
