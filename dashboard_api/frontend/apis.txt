@@ -8,7 +8,6 @@ ScrapTik ✅
 Creative & Content (Parcialmente Implementadas):
 YouTube Media Downloader ✅
 All in One File Converter ✅
-Midjourney Best Experience ✅
 Word Count ✅
 PDF to Text Converter ✅
 Snap Video ✅

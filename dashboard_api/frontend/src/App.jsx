@@ -33,7 +33,7 @@ import AhrefsRankChecker from './pages/AhrefsRankChecker/AhrefsRankChecker';
 import PageSpeedInsights from './pages/PageSpeedInsights/PageSpeedInsights';
 import ProductDescriptionGenerator from './pages/ProductDescriptionGenerator/ProductDescriptionGenerator';
 import SeoMastermind from './pages/SEOMastermind/SEOMastermind';
-import MidjourneyExperience from './pages/MidjourneyExperience/MidjourneyExperience';
+
 import WordCount from './pages/WordCount/WordCount';
 import PdfToText from './pages/PdfToText/PdfToText';
 import SnapVideo from './pages/SnapVideo/SnapVideo';
@@ -384,11 +384,7 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/apps/midjourney" element={
-            <ProtectedRoute>
-              <MidjourneyExperience />
-            </ProtectedRoute>
-          } />
+
           
           <Route path="/apps/word-count" element={
             <ProtectedRoute>
