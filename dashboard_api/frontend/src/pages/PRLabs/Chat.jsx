@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Container,
   Box,
@@ -23,14 +23,17 @@ const ChatContainer = styled(Container)(({ theme }) => ({
   paddingBottom: theme.spacing(4),
   height: '100vh',
   display: 'flex',
-  flexDirection: 'column'
+  flexDirection: 'column',
 }));
 
 const MessageContainer = styled(Box)(({ theme }) => ({
-  flexGrow: 1,
+  minHeight: '120px',
+  maxHeight: '60vh',
   overflowY: 'auto',
   padding: theme.spacing(2),
-  marginBottom: theme.spacing(2)
+  marginBottom: theme.spacing(2),
+  display: 'flex',
+  flexDirection: 'column-reverse',
 }));
 
 const Message = styled(Paper)(({ theme, isUser }) => ({
@@ -45,7 +48,7 @@ const Message = styled(Paper)(({ theme, isUser }) => ({
 const InputContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
   backgroundColor: theme.palette.background.paper,
-  borderTop: `1px solid ${theme.palette.divider}`
+  borderTop: `1px solid ${theme.palette.divider}`,
 }));
 
 const PRLabsChat = () => {
@@ -54,6 +57,13 @@ const PRLabsChat = () => {
   const [messages, setMessages] = useState([]);
   const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
   const [loading, setLoading] = useState(false);
+  const messageEndRef = useRef(null);
+
+  useEffect(() => {
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   const handleSend = async () => {
     if (!message.trim()) return;
@@ -69,13 +79,15 @@ const PRLabsChat = () => {
     setLoading(true);
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch('/api/prlabs/chat', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify({
-          messages: [{ role: 'user', content: message }],
+          prompt: message,
           model: selectedModel
         })
       });
@@ -139,6 +151,7 @@ const PRLabsChat = () => {
               </Typography>
             </Message>
           ))}
+          <div ref={messageEndRef} />
         </Box>
       </MessageContainer>
 

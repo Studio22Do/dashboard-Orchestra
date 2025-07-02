@@ -16,11 +16,11 @@ def chat():
         if not prompt:
             return jsonify({'error': 'El prompt es requerido'}), 400
 
-        url = "https://prlabs-gpt4.p.rapidapi.com/chat"
+        url = "https://chatgpt-42.p.rapidapi.com/chat"
         headers = {
             "content-type": "application/json",
             "X-RapidAPI-Key": current_app.config['RAPIDAPI_KEY'],
-            "X-RapidAPI-Host": "prlabs-gpt4.p.rapidapi.com"
+            "X-RapidAPI-Host": "chatgpt-42.p.rapidapi.com"
         }
         payload = {
             "model": model,
