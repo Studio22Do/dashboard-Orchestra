@@ -40,7 +40,6 @@ import {
 const AIHumanizer = () => {
   const [promptData, setPromptData] = useState({
     type: 'text',
-    language: 'es',
     tone: 'professional',
     length: 'medium',
     prompt: ''
@@ -81,12 +80,12 @@ const AIHumanizer = () => {
       }
       const data = await response.json();
       setGeneratedContent({
-        content: data.humanized_text,
+        content: data.contenido_generado || 'No se pudo generar contenido',
         metadata: {
-          type: promptData.type,
-          language: promptData.language,
-          tone: promptData.tone,
-          length: promptData.length,
+          type: data.metadatos.tipo,
+          language: data.metadatos.idioma,
+          tone: data.metadatos.tono,
+          length: data.metadatos.longitud,
           timestamp: new Date().toLocaleString()
         },
         suggestions: [
@@ -130,7 +129,7 @@ const AIHumanizer = () => {
         <CardContent>
           <Box component="form" onSubmit={handleSubmit}>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
                   <InputLabel>Tipo de Contenido</InputLabel>
                   <Select
@@ -140,29 +139,12 @@ const AIHumanizer = () => {
                     label="Tipo de Contenido"
                   >
                     <MenuItem value="text">Texto</MenuItem>
-                    <MenuItem value="code">Código</MenuItem>
                     <MenuItem value="article">Artículo</MenuItem>
-                    <MenuItem value="translation">Traducción</MenuItem>
+                    <MenuItem value="code">Código</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Idioma</InputLabel>
-                  <Select
-                    name="language"
-                    value={promptData.language}
-                    onChange={handleInputChange}
-                    label="Idioma"
-                  >
-                    <MenuItem value="es">Español</MenuItem>
-                    <MenuItem value="en">Inglés</MenuItem>
-                    <MenuItem value="fr">Francés</MenuItem>
-                    <MenuItem value="de">Alemán</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
                   <InputLabel>Tono</InputLabel>
                   <Select
@@ -178,7 +160,7 @@ const AIHumanizer = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
                   <InputLabel>Longitud</InputLabel>
                   <Select
@@ -194,6 +176,9 @@ const AIHumanizer = () => {
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  La API detecta y procesa automáticamente el idioma del texto ingresado
+                </Typography>
                 <TextField
                   fullWidth
                   label="Prompt"

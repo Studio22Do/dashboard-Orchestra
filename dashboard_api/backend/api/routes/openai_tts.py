@@ -1,5 +1,6 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, send_file
 import requests
+import io
 from flask_jwt_extended import jwt_required
 
 openai_tts_bp = Blueprint('openai_tts', __name__)
@@ -34,9 +35,21 @@ def text_to_speech():
             "format": output_format
         }
 
+        # Hacer la petición a la API
         response = requests.post(url, json=payload, headers=headers)
         response.raise_for_status()
-        return jsonify(response.json()), 200
+
+        # Crear un BytesIO con el contenido de audio
+        audio_data = io.BytesIO(response.content)
+        audio_data.seek(0)
+
+        # Enviar el archivo de audio directamente
+        return send_file(
+            audio_data,
+            mimetype=f'audio/{output_format}',
+            as_attachment=True,
+            download_name=f'speech.{output_format}'
+        )
 
     except requests.exceptions.HTTPError as errh:
         return jsonify({'error': str(errh), 'details': response.text}), response.status_code

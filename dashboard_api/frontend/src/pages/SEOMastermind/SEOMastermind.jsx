@@ -158,42 +158,18 @@ const SEOMastermind = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        mode: 'cors',
-        credentials: 'include',
-        redirect: 'follow',
         body: JSON.stringify({ keyword })
       });
 
-      // Manejar redirecciones manualmente si es necesario
-      if (response.redirected) {
-        console.log('Redirigiendo a:', response.url);
-        const redirectResponse = await fetch(response.url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          credentials: 'include',
-          body: JSON.stringify({ keyword })
-        });
-        
-        if (!redirectResponse.ok) {
-          throw new Error(`Error ${redirectResponse.status}: ${redirectResponse.statusText}`);
-        }
-        
-        const data = await redirectResponse.json();
-        setKeywordData(data);
-      } else if (!response.ok) {
+      if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || `Error ${response.status}: ${response.statusText}`);
-      } else {
-        const data = await response.json();
-        setKeywordData(data);
       }
+
+      const data = await response.json();
+      setKeywordData(data);
 
       dispatch(addNotification({
         message: 'Análisis de keywords completado exitosamente',
@@ -243,22 +219,30 @@ const SEOMastermind = () => {
                     </TableSortLabel>
                   </TableCell>
                   <TableCell align="right">
-                    <TableSortLabel
-                      active={orderBy === 'difficulty'}
-                      direction={orderBy === 'difficulty' ? order : 'asc'}
-                      onClick={() => handleSort('difficulty')}
-                    >
-                      Dificultad
-                    </TableSortLabel>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                      <TableSortLabel
+                        active={orderBy === 'difficulty'}
+                        direction={orderBy === 'difficulty' ? order : 'asc'}
+                        onClick={() => handleSort('difficulty')}
+                      >
+                        Dificultad
+                      </TableSortLabel>
+                      <Tooltip title="Indica qué tan difícil es posicionar esta keyword (0-100):
+                        • 0-30: Fácil
+                        • 31-60: Moderado
+                        • 61-80: Difícil
+                        • 81-100: Muy difícil" arrow>
+                        <InfoIcon sx={{ ml: 1, fontSize: 16, opacity: 0.7 }} />
+                      </Tooltip>
+                    </Box>
                   </TableCell>
                   <TableCell align="right">
-                    <TableSortLabel
-                      active={orderBy === 'volume'}
-                      direction={orderBy === 'volume' ? order : 'asc'}
-                      onClick={() => handleSort('volume')}
-                    >
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                       Volumen
-                    </TableSortLabel>
+                      <Tooltip title="Número promedio de búsquedas mensuales que recibe esta keyword" arrow>
+                        <InfoIcon sx={{ ml: 1, fontSize: 16, opacity: 0.7 }} />
+                      </Tooltip>
+                    </Box>
                   </TableCell>
                 </TableRow>
               </TableHead>
