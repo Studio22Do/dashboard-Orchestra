@@ -44,14 +44,24 @@ export const OUTPUT_FORMATS = [
 const openaiTTSService = {
     textToSpeech: async (text, options = {}) => {
         try {
-            const response = await axios.post(`${API_URL}/api/openai-tts/speech`, {
+            const url = `${API_URL}/openai-tts/speech`;
+            console.log('URL OpenAI TTS:', url);
+            
+            // Configurar axios para recibir una respuesta blob
+            const response = await axios.post(url, {
                 input: text,
                 voice: options.voice || 'alloy',
                 model: options.model || 'tts-1',
                 instructions: options.instructions || 'Speak in a natural tone.',
                 format: options.format || 'mp3'
+            }, {
+                ...getAxiosConfig(),
+                responseType: 'blob' // Importante: especificar que esperamos un blob
             });
-            return response.data;
+
+            // Crear URL del blob para reproducción
+            const audioUrl = URL.createObjectURL(new Blob([response.data], { type: 'audio/mp3' }));
+            return { audio_url: audioUrl };
         } catch (error) {
             throw error.response?.data || error.message;
         }

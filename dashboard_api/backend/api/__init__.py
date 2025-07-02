@@ -73,7 +73,7 @@ def create_app(config_object):
     
     print("Registrando blueprint: prlabs_bp en /api/prlabs")
     app.register_blueprint(prlabs_bp, url_prefix='/api/prlabs')
-
+    
     print("Registrando blueprint: openai_tts_bp en /api/openai-tts")
     app.register_blueprint(openai_tts_bp, url_prefix='/api/openai-tts')
     
