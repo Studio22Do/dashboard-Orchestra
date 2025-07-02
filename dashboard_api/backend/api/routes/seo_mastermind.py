@@ -4,11 +4,13 @@ import requests
 
 seo_mastermind_bp = Blueprint('seo_mastermind', __name__)
 
+@seo_mastermind_bp.route('', methods=['OPTIONS'])
 @seo_mastermind_bp.route('/', methods=['OPTIONS'])
 def handle_options():
     """Manejar peticiones OPTIONS para CORS"""
     return '', 200
 
+@seo_mastermind_bp.route('', methods=['POST'])
 @seo_mastermind_bp.route('/', methods=['POST'])
 def generate_seo():
     """Generar análisis SEO para una keyword"""
