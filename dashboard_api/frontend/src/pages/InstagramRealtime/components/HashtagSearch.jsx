@@ -127,35 +127,28 @@ const HashtagSearch = ({ setError }) => {
                 </Typography>
               </Box>
             </Box>
-            
-            {hashtagData.description && (
-              <>
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="body1">{hashtagData.description}</Typography>
-              </>
-            )}
           </Paper>
           
-          {hashtagData.top_posts && hashtagData.top_posts.length > 0 && (
+          {hashtagData.posts && hashtagData.posts.length > 0 ? (
             <Box sx={{ mb: 4 }}>
               <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                <FavoriteBorder sx={{ mr: 1 }} /> Posts Populares
+                <Tag sx={{ mr: 1 }} /> Posts con este Hashtag
               </Typography>
               <Divider sx={{ mb: 3 }} />
               
               <Grid container spacing={3}>
-                {hashtagData.top_posts.slice(0, 6).map((post, index) => (
+                {hashtagData.posts.map((post, index) => (
                   <Grid item xs={12} sm={6} md={4} key={index}>
                     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                       <CardMedia
                         component="img"
                         height="280"
-                        image={post.image_url || post.display_url || 'https://via.placeholder.com/400?text=No+Image'}
+                        image={post.image_versions2?.candidates?.[0]?.url || 'https://via.placeholder.com/400?text=No+Image'}
                         alt={`Post ${index + 1}`}
                       />
                       
                       <CardContent sx={{ flexGrow: 1 }}>
-                        {post.caption && (
+                        {post.caption?.text && (
                           <Typography variant="body2" color="text.secondary" sx={{
                             mb: 2,
                             overflow: 'hidden',
@@ -164,7 +157,7 @@ const HashtagSearch = ({ setError }) => {
                             WebkitLineClamp: 3,
                             WebkitBoxOrient: 'vertical',
                           }}>
-                            {post.caption}
+                            {post.caption.text}
                           </Typography>
                         )}
                         
@@ -184,22 +177,19 @@ const HashtagSearch = ({ setError }) => {
                         </Stack>
                       </CardContent>
                       
-                      {post.owner && (
+                      {post.user && (
                         <CardActions sx={{ justifyContent: 'space-between', alignItems: 'center', px: 2, pb: 2 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <Avatar 
-                              src={post.owner.profile_pic_url} 
+                              src={post.user.profile_pic_url} 
                               sx={{ width: 32, height: 32, mr: 1 }}
                             >
                               <PersonOutline />
                             </Avatar>
                             <Typography variant="body2">
-                              {post.owner.username}
+                              {post.user.username}
                             </Typography>
                           </Box>
-                          <IconButton size="small">
-                            <ArrowForward fontSize="small" />
-                          </IconButton>
                         </CardActions>
                       )}
                     </Card>
@@ -207,89 +197,15 @@ const HashtagSearch = ({ setError }) => {
                 ))}
               </Grid>
             </Box>
-          )}
-          
-          {hashtagData.recent_posts && hashtagData.recent_posts.length > 0 && (
-            <Box>
-              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                <Tag sx={{ mr: 1 }} /> Posts Recientes
+          ) : (
+            <Paper elevation={0} sx={{ p: 3, textAlign: 'center', bgcolor: 'background.default' }}>
+              <Typography variant="h6">No se encontraron publicaciones con este hashtag</Typography>
+              <Typography variant="body2" color="text.secondary">
+                Intenta con otro hashtag o verifica que esté escrito correctamente.
               </Typography>
-              <Divider sx={{ mb: 3 }} />
-              
-              <Grid container spacing={2}>
-                {hashtagData.recent_posts.slice(0, 12).map((post, index) => (
-                  <Grid item xs={6} sm={4} md={2} key={index}>
-                    <Box
-                      sx={{
-                        position: 'relative',
-                        pb: '100%', // Proporción cuadrada
-                        overflow: 'hidden',
-                        borderRadius: 1,
-                        '&:hover .overlay': {
-                          opacity: 1,
-                        },
-                      }}
-                    >
-                      <Box
-                        component="img"
-                        src={post.image_url || post.display_url || 'https://via.placeholder.com/400?text=No+Image'}
-                        alt={`Post ${index + 1}`}
-                        sx={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                        }}
-                      />
-                      <Box
-                        className="overlay"
-                        sx={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '100%',
-                          height: '100%',
-                          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          opacity: 0,
-                          transition: 'opacity 0.3s',
-                        }}
-                      >
-                        <Stack direction="row" spacing={2} alignItems="center">
-                          <Box sx={{ display: 'flex', alignItems: 'center', color: 'white' }}>
-                            <FavoriteBorder sx={{ mr: 0.5 }} />
-                            <Typography variant="body2">
-                              {formatNumber(post.like_count)}
-                            </Typography>
-                          </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', color: 'white' }}>
-                            <ChatBubbleOutline sx={{ mr: 0.5 }} />
-                            <Typography variant="body2">
-                              {formatNumber(post.comment_count)}
-                            </Typography>
-                          </Box>
-                        </Stack>
-                      </Box>
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
+            </Paper>
           )}
         </Box>
-      )}
-
-      {!loading && hashtagData && (!hashtagData.top_posts && !hashtagData.recent_posts) && (
-        <Paper elevation={0} sx={{ p: 3, textAlign: 'center', bgcolor: 'background.default' }}>
-          <Typography variant="h6">No se encontraron publicaciones con este hashtag</Typography>
-          <Typography variant="body2" color="text.secondary">
-            Intenta con otro hashtag o verifica que esté escrito correctamente.
-          </Typography>
-        </Paper>
       )}
     </Box>
   );

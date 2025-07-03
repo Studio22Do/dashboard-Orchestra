@@ -614,7 +614,7 @@ const AhrefsRankChecker = () => {
                 <Typography color="text.secondary" align="center" py={3}>
                   No se encontraron palabras clave relacionadas
                 </Typography>
-              )}
+            )}
             </Box>
           )}
         </Paper>
