@@ -24,6 +24,7 @@ import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Tooltip from '@mui/material/Tooltip';
+import StoryViewer from './components/StoryViewer';
 
 // Base URL de la API
 const API_URL = 'http://localhost:5000/api';
@@ -157,6 +158,8 @@ const InstagramStats = () => {
           </Box>
         </CardContent>
       </Card>
+
+      <StoryViewer />
 
       {loading && (
         <Box sx={{ mb: 4 }}>

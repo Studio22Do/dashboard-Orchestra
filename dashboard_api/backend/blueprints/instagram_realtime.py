@@ -22,25 +22,46 @@ def get_hashtags():
             "x-rapidapi-host": "instagram-realtimeapi.p.rapidapi.com"
         }
         
-        # URL para búsqueda de hashtags (según el ejemplo proporcionado)
-        url = "https://instagram-realtimeapi.p.rapidapi.com/instagram/hashtags"
-        params = {"query": hashtag}
+        # 1. Obtener información general del hashtag
+        info_url = "https://instagram-realtimeapi.p.rapidapi.com/instagram/hashtags"
+        info_params = {"query": hashtag}
         
-        logger.debug(f"Buscando hashtag: {hashtag}")
-        logger.debug(f"Realizando solicitud a: {url} con params={params}")
+        logger.debug(f"Buscando información del hashtag: {hashtag}")
+        info_response = requests.get(info_url, headers=headers, params=info_params, timeout=15)
         
-        response = requests.get(url, headers=headers, params=params, timeout=15)
-        logger.debug(f"Respuesta: Status={response.status_code}, Content={response.text[:200]}...")
+        # 2. Obtener posts del hashtag
+        posts_url = f"https://instagram-realtimeapi.p.rapidapi.com/instagram/hashtags/{hashtag}/sections"
+        posts_params = {"rank_token": "b"}
         
-        if response.status_code == 200:
-            hashtag_data = response.json()
-            return jsonify(hashtag_data)
+        logger.debug(f"Buscando posts del hashtag: {hashtag}")
+        posts_response = requests.get(posts_url, headers=headers, params=posts_params, timeout=15)
+        
+        # Combinar resultados
+        result = {
+            'name': hashtag,
+            'posts': []
+        }
+        
+        if info_response.status_code == 200:
+            hashtag_info = info_response.json()
+            # Añadir información general del hashtag
+            if isinstance(hashtag_info, dict):
+                result.update(hashtag_info)
         else:
-            logger.error(f"Error en la API de hashtags: {response.status_code} - {response.text}")
-            return jsonify({
-                'error': 'Error al obtener datos de hashtags',
-                'details': response.text
-            }), response.status_code
+            logger.error(f"Error en la API de info de hashtags: {info_response.status_code} - {info_response.text}")
+        
+        if posts_response.status_code == 200:
+            posts_data = posts_response.json()
+            # Procesar y aplanar la estructura de posts
+            if isinstance(posts_data, dict) and 'sections' in posts_data:
+                for section in posts_data['sections']:
+                    if isinstance(section, dict) and 'media' in section:
+                        result['posts'].extend(section['media'])
+        else:
+            logger.error(f"Error en la API de posts de hashtags: {posts_response.status_code} - {posts_response.text}")
+        
+        logger.debug(f"Enviando respuesta con {len(result['posts'])} posts")
+        return jsonify(result)
     
     except requests.RequestException as e:
         logger.error(f"Error de conexión para hashtag {hashtag}: {str(e)}")
@@ -48,9 +69,6 @@ def get_hashtags():
             'error': 'Error al conectar con la API de Instagram', 
             'details': str(e)
         }), 503
-    except Exception as e:
-        logger.error(f"Error inesperado: {str(e)}")
-        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
 
 @instagram_blueprint.route('/profiles', methods=['GET'])
 @handle_api_errors
