@@ -53,10 +53,9 @@ const SimilarWebInsights = () => {
         // Si no es una URL válida, usar el texto tal cual
       }
       // 1. Obtener detalles del sitio
-      const detailsRes = await fetch('/api/similarweb/website-details', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ domain })
+      const detailsRes = await fetch(`/api/similarweb/website-details?domain=${encodeURIComponent(domain)}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
       });
       const detailsData = await detailsRes.json();
       setWebsiteDetails(detailsData);
