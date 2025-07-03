@@ -159,6 +159,8 @@ const InstagramStats = () => {
         </CardContent>
       </Card>
 
+      <StoryViewer />
+
       {loading && (
         <Box sx={{ mb: 4 }}>
           <Skeleton variant="rectangular" height={200} sx={{ mb: 2 }} />
@@ -173,7 +175,7 @@ const InstagramStats = () => {
       )}
 
       {!loading && profileData && (
-        <Box sx={{ mb: 4 }}>
+        <Box>
           {/* Perfil básico */}
           <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
             <Grid container spacing={3}>
@@ -196,53 +198,61 @@ const InstagramStats = () => {
                     <Chip label="Business" color="info" size="small" sx={{ ml: 1 }} />
                   )}
                 </Box>
-                <Typography variant="h6" gutterBottom>
-                  {profileData.full_name}
-                </Typography>
-                <Typography variant="body1" color="text.secondary" paragraph>
-                  {profileData.biography}
-                </Typography>
-                <Grid container spacing={3}>
-                  <Grid item xs={4}>
-                    <Typography variant="h6">
-                      {profileData.edge_followed_by?.count?.toLocaleString()}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                {profileData.full_name && (
+                  <Typography variant="h6" gutterBottom>
+                    {profileData.full_name}
+                  </Typography>
+                )}
+                {profileData.biography && (
+                  <Typography variant="body1" paragraph>
+                    {profileData.biography}
+                  </Typography>
+                )}
+                <Grid container spacing={2}>
+                  <Grid item xs={6} sm={3}>
+                    <Typography variant="subtitle2" color="text.secondary">
                       Seguidores
                     </Typography>
-                  </Grid>
-                  <Grid item xs={4}>
                     <Typography variant="h6">
-                      {profileData.edge_follow?.count?.toLocaleString()}
+                      {profileData.follower_count?.toLocaleString()}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                  </Grid>
+                  <Grid item xs={6} sm={3}>
+                    <Typography variant="subtitle2" color="text.secondary">
                       Siguiendo
                     </Typography>
-                  </Grid>
-                  <Grid item xs={4}>
                     <Typography variant="h6">
-                      {profileData.edge_owner_to_timeline_media?.count?.toLocaleString()}
+                      {profileData.following_count?.toLocaleString()}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                  </Grid>
+                  <Grid item xs={6} sm={3}>
+                    <Typography variant="subtitle2" color="text.secondary">
                       Publicaciones
+                    </Typography>
+                    <Typography variant="h6">
+                      {profileData.media_count?.toLocaleString()}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} sm={3}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Categoría
+                    </Typography>
+                    <Typography variant="h6">
+                      {profileData.category || 'N/A'}
                     </Typography>
                   </Grid>
                 </Grid>
-                <Box sx={{ mt: 2 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Categoría: {profileData.category_name || 'No especificada'}
-                  </Typography>
-                </Box>
+                {profileData.external_url && (
+                  <Box sx={{ mt: 2 }}>
+                    <Button href={profileData.external_url} target="_blank" rel="noopener" variant="outlined" color="primary">
+                      Enlace Externo
+                    </Button>
+                  </Box>
+                )}
               </Grid>
             </Grid>
           </Paper>
-        </Box>
-      )}
 
-      <StoryViewer />
-
-      {!loading && profileData && (
-        <Box>
           {/* Highlights */}
           {highlights && highlights.data && highlights.data.length > 0 && (
             <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
