@@ -220,13 +220,13 @@ const SEOMastermind = () => {
                   </TableCell>
                   <TableCell align="right">
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                      <TableSortLabel
-                        active={orderBy === 'difficulty'}
-                        direction={orderBy === 'difficulty' ? order : 'asc'}
-                        onClick={() => handleSort('difficulty')}
-                      >
-                        Dificultad
-                      </TableSortLabel>
+                    <TableSortLabel
+                      active={orderBy === 'difficulty'}
+                      direction={orderBy === 'difficulty' ? order : 'asc'}
+                      onClick={() => handleSort('difficulty')}
+                    >
+                      Dificultad
+                    </TableSortLabel>
                       <Tooltip title="Indica qué tan difícil es posicionar esta keyword (0-100):
                         • 0-30: Fácil
                         • 31-60: Moderado
