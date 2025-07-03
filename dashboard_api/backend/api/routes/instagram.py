@@ -333,7 +333,6 @@ def proxy_media():
         if response.status_code != 200:
             return jsonify({'error': f'Error al obtener el medio: {response.status_code}'}), response.status_code
 
-        # Devolver la imagen/video con el tipo de contenido correcto
         return Response(
             response.content,
             content_type=response.headers.get('content-type', 'application/octet-stream'),
@@ -344,7 +343,6 @@ def proxy_media():
         )
 
     except Exception as e:
-        print(f"Error en proxy_media: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 # Rutas Realtime API
