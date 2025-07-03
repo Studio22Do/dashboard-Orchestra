@@ -54,6 +54,8 @@ const StoryViewer = () => {
         config
       );
 
+      console.log('Respuesta de la API:', response.data);
+
       if (response.data.error) {
         throw new Error(response.data.error);
       }
@@ -77,6 +79,7 @@ const StoryViewer = () => {
         setStoryData(response.data);
       }
     } catch (err) {
+      console.error('Error completo:', err);
       let errorMessage = err.response?.data?.message || err.response?.data?.error || err.message;
       
       // Manejar error de rate limit
@@ -96,6 +99,13 @@ const StoryViewer = () => {
     const isVideo = mediaItem.media_type === 'video' && mediaItem.video_url;
     const mediaUrl = isVideo ? mediaItem.video_url : mediaItem.thumbnail_url;
     
+    console.log('Renderizando media item:', {
+      id: mediaItem.id,
+      type: mediaItem.media_type,
+      url: mediaUrl,
+      thumbnail: mediaItem.thumbnail_url
+    });
+
     if (!mediaUrl) {
       return (
         <Alert severity="warning" sx={{ mb: 2 }}>
@@ -130,6 +140,7 @@ const StoryViewer = () => {
                 borderRadius: '8px'
               }}
               onError={(e) => {
+                console.error('Error al cargar la imagen:', mediaUrl);
                 const fallbackUrl = getProxyUrl(mediaItem.thumbnail_url);
                 if (e.target.src !== fallbackUrl) {
                   e.target.src = fallbackUrl;
@@ -169,6 +180,7 @@ const StoryViewer = () => {
                   borderRadius: '8px'
                 }}
                 onError={(e) => {
+                  console.error('Error al cargar la portada:', storyData.cover_media);
                 }}
               />
             </Box>
