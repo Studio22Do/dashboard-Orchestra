@@ -11,9 +11,11 @@ ENDPOINTS = {
     'rotate': 'rotate',
     'thumbnail': 'thumbnail',
     'transpose': 'transpose',
+    'pdf_to_images': 'pdf_to_images',
+    'convert': 'convert',
 }
 
-@advanced_image_bp.route('/api/image-manipulation', methods=['POST'])
+@advanced_image_bp.route('/image-manipulation', methods=['POST'])
 def image_manipulation():
     data = request.json
     operation = data.get('operation')
@@ -27,7 +29,14 @@ def image_manipulation():
 
     url = f"https://advanced-image-manipulation-api.p.rapidapi.com/{ENDPOINTS[operation]}"
     querystring = {'source_url': source_url}
-    querystring.update({k: v for k, v in params.items() if v})
+
+    if operation == 'convert':
+        convert_to = params.get('convert_to')
+        if not convert_to:
+            return jsonify({'error': 'El formato de conversión es obligatorio'}), 400
+        querystring['convert_to'] = convert_to
+    else:
+        querystring.update({k: v for k, v in params.items() if v})
 
     headers = {
         "x-rapidapi-key": os.environ.get('RAPIDAPI_KEY', ''),

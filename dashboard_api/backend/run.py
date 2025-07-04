@@ -1,6 +1,10 @@
 import os
-from app import app
 import sys
+
+# Añadir el directorio actual al path de Python
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from app import app
 import logging
 
 logger = logging.getLogger(__name__)

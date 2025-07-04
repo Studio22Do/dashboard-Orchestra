@@ -23,7 +23,7 @@ def get_similarweb_insights():
     except requests.exceptions.HTTPError as errh:
         return jsonify({'error': str(errh), 'details': response.text}), response.status_code
     except requests.exceptions.RequestException as err:
-        return jsonify({'error': 'Error de conexión con la API externa', 'details': str(err)}), 502
+        return jsonify({'error': 'Error de conexión con la API externa', 'details': str(err)}), 502 
 
 @similarweb_bp.route('/website-details', methods=['GET'])
 def get_website_details():

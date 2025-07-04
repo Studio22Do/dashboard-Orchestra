@@ -21,13 +21,12 @@ import Breadcrumbs from '../../components/common/Breadcrumbs';
 import VideoSearch from './components/VideoSearch';
 import VideoDetails from './components/VideoDetails';
 import PlaylistDetails from './components/PlaylistDetails';
-import DownloadOptions from './components/DownloadOptions';
 import ChannelVideos from './components/ChannelVideos';
 
 const YouTubeMedia = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [error, setError] = useState(null);
-  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [channelId, setChannelId] = useState('');
   const [showChannelVideos, setShowChannelVideos] = useState(false);
@@ -79,13 +78,7 @@ const YouTubeMedia = () => {
             icon={<VideoLibrary />} 
             label="Detalles del Video" 
             iconPosition="start"
-            disabled={!selectedVideo}
-          />
-          <Tab 
-            icon={<DownloadForOffline />} 
-            label="Opciones de Descarga" 
-            iconPosition="start"
-            disabled={!selectedVideo}
+            disabled={!selectedVideoId}
           />
           <Tab 
             icon={<PlaylistPlay />} 
@@ -104,19 +97,17 @@ const YouTubeMedia = () => {
         {activeTab === 0 && (
           <VideoSearch 
             setError={setError} 
-            setSelectedVideo={setSelectedVideo} 
             onSelectVideo={(video) => {
-              console.log('Video seleccionado desde búsqueda:', video);
-              setSelectedVideo(video);
+              setSelectedVideoId(video.id);
               setActiveTab(1);
             }}
           />
         )}
         
         {activeTab === 1 && (
-          selectedVideo ? (
+          selectedVideoId ? (
             <VideoDetails 
-              video={selectedVideo} 
+              videoId={selectedVideoId} 
               setError={setError}
             />
           ) : (
@@ -125,34 +116,32 @@ const YouTubeMedia = () => {
         )}
         
         {activeTab === 2 && (
-          selectedVideo ? (
-            <DownloadOptions 
-              videoId={selectedVideo.id} 
-              setError={setError}
-            />
-          ) : (
-            <Typography variant="body2" color="text.secondary">Selecciona un video para ver las opciones de descarga.</Typography>
-          )
-        )}
-        
-        {activeTab === 3 && (
           <PlaylistDetails 
             setError={setError}
             selectedPlaylist={selectedPlaylist}
             setSelectedPlaylist={setSelectedPlaylist}
             onSelectVideo={(video) => {
-              console.log('Video seleccionado desde playlist:', video);
-              setSelectedVideo(video);
+              setSelectedVideoId(video.id);
               setActiveTab(1);
             }}
           />
         )}
         
-        {activeTab === 4 && (
+        {activeTab === 3 && (
           <Box>
             <Paper sx={{ p: 3, mb: 3 }}>
               <Typography variant="h6" gutterBottom>Explora videos de un canal</Typography>
-              <Box component="form" onSubmit={e => { e.preventDefault(); setShowChannelVideos(true); }} sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Box component="form" onSubmit={e => {
+                e.preventDefault();
+                const extracted = extractChannelId(channelId);
+                if (!extracted) {
+                  setError('Por favor, ingresa un ID o URL de canal válido. No se permiten URLs de playlist ni valores vacíos.');
+                  setShowChannelVideos(false);
+                  return;
+                }
+                setError(null);
+                setShowChannelVideos(true);
+              }} sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                 <input
                   type="text"
                   placeholder="Pega el ID o URL del canal de YouTube"
@@ -166,7 +155,7 @@ const YouTubeMedia = () => {
                 Ejemplo de ID: <b>UCeY0bbntWzzVIaj2z3QigXg</b> &nbsp;|&nbsp; Ejemplo de URL: <b>https://www.youtube.com/@CNN</b>
               </Typography>
             </Paper>
-            {showChannelVideos && channelId && (
+            {showChannelVideos && channelId && extractChannelId(channelId) && (
               <ChannelVideos channelId={extractChannelId(channelId)} />
             )}
           </Box>
@@ -177,17 +166,23 @@ const YouTubeMedia = () => {
 };
 
 function extractChannelId(input) {
-  // Si es una URL de canal, extrae el ID o handle
+  if (!input) return '';
+  // No permitir URLs de playlist
+  if (/playlist\?list=/.test(input)) return null;
+  // Si es handle
+  if (input.startsWith('@')) return input;
+  // Si es ID de canal
+  if (input.startsWith('UC')) return input;
+  // Si es URL de canal
   if (input.includes('youtube.com')) {
     // URL tipo /channel/ID
     const matchId = input.match(/channel\/([\w-]+)/);
     if (matchId) return matchId[1];
     // URL tipo /@handle
     const matchHandle = input.match(/\/@([\w-]+)/);
-    if (matchHandle) return matchHandle[1];
+    if (matchHandle) return '@' + matchHandle[1];
   }
-  // Si es un ID directo
-  return input.trim();
+  return null;
 }
 
 export default YouTubeMedia; 
