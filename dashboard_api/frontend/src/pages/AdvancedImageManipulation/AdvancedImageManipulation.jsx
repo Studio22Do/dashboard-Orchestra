@@ -52,7 +52,8 @@ const AdvancedImageManipulation = () => {
     upper: '',
     right: '',
     lower: '',
-    method: ''
+    method: '',
+    convert_to: 'JPG'
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -65,7 +66,9 @@ const AdvancedImageManipulation = () => {
     { value: 'crop', label: 'Recortar (Crop)' },
     { value: 'rotate', label: 'Rotar (Rotate)' },
     { value: 'thumbnail', label: 'Miniatura (Thumbnail)' },
-    { value: 'transpose', label: 'Transponer (Transpose)' }
+    { value: 'transpose', label: 'Transponer (Transpose)' },
+    { value: 'pdf_to_images', label: 'PDF a Imágenes' },
+    { value: 'convert', label: 'Convertir Formato' }
   ];
 
   const transposeMethods = [
@@ -78,6 +81,12 @@ const AdvancedImageManipulation = () => {
     'TRANSVERSE'
   ];
 
+  const formatOptions = [
+    { value: 'JPG', label: 'JPG' },
+    { value: 'PNG', label: 'PNG' },
+    { value: 'GIF', label: 'GIF' }
+  ];
+
   const handleParameterChange = (parameter) => (event) => {
     setParameters(prev => ({
       ...prev,
@@ -88,7 +97,7 @@ const AdvancedImageManipulation = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!imageUrl.trim()) {
-      setError('Por favor ingresa la URL de la imagen');
+      setError('Por favor ingresa la URL de la imagen o PDF');
       return;
     }
     setLoading(true);
@@ -110,11 +119,15 @@ const AdvancedImageManipulation = () => {
       }
       const data = await response.json();
       if (data.urls && data.urls.length > 0) {
-        setProcessedImageUrl(data.urls[0]);
+        if (operation === 'pdf_to_images') {
+          setProcessedImageUrl(data.urls);
+        } else {
+          setProcessedImageUrl(data.urls[0]);
+        }
         setHistory(prev => [{
           operation,
           parameters,
-          processedUrl: data.urls[0],
+          processedUrl: operation === 'pdf_to_images' ? data.urls : data.urls[0],
           timestamp: new Date().toLocaleString()
         }, ...prev]);
       } else {
@@ -127,14 +140,24 @@ const AdvancedImageManipulation = () => {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (processedImageUrl) {
-      const link = document.createElement('a');
-      link.href = processedImageUrl;
-      link.download = 'processed_image.jpg';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      try {
+        const response = await fetch(processedImageUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `processed_image.${parameters.convert_to?.toLowerCase() || 'jpg'}`;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Error al descargar la imagen:', error);
+        setError('Error al descargar la imagen');
+      }
     }
   };
 
@@ -157,16 +180,62 @@ const AdvancedImageManipulation = () => {
             <CardContent>
               <Box component="form" onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="URL de la Imagen"
-                      value={imageUrl}
-                      onChange={e => setImageUrl(e.target.value)}
-                      fullWidth
-                      required
-                      placeholder="https://..."
-                    />
-                  </Grid>
+                  {/* PDF a Imágenes: solo campo URL PDF */}
+                  {operation === 'pdf_to_images' && (
+                    <Grid item xs={12}>
+                      <TextField
+                        label="URL del PDF"
+                        value={imageUrl}
+                        onChange={e => setImageUrl(e.target.value)}
+                        fullWidth
+                        required
+                        placeholder="https://..."
+                      />
+                    </Grid>
+                  )}
+                  {/* Convertir Formato: campo URL y formato destino */}
+                  {operation === 'convert' && (
+                    <>
+                      <Grid item xs={12}>
+                        <TextField
+                          label="URL de la Imagen"
+                          value={imageUrl}
+                          onChange={e => setImageUrl(e.target.value)}
+                          fullWidth
+                          required
+                          placeholder="https://..."
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <FormControl fullWidth>
+                          <InputLabel>Formato destino</InputLabel>
+                          <Select
+                            value={parameters.convert_to}
+                            onChange={handleParameterChange('convert_to')}
+                            label="Formato destino"
+                            required
+                          >
+                            {formatOptions.map(opt => (
+                              <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                    </>
+                  )}
+                  {/* Operaciones normales: mantener comportamiento actual */}
+                  {operation !== 'pdf_to_images' && operation !== 'convert' && (
+                    <Grid item xs={12}>
+                      <TextField
+                        label="URL de la Imagen"
+                        value={imageUrl}
+                        onChange={e => setImageUrl(e.target.value)}
+                        fullWidth
+                        required
+                        placeholder="https://..."
+                      />
+                    </Grid>
+                  )}
                   <Grid item xs={12} md={6}>
                     <FormControl fullWidth>
                       <InputLabel>Operación</InputLabel>
@@ -417,6 +486,55 @@ const AdvancedImageManipulation = () => {
                   </Box>
                 ))}
               </List>
+            </Paper>
+          )}
+
+          {/* Mostrar resultados para PDF a Imágenes */}
+          {operation === 'pdf_to_images' && processedImageUrl && Array.isArray(processedImageUrl) && (
+            <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
+              <Typography variant="h6" gutterBottom>Imágenes generadas del PDF</Typography>
+              <Grid container spacing={2}>
+                {processedImageUrl.map((url, idx) => (
+                  <Grid item xs={12} sm={6} md={4} key={idx}>
+                    <img src={url} alt={`Página ${idx + 1}`} style={{ width: '100%', borderRadius: 8, marginBottom: 8 }} />
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      href={url}
+                      target="_blank"
+                      rel="noopener"
+                      fullWidth
+                      sx={{ mt: 1 }}
+                    >
+                      Descargar Página {idx + 1}
+                    </Button>
+                  </Grid>
+                ))}
+              </Grid>
+            </Paper>
+          )}
+
+          {/* Mostrar resultado para Convertir Formato */}
+          {operation === 'convert' && processedImageUrl && (
+            <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
+              <Typography variant="h6" gutterBottom>Imagen Convertida</Typography>
+              <Box sx={{ textAlign: 'center', mb: 2 }}>
+                <img
+                  src={processedImageUrl}
+                  alt="Convertida"
+                  style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain' }}
+                />
+              </Box>
+              <Button
+                variant="outlined"
+                color="primary"
+                href={processedImageUrl}
+                target="_blank"
+                rel="noopener"
+                fullWidth
+              >
+                Descargar Imagen Convertida
+              </Button>
             </Paper>
           )}
         </Grid>

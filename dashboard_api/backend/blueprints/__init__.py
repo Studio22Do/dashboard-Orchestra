@@ -51,7 +51,7 @@ BLUEPRINT_MAPPING = {
     pdf_converter_bp: '/api/pdf-converter',
     snap_video_bp: '/api/snap-video',
     ai_humanizer_bp: '/api/ai-humanizer',
-    advanced_image_bp: '/api/image-manipulation',
+    advanced_image_bp: '/api',
     whisper_url_bp: '/api/whisper-url',
     runwayml_bp: '/api/runwayml',
     similarweb_bp: '/api/similarweb',

@@ -3,6 +3,7 @@ import os
 from flask import Flask
 from flask_cors import CORS
 from config import config
+import blueprints
 from blueprints import register_blueprints
 from utils.error_handlers import register_error_handlers
 from utils.logging_config import configure_logging
