@@ -1,6 +1,9 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import ValidationError
+import os
+import requests
+from flask import current_app
 
 from api import db
 from api.models.app import App, ApiUsage, UserApp
@@ -272,4 +275,44 @@ def toggle_favorite_app(app_id):
     return jsonify({
         'message': 'Estado de favorito actualizado',
         'app': user_app.to_dict()
-    }), 200 
+    }), 200
+
+@apps_bp.route('/generate-qr', methods=['POST'])
+def generate_qr():
+    """Genera un código QR SVG usando la nueva API y retorna el SVG como string plano"""
+    req_data = request.get_json()
+    if not req_data or 'data' not in req_data:
+        return jsonify({'error': 'Falta el campo data'}), 400
+    qr_data = req_data['data']
+    rapidapi_key = current_app.config.get('RAPIDAPI_KEY')
+    url = 'https://smart-qr-code-with-logo.p.rapidapi.com/generate_svg'
+    headers = {
+        'content-type': 'application/json',
+        'x-rapidapi-key': rapidapi_key,
+        'x-rapidapi-host': 'smart-qr-code-with-logo.p.rapidapi.com',
+    }
+    payload = {
+        'text': qr_data
+    }
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=10)
+        if response.status_code != 200:
+            try:
+                return jsonify(response.json()), response.status_code
+            except Exception:
+                return jsonify({'error': 'Error al generar el QR', 'details': response.text}), response.status_code
+        # Intentar decodificar como JSON
+        try:
+            result = response.json()
+            svg = result.get('svg')
+            if not svg:
+                return jsonify({'error': 'No se recibió SVG de la API externa', 'details': result}), 500
+            return jsonify({'svg': svg}), 200
+        except Exception:
+            # Si no es JSON, devolver el texto plano como SVG
+            svg = response.text
+            if not svg.strip().startswith('<svg'):
+                return jsonify({'error': 'Respuesta inesperada de la API externa', 'details': svg}), 500
+            return jsonify({'svg': svg}), 200
+    except Exception as e:
+        return jsonify({'error': 'Error interno al generar el QR', 'details': str(e)}), 500 
