@@ -376,3 +376,49 @@ def get_video_details_and_formats():
     except Exception as e:
         logger.error(f"Error al obtener detalles y formatos del video: {str(e)}")
         return jsonify({"error": str(e)}), 500 
+
+@youtube_media_bp.route('/playlist/videos', methods=['GET'])
+def get_playlist_videos():
+    """Obtener videos de una lista de reproducción de YouTube"""
+    try:
+        playlist_id = request.args.get('playlistId')
+        if not playlist_id:
+            return jsonify({"error": "Se requiere el ID de la lista de reproducción"}), 400
+
+        # Endpoint actualizado de RapidAPI (usualmente /v2/playlist/videos o similar)
+        api_url = f"https://{current_app.config['RAPIDAPI_YOUTUBE_MEDIA_HOST']}/v2/playlist/videos"
+        headers = {
+            "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
+            "x-rapidapi-host": current_app.config['RAPIDAPI_YOUTUBE_MEDIA_HOST']
+        }
+        params = {"playlistId": playlist_id}
+        response = requests.get(api_url, headers=headers, params=params)
+
+        if response.status_code != 200:
+            error_detail = {
+                "status_code": response.status_code,
+                "message": response.text
+            }
+            return jsonify({"error": "Error en la API de YouTube", "details": error_detail}), response.status_code
+
+        data = response.json()
+        # Transformar la respuesta para el frontend
+        videos = []
+        for item in data.get('items', []):
+            videos.append({
+                "id": item.get("id", ""),
+                "title": item.get("title", ""),
+                "description": item.get("description", ""),
+                "thumbnail_url": item.get("thumbnails", [{}])[-1].get("url", "") if item.get("thumbnails") else "",
+                "channel": {
+                    "id": item.get("channel", {}).get("id", ""),
+                    "title": item.get("channel", {}).get("name", "")
+                },
+                "views": item.get("viewCount", 0),
+                "published": item.get("publishedTime", ""),
+                "duration": item.get("lengthSeconds", "")
+            })
+        return jsonify({"videos": videos}), 200
+    except Exception as e:
+        logger.error(f"Error al obtener videos de la playlist: {str(e)}")
+        return jsonify({"error": str(e)}), 500 
