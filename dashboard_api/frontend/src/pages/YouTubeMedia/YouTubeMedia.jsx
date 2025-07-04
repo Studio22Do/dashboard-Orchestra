@@ -131,7 +131,17 @@ const YouTubeMedia = () => {
           <Box>
             <Paper sx={{ p: 3, mb: 3 }}>
               <Typography variant="h6" gutterBottom>Explora videos de un canal</Typography>
-              <Box component="form" onSubmit={e => { e.preventDefault(); setShowChannelVideos(true); }} sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Box component="form" onSubmit={e => {
+                e.preventDefault();
+                const extracted = extractChannelId(channelId);
+                if (!extracted) {
+                  setError('Por favor, ingresa un ID o URL de canal válido. No se permiten URLs de playlist ni valores vacíos.');
+                  setShowChannelVideos(false);
+                  return;
+                }
+                setError(null);
+                setShowChannelVideos(true);
+              }} sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                 <input
                   type="text"
                   placeholder="Pega el ID o URL del canal de YouTube"
@@ -145,7 +155,7 @@ const YouTubeMedia = () => {
                 Ejemplo de ID: <b>UCeY0bbntWzzVIaj2z3QigXg</b> &nbsp;|&nbsp; Ejemplo de URL: <b>https://www.youtube.com/@CNN</b>
               </Typography>
             </Paper>
-            {showChannelVideos && channelId && (
+            {showChannelVideos && channelId && extractChannelId(channelId) && (
               <ChannelVideos channelId={extractChannelId(channelId)} />
             )}
           </Box>
@@ -156,17 +166,23 @@ const YouTubeMedia = () => {
 };
 
 function extractChannelId(input) {
-  // Si es una URL de canal, extrae el ID o handle
+  if (!input) return '';
+  // No permitir URLs de playlist
+  if (/playlist\?list=/.test(input)) return null;
+  // Si es handle
+  if (input.startsWith('@')) return input;
+  // Si es ID de canal
+  if (input.startsWith('UC')) return input;
+  // Si es URL de canal
   if (input.includes('youtube.com')) {
     // URL tipo /channel/ID
     const matchId = input.match(/channel\/([\w-]+)/);
     if (matchId) return matchId[1];
     // URL tipo /@handle
     const matchHandle = input.match(/\/@([\w-]+)/);
-    if (matchHandle) return matchHandle[1];
+    if (matchHandle) return '@' + matchHandle[1];
   }
-  // Si es un ID directo
-  return input.trim();
+  return null;
 }
 
 export default YouTubeMedia; 

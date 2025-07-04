@@ -422,3 +422,60 @@ def get_playlist_videos():
     except Exception as e:
         logger.error(f"Error al obtener videos de la playlist: {str(e)}")
         return jsonify({"error": str(e)}), 500 
+
+@youtube_media_bp.route('/channel/videos', methods=['GET'])
+def get_channel_videos():
+    """Obtener videos, shorts o lives de un canal de YouTube"""
+    try:
+        channel_id = request.args.get('channelId')
+        video_type = request.args.get('type', 'videos')  # videos, shorts, lives
+        sort_by = request.args.get('sortBy', 'newest')
+        next_token = request.args.get('nextToken')
+
+        if not channel_id:
+            return jsonify({"error": "Se requiere el ID o handle del canal"}), 400
+        if video_type not in ['videos', 'shorts', 'lives']:
+            return jsonify({"error": "Tipo de video inválido"}), 400
+
+        # Endpoint RapidAPI (usualmente /v2/channel/videos)
+        api_url = f"https://{current_app.config['RAPIDAPI_YOUTUBE_MEDIA_HOST']}/v2/channel/videos"
+        headers = {
+            "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
+            "x-rapidapi-host": current_app.config['RAPIDAPI_YOUTUBE_MEDIA_HOST']
+        }
+        params = {
+            "channelId": channel_id,
+            "type": video_type,
+            "sortBy": sort_by
+        }
+        if next_token:
+            params["nextToken"] = next_token
+
+        response = requests.get(api_url, headers=headers, params=params)
+        if response.status_code != 200:
+            error_detail = {
+                "status_code": response.status_code,
+                "message": response.text
+            }
+            return jsonify({"error": "Error en la API de YouTube", "details": error_detail}), response.status_code
+
+        data = response.json()
+        # Transformar la respuesta para el frontend
+        items = []
+        for item in data.get('items', []):
+            items.append({
+                "id": item.get("id", ""),
+                "title": item.get("title", ""),
+                "description": item.get("description", ""),
+                "thumbnails": item.get("thumbnails", []),
+                "lengthText": item.get("lengthText", ""),
+                "viewCountText": item.get("viewCountText", ""),
+                "publishedTimeText": item.get("publishedTimeText", "")
+            })
+        return jsonify({
+            "items": items,
+            "nextToken": data.get("nextToken")
+        }), 200
+    except Exception as e:
+        logger.error(f"Error al obtener videos del canal: {str(e)}")
+        return jsonify({"error": str(e)}), 500 
