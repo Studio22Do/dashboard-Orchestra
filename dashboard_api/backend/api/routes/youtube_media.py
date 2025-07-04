@@ -280,3 +280,99 @@ def get_playlist_details():
     except Exception as e:
         logger.error(f"Error al obtener detalles de la lista de reproducción: {str(e)}")
         return jsonify({"error": f"Error: {str(e)}"}), 500 
+
+@youtube_media_bp.route('/video/details-and-formats', methods=['GET'])
+def get_video_details_and_formats():
+    try:
+        video_id = request.args.get('videoId')
+        if not video_id:
+            return jsonify({"error": "Se requiere el ID del video"}), 400
+
+        api_url = f"https://{current_app.config['RAPIDAPI_YOUTUBE_MEDIA_HOST']}/v2/video/details"
+        headers = {
+            "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
+            "x-rapidapi-host": current_app.config['RAPIDAPI_YOUTUBE_MEDIA_HOST']
+        }
+        params = {
+            "videoId": video_id,
+            "urlAccess": "normal",
+            "videos": "auto",
+            "audios": "auto"
+        }
+
+        response = requests.get(api_url, headers=headers, params=params)
+        print("STATUS CODE RAPIDAPI:", response.status_code)
+        print("RAW RESPONSE TEXT:", response.text[:1000])
+        try:
+            data = response.json()
+        except Exception as e:
+            print("ERROR AL PARSEAR JSON:", str(e))
+            data = response.text
+        print("TIPO DE DATA:", type(data))
+        print("DATA:", str(data)[:1000])  # Solo los primeros 1000 caracteres para no saturar
+
+        # Prints explícitos para depuración de formatos
+        videos_items = data.get('videos', {}).get('items', []) if isinstance(data, dict) else []
+        audios_items = data.get('audios', {}).get('items', []) if isinstance(data, dict) else []
+        print('VIDEOS ITEMS:', videos_items)
+        print('AUDIOS ITEMS:', audios_items)
+
+        if response.status_code != 200:
+            logger.error(f"Error en la API de YouTube: {response.text}")
+            return jsonify({"error": "Error en la API de YouTube"}), response.status_code
+
+        result = {
+            "id": data.get("id", "") if isinstance(data, dict) else "",
+            "title": data.get("title", "") if isinstance(data, dict) else "",
+            "description": data.get("description", "") if isinstance(data, dict) else "",
+            "thumbnail_url": data.get("thumbnails", [{}])[-1].get("url", "") if isinstance(data, dict) and data.get("thumbnails") else "",
+            "channel": {
+                "id": data.get("channel", {}).get("id", "") if isinstance(data, dict) else "",
+                "title": data.get("channel", {}).get("name", "") if isinstance(data, dict) else "",
+                "thumbnail": data.get("channel", {}).get("avatar", [{}])[-1].get("url", "") if isinstance(data, dict) and data.get("channel", {}).get("avatar") else ""
+            },
+            "views": data.get("viewCount", 0) if isinstance(data, dict) else 0,
+            "likes": data.get("likeCount", 0) if isinstance(data, dict) else 0,
+            "published": data.get("publishedTime", "") if isinstance(data, dict) else "",
+            "duration": data.get("lengthSeconds", "") if isinstance(data, dict) else "",
+            "formats": []
+        }
+
+        # Formatos de video+audio
+        if isinstance(data, dict):
+            for video in videos_items:
+                if not video.get("url"):
+                    continue
+                result["formats"].append({
+                    "url": video.get("url"),
+                    "container": video.get("extension", "mp4"),
+                    "width": video.get("width", 0),
+                    "height": video.get("height", 0),
+                    "qualityLabel": video.get("quality", ""),
+                    "contentLength": video.get("size", 0),
+                    "hasVideo": video.get("hasVideo", True),
+                    "hasAudio": video.get("hasAudio", True),
+                    "audioBitrate": video.get("audioQuality", 0)
+                })
+
+            # Formatos de solo audio (si existen)
+            for audio in audios_items:
+                if not audio.get("url"):
+                    continue
+                result["formats"].append({
+                    "url": audio.get("url"),
+                    "container": audio.get("extension", "mp3"),
+                    "width": 0,
+                    "height": 0,
+                    "qualityLabel": f"Audio {audio.get('quality', '')}",
+                    "contentLength": audio.get("size", 0),
+                    "hasVideo": False,
+                    "hasAudio": True,
+                    "audioBitrate": audio.get("bitrate", 0)
+                })
+
+        return jsonify(result), 200
+
+    except Exception as e:
+        logger.error(f"Error al obtener detalles y formatos del video: {str(e)}")
+        return jsonify({"error": str(e)}), 500 

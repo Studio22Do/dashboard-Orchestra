@@ -21,13 +21,12 @@ import Breadcrumbs from '../../components/common/Breadcrumbs';
 import VideoSearch from './components/VideoSearch';
 import VideoDetails from './components/VideoDetails';
 import PlaylistDetails from './components/PlaylistDetails';
-import DownloadOptions from './components/DownloadOptions';
 import ChannelVideos from './components/ChannelVideos';
 
 const YouTubeMedia = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [error, setError] = useState(null);
-  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [channelId, setChannelId] = useState('');
   const [showChannelVideos, setShowChannelVideos] = useState(false);
@@ -79,13 +78,7 @@ const YouTubeMedia = () => {
             icon={<VideoLibrary />} 
             label="Detalles del Video" 
             iconPosition="start"
-            disabled={!selectedVideo}
-          />
-          <Tab 
-            icon={<DownloadForOffline />} 
-            label="Opciones de Descarga" 
-            iconPosition="start"
-            disabled={!selectedVideo}
+            disabled={!selectedVideoId}
           />
           <Tab 
             icon={<PlaylistPlay />} 
@@ -104,19 +97,17 @@ const YouTubeMedia = () => {
         {activeTab === 0 && (
           <VideoSearch 
             setError={setError} 
-            setSelectedVideo={setSelectedVideo} 
             onSelectVideo={(video) => {
-              console.log('Video seleccionado desde búsqueda:', video);
-              setSelectedVideo(video);
+              setSelectedVideoId(video.id);
               setActiveTab(1);
             }}
           />
         )}
         
         {activeTab === 1 && (
-          selectedVideo ? (
+          selectedVideoId ? (
             <VideoDetails 
-              video={selectedVideo} 
+              videoId={selectedVideoId} 
               setError={setError}
             />
           ) : (
@@ -125,30 +116,18 @@ const YouTubeMedia = () => {
         )}
         
         {activeTab === 2 && (
-          selectedVideo ? (
-            <DownloadOptions 
-              videoId={selectedVideo.id} 
-              setError={setError}
-            />
-          ) : (
-            <Typography variant="body2" color="text.secondary">Selecciona un video para ver las opciones de descarga.</Typography>
-          )
-        )}
-        
-        {activeTab === 3 && (
           <PlaylistDetails 
             setError={setError}
             selectedPlaylist={selectedPlaylist}
             setSelectedPlaylist={setSelectedPlaylist}
             onSelectVideo={(video) => {
-              console.log('Video seleccionado desde playlist:', video);
-              setSelectedVideo(video);
+              setSelectedVideoId(video.id);
               setActiveTab(1);
             }}
           />
         )}
         
-        {activeTab === 4 && (
+        {activeTab === 3 && (
           <Box>
             <Paper sx={{ p: 3, mb: 3 }}>
               <Typography variant="h6" gutterBottom>Explora videos de un canal</Typography>

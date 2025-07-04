@@ -139,9 +139,10 @@ const VideoSearch = ({ setError, onSelectVideo }) => {
                     cursor: 'pointer'
                   }}
                   onClick={() => {
-                    console.log('Video seleccionado:', item);
+                    const videoId = item.videoId || (item.id && item.id.videoId) || item.id;
+                    console.log('Video seleccionado:', { ...item, id: videoId });
                     onSelectVideo({
-                      id: item.videoId || item.id,
+                      id: videoId,
                       title: item.title,
                       description: item.description,
                       thumbnail: item.thumbnail || item.thumbnails?.[0]?.url || '',
