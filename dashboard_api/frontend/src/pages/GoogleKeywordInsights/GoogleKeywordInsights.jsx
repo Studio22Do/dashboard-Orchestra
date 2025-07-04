@@ -23,7 +23,9 @@ import {
   FormControl,
   InputLabel,
   Pagination,
-  Tooltip
+  Tooltip,
+  ListSubheader,
+  InputAdornment
 } from '@mui/material';
 import { 
   Search,
@@ -32,6 +34,48 @@ import {
   TrendingFlat,
   BarChart
 } from '@mui/icons-material';
+
+// Definición de países por región
+const COUNTRIES = {
+  EUROPA: [
+    { code: 'ES', name: 'España' },
+    { code: 'FR', name: 'Francia' },
+    { code: 'IT', name: 'Italia' }
+  ],
+  LATINOAMERICA: {
+    SUDAMERICA: [
+      { code: 'AR', name: 'Argentina' },
+      { code: 'BO', name: 'Bolivia' },
+      { code: 'BR', name: 'Brasil' },
+      { code: 'CL', name: 'Chile' },
+      { code: 'CO', name: 'Colombia' },
+      { code: 'EC', name: 'Ecuador' },
+      { code: 'GY', name: 'Guyana' },
+      { code: 'PY', name: 'Paraguay' },
+      { code: 'PE', name: 'Perú' },
+      { code: 'SR', name: 'Surinam' },
+      { code: 'UY', name: 'Uruguay' },
+      { code: 'VE', name: 'Venezuela' }
+    ],
+    CENTROAMERICA: [
+      { code: 'BZ', name: 'Belice' },
+      { code: 'CR', name: 'Costa Rica' },
+      { code: 'SV', name: 'El Salvador' },
+      { code: 'GT', name: 'Guatemala' },
+      { code: 'HN', name: 'Honduras' },
+      { code: 'NI', name: 'Nicaragua' },
+      { code: 'PA', name: 'Panamá' },
+      { code: 'CU', name: 'Cuba' },
+      { code: 'DO', name: 'República Dominicana' },
+      { code: 'PR', name: 'Puerto Rico' }
+    ]
+  },
+  NORTEAMERICA: [
+    { code: 'US', name: 'Estados Unidos' },
+    { code: 'CA', name: 'Canadá' },
+    { code: 'MX', name: 'México' }
+  ]
+};
 
 const GoogleKeywordInsights = () => {
   const [keyword, setKeyword] = useState('');
@@ -43,6 +87,40 @@ const GoogleKeywordInsights = () => {
   const [lang, setLang] = useState('es');
   const [page, setPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [countrySearch, setCountrySearch] = useState('');
+
+  // Filtrar países basado en la búsqueda
+  const getFilteredCountries = () => {
+    const searchTerm = countrySearch.toLowerCase();
+    let filteredItems = [];
+
+    // Función auxiliar para agregar países filtrados
+    const addFilteredCountries = (countries, region, subregion = null) => {
+      countries.forEach(country => {
+        if (country.name.toLowerCase().includes(searchTerm)) {
+          filteredItems.push({
+            ...country,
+            region,
+            subregion
+          });
+        }
+      });
+    };
+
+    // Procesar Europa y Norteamérica
+    Object.entries(COUNTRIES).forEach(([region, content]) => {
+      if (region !== 'LATINOAMERICA') {
+        addFilteredCountries(content, region);
+      }
+    });
+
+    // Procesar Latinoamérica (tiene subregiones)
+    Object.entries(COUNTRIES.LATINOAMERICA).forEach(([subregion, countries]) => {
+      addFilteredCountries(countries, 'LATINOAMERICA', subregion);
+    });
+
+    return filteredItems;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,7 +157,6 @@ const GoogleKeywordInsights = () => {
         throw new Error('Formato de respuesta inválido');
       }
 
-      // Mapear los datos para usar los nombres de campos correctos
       const mappedData = data.map(item => ({
         keyword: item.text || '-',
         search_volume: item.volume || 0,
@@ -165,17 +242,129 @@ const GoogleKeywordInsights = () => {
               ),
             }}
           />
-          <FormControl sx={{ minWidth: 120 }}>
+          <FormControl sx={{ minWidth: 200 }}>
             <InputLabel>Ubicación</InputLabel>
             <Select
               value={location}
               label="Ubicación"
               onChange={(e) => setLocation(e.target.value)}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 400
+                  }
+                }
+              }}
             >
-              <MenuItem value="ES">España</MenuItem>
-              <MenuItem value="US">Estados Unidos</MenuItem>
-              <MenuItem value="MX">México</MenuItem>
-              <MenuItem value="AR">Argentina</MenuItem>
+              <TextField
+                size="small"
+                placeholder="Buscar país..."
+                value={countrySearch}
+                onChange={(e) => setCountrySearch(e.target.value)}
+                sx={{ m: 1, width: 'calc(100% - 16px)' }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search fontSize="small" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              {!countrySearch ? (
+                <>
+                  <ListSubheader 
+                    sx={{ 
+                      bgcolor: 'primary.dark',
+                      color: 'primary.contrastText',
+                      fontWeight: 'bold',
+                      lineHeight: '40px',
+                      borderLeft: '4px solid',
+                      borderColor: 'primary.main'
+                    }}
+                  >
+                    EUROPA
+                  </ListSubheader>
+                  {COUNTRIES.EUROPA.map(country => (
+                    <MenuItem key={country.code} value={country.code}>
+                      {country.name}
+                    </MenuItem>
+                  ))}
+
+                  <ListSubheader 
+                    sx={{ 
+                      bgcolor: 'primary.dark',
+                      color: 'primary.contrastText',
+                      fontWeight: 'bold',
+                      lineHeight: '40px',
+                      mt: 1,
+                      borderLeft: '4px solid',
+                      borderColor: 'primary.main'
+                    }}
+                  >
+                    LATINOAMÉRICA - SUDAMÉRICA
+                  </ListSubheader>
+                  {COUNTRIES.LATINOAMERICA.SUDAMERICA.map(country => (
+                    <MenuItem key={country.code} value={country.code}>
+                      {country.name}
+                    </MenuItem>
+                  ))}
+
+                  <ListSubheader 
+                    sx={{ 
+                      bgcolor: 'primary.dark',
+                      color: 'primary.contrastText',
+                      fontWeight: 'bold',
+                      lineHeight: '40px',
+                      mt: 1,
+                      borderLeft: '4px solid',
+                      borderColor: 'primary.main'
+                    }}
+                  >
+                    LATINOAMÉRICA - CENTROAMÉRICA Y CARIBE
+                  </ListSubheader>
+                  {COUNTRIES.LATINOAMERICA.CENTROAMERICA.map(country => (
+                    <MenuItem key={country.code} value={country.code}>
+                      {country.name}
+                    </MenuItem>
+                  ))}
+
+                  <ListSubheader 
+                    sx={{ 
+                      bgcolor: 'primary.dark',
+                      color: 'primary.contrastText',
+                      fontWeight: 'bold',
+                      lineHeight: '40px',
+                      mt: 1,
+                      borderLeft: '4px solid',
+                      borderColor: 'primary.main'
+                    }}
+                  >
+                    NORTEAMÉRICA
+                  </ListSubheader>
+                  {COUNTRIES.NORTEAMERICA.map(country => (
+                    <MenuItem key={country.code} value={country.code}>
+                      {country.name}
+                    </MenuItem>
+                  ))}
+                </>
+              ) : (
+                getFilteredCountries().map(country => (
+                  <MenuItem key={country.code} value={country.code}>
+                    {country.name} 
+                    <Typography 
+                      variant="caption" 
+                      sx={{ 
+                        ml: 1,
+                        color: 'primary.main',
+                        fontWeight: 'medium'
+                      }}
+                    >
+                      ({country.subregion || country.region})
+                    </Typography>
+                  </MenuItem>
+                ))
+              )}
             </Select>
           </FormControl>
           <Button

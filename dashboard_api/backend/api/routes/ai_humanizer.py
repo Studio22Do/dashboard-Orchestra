@@ -11,25 +11,25 @@ ai_humanizer_bp = Blueprint('ai_humanizer', __name__)
 @ai_humanizer_bp.route('/', methods=['POST'])
 def ai_humanizer():
     try:
-        data = request.json
-        text = data.get('text')
+    data = request.json
+    text = data.get('text')
         
         logger.debug(f"Datos recibidos del frontend: {data}")
 
-        if not text:
-            return jsonify({'error': 'El campo "text" es obligatorio.'}), 400
+    if not text:
+        return jsonify({'error': 'El campo "text" es obligatorio.'}), 400
 
         url = "https://humanizer-apis.p.rapidapi.com/humanizer/language"
         
-        payload = {
+    payload = {
             "text": text
-        }
+    }
         
-        headers = {
+    headers = {
             "x-rapidapi-key": os.environ.get('RAPIDAPI_KEY', ''),
             "x-rapidapi-host": "humanizer-apis.p.rapidapi.com",
-            "Content-Type": "application/json"
-        }
+        "Content-Type": "application/json"
+    }
 
         logger.debug(f"Enviando solicitud a: {url}")
         logger.debug(f"Payload: {payload}")

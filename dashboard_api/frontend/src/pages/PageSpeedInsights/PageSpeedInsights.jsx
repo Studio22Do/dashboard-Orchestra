@@ -136,22 +136,22 @@ const PageSpeedInsights = () => {
         }}
       >
         <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-          <TextField
-            fullWidth
+                <TextField
+                  fullWidth
             label="URL del sitio web"
-            variant="outlined"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
+                  variant="outlined"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
             sx={{ flex: '2 1 300px' }}
-          />
+                />
           <FormControl sx={{ minWidth: 200, flex: '1 1 200px' }}>
             <InputLabel id="category-label">Categoría</InputLabel>
             <Select
               labelId="category-label"
               value={category}
-              label="Categoría"
-              onChange={(e) => setCategory(e.target.value)}
-            >
+                  label="Categoría"
+                  onChange={(e) => setCategory(e.target.value)}
+                >
               <MenuItem value="PERFORMANCE">Rendimiento</MenuItem>
               <MenuItem value="ACCESSIBILITY">Accesibilidad</MenuItem>
               <MenuItem value="BEST_PRACTICES">Mejores Prácticas</MenuItem>
@@ -163,26 +163,26 @@ const PageSpeedInsights = () => {
             <Select
               labelId="strategy-label"
               value={strategy}
-              label="Estrategia"
-              onChange={(e) => setStrategy(e.target.value)}
-            >
+                  label="Estrategia"
+                  onChange={(e) => setStrategy(e.target.value)}
+                >
               <MenuItem value="DESKTOP">Escritorio</MenuItem>
               <MenuItem value="MOBILE">Móvil</MenuItem>
             </Select>
           </FormControl>
-          <Button
+                <Button
             variant="contained"
-            type="submit"
-            disabled={loading}
+                  type="submit"
+                  disabled={loading}
             sx={{ 
               height: '56px',
               flex: '0 0 auto',
               minWidth: '120px'
             }}
-          >
-            {loading ? <CircularProgress size={24} /> : 'Analizar URL'}
-          </Button>
-        </Box>
+                >
+                  {loading ? <CircularProgress size={24} /> : 'Analizar URL'}
+                </Button>
+          </Box>
       </Paper>
 
       {loading && (
@@ -203,11 +203,11 @@ const PageSpeedInsights = () => {
       {!loading && result && (
         <>
           <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-            <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" gutterBottom>
               Resultados del análisis
-            </Typography>
+          </Typography>
             
-            <Grid container spacing={2}>
+          <Grid container spacing={2}>
               {categories.slice(1).map((cat) => (
                 <Grid item xs={6} sm={3} key={cat.value}>
                   <Tooltip title={`${cat.label}: ${getScore(cat.value)}%`}>
@@ -220,19 +220,19 @@ const PageSpeedInsights = () => {
                       />
                     </Box>
                   </Tooltip>
-                </Grid>
+            </Grid>
               ))}
             </Grid>
 
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="subtitle1" gutterBottom>
-                URL Analizada:
-              </Typography>
+          <Box sx={{ mt: 3 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              URL Analizada:
+            </Typography>
               <Typography variant="body2" color="text.secondary" component="div" sx={{ wordBreak: 'break-all' }}>
-                {result.lighthouseResult?.finalUrl || url}
-              </Typography>
-            </Box>
-          </Paper>
+              {result.lighthouseResult?.finalUrl || url}
+            </Typography>
+          </Box>
+        </Paper>
 
           {/* Detalles de JavaScript */}
           <Paper elevation={2} sx={{ p: 3, mb: 3 }}>

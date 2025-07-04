@@ -198,12 +198,12 @@ const HashtagSearch = ({ setError }) => {
               </Grid>
             </Box>
           ) : (
-            <Paper elevation={0} sx={{ p: 3, textAlign: 'center', bgcolor: 'background.default' }}>
-              <Typography variant="h6">No se encontraron publicaciones con este hashtag</Typography>
-              <Typography variant="body2" color="text.secondary">
-                Intenta con otro hashtag o verifica que esté escrito correctamente.
-              </Typography>
-            </Paper>
+        <Paper elevation={0} sx={{ p: 3, textAlign: 'center', bgcolor: 'background.default' }}>
+          <Typography variant="h6">No se encontraron publicaciones con este hashtag</Typography>
+          <Typography variant="body2" color="text.secondary">
+            Intenta con otro hashtag o verifica que esté escrito correctamente.
+          </Typography>
+        </Paper>
           )}
         </Box>
       )}
