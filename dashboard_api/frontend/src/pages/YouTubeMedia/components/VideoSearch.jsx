@@ -138,15 +138,20 @@ const VideoSearch = ({ setError, onSelectVideo }) => {
                     },
                     cursor: 'pointer'
                   }}
-                  onClick={() => onSelectVideo({
-                    id: item.id,
-                    title: item.title,
-                    description: item.description,
-                    thumbnail: item.thumbnails?.[0]?.url || '',
-                    channelTitle: item.channel?.name,
-                    channelId: item.channel?.id,
-                    publishedAt: item.publishedTimeText
-                  })}
+                  onClick={() => {
+                    console.log('Video seleccionado:', item);
+                    onSelectVideo({
+                      id: item.videoId || item.id,
+                      title: item.title,
+                      description: item.description,
+                      thumbnail: item.thumbnail || item.thumbnails?.[0]?.url || '',
+                      channelTitle: item.channel?.name || item.channelTitle,
+                      channelId: item.channel?.id || item.channelId,
+                      publishedAt: item.publishedTimeText || item.publishedAt,
+                      duration: item.duration,
+                      views: item.views
+                    });
+                  }}
                 >
                   <CardMedia
                     component="img"

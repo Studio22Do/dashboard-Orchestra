@@ -12,6 +12,7 @@ import PRLabsChatbot from './pages/PRLabs/Chatbot';
 import PRLabsTools from './pages/PRLabs/Tools';
 import Dashboard from './pages/Dashboard/Dashboard';
 import OpenAITextToSpeech from './pages/OpenAITextToSpeech/OpenAITextToSpeech';
+import GoogleReviewLink from './pages/GoogleReviewLink/GoogleReviewLink';
 
 const AppRoutes = () => {
     return (
@@ -30,6 +31,8 @@ const AppRoutes = () => {
                 <Route path="/prlabs/voice" element={<PRLabsVoice />} />
                 <Route path="/prlabs/chatbot" element={<PRLabsChatbot />} />
                 <Route path="/prlabs/tools" element={<PRLabsTools />} />
+
+                <Route path="/apps/google-review-link" element={<GoogleReviewLink />} />
             </Route>
         </Routes>
     );

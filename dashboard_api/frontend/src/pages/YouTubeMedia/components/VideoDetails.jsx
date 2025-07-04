@@ -40,17 +40,16 @@ const VideoDetails = ({ video, setError }) => {
       }
       
       setLoading(true);
+      console.log('Obteniendo detalles para video:', video.id);
       
       try {
         const response = await axios.get('/api/youtube/video/details', {
           params: {
-            videoId: video.id,
-            urlAccess: 'normal',
-            videos: 'auto',
-            audios: 'auto'
+            videoId: video.id
           }
         });
         
+        console.log('Detalles recibidos:', response.data);
         setVideoDetails(response.data);
         setError(null);
       } catch (err) {
@@ -113,25 +112,25 @@ const VideoDetails = ({ video, setError }) => {
               <CardMedia
                 component="img"
                 sx={{ width: '100%', height: 'auto' }}
-                image={video.thumbnail || videoDetails.thumbnail_url || 'https://via.placeholder.com/480x360?text=Video+no+disponible'}
-                alt={video.title || videoDetails.title}
+                image={videoDetails.thumbnail_url || video.thumbnail || 'https://via.placeholder.com/480x360?text=Video+no+disponible'}
+                alt={videoDetails.title || video.title}
               />
             </Grid>
             
             <Grid item xs={12} md={7}>
               <CardContent>
                 <Typography variant="h5" gutterBottom>
-                  {video.title || videoDetails.title}
+                  {videoDetails.title || video.title}
                 </Typography>
 
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <Avatar 
                     src={videoDetails.channel?.thumbnail} 
-                    alt={video.channelTitle || videoDetails.channel?.title}
+                    alt={videoDetails.channel?.title || video.channelTitle}
                     sx={{ mr: 1 }}
                   />
                   <Typography variant="subtitle1">
-                    {video.channelTitle || videoDetails.channel?.title}
+                    {videoDetails.channel?.title || video.channelTitle}
                   </Typography>
                 </Box>
 
@@ -140,24 +139,24 @@ const VideoDetails = ({ video, setError }) => {
                 <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
                   <Chip 
                     icon={<ViewArray />} 
-                    label={`${formatNumber(videoDetails.views || 0)} vistas`}
+                    label={`${formatNumber(videoDetails.views)} vistas`}
                     color="primary"
                     variant="outlined"
                   />
                   <Chip 
                     icon={<CalendarToday />} 
-                    label={formatDate(video.publishedAt || videoDetails.published)}
+                    label={formatDate(videoDetails.published || video.publishedAt)}
                     variant="outlined"
                   />
                   <Chip 
                     icon={<Favorite />} 
-                    label={formatNumber(videoDetails.likes || 0) + ' likes'}
+                    label={formatNumber(videoDetails.likes) + ' likes'}
                     variant="outlined"
                   />
                 </Stack>
 
                 <Typography variant="body1" paragraph>
-                  {video.description || videoDetails.description || 'Sin descripción disponible'}
+                  {videoDetails.description || video.description || 'Sin descripción disponible'}
                 </Typography>
 
                 <Divider sx={{ my: 2 }} />
@@ -175,8 +174,10 @@ const VideoDetails = ({ video, setError }) => {
                     variant="outlined" 
                     startIcon={<DownloadForOffline />}
                     onClick={() => {
-                      const tab = document.querySelector('[role="tab"][aria-label="Opciones de Descarga"]');
-                      if (tab) tab.click();
+                      // Cambiar a la pestaña de opciones de descarga
+                      const tabs = document.querySelectorAll('[role="tab"]');
+                      const downloadTab = Array.from(tabs).find(tab => tab.textContent.includes('Opciones de Descarga'));
+                      if (downloadTab) downloadTab.click();
                     }}
                   >
                     Opciones de Descarga

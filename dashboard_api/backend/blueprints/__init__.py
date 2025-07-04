@@ -8,6 +8,7 @@ import os
 from api.routes.youtube_media import youtube_media_bp
 from api.routes.auth_google import auth_google_bp
 from api.routes.openai_tts import openai_tts_bp
+from api.routes.google_review_link import google_review_link_bp
 
 # Añadir el directorio raíz al path de Python para importar correctamente
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -66,7 +67,8 @@ BLUEPRINT_MAPPING = {
     youtube_media_bp: '/api/youtube',
     auth_google_bp: '/api/auth/google',
     prlabs_bp: '/api/prlabs',
-    openai_tts_bp: '/api/openai-tts'
+    openai_tts_bp: '/api/openai-tts',
+    google_review_link_bp: '/api/google-review-link'
 }
 
 def register_blueprints(app):

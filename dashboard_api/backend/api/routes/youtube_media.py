@@ -19,9 +19,6 @@ def get_video_details():
     try:
         # Obtener parámetros
         video_id = request.args.get('videoId')
-        url_access = request.args.get('urlAccess', 'normal')
-        videos = request.args.get('videos', 'auto')
-        audios = request.args.get('audios', 'auto')
         
         if not video_id:
             return jsonify({"error": "Se requiere el ID del video"}), 400
@@ -36,12 +33,7 @@ def get_video_details():
         }
         
         # Configurar parámetros
-        params = {
-            "videoId": video_id,
-            "urlAccess": url_access,
-            "videos": videos,
-            "audios": audios
-        }
+        params = {"videoId": video_id}
         
         # Hacer solicitud a la API
         response = requests.get(api_url, headers=headers, params=params)
@@ -52,14 +44,33 @@ def get_video_details():
                 "status_code": response.status_code,
                 "message": response.text
             }
-            return jsonify({"error": "Error en la API de YouTube", "details": error_detail}), response.status_code
+            logger.error(f"Error en la API de YouTube: {error_detail}")
+            return jsonify({"error": "Error en la API de YouTube"}), response.status_code
         
-        # Devolver resultados
-        return jsonify(response.json()), 200
+        # Procesar y transformar la respuesta para mantener compatibilidad
+        data = response.json()
+        transformed_data = {
+            "id": data.get("videoId", ""),
+            "title": data.get("title", ""),
+            "description": data.get("description", ""),
+            "thumbnail_url": data.get("thumbnail", {}).get("url", "") if data.get("thumbnail") else "",
+            "channel": {
+                "id": data.get("channelId", ""),
+                "title": data.get("channelTitle", ""),
+                "thumbnail": data.get("channelThumbnail", "")
+            },
+            "views": data.get("viewCount", 0),
+            "likes": data.get("likeCount", 0),
+            "published": data.get("publishDate", ""),
+            "duration": data.get("duration", "")
+        }
+        
+        # Devolver resultados transformados
+        return jsonify(transformed_data), 200
         
     except Exception as e:
         logger.error(f"Error al obtener detalles del video: {str(e)}")
-        return jsonify({"error": f"Error: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 @youtube_media_bp.route('/search/videos', methods=['GET'])
 # @jwt_required()  # Comentado temporalmente para desarrollo
@@ -120,8 +131,8 @@ def get_video_formats():
         if not video_id:
             return jsonify({"error": "Se requiere el ID del video"}), 400
         
-        # Configurar API
-        api_url = f"https://{current_app.config['RAPIDAPI_YOUTUBE_MEDIA_HOST']}/v2/video/formats"
+        # Primero obtener detalles del video para el título
+        details_url = f"https://{current_app.config['RAPIDAPI_YOUTUBE_MEDIA_HOST']}/v2/video/details"
         
         # Configurar headers
         headers = {
@@ -129,28 +140,60 @@ def get_video_formats():
             "x-rapidapi-host": current_app.config['RAPIDAPI_YOUTUBE_MEDIA_HOST']
         }
         
-        # Configurar parámetros
-        params = {
-            "videoId": video_id
-        }
+        # Obtener detalles
+        details_response = requests.get(details_url, headers=headers, params={"videoId": video_id})
+        if details_response.status_code != 200:
+            return jsonify({"error": "Error al obtener detalles del video"}), details_response.status_code
+        
+        video_details = details_response.json()
+        
+        # Configurar API para formatos
+        formats_url = f"https://{current_app.config['RAPIDAPI_YOUTUBE_MEDIA_HOST']}/v2/video/formats"
         
         # Hacer solicitud a la API
-        response = requests.get(api_url, headers=headers, params=params)
+        formats_response = requests.get(formats_url, headers=headers, params={"videoId": video_id})
         
         # Verificar respuesta
-        if response.status_code != 200:
+        if formats_response.status_code != 200:
             error_detail = {
-                "status_code": response.status_code,
-                "message": response.text
+                "status_code": formats_response.status_code,
+                "message": formats_response.text
             }
-            return jsonify({"error": "Error en la API de YouTube", "details": error_detail}), response.status_code
+            logger.error(f"Error en la API de YouTube: {error_detail}")
+            return jsonify({"error": "Error en la API de YouTube"}), formats_response.status_code
         
-        # Devolver resultados
-        return jsonify(response.json()), 200
+        formats_data = formats_response.json()
+        
+        # Transformar los datos al formato esperado por el frontend
+        transformed_formats = []
+        
+        # Procesar formatos de video+audio
+        for format in formats_data.get("formats", []):
+            if not format.get("url"):  # Skip formatos sin URL
+                continue
+                
+            transformed_format = {
+                "url": format.get("url"),
+                "container": format.get("container", "mp4").lower(),
+                "width": format.get("width", 0),
+                "height": format.get("height", 0),
+                "qualityLabel": format.get("qualityLabel", ""),
+                "contentLength": format.get("contentLength", "0"),
+                "hasVideo": format.get("hasVideo", True),
+                "hasAudio": format.get("hasAudio", True),
+                "audioBitrate": format.get("audioBitrate", 0)
+            }
+            transformed_formats.append(transformed_format)
+        
+        # Devolver resultados en el formato esperado por el frontend
+        return jsonify({
+            "title": video_details.get("title", ""),
+            "formats": transformed_formats
+        }), 200
         
     except Exception as e:
-        logger.error(f"Error al obtener formatos de video: {str(e)}")
-        return jsonify({"error": f"Error: {str(e)}"}), 500
+        logger.error(f"Error al obtener formatos del video: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 @youtube_media_bp.route('/video/download-links', methods=['GET'])
 # @jwt_required()  # Comentado temporalmente para desarrollo

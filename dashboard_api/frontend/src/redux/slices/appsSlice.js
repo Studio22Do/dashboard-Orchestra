@@ -7,6 +7,15 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 const MOCK_APPS_DATA = [
   // Social Listening
   {
+    id: 'google-review-link',
+    title: 'Google Review Link Generator',
+    description: 'Genera enlaces directos para reseñas de Google',
+    imageUrl: 'https://cdn.pixabay.com/photo/2015/12/11/11/43/google-1088004_960_720.png',
+    category: 'Social Listening',
+    route: '/apps/google-review-link',
+    apiName: 'Google Review Link Generator API'
+  },
+  {
     id: 'instagram-stats',
     title: 'Instagram Statistics',
     description: 'Analiza perfiles de Instagram, obtén estadísticas y monitorea crecimiento',
@@ -298,9 +307,16 @@ export const fetchPurchasedApps = createAsyncThunk(
       const response = await axios.get(`${API_URL}/apps/user/apps`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      
+      // Si no hay apps compradas o hay error, retornar todas las apps mock
+      if (!response.data.apps || response.data.apps.length === 0) {
+        return MOCK_APPS_DATA;
+      }
+      
       return response.data.apps;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Error al obtener apps compradas');
+      // En caso de error, retornar todas las apps mock
+      return MOCK_APPS_DATA;
     }
   }
 );

@@ -62,6 +62,33 @@ def init_db_command():
 def update_apps_command():
     """Comando de Flask CLI para actualizar aplicaciones en la base de datos"""
     with app.app_context():
+        # Añadir o actualizar Google Review Link Generator
+        google_review_app = App.query.filter_by(id='google-review-link').first()
+        
+        if not google_review_app:
+            # Crear si no existe
+            google_review_app = App(
+                id='google-review-link',
+                title='Google Review Link Generator',
+                description='Genera enlaces directos para reseñas de Google',
+                image_url='https://cdn.pixabay.com/photo/2015/12/11/11/43/google-1088004_960_720.png',
+                category='Social Listening',
+                route='/apps/google-review-link',
+                api_name='Google Review Link Generator API'
+            )
+            db.session.add(google_review_app)
+            db.session.commit()
+            print("Aplicación Google Review Link Generator añadida correctamente")
+        else:
+            # Actualizar si ya existe
+            google_review_app.title = 'Google Review Link Generator'
+            google_review_app.description = 'Genera enlaces directos para reseñas de Google'
+            google_review_app.category = 'Social Listening'
+            google_review_app.route = '/apps/google-review-link'
+            google_review_app.api_name = 'Google Review Link Generator API'
+            db.session.commit()
+            print("Aplicación Google Review Link Generator actualizada correctamente")
+
         # Añadir o actualizar Google Trends
         google_trends_app = App.query.filter_by(id='google-trends').first()
         
