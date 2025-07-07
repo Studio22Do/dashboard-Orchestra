@@ -133,14 +133,14 @@ const UrlShortener = () => {
           <Typography variant="h6" gutterBottom>
             Código QR SVG Generado
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
             <span
               dangerouslySetInnerHTML={{ __html: svgData }}
               aria-label="QR SVG"
               tabIndex={0}
               role="img"
             />
-          </Box>
+                  </Box>
         </Paper>
       )}
     </Container>
