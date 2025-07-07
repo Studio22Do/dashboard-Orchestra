@@ -36,6 +36,16 @@ SUPPORTED_ARCHIVE_FORMATS = {
     'zip': {'mime': 'application/zip', 'ext': 'zip'}
 }
 
+SUPPORTED_AUDIO_FORMATS = {
+    'mp3': {'mime': 'audio/mpeg', 'ext': 'mp3'},
+    'wav': {'mime': 'audio/wav', 'ext': 'wav'},
+    'ogg': {'mime': 'audio/ogg', 'ext': 'ogg'},
+    'aac': {'mime': 'audio/aac', 'ext': 'aac'},
+    'ac3': {'mime': 'audio/ac3', 'ext': 'ac3'},
+    'flac': {'mime': 'audio/flac', 'ext': 'flac'},
+    'm4a': {'mime': 'audio/mp4', 'ext': 'm4a'}
+}
+
 # Decorador para manejo de errores común
 def handle_conversion_errors(f):
     @wraps(f)
@@ -104,13 +114,16 @@ def convert_file():
         return handle_document_conversion(file, original_format, target_format)
     elif original_format in SUPPORTED_ARCHIVE_FORMATS and target_format in SUPPORTED_ARCHIVE_FORMATS:
         return handle_archive_conversion(file, original_format, target_format)
+    elif original_format in SUPPORTED_AUDIO_FORMATS and target_format in SUPPORTED_AUDIO_FORMATS:
+        return handle_audio_conversion(file, original_format, target_format)
     else:
         return jsonify({
             "error": "Combinación de formatos no soportada",
             "supported_formats": {
                 "images": list(SUPPORTED_IMAGE_FORMATS.keys()),
                 "documents": list(SUPPORTED_DOCUMENT_FORMATS.keys()),
-                "archives": list(SUPPORTED_ARCHIVE_FORMATS.keys())
+                "archives": list(SUPPORTED_ARCHIVE_FORMATS.keys()),
+                "audio": list(SUPPORTED_AUDIO_FORMATS.keys())
             }
         }), 400
 
@@ -192,13 +205,42 @@ def handle_archive_conversion(file, original_format: str, target_format: str):
         'Content-Disposition': f'attachment; filename={filename}'
     }
 
+def handle_audio_conversion(file, original_format: str, target_format: str):
+    """Maneja la conversión de archivos de audio"""
+    if not file.filename.lower().endswith(f'.{original_format}'):
+        return jsonify({"error": f"El archivo debe tener extensión .{original_format}"}), 400
+    
+    # No permitir conversión al mismo formato
+    if original_format == target_format:
+        return jsonify({"error": "El formato de origen y destino son iguales"}), 400
+    
+    api_url = f"https://all-in-one-file-converter.p.rapidapi.com/api/{original_format}-to-{target_format}"
+    headers = {
+        "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
+        "x-rapidapi-host": "all-in-one-file-converter.p.rapidapi.com"
+    }
+    
+    files = {"file": (file.filename, file.read(), file.content_type)}
+    response = requests.post(api_url, files=files, headers=headers)
+    response.raise_for_status()
+    
+    content_type = SUPPORTED_AUDIO_FORMATS[target_format]['mime']
+    ext = SUPPORTED_AUDIO_FORMATS[target_format]['ext']
+    filename = f"{os.path.splitext(secure_filename(file.filename))[0]}.{ext}"
+    
+    return response.content, 200, {
+        'Content-Type': content_type,
+        'Content-Disposition': f'attachment; filename={filename}'
+    }
+
 @file_converter_bp.route('/supported-formats', methods=['GET'])
 def supported_formats():
     """Obtiene los formatos soportados para conversión"""
     return jsonify({
         "image_formats": list(SUPPORTED_IMAGE_FORMATS.keys()),
         "document_formats": list(SUPPORTED_DOCUMENT_FORMATS.keys()),
-        "archive_formats": list(SUPPORTED_ARCHIVE_FORMATS.keys())
+        "archive_formats": list(SUPPORTED_ARCHIVE_FORMATS.keys()),
+        "audio_formats": list(SUPPORTED_AUDIO_FORMATS.keys())
     }), 200
 
 @file_converter_bp.route('/ping', methods=['GET'])

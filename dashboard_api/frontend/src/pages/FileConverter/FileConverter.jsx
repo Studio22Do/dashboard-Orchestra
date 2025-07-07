@@ -21,6 +21,7 @@ import {
 import Breadcrumbs from '../../components/common/Breadcrumbs';
 import ImageConverter from './components/ImageConverter';
 import PdfToWord from './components/PdfToWord';
+import AudioConverter from './components/AudioConverter';
 
 const FileConverter = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -78,7 +79,6 @@ const FileConverter = () => {
             icon={<AudioFile />} 
             label="Convertidor de Audio" 
             iconPosition="start"
-            disabled
           />
           <Tab 
             icon={<VideoFile />} 
@@ -98,7 +98,11 @@ const FileConverter = () => {
           <PdfToWord setError={setError} />
         )}
         
-        {activeTab > 1 && (
+        {activeTab === 2 && (
+          <AudioConverter setError={setError} />
+        )}
+        
+        {activeTab === 3 && (
           <Paper sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="h6">
               Esta funcionalidad estará disponible próximamente
