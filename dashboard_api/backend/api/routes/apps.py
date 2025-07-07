@@ -4,6 +4,7 @@ from marshmallow import ValidationError
 import os
 import requests
 from flask import current_app
+import logging
 
 from api import db
 from api.models.app import App, ApiUsage, UserApp
@@ -275,7 +276,7 @@ def toggle_favorite_app(app_id):
     return jsonify({
         'message': 'Estado de favorito actualizado',
         'app': user_app.to_dict()
-    }), 200
+    }), 200 
 
 @apps_bp.route('/generate-qr', methods=['POST'])
 def generate_qr():
@@ -295,24 +296,39 @@ def generate_qr():
         'text': qr_data
     }
     try:
+        logging.info(f"Enviando request a API externa con payload: {payload}")
         response = requests.post(url, headers=headers, json=payload, timeout=10)
+        logging.info(f"Response status: {response.status_code}, Content-Type: {response.headers.get('content-type')}")
+        
         if response.status_code != 200:
             try:
                 return jsonify(response.json()), response.status_code
             except Exception:
                 return jsonify({'error': 'Error al generar el QR', 'details': response.text}), response.status_code
-        # Intentar decodificar como JSON
+        
+        # La API devuelve SVG como texto plano, manejar encoding correctamente
         try:
-            result = response.json()
-            svg = result.get('svg')
-            if not svg:
-                return jsonify({'error': 'No se recibió SVG de la API externa', 'details': result}), 500
-            return jsonify({'svg': svg}), 200
-        except Exception:
-            # Si no es JSON, devolver el texto plano como SVG
-            svg = response.text
-            if not svg.strip().startswith('<svg'):
-                return jsonify({'error': 'Respuesta inesperada de la API externa', 'details': svg}), 500
-            return jsonify({'svg': svg}), 200
+            logging.info("Intentando decodificar respuesta como UTF-8")
+            svg = response.content.decode('utf-8')
+            logging.info(f"SVG decodificado exitosamente, longitud: {len(svg)}")
+        except UnicodeDecodeError as e:
+            logging.warning(f"Error UTF-8: {e}, intentando latin-1")
+            svg = response.content.decode('latin-1')
+            logging.info(f"SVG decodificado con latin-1, longitud: {len(svg)}")
+        
+        if not svg.strip():
+            return jsonify({'error': 'SVG vacío recibido de la API externa'}), 500
+            
+        logging.info(f"Primeros 100 caracteres del SVG: {repr(svg[:100])}")
+        
+        # Validar que sea SVG (más flexible)
+        svg_lower = svg.strip().lower()
+        if not ('<svg' in svg_lower):
+            return jsonify({'error': 'Respuesta no es SVG válido', 'details': svg[:200]}), 500
+        
+        logging.info("SVG válido recibido, enviando al frontend")
+        return jsonify({'svg': svg}), 200
+        
     except Exception as e:
-        return jsonify({'error': 'Error interno al generar el QR', 'details': str(e)}), 500 
+        logging.error(f"Error en generate_qr: {str(e)}", exc_info=True)
+        return jsonify({'error': 'Error interno al generar el QR', 'details': str(e), 'type': type(e).__name__}), 500 

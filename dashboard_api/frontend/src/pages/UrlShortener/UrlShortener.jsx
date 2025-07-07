@@ -71,6 +71,48 @@ const UrlShortener = () => {
     document.body.removeChild(link);
   };
 
+  const handleDownloadSVG = () => {
+    if (!svgData) return;
+    const blob = new Blob([svgData], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'qrcode.svg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadPNG = () => {
+    if (!svgData) return;
+    // Crear un canvas para convertir SVG a PNG
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'qrcode.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    };
+    
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    img.src = svgUrl;
+  };
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
@@ -133,13 +175,35 @@ const UrlShortener = () => {
           <Typography variant="h6" gutterBottom>
             Código QR SVG Generado
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
             <span
               dangerouslySetInnerHTML={{ __html: svgData }}
               aria-label="QR SVG"
               tabIndex={0}
               role="img"
             />
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
+            <Tooltip title="Descargar como SVG (máxima calidad)">
+              <Button
+                variant="outlined"
+                startIcon={<Download />}
+                onClick={handleDownloadSVG}
+                size="small"
+              >
+                SVG
+              </Button>
+            </Tooltip>
+            <Tooltip title="Descargar como PNG (universal)">
+              <Button
+                variant="contained"
+                startIcon={<Download />}
+                onClick={handleDownloadPNG}
+                size="small"
+              >
+                PNG
+              </Button>
+            </Tooltip>
           </Box>
         </Paper>
       )}
