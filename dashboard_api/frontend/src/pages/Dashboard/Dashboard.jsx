@@ -539,7 +539,7 @@ const Dashboard = () => {
         },
         {
           id: 'url-shortener',
-          title: 'URL Link Shortener and QR Code Generator',
+          title: 'QR Code Generator',
           icon: Link,
           onClick: () => {
             setSelectedApp({
