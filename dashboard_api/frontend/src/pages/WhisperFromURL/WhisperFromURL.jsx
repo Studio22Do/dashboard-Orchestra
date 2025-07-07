@@ -99,13 +99,19 @@ const WhisperFromURL = () => {
         throw new Error(errorData.error || 'Error al transcribir el audio');
       }
       const data = await response.json();
+      
+      // Verificar si hay un mensaje específico (audio sin texto audible)
+      const transcriptionText = data.message || data.text || data.transcription || 'No se recibió transcripción';
+      const hasNoSpeech = data.message && !data.text;
+      
       const newTranscription = {
         url,
         language,
         model,
-        text: data.text || data.transcription || 'No se recibió transcripción',
+        text: transcriptionText,
         metadata: data.metadata || {},
-        timestamp: new Date().toLocaleString()
+        timestamp: new Date().toLocaleString(),
+        hasNoSpeech: hasNoSpeech
       };
       setTranscription(newTranscription);
       setHistory(prev => [newTranscription, ...prev]);
@@ -242,25 +248,35 @@ const WhisperFromURL = () => {
             <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h6">
-                  Transcripción
+                  {transcription.hasNoSpeech ? 'Resultado del Análisis' : 'Transcripción'}
                 </Typography>
-                <Box>
-                  <Tooltip title="Descargar transcripción">
-                    <IconButton onClick={handleDownload} sx={{ mr: 1 }}>
-                      <Download />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Copiar transcripción">
-                    <IconButton onClick={() => handleCopy(transcription.text)}>
-                      <ContentCopy />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
+                {!transcription.hasNoSpeech && (
+                  <Box>
+                    <Tooltip title="Descargar transcripción">
+                      <IconButton onClick={handleDownload} sx={{ mr: 1 }}>
+                        <Download />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Copiar transcripción">
+                      <IconButton onClick={() => handleCopy(transcription.text)}>
+                        <ContentCopy />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                )}
               </Box>
               
-              <Typography variant="body1" paragraph>
-                {transcription.text}
-              </Typography>
+              {transcription.hasNoSpeech ? (
+                <Alert severity="info" sx={{ mb: 2 }}>
+                  <Typography variant="body1">
+                    {transcription.text}
+                  </Typography>
+                </Alert>
+              ) : (
+                <Typography variant="body1" paragraph>
+                  {transcription.text}
+                </Typography>
+              )}
               
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
                 <Chip icon={<Language />} 
@@ -308,9 +324,17 @@ const WhisperFromURL = () => {
                         }
                         secondary={
                           <Box>
-                            <Typography variant="body2" paragraph>
-                              {item.text}
-                            </Typography>
+                            {item.hasNoSpeech ? (
+                              <Alert severity="info" sx={{ mb: 1 }}>
+                                <Typography variant="body2">
+                                  {item.text}
+                                </Typography>
+                              </Alert>
+                            ) : (
+                              <Typography variant="body2" paragraph>
+                                {item.text}
+                              </Typography>
+                            )}
                             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
                               <Chip icon={<Language />} 
                                     label={languages.find(l => l.value === item.language)?.label} 
