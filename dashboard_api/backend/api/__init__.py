@@ -36,6 +36,7 @@ def create_app(config_object):
     from api.routes.google_news import google_news_bp
     from api.routes.google_review_link import google_review_link_bp
     from api.routes.whois_lookup import whois_lookup_bp
+    from api.routes.pdf_converter import pdf_converter_bp
     
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(apps_bp, url_prefix='/api/apps')
@@ -54,6 +55,7 @@ def create_app(config_object):
     app.register_blueprint(google_news_bp, url_prefix='/api/google-news')
     app.register_blueprint(google_review_link_bp, url_prefix='/api/google-review-link')
     app.register_blueprint(whois_lookup_bp, url_prefix='/api/whois-lookup')
+    app.register_blueprint(pdf_converter_bp, url_prefix='/api/pdf-converter')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers

@@ -80,31 +80,39 @@ const PdfToText = () => {
     setError(null);
     
     try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Crear FormData para enviar el archivo
+      const formData = new FormData();
+      formData.append('pdfFile', file);
       
-      // Simulamos el texto extraído
-      const mockText = `Este es un ejemplo de texto extraído del PDF.
-      
-El texto se ha convertido correctamente y mantiene su formato original.
-
-Puedes copiar o descargar el texto convertido para usarlo donde lo necesites.
-
-El proceso de conversión ha sido exitoso.`;
-
-      setConvertedText({
-        text: mockText,
-        stats: {
-          characters: mockText.length,
-          words: mockText.split(/\s+/).length,
-          paragraphs: mockText.split(/\n\s*\n/).length,
-          lines: mockText.split('\n').length
+      // Llamar a la API real de PDF to Text
+      const response = await axios.post('/api/pdf-converter/to-text', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
       });
+      
+      if (response.data && response.data.status === 'Success' && Array.isArray(response.data.data)) {
+        // Combinar el texto de todas las páginas
+        const fullText = response.data.data.map(page => page.content).join('\n\n');
+        
+        setConvertedText({
+          text: fullText,
+          stats: {
+            characters: fullText.length,
+            words: fullText.split(/\s+/).filter(word => word.length > 0).length,
+            paragraphs: fullText.split(/\n\s*\n/).length,
+            lines: fullText.split('\n').length
+          },
+          pages: response.data.data // Guardar también los datos por página
+        });
+        
+        setError(null);
+      } else {
+        setError('No se pudo extraer el texto del PDF. Verifica que el archivo no esté protegido.');
+      }
     } catch (err) {
       console.error('Error converting PDF:', err);
-      setError(err.message || 'Error al convertir el PDF');
+      setError(err.response?.data?.error || err.message || 'Error al convertir el PDF');
     } finally {
       setLoading(false);
     }
