@@ -14,6 +14,8 @@ import YouTubeMedia from './pages/YouTubeMedia/YouTubeMedia';
 import FileConverter from './pages/FileConverter/FileConverter';
 import GoogleTrends from './pages/GoogleTrends/GoogleTrends';
 import GooglePaidSearch from './pages/GooglePaidSearch/GooglePaidSearch';
+import GoogleNews from './pages/GoogleNews/GoogleNews';
+import GoogleReviewLink from './pages/GoogleReviewLink/GoogleReviewLink';
 import Dashboard from './pages/Dashboard/Dashboard';
 import NotificationManager from './components/Notifications/NotificationManager';
 import { useAppDispatch, useAppSelector } from './redux/hooks/reduxHooks';
@@ -283,6 +285,18 @@ function App() {
           <Route path="/apps/paid-search" element={
             <ProtectedRoute>
               <GooglePaidSearch />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/apps/google-news" element={
+            <ProtectedRoute>
+              <GoogleNews />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/apps/google-review-link" element={
+            <ProtectedRoute>
+              <GoogleReviewLink />
             </ProtectedRoute>
           } />
 

@@ -34,6 +34,7 @@ def create_app(config_object):
     from api.routes.prlabs import prlabs_bp
     from api.routes.openai_tts import openai_tts_bp
     from api.routes.google_news import google_news_bp
+    from api.routes.google_review_link import google_review_link_bp
     
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(apps_bp, url_prefix='/api/apps')
@@ -50,6 +51,7 @@ def create_app(config_object):
     app.register_blueprint(prlabs_bp, url_prefix='/api/prlabs')
     app.register_blueprint(openai_tts_bp, url_prefix='/api/openai-tts')
     app.register_blueprint(google_news_bp, url_prefix='/api/google-news')
+    app.register_blueprint(google_review_link_bp, url_prefix='/api/google-review-link')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers

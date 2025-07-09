@@ -1,26 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Container,
-  Grid,
-  Typography,
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { 
+  Container, 
+  Typography, 
+  TextField, 
+  Button, 
+  Card, 
+  CardContent, 
+  Grid, 
   Box,
   Tabs,
   Tab,
-  TextField,
-  IconButton,
-  Card,
-  CardContent,
-  CardMedia,
-  Button,
-  Chip,
-  Select,
-  MenuItem,
+  CircularProgress,
+  Alert,
+  AlertTitle,
   FormControl,
   InputLabel,
-  CircularProgress
+  Select,
+  MenuItem,
+  IconButton,
+  Paper
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
-import axios from 'axios';
+import Breadcrumbs from '../../components/common/Breadcrumbs';
+
+// Base URL de la API
+const API_URL = 'http://localhost:5000/api';
 
 const categories = [
   { id: 'latest', label: 'Últimas Noticias' },
@@ -33,126 +38,115 @@ const categories = [
   { id: 'health', label: 'Salud' }
 ];
 
-const NewsCard = ({ article }) => (
-  <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-    {article.image && (
-      <CardMedia
-        component="img"
-        height="200"
-        image={article.image}
-        alt={article.title}
-        sx={{ objectFit: 'cover' }}
-      />
-    )}
-    <CardContent sx={{ flexGrow: 1 }}>
-      <Typography gutterBottom variant="h6" component="div">
-        {article.title}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        {article.description}
-      </Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Chip 
-          label={article.source} 
-          size="small" 
-          color="primary" 
-          variant="outlined" 
-        />
-        <Typography variant="caption" color="text.secondary">
-          {new Date(article.published).toLocaleDateString()}
-        </Typography>
-      </Box>
-    </CardContent>
-    <Box sx={{ p: 2, pt: 0 }}>
-      <Button 
-        size="small" 
-        fullWidth 
-        variant="outlined"
-        href={article.link}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Leer más
-      </Button>
-    </Box>
-  </Card>
-);
-
 const GoogleNews = () => {
-  const [selectedCategory, setSelectedCategory] = useState('latest');
+  const [activeTab, setActiveTab] = useState('latest');
   const [searchQuery, setSearchQuery] = useState('');
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState('es-ES');
-  const [languages, setLanguages] = useState([]);
+  const [languages, setLanguages] = useState([
+    { value: 'es-ES', label: 'Español' },
+    { value: 'en-US', label: 'English' },
+    { value: 'fr-FR', label: 'Français' },
+    { value: 'de-DE', label: 'Deutsch' }
+  ]);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    // Cargar idiomas disponibles
-    const fetchLanguages = async () => {
-      try {
-        const response = await axios.get('/api/google-news/languages');
-        setLanguages(response.data);
-      } catch (error) {
-        console.error('Error fetching languages:', error);
-      }
-    };
-    fetchLanguages();
-  }, []);
-
-  useEffect(() => {
-    const fetchNews = async () => {
-      setLoading(true);
-      try {
-        let response;
-        if (searchQuery) {
-          response = await axios.get(`/api/google-news/search`, {
-            params: { keyword: searchQuery, lr: language }
-          });
-        } else if (selectedCategory === 'latest') {
-          response = await axios.get(`/api/google-news/latest`, {
-            params: { lr: language }
-          });
-        } else {
-          response = await axios.get(`/api/google-news/category/${selectedCategory}`, {
-            params: { lr: language }
-          });
-        }
-        setNews(response.data.articles || []);
-      } catch (error) {
-        console.error('Error fetching news:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchNews();
-  }, [selectedCategory, searchQuery, language]);
-
-  const handleSearch = (event) => {
-    event.preventDefault();
-    // La búsqueda se activará por el useEffect
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+    setError(null);
+    setSearchQuery(''); // Limpiar búsqueda al cambiar tab
+    fetchNews(newValue);
   };
+
+  const fetchNews = async (category = activeTab) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      let response;
+      if (searchQuery && searchQuery.trim()) {
+        response = await axios.get(`${API_URL}/google-news/search?keyword=${encodeURIComponent(searchQuery)}&lr=${language}`);
+      } else if (category === 'latest') {
+        response = await axios.get(`${API_URL}/google-news/latest?lr=${language}`);
+      } else {
+        response = await axios.get(`${API_URL}/google-news/category/${category}?lr=${language}`);
+      }
+      
+      if (response.data && response.data.articles) {
+        setNews(response.data.articles);
+      } else {
+        setNews([]);
+        setError('No se encontraron noticias para esta búsqueda.');
+      }
+    } catch (err) {
+      console.error('Error fetching news:', err);
+      setError(err.response?.data?.error || err.message || 'Error al obtener noticias');
+      setNews([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!searchQuery || !searchQuery.trim()) {
+      setError('Por favor ingresa un término de búsqueda');
+      return;
+    }
+    await fetchNews(activeTab);
+  };
+
+  const handleLanguageChange = (event) => {
+    setLanguage(event.target.value);
+    // Recargar noticias con el nuevo idioma
+    setTimeout(() => {
+      fetchNews(activeTab);
+    }, 100);
+  };
+
+  useEffect(() => {
+    // Cargar noticias iniciales
+    fetchNews('latest');
+  }, []);
 
   return (
     <Container maxWidth="xl">
-      <Box sx={{ py: 4 }}>
+      <Box sx={{ mb: 4 }}>
+        <Breadcrumbs
+          items={[
+            { label: 'Dashboard', href: '/' },
+            { label: 'Google News', href: '/apps/google-news' },
+          ]}
+        />
         <Typography variant="h4" component="h1" gutterBottom>
           Google News
         </Typography>
+        <Typography variant="body1" color="text.secondary" paragraph>
+          Accede a noticias en tiempo real de todo el mundo con filtros por categoría e idioma
+        </Typography>
 
-        {/* Barra de búsqueda y selector de idioma */}
-        <Grid container spacing={2} sx={{ mb: 4 }}>
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            <AlertTitle>Error</AlertTitle>
+            {error}
+          </Alert>
+        )}
+      </Box>
+
+      <Paper sx={{ mb: 4, p: 3 }}>
+        <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} md={8}>
             <form onSubmit={handleSearch}>
               <TextField
                 fullWidth
-                variant="outlined"
-                placeholder="Buscar noticias..."
+                label="Buscar noticias"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Ej: tecnología, deportes, política..."
                 InputProps={{
                   endAdornment: (
-                    <IconButton type="submit">
+                    <IconButton type="submit" disabled={loading}>
                       <SearchIcon />
                     </IconButton>
                   ),
@@ -166,7 +160,7 @@ const GoogleNews = () => {
               <Select
                 value={language}
                 label="Idioma"
-                onChange={(e) => setLanguage(e.target.value)}
+                onChange={handleLanguageChange}
               >
                 {languages.map((lang) => (
                   <MenuItem key={lang.value} value={lang.value}>
@@ -177,14 +171,15 @@ const GoogleNews = () => {
             </FormControl>
           </Grid>
         </Grid>
+      </Paper>
 
-        {/* Tabs de categorías */}
+      <Paper sx={{ mb: 4 }}>
         <Tabs
-          value={selectedCategory}
-          onChange={(_, newValue) => setSelectedCategory(newValue)}
+          value={activeTab}
+          onChange={handleTabChange}
           variant="scrollable"
           scrollButtons="auto"
-          sx={{ mb: 4 }}
+          sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
           {categories.map((category) => (
             <Tab
@@ -194,22 +189,78 @@ const GoogleNews = () => {
             />
           ))}
         </Tabs>
+      </Paper>
 
-        {/* Grid de noticias */}
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <Grid container spacing={3}>
-            {news.map((article, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <NewsCard article={article} />
-              </Grid>
-            ))}
-          </Grid>
-        )}
-      </Box>
+      {loading ? (
+        <Box display="flex" justifyContent="center" sx={{ my: 4 }}>
+          <CircularProgress />
+          <Typography variant="body2" sx={{ ml: 2, alignSelf: 'center' }}>
+            Cargando noticias...
+          </Typography>
+        </Box>
+      ) : news.length > 0 ? (
+        <Grid container spacing={3}>
+          {news.map((article, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography variant="h6" gutterBottom component="div" sx={{ mb: 2 }}>
+                    {article.title}
+                  </Typography>
+                  {article.imageUrl && (
+                    <Box
+                      component="img"
+                      src={article.imageUrl}
+                      alt={article.title}
+                      sx={{
+                        width: '100%',
+                        height: 200,
+                        objectFit: 'cover',
+                        mb: 2,
+                        borderRadius: 1
+                      }}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  )}
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    {article.description || article.snippet || 'Sin descripción disponible'}
+                  </Typography>
+                  <Box sx={{ mt: 'auto' }}>
+                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+                      {article.source} • {new Date(article.publishedAt || article.date).toLocaleDateString()}
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      href={article.url || article.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="small"
+                      fullWidth
+                    >
+                      Leer más
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      ) : (
+        <Paper sx={{ p: 4, textAlign: 'center' }}>
+          <Typography variant="h6" color="text.secondary">
+            No se encontraron noticias
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            {searchQuery ? 
+              `No hay resultados para "${searchQuery}". Intenta con otros términos.` : 
+              'Selecciona una categoría o realiza una búsqueda para ver noticias.'
+            }
+          </Typography>
+        </Paper>
+      )}
     </Container>
   );
 };
