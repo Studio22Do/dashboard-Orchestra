@@ -3,83 +3,64 @@ import requests
 
 pagespeed_bp = Blueprint('pagespeed_insights', __name__)
 
+@pagespeed_bp.route('', methods=['OPTIONS'])
+@pagespeed_bp.route('/', methods=['OPTIONS'])
+def handle_options():
+    """Manejar peticiones OPTIONS para CORS"""
+    return '', 200
+
 @pagespeed_bp.route('/run', methods=['GET'])
 def run_pagespeed():
     url_param = request.args.get('url')
-    category = request.args.get('category', 'CATEGORY_UNSPECIFIED')
-    strategy = request.args.get('strategy', 'STRATEGY_UNSPECIFIED')
 
     if not url_param:
         return jsonify({'error': 'El campo "url" es obligatorio.'}), 400
 
-    # Asegurar que la URL tenga https://
+    # Asegurar que la URL tenga protocol://
     if not url_param.startswith(('http://', 'https://')):
         url_param = 'https://' + url_param
 
-    api_url = "https://pagespeed-insights.p.rapidapi.com/run_pagespeed"
+    api_url = "https://website-speed-test.p.rapidapi.com/speed-check.php"
     
-    # Validar y mapear categorías
-    valid_categories = {
-        'performance': 'PERFORMANCE',
-        'accessibility': 'ACCESSIBILITY',
-        'best-practices': 'BEST_PRACTICES',
-        'seo': 'SEO',
-        '': 'CATEGORY_UNSPECIFIED'
-    }
-    
-    # Validar y mapear estrategias
-    valid_strategies = {
-        'desktop': 'DESKTOP',
-        'mobile': 'MOBILE',
-        '': 'STRATEGY_UNSPECIFIED'
-    }
-
-    # Usar los valores mapeados o los valores por defecto
-    category = valid_categories.get(category.lower(), 'CATEGORY_UNSPECIFIED')
-    strategy = valid_strategies.get(strategy.lower(), 'STRATEGY_UNSPECIFIED')
-
     params = {
-        "url": url_param,
-        "category": category,
-        "strategy": strategy
+        "url": url_param
     }
 
     headers = {
         "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
-        "x-rapidapi-host": "pagespeed-insights.p.rapidapi.com"
+        "x-rapidapi-host": "website-speed-test.p.rapidapi.com"
     }
 
-    current_app.logger.debug("[PageSpeed] Llamando a RapidAPI con:")
-    current_app.logger.debug(f"URL: {api_url}")
-    current_app.logger.debug(f"Params: {params}")
-    current_app.logger.debug(f"Headers: {headers}")
+    current_app.logger.info(f"[WebsiteSpeedTest] Analizando URL: {url_param}")
+    current_app.logger.debug(f"[WebsiteSpeedTest] API URL: {api_url}")
+    current_app.logger.debug(f"[WebsiteSpeedTest] Params: {params}")
 
     try:
-        response = requests.get(api_url, headers=headers, params=params, timeout=30)
-        current_app.logger.debug(f"[PageSpeed] Status: {response.status_code}")
-        current_app.logger.debug(f"[PageSpeed] Response: {response.text}")
+        response = requests.get(api_url, headers=headers, params=params, timeout=60)
+        current_app.logger.info(f"[WebsiteSpeedTest] Status: {response.status_code}")
+        current_app.logger.debug(f"[WebsiteSpeedTest] Response: {response.text}")
         
         response.raise_for_status()
         return jsonify(response.json()), 200
 
     except requests.exceptions.HTTPError as errh:
-        current_app.logger.error(f"[PageSpeed] HTTP Error: {errh}")
-        current_app.logger.error(f"[PageSpeed] Response: {response.text}")
+        current_app.logger.error(f"[WebsiteSpeedTest] HTTP Error: {errh}")
+        current_app.logger.error(f"[WebsiteSpeedTest] Response: {response.text}")
         return jsonify({
-            'error': 'Error en la respuesta de PageSpeed Insights', 
+            'error': 'Error en la respuesta del análisis de velocidad', 
             'details': response.text
         }), response.status_code
 
     except requests.exceptions.Timeout:
-        current_app.logger.error("[PageSpeed] Timeout Error")
+        current_app.logger.error("[WebsiteSpeedTest] Timeout Error")
         return jsonify({
             'error': 'El análisis está tomando más tiempo de lo esperado. Por favor, intente nuevamente.',
-            'details': 'Timeout después de 30 segundos'
+            'details': 'Timeout después de 60 segundos'
         }), 504
 
     except requests.exceptions.RequestException as err:
-        current_app.logger.error(f"[PageSpeed] Request Error: {err}")
+        current_app.logger.error(f"[WebsiteSpeedTest] Request Error: {err}")
         return jsonify({
-            'error': 'Error de conexión con PageSpeed Insights', 
+            'error': 'Error de conexión con la API de análisis de velocidad', 
             'details': str(err)
         }), 502 
