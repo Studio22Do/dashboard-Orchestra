@@ -38,7 +38,8 @@ import {
   Visibility,
   Settings,
   PhotoCamera,
-  Psychology
+  Psychology,
+  Dns
 } from '@mui/icons-material';
 import AppDetailDrawer from '../../components/AppDetailDrawer/AppDetailDrawer';
 import AppSearchHeader from '../../components/app-search/AppSearchHeader';
@@ -618,6 +619,23 @@ const Dashboard = () => {
               category: 'Web & SEO',
               route: '/apps/seo-mastermind',
               apiName: 'SEO Mastermind API',
+            });
+            setDrawerOpen(true);
+          }
+        },
+        {
+          id: 'whois-lookup',
+          title: 'WHOIS Lookup Service',
+          icon: Dns,
+          onClick: () => {
+            setSelectedApp({
+              id: 'whois-lookup',
+              title: 'WHOIS Lookup Service',
+              description: 'Consulta información detallada de registro para dominios, direcciones IP y números ASN',
+              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              category: 'Web & SEO',
+              route: '/apps/whois-lookup',
+              apiName: 'WHOIS Lookup API',
             });
             setDrawerOpen(true);
           }

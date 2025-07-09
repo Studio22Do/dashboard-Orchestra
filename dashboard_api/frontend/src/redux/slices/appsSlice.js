@@ -304,6 +304,15 @@ const MOCK_APPS_DATA = [
     category: 'Web & SEO',
     route: '/apps/image-optimizer',
     apiName: 'Image Optimizer API'
+  },
+  {
+    id: 'whois-lookup',
+    title: 'WHOIS Lookup Service',
+    description: 'Consulta información detallada de registro para dominios, direcciones IP y números ASN',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Web & SEO',
+    route: '/apps/whois-lookup',
+    apiName: 'WHOIS Lookup API'
   }
 ];
 
