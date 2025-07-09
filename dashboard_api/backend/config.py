@@ -36,6 +36,12 @@ class Config:
     RAPIDAPI_TIKTOK_SCRAPER2_HOST = os.environ.get('RAPIDAPI_TIKTOK_SCRAPER2_HOST', 'tiktok-scraper2.p.rapidapi.com')
     RAPIDAPI_AHREFS_HOST = os.environ.get('RAPIDAPI_AHREFS_HOST', 'ahrefs2.p.rapidapi.com')
     
+    # Configuración de Google News API
+    GOOGLE_NEWS_API_HOST = os.environ.get('GOOGLE_NEWS_API_HOST', 'google-news13.p.rapidapi.com')
+    GOOGLE_NEWS_API_BASE_URL = 'https://google-news13.p.rapidapi.com'
+    GOOGLE_NEWS_DEFAULT_LANGUAGE = 'en-US'
+    GOOGLE_NEWS_CACHE_TIMEOUT = 300  # 5 minutos en segundos
+    
     # Instagram API config
     INSTAGRAM_API_BASE_URL = os.environ.get('INSTAGRAM_API_BASE_URL')
     INSTAGRAM_API_KEY = os.environ.get('INSTAGRAM_API_KEY')

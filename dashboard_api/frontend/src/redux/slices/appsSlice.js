@@ -16,6 +16,15 @@ const MOCK_APPS_DATA = [
     apiName: 'Google Review Link Generator API'
   },
   {
+    id: 'google-news',
+    title: 'Google News API',
+    description: 'Accede a noticias en tiempo real de todo el mundo con filtros por categoría e idioma',
+    imageUrl: 'https://cdn.pixabay.com/photo/2015/11/03/09/03/google-1018443_960_720.jpg',
+    category: 'Social Listening',
+    route: '/apps/google-news',
+    apiName: 'Google News API'
+  },
+  {
     id: 'instagram-stats',
     title: 'Instagram Statistics',
     description: 'Analiza perfiles de Instagram, obtén estadísticas y monitorea crecimiento',
@@ -189,17 +198,17 @@ const MOCK_APPS_DATA = [
   },
   // Web & SEO
   {
-    id: 'seo-analyzer',
-    title: 'SEO Analyzer',
-    description: 'Analiza y optimiza el SEO de tu sitio web',
+    id: 'smart-scraper',
+    title: 'Smart Web Scraper',
+    description: 'Extrae y analiza contenido web usando IA. Obtén datos estructurados, enlaces, tablas y más.',
     imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
     category: 'Web & SEO',
-    route: '/apps/seo-analyzer',
-    apiName: 'SEO Analyzer API'
+    route: '/apps/smart-scraper',
+    apiName: 'Smart Web Scraper API'
   },
   {
     id: 'similar-web',
-    title: 'Similar Web',
+    title: 'Similar Web Insights',
     description: 'Obtén insights detallados sobre el tráfico web y la competencia',
     imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
     category: 'Web & SEO',

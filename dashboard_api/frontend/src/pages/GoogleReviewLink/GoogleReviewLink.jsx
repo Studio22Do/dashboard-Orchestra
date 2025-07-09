@@ -12,19 +12,17 @@ import {
   CircularProgress,
   IconButton,
   Tooltip,
-  Divider,
+
   Paper
 } from '@mui/material';
 import {
   ContentCopy,
   QrCode,
-  Search,
   Link as LinkIcon
 } from '@mui/icons-material';
 
 const GoogleReviewLink = () => {
   const [placeId, setPlaceId] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
   const [reviewLink, setReviewLink] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -55,7 +53,7 @@ const GoogleReviewLink = () => {
         throw new Error(data.error || 'Error al generar el enlace');
       }
 
-      setReviewLink(data.review_link || data.url);
+      setReviewLink(data.data || data.review_link || data.url);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -63,31 +61,7 @@ const GoogleReviewLink = () => {
     }
   };
 
-  const handleSearchPlace = async () => {
-    if (!searchQuery) {
-      setError('Por favor ingresa un término de búsqueda');
-      return;
-    }
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(`/api/google-review-link/search-place?query=${encodeURIComponent(searchQuery)}`);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al buscar el lugar');
-      }
-
-      // Por ahora solo mostramos el mensaje de desarrollo
-      setError(data.message);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(reviewLink);
@@ -108,31 +82,6 @@ const GoogleReviewLink = () => {
         <Grid item xs={12} md={6}>
           <Card sx={{ mb: 4 }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Buscar Negocio
-              </Typography>
-              <Box sx={{ mb: 3 }}>
-                <TextField
-                  fullWidth
-                  label="Nombre del negocio"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Ej: Restaurante XYZ"
-                  sx={{ mb: 2 }}
-                />
-                <Button
-                  variant="contained"
-                  onClick={handleSearchPlace}
-                  startIcon={<Search />}
-                  disabled={loading}
-                  fullWidth
-                >
-                  Buscar
-                </Button>
-              </Box>
-
-              <Divider sx={{ my: 3 }} />
-
               <Typography variant="h6" gutterBottom>
                 Generar Enlace
               </Typography>

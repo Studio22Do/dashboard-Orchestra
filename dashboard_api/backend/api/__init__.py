@@ -18,7 +18,6 @@ def create_app(config_object):
     migrate.init_app(app, db)
     jwt.init_app(app)
     
-    print("\n=== REGISTRANDO BLUEPRINTS (desde api/__init__.py) ===")
     # Registrar blueprints
     from api.routes.auth import auth_bp
     from api.routes.apps import apps_bp
@@ -34,56 +33,28 @@ def create_app(config_object):
     from api.routes.seo_mastermind import seo_mastermind_bp
     from api.routes.prlabs import prlabs_bp
     from api.routes.openai_tts import openai_tts_bp
+    from api.routes.google_news import google_news_bp
+    from api.routes.google_review_link import google_review_link_bp
     
-    print("Registrando blueprint: auth_bp en /api/auth")
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    
-    print("Registrando blueprint: apps_bp en /api/apps")
     app.register_blueprint(apps_bp, url_prefix='/api/apps')
-    
-    print("Registrando blueprint: stats_bp en /api/stats")
     app.register_blueprint(stats_bp, url_prefix='/api/stats')
-    
-    print("Registrando blueprint: instagram_bp en /api/instagram")
     app.register_blueprint(instagram_bp, url_prefix='/api/instagram')
-    
-    print("Registrando blueprint: google_trends_bp en /api/trends")
     app.register_blueprint(google_trends_bp, url_prefix='/api/trends')
-    
-    print("Registrando blueprint: google_paid_search_bp en /api/paid-search")
     app.register_blueprint(google_paid_search_bp, url_prefix='/api/paid-search')
-    
-    print("Registrando blueprint: instagram_realtime_bp en /api/instagram-realtime")
     app.register_blueprint(instagram_realtime_bp, url_prefix='/api/instagram-realtime')
-    
-    print("Registrando blueprint: youtube_media_bp en /api/youtube-media")
     app.register_blueprint(youtube_media_bp, url_prefix='/api/youtube-media')
-    
-    print("Registrando blueprint: file_converter_bp en /api/file-converter")
     app.register_blueprint(file_converter_bp, url_prefix='/api/file-converter')
-    
-    print("Registrando blueprint: tiktok_api_bp en /api/tiktok")
     app.register_blueprint(tiktok_api_bp, url_prefix='/api/tiktok')
-    
-    print("Registrando blueprint: ai_humanizer_bp en /api/ai-humanizer")
     app.register_blueprint(ai_humanizer_bp, url_prefix='/api/ai-humanizer')
-    
-    print("Registrando blueprint: seo_mastermind_bp en /api/seo-mastermind")
     app.register_blueprint(seo_mastermind_bp, url_prefix='/api/seo-mastermind')
-    
-    print("Registrando blueprint: prlabs_bp en /api/prlabs")
     app.register_blueprint(prlabs_bp, url_prefix='/api/prlabs')
-
-    print("Registrando blueprint: openai_tts_bp en /api/openai-tts")
     app.register_blueprint(openai_tts_bp, url_prefix='/api/openai-tts')
+    app.register_blueprint(google_news_bp, url_prefix='/api/google-news')
+    app.register_blueprint(google_review_link_bp, url_prefix='/api/google-review-link')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers
     register_error_handlers(app)
-    
-    # Listar todas las rutas registradas
-    print("Rutas registradas en la aplicación después de api/__init__.py:")
-    for rule in app.url_map.iter_rules():
-        print(f"  {rule.endpoint} -> {rule.rule} [{', '.join(rule.methods)}]")
     
     return app 

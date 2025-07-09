@@ -64,6 +64,23 @@ const Dashboard = () => {
       icon: Search,
       tools: [
         {
+          id: 'google-review-link',
+          title: 'Google Review Link Generator',
+          icon: Link,
+          onClick: () => {
+            setSelectedApp({
+              id: 'google-review-link',
+              title: 'Google Review Link Generator',
+              description: 'Genera enlaces directos para reseñas de Google',
+              imageUrl: 'https://cdn.pixabay.com/photo/2015/12/11/11/43/google-1088004_960_720.png',
+              category: 'Social Listening',
+              route: '/apps/google-review-link',
+              apiName: 'Google Review Link Generator API',
+            });
+            setDrawerOpen(true);
+          }
+        },
+        {
           id: 'instagram-stats',
           title: 'Instagram Statistics API',
           icon: Instagram,
@@ -93,6 +110,23 @@ const Dashboard = () => {
               category: 'Social Listening',
               route: '/apps/trends',
               apiName: 'Google Trends API',
+            });
+            setDrawerOpen(true);
+          }
+        },
+        {
+          id: 'google-news',
+          title: 'Google News API',
+          icon: Description,
+          onClick: () => {
+            setSelectedApp({
+              id: 'google-news',
+              title: 'Google News',
+              description: 'Accede a noticias en tiempo real de múltiples fuentes, categorías y países',
+              imageUrl: 'https://cdn.pixabay.com/photo/2015/11/03/09/03/google-1018443_960_720.jpg',
+              category: 'Social Listening',
+              route: '/apps/google-news',
+              apiName: 'Google News API',
             });
             setDrawerOpen(true);
           }
@@ -384,6 +418,23 @@ const Dashboard = () => {
       title: 'Web & SEO',
       icon: Language,
       tools: [
+        {
+          id: 'smart-scraper',
+          title: 'Smart Web Scraper con IA',
+          icon: Code,
+          onClick: () => {
+            setSelectedApp({
+              id: 'smart-scraper',
+              title: 'Smart Web Scraper con IA',
+              description: 'Extrae y analiza contenido de cualquier página web usando inteligencia artificial',
+              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              category: 'Web & SEO',
+              route: '/apps/smart-scraper',
+              apiName: 'Smart Web Scraper API',
+            });
+            setDrawerOpen(true);
+          }
+        },
         {
           id: 'seo-analyzer',
           title: 'SEO Analyzer',
