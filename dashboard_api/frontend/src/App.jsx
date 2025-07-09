@@ -33,7 +33,6 @@ import AhrefsRankChecker from './pages/AhrefsRankChecker/AhrefsRankChecker';
 import PageSpeedInsights from './pages/PageSpeedInsights/PageSpeedInsights';
 import ProductDescriptionGenerator from './pages/ProductDescriptionGenerator/ProductDescriptionGenerator';
 import SeoMastermind from './pages/SEOMastermind/SEOMastermind';
-
 import WordCount from './pages/WordCount/WordCount';
 import PdfToText from './pages/PdfToText/PdfToText';
 import SnapVideo from './pages/SnapVideo/SnapVideo';
@@ -46,7 +45,6 @@ import RunwayML from './pages/RunwayML/RunwayML';
 import AIHumanizer from './pages/AIHumanizer/AIHumanizer';
 import CategoryView from './pages/CategoryView/CategoryView';
 import ImageOptimizer from './pages/ImageOptimizer/ImageOptimizer';
-import theme from './theme';
 import ForgotPassword from './pages/Login/ForgotPassword';
 import ResetPassword from './pages/Login/ResetPassword';
 import PRLabsDashboard from './pages/PRLabs/Dashboard';
@@ -56,6 +54,7 @@ import PRLabsText from './pages/PRLabs/Text';
 import PRLabsVoice from './pages/PRLabs/Voice';
 import PRLabsChatbot from './pages/PRLabs/Chatbot';
 import PRLabsTools from './pages/PRLabs/Tools';
+import SmartWebScraper from './pages/SmartWebScraper/SmartWebScraper';
 
 // Theme configuration function
 const createAppTheme = (mode) => createTheme({
@@ -210,7 +209,7 @@ function App() {
   
   // Crear tema basado en el modo seleccionado
   const theme = createAppTheme(themeMode);
-  
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -231,7 +230,7 @@ function App() {
               isAuthenticated ? <Navigate to="/" /> : <Register />
             }
           />
-          
+
           {/* Ruta de verificación de email */}
           <Route
             path="/verify-email"
@@ -330,7 +329,13 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/apps/url-shortener" element={
+          <Route path="/apps/smart-scraper" element={
+            <ProtectedRoute>
+              <SmartWebScraper />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/apps/whisper-url" element={
             <ProtectedRoute>
               <UrlShortener />
             </ProtectedRoute>

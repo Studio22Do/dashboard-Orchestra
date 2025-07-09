@@ -13,6 +13,7 @@ import PRLabsTools from './pages/PRLabs/Tools';
 import Dashboard from './pages/Dashboard/Dashboard';
 import OpenAITextToSpeech from './pages/OpenAITextToSpeech/OpenAITextToSpeech';
 import GoogleReviewLink from './pages/GoogleReviewLink/GoogleReviewLink';
+import GoogleNews from './pages/GoogleNews/GoogleNews';
 
 const AppRoutes = () => {
     return (
@@ -33,6 +34,7 @@ const AppRoutes = () => {
                 <Route path="/prlabs/tools" element={<PRLabsTools />} />
 
                 <Route path="/apps/google-review-link" element={<GoogleReviewLink />} />
+                <Route path="/apps/google-news" element={<GoogleNews />} />
             </Route>
         </Routes>
     );
