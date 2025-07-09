@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify, current_app
-from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request
 import requests
 
 seo_mastermind_bp = Blueprint('seo_mastermind', __name__)
@@ -14,13 +13,6 @@ def handle_options():
 @seo_mastermind_bp.route('/', methods=['POST'])
 def generate_seo():
     """Generar análisis SEO para una keyword"""
-    # Verificar autenticación manualmente para evitar redirecciones en OPTIONS
-    try:
-        verify_jwt_in_request()
-        current_user_id = get_jwt_identity()
-    except Exception as e:
-        return jsonify({'error': 'No autorizado', 'details': str(e)}), 401
-
     data = request.json
     keyword = data.get('keyword')
     
@@ -35,7 +27,7 @@ def generate_seo():
     params = {"keyword": keyword}
 
     try:
-        print(f"[SEOMastermind] Analizando keyword: {keyword} para usuario: {current_user_id}")
+        print(f"[SEOMastermind] Analizando keyword: {keyword}")
         response = requests.get(api_url, headers=headers, params=params)
         print(f"[SEOMastermind] Status: {response.status_code}")
         print(f"[SEOMastermind] Response: {response.text}")

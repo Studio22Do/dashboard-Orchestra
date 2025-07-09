@@ -57,6 +57,7 @@ import PRLabsVoice from './pages/PRLabs/Voice';
 import PRLabsChatbot from './pages/PRLabs/Chatbot';
 import PRLabsTools from './pages/PRLabs/Tools';
 import SmartWebScraper from './pages/SmartWebScraper/SmartWebScraper';
+import WhoisLookup from './pages/WhoisLookup/WhoisLookup';
 
 // Theme configuration function
 const createAppTheme = (mode) => createTheme({
@@ -346,6 +347,12 @@ function App() {
           <Route path="/apps/smart-scraper" element={
             <ProtectedRoute>
               <SmartWebScraper />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/apps/whois-lookup" element={
+            <ProtectedRoute>
+              <WhoisLookup />
             </ProtectedRoute>
           } />
           
