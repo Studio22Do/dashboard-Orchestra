@@ -12,35 +12,35 @@ import {
   Alert,
   Paper,
   Chip,
-  Tooltip,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Divider,
+  LinearProgress,
+  useTheme
 } from '@mui/material';
-import { Speed, Accessibility, Code, Search } from '@mui/icons-material';
-
-const categories = [
-  { value: '', label: 'Todas', icon: Speed, color: 'default' },
-  { value: 'PERFORMANCE', label: 'Performance', icon: Speed, color: 'primary' },
-  { value: 'ACCESSIBILITY', label: 'Accesibilidad', icon: Accessibility, color: 'info' },
-  { value: 'BEST_PRACTICES', label: 'Mejores Prácticas', icon: Code, color: 'secondary' },
-  { value: 'SEO', label: 'SEO', icon: Search, color: 'success' }
-];
-
-const strategies = [
-  { value: '', label: 'Automático' },
-  { value: 'DESKTOP', label: 'Desktop' },
-  { value: 'MOBILE', label: 'Mobile' }
-];
+import {
+  Speed as SpeedIcon,
+  Warning as WarningIcon,
+  CheckCircle as CheckIcon,
+  Error as ErrorIcon,
+  Info as InfoIcon,
+  TrendingUp as TrendingUpIcon,
+  AccessTime as TimeIcon,
+  Storage as StorageIcon,
+  Image as ImageIcon,
+  Code as CodeIcon,
+  Dns as DnsIcon,
+  Security as SecurityIcon
+} from '@mui/icons-material';
 
 const PageSpeedInsights = () => {
   const [url, setUrl] = useState('');
-  const [category, setCategory] = useState('');
-  const [strategy, setStrategy] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
+  const theme = useTheme();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,78 +53,99 @@ const PageSpeedInsights = () => {
     setResult(null);
 
     try {
-      const params = new URLSearchParams({
-        url: url
-      });
-      
-      if (category) params.append('category', category);
-      if (strategy) params.append('strategy', strategy);
-
+      const params = new URLSearchParams({ url: url });
       const response = await fetch(`/api/pagespeed-insights/run?${params.toString()}`);
       const data = await response.json();
 
       if (!response.ok || data.error) {
-        throw new Error(data.error || data.details || 'Error al consultar PageSpeed Insights');
+        throw new Error(data.error || data.details || 'Error al analizar la velocidad del sitio web');
       }
 
       setResult(data);
     } catch (err) {
-      setError(err.message || 'Error al consultar PageSpeed Insights');
+      setError(err.message || 'Error al analizar la velocidad del sitio web');
     } finally {
       setLoading(false);
     }
   };
 
-  // Helper para extraer los puntajes principales
-  const getScore = (cat) => {
-    try {
-      return Math.round((result.lighthouseResult.categories[cat.toLowerCase()]?.score || 0) * 100);
-    } catch {
-      return 0;
-    }
-  };
-
-  // Helper para obtener el color basado en el puntaje
-  const getScoreColor = (score) => {
-    if (score >= 90) return 'success';
-    if (score >= 50) return 'warning';
+  // Helper para obtener el color del puntaje de velocidad
+  const getSpeedColor = (loadTime) => {
+    if (loadTime <= 2) return 'success';
+    if (loadTime <= 4) return 'warning';
     return 'error';
   };
 
-  // Helpers adicionales para mostrar detalles
-  const getJavaScriptDetails = () => {
-    try {
-      return result.lighthouseResult.audits['bootup-time'].details.items || [];
-    } catch {
-      return [];
+  // Helper para formatear el tiempo de carga
+  const formatLoadTime = (loadTime) => {
+    if (loadTime < 1) {
+      return `${Math.round(loadTime * 1000)}ms`;
     }
+    return `${loadTime.toFixed(2)}s`;
   };
 
-  const getOptimizationSuggestions = () => {
-    try {
-      const suggestions = [];
-      const audits = result.lighthouseResult.audits;
-      
-      if (audits['uses-rel-preconnect']) {
-        suggestions.push({
-          title: audits['uses-rel-preconnect'].title,
-          description: audits['uses-rel-preconnect'].description
-        });
-      }
-      
-      return suggestions;
-    } catch {
-      return [];
+  // Helper para mostrar las optimizaciones sugeridas
+  const renderOptimizations = () => {
+    if (!result?.optimizations || result.optimizations.length === 0) {
+      return (
+        <Typography variant="body2" color="text.secondary">
+          No se encontraron optimizaciones específicas para este sitio.
+        </Typography>
+      );
     }
+
+    return (
+      <List>
+        {result.optimizations.map((optimization, index) => (
+          <ListItem key={index} sx={{ py: 1 }}>
+            <ListItemIcon>
+              <InfoIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText 
+              primary={optimization.title || optimization.suggestion}
+              secondary={optimization.description || optimization.detail}
+            />
+          </ListItem>
+        ))}
+      </List>
+    );
+  };
+
+  // Helper para mostrar problemas detectados
+  const renderIssues = () => {
+    if (!result?.issues || result.issues.length === 0) {
+      return (
+        <Typography variant="body2" color="text.secondary">
+          No se detectaron problemas específicos.
+        </Typography>
+      );
+    }
+
+    return (
+      <List>
+        {result.issues.map((issue, index) => (
+          <ListItem key={index} sx={{ py: 1 }}>
+            <ListItemIcon>
+              <WarningIcon color="warning" />
+            </ListItemIcon>
+            <ListItemText 
+              primary={issue.title || issue.problem}
+              secondary={issue.description || issue.detail}
+            />
+          </ListItem>
+        ))}
+      </List>
+    );
   };
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom>
-        PageSpeed Insights
+        Website Speed Test
       </Typography>
       <Typography variant="subtitle1" gutterBottom color="text.secondary">
-        Analiza el rendimiento, SEO y accesibilidad de cualquier sitio web usando datos de Google PageSpeed Insights.
+        Analiza la velocidad de carga y rendimiento de cualquier sitio web. 
+        Obtén métricas precisas y sugerencias de optimización.
       </Typography>
 
       <Paper 
@@ -135,163 +156,195 @@ const PageSpeedInsights = () => {
           bgcolor: 'background.paper'
         }}
       >
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                <TextField
-                  fullWidth
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+          <TextField
+            fullWidth
             label="URL del sitio web"
-                  variant="outlined"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-            sx={{ flex: '2 1 300px' }}
-                />
-          <FormControl sx={{ minWidth: 200, flex: '1 1 200px' }}>
-            <InputLabel id="category-label">Categoría</InputLabel>
-            <Select
-              labelId="category-label"
-              value={category}
-                  label="Categoría"
-                  onChange={(e) => setCategory(e.target.value)}
-                >
-              <MenuItem value="PERFORMANCE">Rendimiento</MenuItem>
-              <MenuItem value="ACCESSIBILITY">Accesibilidad</MenuItem>
-              <MenuItem value="BEST_PRACTICES">Mejores Prácticas</MenuItem>
-              <MenuItem value="SEO">SEO</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl sx={{ minWidth: 200, flex: '1 1 200px' }}>
-            <InputLabel id="strategy-label">Estrategia</InputLabel>
-            <Select
-              labelId="strategy-label"
-              value={strategy}
-                  label="Estrategia"
-                  onChange={(e) => setStrategy(e.target.value)}
-                >
-              <MenuItem value="DESKTOP">Escritorio</MenuItem>
-              <MenuItem value="MOBILE">Móvil</MenuItem>
-            </Select>
-          </FormControl>
-                <Button
+            variant="outlined"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="Ej: https://github.com"
+            sx={{ flex: '1 1 300px' }}
+          />
+          <Button
             variant="contained"
-                  type="submit"
-                  disabled={loading}
+            type="submit"
+            disabled={loading}
+            startIcon={loading ? <CircularProgress size={20} /> : <SpeedIcon />}
             sx={{ 
               height: '56px',
               flex: '0 0 auto',
-              minWidth: '120px'
+              minWidth: '140px'
             }}
-                >
-                  {loading ? <CircularProgress size={24} /> : 'Analizar URL'}
-                </Button>
-          </Box>
+          >
+            {loading ? 'Analizando...' : 'Analizar'}
+          </Button>
+        </Box>
       </Paper>
 
       {loading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', my: 4 }}>
-          <CircularProgress />
+          <CircularProgress size={60} />
           <Typography variant="body1" sx={{ mt: 2 }}>
-            Analizando sitio web... Esto puede tomar hasta 30 segundos.
+            Analizando velocidad del sitio web...
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Esto puede tomar hasta 60 segundos
           </Typography>
         </Box>
       )}
 
       {!loading && error && (
-        <Alert severity="error" sx={{ mb: 4 }}>
+        <Alert severity="error" sx={{ mt: 3 }}>
           {error}
         </Alert>
       )}
 
       {!loading && result && (
         <>
-          <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-              Resultados del análisis
-          </Typography>
-            
-          <Grid container spacing={2}>
-              {categories.slice(1).map((cat) => (
-                <Grid item xs={6} sm={3} key={cat.value}>
-                  <Tooltip title={`${cat.label}: ${getScore(cat.value)}%`}>
-                    <Box>
-                      <Chip
-                        icon={<cat.icon />}
-                        label={`${getScore(cat.value)}%`}
-                        color={getScoreColor(getScore(cat.value))}
-                        sx={{ width: '100%' }}
-                      />
-                    </Box>
-                  </Tooltip>
-            </Grid>
-              ))}
-            </Grid>
+          {/* Métricas Principales */}
+          <Card sx={{ mt: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Resultados del Análisis
+              </Typography>
+              
+              <Grid container spacing={3}>
+                {/* Tiempo de Carga Principal */}
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ textAlign: 'center', p: 2 }}>
+                    <SpeedIcon 
+                      sx={{ 
+                        fontSize: 48, 
+                        color: getSpeedColor(result.load_time || result.loadTime || 0) === 'success' ? 'success.main' : 
+                               getSpeedColor(result.load_time || result.loadTime || 0) === 'warning' ? 'warning.main' : 'error.main'
+                      }} 
+                    />
+                    <Typography variant="h4" sx={{ mt: 1 }}>
+                      {formatLoadTime(result.load_time || result.loadTime || 0)}
+                    </Typography>
+                    <Typography variant="subtitle1" color="text.secondary">
+                      Tiempo de Carga
+                    </Typography>
+                    <Chip 
+                      label={
+                        getSpeedColor(result.load_time || result.loadTime || 0) === 'success' ? 'Excelente' :
+                        getSpeedColor(result.load_time || result.loadTime || 0) === 'warning' ? 'Mejorable' : 'Lento'
+                      }
+                      color={getSpeedColor(result.load_time || result.loadTime || 0)}
+                      sx={{ mt: 1 }}
+                    />
+                  </Box>
+                </Grid>
 
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              URL Analizada:
-            </Typography>
-              <Typography variant="body2" color="text.secondary" component="div" sx={{ wordBreak: 'break-all' }}>
-              {result.lighthouseResult?.finalUrl || url}
-            </Typography>
-          </Box>
-        </Paper>
+                {/* Métricas Adicionales */}
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ p: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Métricas Detectadas
+                    </Typography>
+                    
+                    {/* CDN Status */}
+                    {result.cdn_status !== undefined && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                        <DnsIcon sx={{ mr: 1, color: result.cdn_status ? 'success.main' : 'warning.main' }} />
+                        <Typography variant="body2">
+                          CDN: {result.cdn_status ? 'Activo' : 'No detectado'}
+                        </Typography>
+                      </Box>
+                    )}
 
-          {/* Detalles de JavaScript */}
-          <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Detalles de Tiempo de Ejecución JavaScript
-            </Typography>
-            <Box sx={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr>
-                    <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid rgba(224, 224, 224, 1)' }}>URL</th>
-                    <th style={{ textAlign: 'right', padding: '8px', borderBottom: '1px solid rgba(224, 224, 224, 1)' }}>Tiempo Total (ms)</th>
-                    <th style={{ textAlign: 'right', padding: '8px', borderBottom: '1px solid rgba(224, 224, 224, 1)' }}>Evaluación (ms)</th>
-                    <th style={{ textAlign: 'right', padding: '8px', borderBottom: '1px solid rgba(224, 224, 224, 1)' }}>Parsing (ms)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {getJavaScriptDetails().map((item, index) => (
-                    <tr key={index}>
-                      <td style={{ padding: '8px', borderBottom: '1px solid rgba(224, 224, 224, 1)' }}>
-                        {item.url === 'Unattributable' ? 'Otros Scripts' : item.url}
-                      </td>
-                      <td style={{ textAlign: 'right', padding: '8px', borderBottom: '1px solid rgba(224, 224, 224, 1)' }}>
-                        {Math.round(item.total)}
-                      </td>
-                      <td style={{ textAlign: 'right', padding: '8px', borderBottom: '1px solid rgba(224, 224, 224, 1)' }}>
-                        {Math.round(item.scripting)}
-                      </td>
-                      <td style={{ textAlign: 'right', padding: '8px', borderBottom: '1px solid rgba(224, 224, 224, 1)' }}>
-                        {Math.round(item.scriptParseCompile)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Box>
-          </Paper>
+                    {/* Compression */}
+                    {result.compression !== undefined && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                        <StorageIcon sx={{ mr: 1, color: result.compression ? 'success.main' : 'warning.main' }} />
+                        <Typography variant="body2">
+                          Compresión: {result.compression ? 'Habilitada' : 'No detectada'}
+                        </Typography>
+                      </Box>
+                    )}
 
-          {/* Sugerencias de Optimización */}
-          <Paper elevation={2} sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Sugerencias de Optimización
-            </Typography>
-            {getOptimizationSuggestions().map((suggestion, index) => (
-              <Box key={index} sx={{ mb: 2 }}>
+                    {/* Page Size */}
+                    {result.page_size && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                        <StorageIcon sx={{ mr: 1, color: 'info.main' }} />
+                        <Typography variant="body2">
+                          Tamaño: {result.page_size}
+                        </Typography>
+                      </Box>
+                    )}
+
+                    {/* Requests */}
+                    {result.requests && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                        <CodeIcon sx={{ mr: 1, color: 'info.main' }} />
+                        <Typography variant="body2">
+                          Requests: {result.requests}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                </Grid>
+              </Grid>
+
+              <Box sx={{ mt: 3 }}>
                 <Typography variant="subtitle1" gutterBottom>
-                  {suggestion.title}
+                  URL Analizada:
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {suggestion.description}
+                <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
+                  {result.url || url}
                 </Typography>
               </Box>
-            ))}
-            {getOptimizationSuggestions().length === 0 && (
-              <Typography variant="body2" color="text.secondary">
-                No hay sugerencias de optimización disponibles para la categoría seleccionada.
+            </CardContent>
+          </Card>
+
+          {/* Problemas Detectados */}
+          {(result.issues || result.problems) && (
+            <Card sx={{ mt: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  <WarningIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Problemas Detectados
+                </Typography>
+                {renderIssues()}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Sugerencias de Optimización */}
+          <Card sx={{ mt: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                <TrendingUpIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                Sugerencias de Optimización
               </Typography>
-            )}
-          </Paper>
+              {renderOptimizations()}
+              
+              {/* Consejos Generales */}
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="subtitle2" gutterBottom>
+                Consejos Generales para Mejorar la Velocidad:
+              </Typography>
+              <List dense>
+                <ListItem>
+                  <ListItemIcon><CheckIcon fontSize="small" color="success" /></ListItemIcon>
+                  <ListItemText primary="Usa un CDN como Cloudflare para distribuir contenido" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><CheckIcon fontSize="small" color="success" /></ListItemIcon>
+                  <ListItemText primary="Comprime imágenes y archivos CSS/JS" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><CheckIcon fontSize="small" color="success" /></ListItemIcon>
+                  <ListItemText primary="Habilita compresión GZIP en el servidor" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><CheckIcon fontSize="small" color="success" /></ListItemIcon>
+                  <ListItemText primary="Minimiza el número de plugins y scripts" />
+                </ListItem>
+              </List>
+            </CardContent>
+          </Card>
         </>
       )}
     </Container>

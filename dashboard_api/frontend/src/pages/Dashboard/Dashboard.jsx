@@ -523,17 +523,17 @@ const Dashboard = () => {
         },
         {
           id: 'page-speed',
-          title: 'Page Speed Insights',
+          title: 'Website Speed Test',
           icon: Speed,
           onClick: () => {
             setSelectedApp({
               id: 'page-speed',
-              title: 'Page Speed',
-              description: 'Analiza y optimiza la velocidad de carga de tu sitio web',
+              title: 'Website Speed Test',
+              description: 'Analiza la velocidad de carga y rendimiento de cualquier sitio web con métricas precisas',
               imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
               category: 'Web & SEO',
               route: '/apps/page-speed',
-              apiName: 'Page Speed API',
+              apiName: 'Website Speed Test API',
             });
             setDrawerOpen(true);
           }
