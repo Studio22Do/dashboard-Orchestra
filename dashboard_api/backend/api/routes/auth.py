@@ -13,6 +13,7 @@ from api import db
 from api.models.user import User
 from api.utils.schemas import UserSchema, LoginSchema, ChangePasswordSchema
 from api.utils.error_handlers import AuthenticationError, ValidationError as ApiValidationError
+from utils.version_control import require_version
 
 # Crear blueprint
 auth_bp = Blueprint('auth', __name__)
@@ -27,6 +28,7 @@ verification_tokens = {}  # {token: user_id}
 reset_password_tokens = {}  # {token: {user_id: id, expires: datetime}}
 
 @auth_bp.route('/register', methods=['POST'])
+@require_version('beta_v2')
 def register():
     """Registrar un nuevo usuario"""
     try:
@@ -103,6 +105,7 @@ def verify_email():
     }), 200
 
 @auth_bp.route('/forgot-password', methods=['POST'])
+@require_version('beta_v2')
 def forgot_password():
     """Iniciar proceso de recuperación de contraseña"""
     data = request.get_json()
@@ -139,6 +142,7 @@ def forgot_password():
     }), 200
 
 @auth_bp.route('/reset-password', methods=['POST'])
+@require_version('beta_v2')
 def reset_password():
     """Restablecer contraseña con token"""
     data = request.get_json()
@@ -170,6 +174,7 @@ def reset_password():
     }), 200
 
 @auth_bp.route('/login', methods=['POST'])
+@require_version('beta_v2')
 def login():
     """Iniciar sesión"""
     try:
@@ -229,6 +234,7 @@ def refresh():
 
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()
+@require_version('beta_v2')
 def get_user_info():
     """Obtener información del usuario autenticado"""
     current_user_id = get_jwt_identity()
@@ -241,6 +247,7 @@ def get_user_info():
 
 @auth_bp.route('/change-password', methods=['POST'])
 @jwt_required()
+@require_version('beta_v2')
 def change_password():
     """Cambiar la contraseña del usuario autenticado"""
     try:

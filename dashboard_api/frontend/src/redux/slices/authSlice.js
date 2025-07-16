@@ -2,7 +2,9 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 // Base URL de la API
-const API_URL = 'http://localhost:5000/api';
+const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = `${API_URL}/${API_MODE}`;
 
 // Credenciales para desarrollo
 const TEST_CREDENTIALS = {
@@ -66,7 +68,7 @@ export const registerUser = createAsyncThunk(
   async ({ name, email, password }, { rejectWithValue }) => {
     try {
       // Realizar petición al backend para registro
-      const response = await axios.post(`${API_URL}/auth/register`, {
+      const response = await axios.post(`${API_BASE_URL}/auth/register`, {
         name,
         email,
         password

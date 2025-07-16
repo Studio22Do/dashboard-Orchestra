@@ -20,33 +20,54 @@ graph TD
 - **Lógica condicional**: El código revisa la variable `MODE` para activar o desactivar funcionalidades específicas de cada versión.
 - **Base de datos compartida**: Se utiliza un solo esquema, diferenciando usuarios y datos por versión mediante un campo como `beta_version` o `user_type`.
 
-## Ejemplo de Lógica Condicional
+## Implementación Real de la Lógica de Versiones
 
-**Backend (Flask):**
-```python
-import os
-MODE = os.getenv("MODE", "beta_v1")
+### Backend (Flask)
+- Se creó un decorador reutilizable `require_version` en `utils/version_control.py`:
+  ```python
+  def require_version(allowed_versions):
+      ... # Verifica si la versión actual está permitida, si no aborta con 403
+  ```
+- Este decorador se aplica a todos los endpoints sensibles (registro, login, recuperación de contraseña, perfil, etc.) para que **solo estén disponibles en beta_v2**:
+  ```python
+  @auth_bp.route('/register', methods=['POST'])
+  @require_version('beta_v2')
+  def register():
+      ...
+  ```
+- Si el backend está en modo `beta_v1`, estos endpoints devuelven 403 Forbidden.
+- El prefijo de las rutas de la API incluye la versión:
+  `/api/beta_v1/...` o `/api/beta_v2/...` según la variable de entorno `MODE`.
 
-@app.route('/api/favoritos', methods=['POST'])
-def agregar_favorito():
-    if MODE == "beta_v1":
-        return jsonify({"error": "Funcionalidad no disponible en beta v1"}), 403
-    # lógica normal para beta_v2
-```
+### Frontend (React)
+- Se usan variables de entorno en `.env`:
+  ```env
+  REACT_APP_API_URL=http://localhost:5000/api
+  REACT_APP_MODE=beta_v1
+  ```
+- Se construye la URL base de la API dinámicamente:
+  ```js
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+  const API_BASE_URL = `${API_URL}/${API_MODE}`;
+  // Ejemplo de uso:
+  axios.post(`${API_BASE_URL}/auth/register`, ...)
+  ```
+- Así, el frontend siempre llama a la versión correcta de la API según el modo.
 
-**Frontend (React):**
-```jsx
-const mode = process.env.REACT_APP_MODE;
-
-return (
-  <div>
-    {mode === "beta_v2" && <BotonFavoritos />}
-    {mode === "beta_v1" && (
-      <p className="text-gray-500">Funcionalidad solo disponible en beta v2</p>
-    )}
-  </div>
-);
-```
+### Ejemplo de Lógica Condicional en Componentes
+- En el frontend, se puede mostrar u ocultar componentes según el modo:
+  ```jsx
+  const mode = process.env.REACT_APP_MODE;
+  return (
+    <div>
+      {mode === "beta_v2" && <BotonFavoritos />}
+      {mode === "beta_v1" && (
+        <p className="text-gray-500">Funcionalidad solo disponible en beta v2</p>
+      )}
+    </div>
+  );
+  ```
 
 ## Despliegue
 
@@ -58,7 +79,8 @@ return (
 
 - Un solo modelo de usuario, con un campo para distinguir la versión.
 - Rate limiting solo para v1.
-- Funcionalidades avanzadas solo para v2.
+- Funcionalidades avanzadas solo para v2 (autenticación, favoritos, compras, perfil, etc.).
+- Endpoints sensibles protegidos con el decorador `require_version`.
 
 ## Ventajas
 
