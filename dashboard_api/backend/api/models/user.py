@@ -15,12 +15,14 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     plan = db.Column(db.String(20), default='basic')  # Plan del usuario: basic, pro, premium
+    version = db.Column(db.String(20), default='beta_v1')  # Versión: beta_v1 o beta_v2
     
-    def __init__(self, email, password, name, role='user'):
+    def __init__(self, email, password, name, role='user', version='beta_v1'):
         self.email = email
         self.password = password  # Utiliza el setter para hashear automáticamente
         self.name = name
         self.role = role
+        self.version = version
     
     @property
     def password(self):
@@ -44,6 +46,7 @@ class User(db.Model):
             'name': self.name,
             'role': self.role,
             'plan': self.plan,
+            'version': self.version,
             'is_active': self.is_active,
             'created_at': self.created_at.isoformat() if self.created_at else None,
         }

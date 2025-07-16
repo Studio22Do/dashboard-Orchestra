@@ -13,6 +13,7 @@ import {
   Paper
 } from '@mui/material';
 import axios from 'axios';
+import { APP_CONFIG } from '../../../config/constants';
 
 const VIDEO_TYPES = [
   { label: 'Videos', value: 'videos' },
@@ -27,6 +28,9 @@ const ChannelVideos = ({ channelId }) => {
   const [error, setError] = useState(null);
   const [nextToken, setNextToken] = useState(null);
 
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `${APP_CONFIG.API_URL}/${API_MODE}`;
+
   const fetchVideos = async (reset = false, token = null) => {
     setLoading(true);
     setError(null);
@@ -37,7 +41,7 @@ const ChannelVideos = ({ channelId }) => {
         sortBy: 'newest',
       };
       if (token) params.nextToken = token;
-      const response = await axios.get('/api/youtube/channel/videos', { params });
+      const response = await axios.get(`${API_BASE_URL}/youtube-media/channel/videos`, { params });
       const items = response.data.items || [];
       setVideos(reset ? items : [...videos, ...items]);
       setNextToken(response.data.nextToken || null);

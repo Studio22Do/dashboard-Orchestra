@@ -13,6 +13,7 @@ from api import db
 from api.models.user import User
 from api.utils.schemas import UserSchema, LoginSchema, ChangePasswordSchema
 from api.utils.error_handlers import AuthenticationError, ValidationError as ApiValidationError
+from utils.version_control import require_version
 
 # Crear blueprint
 auth_bp = Blueprint('auth', __name__)
@@ -27,19 +28,24 @@ verification_tokens = {}  # {token: user_id}
 reset_password_tokens = {}  # {token: {user_id: id, expires: datetime}}
 
 @auth_bp.route('/register', methods=['POST'])
+@require_version('beta_v2')
 def register():
-    """Registrar un nuevo usuario"""
+    print('--- INICIO /register ---')
     try:
         # Validar datos de entrada
         data = request.get_json()
+        print('Datos recibidos:', data)
         if not data:
+            print('No se proporcionaron datos')
             raise ApiValidationError("No se proporcionaron datos")
         
         # Deserializar y validar con marshmallow
         user_data = user_schema.load(data)
+        print('Datos validados:', user_data)
         
         # Verificar si el correo ya está registrado
         if User.query.filter_by(email=user_data['email']).first():
+            print('El correo ya está registrado:', user_data['email'])
             raise ApiValidationError("El correo electrónico ya está registrado")
         
         # Crear usuario (activo por defecto para desarrollo)
@@ -49,6 +55,7 @@ def register():
             name=user_data['name'],
             role=user_data.get('role', 'user')
         )
+        print('Usuario a crear:', user)
         
         # En desarrollo, el usuario se crea activo
         user.is_active = True
@@ -56,10 +63,12 @@ def register():
         # Guardar en la base de datos
         db.session.add(user)
         db.session.commit()
+        print('Usuario creado y guardado en la base de datos')
         
         # Generar tokens de acceso inmediatamente
         access_token = create_access_token(identity=str(user.id))
         refresh_token = create_refresh_token(identity=str(user.id))
+        print('Tokens generados')
         
         # Retornar respuesta con tokens
         return jsonify({
@@ -70,9 +79,11 @@ def register():
         }), 201
         
     except ValidationError as e:
+        print('ValidationError:', str(e))
         raise ApiValidationError(str(e.messages))
     except Exception as e:
         db.session.rollback()
+        print('Exception general:', str(e))
         raise ApiValidationError(str(e))
 
 @auth_bp.route('/verify-email', methods=['GET'])
@@ -103,6 +114,7 @@ def verify_email():
     }), 200
 
 @auth_bp.route('/forgot-password', methods=['POST'])
+@require_version('beta_v2')
 def forgot_password():
     """Iniciar proceso de recuperación de contraseña"""
     data = request.get_json()
@@ -139,6 +151,7 @@ def forgot_password():
     }), 200
 
 @auth_bp.route('/reset-password', methods=['POST'])
+@require_version('beta_v2')
 def reset_password():
     """Restablecer contraseña con token"""
     data = request.get_json()
@@ -170,6 +183,7 @@ def reset_password():
     }), 200
 
 @auth_bp.route('/login', methods=['POST'])
+@require_version('beta_v2')
 def login():
     """Iniciar sesión"""
     try:
@@ -229,6 +243,7 @@ def refresh():
 
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()
+@require_version('beta_v2')
 def get_user_info():
     """Obtener información del usuario autenticado"""
     current_user_id = get_jwt_identity()
@@ -241,6 +256,7 @@ def get_user_info():
 
 @auth_bp.route('/change-password', methods=['POST'])
 @jwt_required()
+@require_version('beta_v2')
 def change_password():
     """Cambiar la contraseña del usuario autenticado"""
     try:

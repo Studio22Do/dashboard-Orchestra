@@ -27,7 +27,9 @@ import Tooltip from '@mui/material/Tooltip';
 import StoryViewer from './components/StoryViewer';
 
 // Base URL de la API
-const API_URL = 'http://localhost:5000/api';
+const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = `${API_URL}/${API_MODE}`;
 
 const InstagramStats = () => {
   const [username, setUsername] = useState('');
@@ -55,7 +57,7 @@ const InstagramStats = () => {
     try {
       const token = localStorage.getItem('token');
       const config = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
-      const response = await axios.get(`${API_URL}/instagram/full-profile?username=${username}`, config);
+      const response = await axios.get(`${API_BASE_URL}/instagram/full-profile?username=${username}`, config);
       setProfileData(response.data.profile);
       setHighlights(response.data.highlights);
       setStories(response.data.stories);

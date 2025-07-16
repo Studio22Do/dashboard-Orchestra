@@ -25,7 +25,9 @@ import { Search as SearchIcon } from '@mui/icons-material';
 import Breadcrumbs from '../../components/common/Breadcrumbs';
 
 // Base URL de la API
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+const API_BASE_URL = `${API_URL}/${API_MODE}`;
 
 const categories = [
   { id: 'latest', label: 'Últimas Noticias' },
@@ -66,11 +68,11 @@ const GoogleNews = () => {
     try {
       let response;
       if (searchQuery && searchQuery.trim()) {
-        response = await axios.get(`${API_URL}/google-news/search?keyword=${encodeURIComponent(searchQuery)}&lr=${language}`);
+        response = await axios.get(`${API_BASE_URL}/google-news/search?keyword=${encodeURIComponent(searchQuery)}&lr=${language}`);
       } else if (category === 'latest') {
-        response = await axios.get(`${API_URL}/google-news/latest?lr=${language}`);
+        response = await axios.get(`${API_BASE_URL}/google-news/latest?lr=${language}`);
       } else {
-        response = await axios.get(`${API_URL}/google-news/category/${category}?lr=${language}`);
+        response = await axios.get(`${API_BASE_URL}/google-news/category/${category}?lr=${language}`);
       }
       
       if (response.data && response.data.articles) {
@@ -81,7 +83,7 @@ const GoogleNews = () => {
       }
     } catch (err) {
       console.error('Error fetching news:', err);
-      setError(err.response?.data?.error || err.message || 'Error al obtener noticias');
+      setError(err.response?.data?.error || (typeof err.response?.data === 'string' ? err.response.data : null) || err.message || 'Error al obtener noticias');
       setNews([]);
     } finally {
       setLoading(false);

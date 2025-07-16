@@ -1,24 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { APP_CONFIG } from '../../../config/constants';
 
 const VideoDetails = ({ videoId, setError }) => {
   const [loading, setLoading] = useState(false);
   const [videoData, setVideoData] = useState(null);
   const [error, setLocalError] = useState(null);
 
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `${APP_CONFIG.API_URL}/${API_MODE}`;
+
   useEffect(() => {
     if (!videoId) return;
     setLoading(true);
     setLocalError(null);
     setVideoData(null);
-    axios.get('/api/youtube/video/details-and-formats', { params: { videoId } })
+    axios.get(`${API_BASE_URL}/youtube-media/video/details-and-formats`, { params: { videoId } })
       .then(res => setVideoData(res.data))
       .catch(err => {
         setLocalError(err.response?.data?.error || 'Error al obtener detalles');
         setError && setError(err.response?.data?.error || 'Error al obtener detalles');
       })
       .finally(() => setLoading(false));
-  }, [videoId, setError]);
+  }, [videoId, setError, API_BASE_URL]);
 
   if (!videoId) {
     return <div className="text-gray-500 my-8">Selecciona un video para ver los detalles.</div>;

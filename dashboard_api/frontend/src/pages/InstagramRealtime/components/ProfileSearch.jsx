@@ -31,6 +31,10 @@ const ProfileSearch = ({ setError }) => {
   const [loading, setLoading] = useState(false);
   const [profileData, setProfileData] = useState(null);
 
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `${API_URL}/${API_MODE}`;
+
   const handleSearch = async (e) => {
     e.preventDefault();
     
@@ -42,7 +46,7 @@ const ProfileSearch = ({ setError }) => {
     setLoading(true);
     
     try {
-      const response = await axios.get('/api/instagram-realtime/profiles', {
+      const response = await axios.get(`${API_BASE_URL}/instagram-realtime/profiles`, {
         params: { username },
         headers: {
           'Authorization': `Bearer ${token}`

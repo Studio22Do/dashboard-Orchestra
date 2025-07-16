@@ -29,12 +29,16 @@ import {
   Warning
 } from '@mui/icons-material';
 import axios from 'axios';
+import { APP_CONFIG } from '../../config/constants';
 
 const SnapVideo = () => {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [videoInfo, setVideoInfo] = useState(null);
+
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `${APP_CONFIG.API_URL}/${API_MODE}`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,7 +53,99 @@ const SnapVideo = () => {
     setVideoInfo(null);
     
     try {
-      const response = await axios.post('/api/snap-video/download', { url });
+      console.log('Enviando petición a:', `${API_BASE_URL}/media-downloader/download`);
+      console.log('URL enviada:', url);
+      
+      const response = await axios.post(`${API_BASE_URL}/media-downloader/download`, { url });
+      
+      console.log('Respuesta completa:', response.data);
+      
+      // Verificar si hay error en la respuesta
+      if (response.data && response.data.error) {
+        console.error('Error de la API externa:', response.data.error);
+        setError(`Error de la API: ${response.data.error}. Intenta con una URL diferente o verifica que la URL sea válida.`);
+        return;
+      }
+      
+      // Verificar si hay datos en la respuesta
+      if (response.data) {
+        // Intentar diferentes estructuras de respuesta
+        let videoData = null;
+        
+        // Estructura 1: medias array
+        if (response.data.medias && response.data.medias.length > 0) {
+          videoData = {
+            title: response.data.title || 'Video de Snapchat',
+            duration: response.data.duration || 'N/A',
+            thumbnail: response.data.thumbnail || '',
+            source: response.data.source || 'Snapchat',
+            medias: response.data.medias
+          };
+        }
+        // Estructura 2: links array
+        else if (response.data.links && response.data.links.length > 0) {
+          videoData = {
+            title: response.data.title || 'Video de Snapchat',
+            duration: response.data.duration || 'N/A',
+            thumbnail: response.data.thumbnail || '',
+            source: response.data.source || 'Snapchat',
+            medias: response.data.links.map(link => ({
+              url: link.url || link,
+              quality: link.quality || 'HD',
+              extension: link.extension || 'mp4'
+            }))
+          };
+        }
+        // Estructura 3: url directa
+        else if (response.data.url) {
+          videoData = {
+            title: response.data.title || 'Video de Snapchat',
+            duration: response.data.duration || 'N/A',
+            thumbnail: response.data.thumbnail || '',
+            source: response.data.source || 'Snapchat',
+            medias: [{
+              url: response.data.url,
+              quality: 'HD',
+              extension: 'mp4'
+            }]
+          };
+        }
+        // Estructura 4: datos en formato diferente
+        else if (typeof response.data === 'object') {
+          console.log('Estructura de respuesta no reconocida:', response.data);
+          setError(`Respuesta recibida pero formato no reconocido. Revisa la consola para más detalles.`);
+          return;
+        }
+        
+        if (videoData) {
+          setVideoInfo(videoData);
+          console.log('Datos del video procesados:', videoData);
+        } else {
+          setError('No se encontraron enlaces de descarga para esta URL.');
+        }
+      } else {
+        setError('Respuesta vacía del servidor.');
+      }
+    } catch (err) {
+      console.error('Error completo:', err);
+      console.error('Respuesta de error:', err.response?.data);
+      setError(err.response?.data?.error || err.message || 'Error al obtener el video');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTest = async () => {
+    setLoading(true);
+    setError(null);
+    setVideoInfo(null);
+    
+    try {
+      console.log('Probando endpoint de test...');
+      const response = await axios.post(`${API_BASE_URL}/media-downloader/test`, { url: 'test-url' });
+      
+      console.log('Respuesta de test:', response.data);
+      
       if (response.data && response.data.medias && response.data.medias.length > 0) {
         setVideoInfo({
           title: response.data.title,
@@ -58,11 +154,13 @@ const SnapVideo = () => {
           source: response.data.source,
           medias: response.data.medias
         });
+        console.log('Test exitoso - Frontend funcionando correctamente');
       } else {
-        setError('No se encontraron enlaces de descarga para esta URL.');
+        setError('Test falló - No se recibieron datos de prueba');
       }
     } catch (err) {
-      setError(err.response?.data?.error || err.message || 'Error al obtener el video');
+      console.error('Error en test:', err);
+      setError('Error en el test: ' + (err.response?.data?.error || err.message));
     } finally {
       setLoading(false);
     }
@@ -80,10 +178,10 @@ const SnapVideo = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        Snap Video
+        Media Downloader
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        Descarga videos de Snapchat fácilmente
+        Descarga videos y audio de YouTube, Instagram, TikTok, Facebook y más plataformas
       </Typography>
 
       <Card sx={{ mb: 4 }}>
@@ -94,7 +192,7 @@ const SnapVideo = () => {
                 <TextField
                   fullWidth
                   label="URL del Video"
-                  placeholder="https://www.snapchat.com/..."
+                  placeholder="https://www.youtube.com/watch?v=... o https://www.instagram.com/reel/..."
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   required
@@ -115,6 +213,18 @@ const SnapVideo = () => {
                   sx={{ height: '56px' }}
                 >
                   {loading ? <CircularProgress size={24} /> : 'Obtener Video'}
+                </Button>
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={handleTest}
+                  disabled={loading}
+                  startIcon={<Info />}
+                  sx={{ height: '56px' }}
+                >
+                  {loading ? <CircularProgress size={24} /> : '🧪 Probar Frontend'}
                 </Button>
               </Grid>
             </Grid>
