@@ -29,6 +29,7 @@ import {
   Speed
 } from '@mui/icons-material';
 import axios from 'axios';
+import { APP_CONFIG } from '../../config/constants';
 
 const WordCount = () => {
   const [text, setText] = useState('');
@@ -37,6 +38,9 @@ const WordCount = () => {
   const [analysis, setAnalysis] = useState(null);
   const [url, setUrl] = useState('');
   const [extracting, setExtracting] = useState(false);
+
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `${APP_CONFIG.API_URL}/${API_MODE}`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -128,7 +132,7 @@ const WordCount = () => {
     setExtracting(true);
     setError(null);
     try {
-      const response = await axios.post('/api/text-extract/extract', { url });
+      const response = await axios.post(`${API_BASE_URL}/text-extract/extract`, { url });
       if (response.data && response.data.text) {
         setText(response.data.text);
       } else if (typeof response.data === 'string') {

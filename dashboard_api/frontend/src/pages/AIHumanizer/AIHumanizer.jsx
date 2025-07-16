@@ -36,12 +36,16 @@ import {
   Code,
   Translate
 } from '@mui/icons-material';
+import { APP_CONFIG } from '../../config/constants';
 
 const AIHumanizer = () => {
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `${APP_CONFIG.API_URL}/${API_MODE}`;
   const [promptData, setPromptData] = useState({
     type: 'text',
     tone: 'professional',
     length: 'medium',
+    mode: 'easy',
     prompt: ''
   });
   const [loading, setLoading] = useState(false);
@@ -65,15 +69,35 @@ const AIHumanizer = () => {
     setLoading(true);
     setError(null);
     setGeneratedContent(null);
-    try {
-      const response = await fetch('/api/ai-humanizer/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: promptData.prompt,
-          level: 'standard' // Puedes hacer esto dinámico si quieres
-        })
-      });
+    
+    // Mapear longitud a nivel
+    const lengthToLevel = {
+      'short': 3,
+      'medium': 7,
+      'long': 10
+    };
+    
+    // Mapear tono del frontend al de la API
+    const toneMapping = {
+      'professional': 'formal',
+      'casual': 'casual',
+      'creative': 'general',
+      'technical': 'academic'
+    };
+    
+          try {
+        // Usar endpoint diferente según el modo
+        const endpoint = promptData.mode === 'basic' ? '/basic' : '/';
+        const response = await fetch(`${API_BASE_URL}/ai-humanizer${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: promptData.prompt,
+            level: lengthToLevel[promptData.length] || 7,
+            tone: toneMapping[promptData.tone] || 'general',
+            type: promptData.type
+          })
+        });
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Error al generar el contenido');
@@ -81,11 +105,16 @@ const AIHumanizer = () => {
       const data = await response.json();
       setGeneratedContent({
         content: data.contenido_generado || 'No se pudo generar contenido',
+        alternatives: data.alternativas || [],
         metadata: {
           type: data.metadatos.tipo,
           language: data.metadatos.idioma,
           tone: data.metadatos.tono,
           length: data.metadatos.longitud,
+          palabras_originales: data.metadatos.palabras_originales,
+          palabras_humanizadas: data.metadatos.palabras_humanizadas,
+          mejor_probabilidad_ai: data.metadatos.mejor_probabilidad_ai,
+          total_alternativas: data.metadatos.total_alternativas,
           timestamp: new Date().toLocaleString()
         },
         suggestions: [
@@ -116,6 +145,45 @@ const AIHumanizer = () => {
     document.body.removeChild(element);
   };
 
+  const handleTest = async () => {
+    setLoading(true);
+    setError(null);
+    setGeneratedContent(null);
+    try {
+      const response = await fetch(`${API_BASE_URL}/ai-humanizer/test`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: 'Texto de prueba para verificar la funcionalidad'
+        })
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error en la prueba');
+      }
+      const data = await response.json();
+      setGeneratedContent({
+        content: data.contenido_generado || 'No se pudo generar contenido de prueba',
+        metadata: {
+          type: data.metadatos.tipo,
+          language: data.metadatos.idioma,
+          tone: data.metadatos.tono,
+          length: data.metadatos.longitud,
+          timestamp: new Date().toLocaleString()
+        },
+        suggestions: [
+          'Esta es una respuesta de prueba que confirma que el frontend y backend funcionan correctamente',
+          'El problema principal es que la API externa está tardando demasiado en responder',
+          'Puedes intentar con textos más cortos o esperar unos minutos antes de intentar nuevamente'
+        ]
+      });
+    } catch (err) {
+      setError(err.message || 'Error en la prueba');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
@@ -129,7 +197,21 @@ const AIHumanizer = () => {
         <CardContent>
           <Box component="form" onSubmit={handleSubmit}>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={3}>
+                <FormControl fullWidth>
+                  <InputLabel>Modo</InputLabel>
+                  <Select
+                    name="mode"
+                    value={promptData.mode}
+                    onChange={handleInputChange}
+                    label="Modo"
+                  >
+                    <MenuItem value="easy">Fácil (Rápido)</MenuItem>
+                    <MenuItem value="basic">Básico (Con Alternativas)</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={3}>
                 <FormControl fullWidth>
                   <InputLabel>Tipo de Contenido</InputLabel>
                   <Select
@@ -144,7 +226,7 @@ const AIHumanizer = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={3}>
                 <FormControl fullWidth>
                   <InputLabel>Tono</InputLabel>
                   <Select
@@ -160,7 +242,7 @@ const AIHumanizer = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={3}>
                 <FormControl fullWidth>
                   <InputLabel>Longitud</InputLabel>
                   <Select
@@ -201,6 +283,19 @@ const AIHumanizer = () => {
                   sx={{ height: '56px' }}
                 >
                   {loading ? <CircularProgress size={24} /> : 'Generar Contenido'}
+                </Button>
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  type="button"
+                  variant="outlined"
+                  fullWidth
+                  disabled={loading}
+                  onClick={handleTest}
+                  startIcon={<SmartToy />}
+                  sx={{ height: '56px' }}
+                >
+                  Probar Funcionalidad (Simulado)
                 </Button>
               </Grid>
             </Grid>
@@ -299,6 +394,34 @@ const AIHumanizer = () => {
                         secondary={generatedContent.metadata.length} 
                       />
                     </ListItem>
+                    {generatedContent.metadata.palabras_originales && (
+                      <>
+                        <Divider />
+                        <ListItem>
+                          <ListItemIcon>
+                            <Psychology />
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary="Palabras" 
+                            secondary={`${generatedContent.metadata.palabras_originales} → ${generatedContent.metadata.palabras_humanizadas}`} 
+                          />
+                        </ListItem>
+                      </>
+                    )}
+                    {generatedContent.metadata.mejor_probabilidad_ai !== undefined && (
+                      <>
+                        <Divider />
+                        <ListItem>
+                          <ListItemIcon>
+                            <SmartToy />
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary="Probabilidad AI" 
+                            secondary={`${(generatedContent.metadata.mejor_probabilidad_ai * 100).toFixed(1)}%`} 
+                          />
+                        </ListItem>
+                      </>
+                    )}
                   </List>
                 </CardContent>
               </Card>
@@ -323,6 +446,41 @@ const AIHumanizer = () => {
                 </CardContent>
               </Card>
             </Grid>
+            
+            {/* Mostrar alternativas si están disponibles */}
+            {generatedContent.alternatives && generatedContent.alternatives.length > 0 && (
+              <Grid item xs={12}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Alternativas Generadas ({generatedContent.alternatives.length})
+                    </Typography>
+                    <List>
+                      {generatedContent.alternatives.map((alt, index) => (
+                        <ListItem key={index} sx={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                          <Box sx={{ width: '100%', mb: 1 }}>
+                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                              Probabilidad AI: {(alt.probabilidad_ai * 100).toFixed(1)}%
+                            </Typography>
+                            <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
+                              {alt.texto}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ alignSelf: 'flex-end' }}>
+                            <Tooltip title="Copiar alternativa">
+                              <IconButton size="small" onClick={() => handleCopy(alt.texto)}>
+                                <ContentCopy />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                          <Divider sx={{ width: '100%', mt: 1 }} />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </CardContent>
+                </Card>
+              </Grid>
+            )}
           </Grid>
         </Paper>
       )}

@@ -12,6 +12,7 @@ import {
     CircularProgress
 } from '@mui/material';
 import { openaiTTSService } from '../../services/openaiTTS';
+import { APP_CONFIG } from '../../config/constants';
 
 const OpenAITextToSpeech = () => {
     const [text, setText] = useState('');
@@ -39,6 +40,35 @@ const OpenAITextToSpeech = () => {
             setAudioUrl(response.audio_url);
         } catch (err) {
             setError(err.message || 'Error al generar el audio');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleTest = async () => {
+        setLoading(true);
+        setError('');
+        try {
+            const response = await fetch(`${APP_CONFIG.API_URL}/api/${process.env.REACT_APP_MODE || 'beta_v1'}/openai-tts/test`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    text: 'Texto de prueba para verificar la funcionalidad'
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error en la prueba');
+            }
+            
+            const data = await response.json();
+            setError(`✅ ${data.message}`);
+        } catch (err) {
+            setError(`❌ ${err.message || 'Error en la prueba'}`);
         } finally {
             setLoading(false);
         }
@@ -100,14 +130,22 @@ const OpenAITextToSpeech = () => {
                     />
                 </FormControl>
 
-                <Button
-                    variant="contained"
-                    onClick={handleSubmit}
-                    disabled={loading || !text}
-                    sx={{ mb: 2 }}
-                >
-                    {loading ? <CircularProgress size={24} /> : 'Generar Audio'}
-                </Button>
+                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                    <Button
+                        variant="contained"
+                        onClick={handleSubmit}
+                        disabled={loading || !text}
+                    >
+                        {loading ? <CircularProgress size={24} /> : 'Generar Audio'}
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        onClick={handleTest}
+                        disabled={loading}
+                    >
+                        Probar Funcionalidad
+                    </Button>
+                </Box>
 
                 {error && (
                     <Typography color="error" sx={{ mb: 2 }}>
