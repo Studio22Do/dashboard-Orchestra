@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = `${API_URL}/${API_MODE}`;
 
 // Datos de ejemplo para las apps (simulamos datos que vendrían del backend)
 const MOCK_APPS_DATA = [
@@ -322,7 +324,7 @@ export const fetchPurchasedApps = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token || localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/apps/user/apps`, {
+      const response = await axios.get(`${API_BASE_URL}/apps/user/apps`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -344,7 +346,7 @@ export const fetchFavoriteApps = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token || localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/apps/user/favorites`, {
+      const response = await axios.get(`${API_BASE_URL}/apps/user/favorites`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data.apps;
@@ -375,7 +377,7 @@ export const purchaseApp = createAsyncThunk(
     }
     // Si hay backend, llamar al endpoint real
     try {
-      const response = await axios.post(`${API_URL}/apps/user/apps/${appId}/purchase`, {}, {
+      const response = await axios.post(`${API_BASE_URL}/apps/user/apps/${appId}/purchase`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data.app;
@@ -390,7 +392,7 @@ export const toggleFavoriteApp = createAsyncThunk(
   async (appId, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token || localStorage.getItem('token');
-      const response = await axios.post(`${API_URL}/apps/user/apps/${appId}/favorite`, {}, {
+      const response = await axios.post(`${API_BASE_URL}/apps/user/apps/${appId}/favorite`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data.app;
@@ -406,7 +408,7 @@ export const fetchAllApps = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token || localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/apps`, {
+      const response = await axios.get(`${API_BASE_URL}/apps`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Si la respuesta es vacía, usar el mock

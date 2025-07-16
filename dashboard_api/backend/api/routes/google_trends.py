@@ -214,43 +214,42 @@ def get_interest_over_time():
     # Obtener parámetros
     keyword = request.args.get('keyword')
     geo = request.args.get('geo', 'US')  # Por defecto USA
-    
+
+    current_app.logger.info(f"[GoogleTrends] Parámetros recibidos: keyword={keyword}, geo={geo}")
+
     if not keyword:
+        current_app.logger.warning("[GoogleTrends] Falta el parámetro 'keyword'")
         raise ValidationError("Se requiere una palabra clave")
-    
+
     try:
         url = "https://google-trends8.p.rapidapi.com/interest-over-time"
-        
         querystring = {
             "keyword": keyword,
             "region_code": geo,
             "hl": "en-US"
         }
-        
         headers = {
             "x-rapidapi-key": current_app.config.get('RAPIDAPI_KEY'),
             "x-rapidapi-host": "google-trends8.p.rapidapi.com"
         }
-        
-        current_app.logger.debug(f"Enviando solicitud a: {url} con parámetros: {querystring}")
-        
-        # Realizar solicitud usando requests
+        current_app.logger.info(f"[GoogleTrends] Enviando solicitud a RapidAPI: {url} con params: {querystring}")
         response = requests.get(url, headers=headers, params=querystring)
-        
-        # Registrar la respuesta para depuración
-        current_app.logger.debug(f"Código de estado: {response.status_code}")
-        current_app.logger.debug(f"Respuesta de interés a lo largo del tiempo: {response.text[:1000]}...")
-        
-        # Verificar si la respuesta es exitosa
+        current_app.logger.info(f"[GoogleTrends] RapidAPI status: {response.status_code}")
+        current_app.logger.info(f"[GoogleTrends] RapidAPI response: {response.text[:1000]}")
         if response.status_code == 200:
             result = response.json()
             return jsonify(result), 200
         else:
-            current_app.logger.warning(f"La API devolvió un error: {response.text}")
-            return jsonify({"error": "Error al obtener interés a lo largo del tiempo"}), response.status_code
-    
+            # Intentar extraer mensaje de error de la respuesta de RapidAPI
+            try:
+                error_json = response.json()
+                error_message = error_json.get('message') or error_json.get('error') or response.text
+            except Exception:
+                error_message = response.text
+            current_app.logger.warning(f"[GoogleTrends] RapidAPI error: {error_message}")
+            return jsonify({"error": error_message}), response.status_code
     except Exception as e:
-        current_app.logger.error(f"Error al consultar interés a lo largo del tiempo: {str(e)}")
+        current_app.logger.error(f"[GoogleTrends] Error inesperado: {str(e)}")
         return jsonify({"error": f"Error al obtener interés: {str(e)}"}), 500
 
 @google_trends_bp.route('/related-queries', methods=['GET'])

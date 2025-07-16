@@ -26,6 +26,10 @@ const VideoSearch = ({ setError, onSelectVideo }) => {
   const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState(null);
 
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `${API_URL}/${API_MODE}`;
+
   const handleSearch = async (e) => {
     e.preventDefault();
     
@@ -37,7 +41,7 @@ const VideoSearch = ({ setError, onSelectVideo }) => {
     setLoading(true);
     
     try {
-      const response = await axios.get('/api/youtube/search/videos', {
+      const response = await axios.get(`${API_BASE_URL}/youtube-media/search/videos`, {
         params: { 
           query: searchTerm,
           maxResults: 20

@@ -21,6 +21,10 @@ import {
   Link as LinkIcon
 } from '@mui/icons-material';
 
+const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = `${API_URL}/${API_MODE}`;
+
 const GoogleReviewLink = () => {
   const [placeId, setPlaceId] = useState('');
   const [reviewLink, setReviewLink] = useState('');
@@ -39,7 +43,7 @@ const GoogleReviewLink = () => {
     setReviewLink('');
 
     try {
-      const response = await fetch('/api/google-review-link/generate', {
+      const response = await fetch(`${API_BASE_URL}/google-review-link/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,12 +54,14 @@ const GoogleReviewLink = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al generar el enlace');
+        setError(data.error || 'Error al generar el enlace de reseñas');
+        setLoading(false);
+        return;
       }
 
       setReviewLink(data.data || data.review_link || data.url);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Error al generar el enlace de reseñas');
     } finally {
       setLoading(false);
     }

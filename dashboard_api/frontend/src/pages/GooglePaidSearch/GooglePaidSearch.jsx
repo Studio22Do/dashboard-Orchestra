@@ -62,6 +62,10 @@ const GooglePaidSearch = () => {
   const [competitors, setCompetitors] = useState(null);
   const [adPerformance, setAdPerformance] = useState(null);
 
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `${API_URL}/${API_MODE}`;
+
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
     setError(null);
@@ -79,7 +83,7 @@ const GooglePaidSearch = () => {
 
     try {
       // Llamada real a la API
-      const response = await axios.get('/api/paid-search/search', {
+      const response = await axios.get(`${API_BASE_URL}/paid-search/search`, {
         params: {
           query: searchQuery,
           country: selectedCountry
@@ -121,7 +125,7 @@ const GooglePaidSearch = () => {
 
     try {
       // Llamada real a la API
-      const response = await axios.get('/api/paid-search/keywords', {
+      const response = await axios.get(`${API_BASE_URL}/paid-search/keywords`, {
         params: {
           keywords: keywordInput,
           country: selectedCountry
@@ -163,7 +167,7 @@ const GooglePaidSearch = () => {
 
     try {
       // Llamada real a la API
-      const response = await axios.get('/api/paid-search/competitors', {
+      const response = await axios.get(`${API_BASE_URL}/paid-search/competitors`, {
         params: {
           keyword: competitorKeyword,
           country: selectedCountry
@@ -205,7 +209,7 @@ const GooglePaidSearch = () => {
 
     try {
       // Llamada real a la API
-      const response = await axios.get('/api/paid-search/ad-performance', {
+      const response = await axios.get(`${API_BASE_URL}/paid-search/ad-performance`, {
         params: {
           domain: domainInput
         },

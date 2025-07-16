@@ -30,7 +30,9 @@ import {
 } from '@mui/icons-material';
 
 // Base URL de la API
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+const API_BASE_URL = `${API_URL}/${API_MODE}`;
 
 // Lista de países para el selector
 const countries = [
@@ -76,12 +78,12 @@ const GoogleTrends = () => {
       };
       
       // Obtener tendencias
-      const response = await axios.get(`${API_URL}/trends/trending-searches?geo=${country}`, config);
+      const response = await axios.get(`${API_BASE_URL}/trends/trending-searches?geo=${country}`, config);
       
       setTrendingData(response.data);
     } catch (err) {
       console.error('Error fetching Google Trends data:', err);
-      setError(err.response?.data?.error || err.message || 'Error al obtener datos de tendencias');
+      setError(err.response?.data?.error || (typeof err.response?.data === 'string' ? err.response.data : null) || err.message || 'Error al obtener datos de tendencias');
     } finally {
       setLoading(false);
     }
@@ -113,12 +115,12 @@ const GoogleTrends = () => {
       };
       
       // Obtener datos de interés a lo largo del tiempo
-      const response = await axios.get(`${API_URL}/trends/interest-over-time?keyword=${encodeURIComponent(searchTerm)}&geo=${country}`, config);
+      const response = await axios.get(`${API_BASE_URL}/trends/interest-over-time?keyword=${encodeURIComponent(searchTerm)}&geo=${country}`, config);
       
       setInterestData(response.data);
     } catch (err) {
       console.error('Error fetching interest over time data:', err);
-      setError(err.response?.data?.error || err.message || 'Error al obtener datos de interés');
+      setError(err.response?.data?.error || (typeof err.response?.data === 'string' ? err.response.data : null) || err.message || 'Error al obtener datos de interés');
     } finally {
       setLoading(false);
     }

@@ -30,18 +30,22 @@ reset_password_tokens = {}  # {token: {user_id: id, expires: datetime}}
 @auth_bp.route('/register', methods=['POST'])
 @require_version('beta_v2')
 def register():
-    """Registrar un nuevo usuario"""
+    print('--- INICIO /register ---')
     try:
         # Validar datos de entrada
         data = request.get_json()
+        print('Datos recibidos:', data)
         if not data:
+            print('No se proporcionaron datos')
             raise ApiValidationError("No se proporcionaron datos")
         
         # Deserializar y validar con marshmallow
         user_data = user_schema.load(data)
+        print('Datos validados:', user_data)
         
         # Verificar si el correo ya está registrado
         if User.query.filter_by(email=user_data['email']).first():
+            print('El correo ya está registrado:', user_data['email'])
             raise ApiValidationError("El correo electrónico ya está registrado")
         
         # Crear usuario (activo por defecto para desarrollo)
@@ -51,6 +55,7 @@ def register():
             name=user_data['name'],
             role=user_data.get('role', 'user')
         )
+        print('Usuario a crear:', user)
         
         # En desarrollo, el usuario se crea activo
         user.is_active = True
@@ -58,10 +63,12 @@ def register():
         # Guardar en la base de datos
         db.session.add(user)
         db.session.commit()
+        print('Usuario creado y guardado en la base de datos')
         
         # Generar tokens de acceso inmediatamente
         access_token = create_access_token(identity=str(user.id))
         refresh_token = create_refresh_token(identity=str(user.id))
+        print('Tokens generados')
         
         # Retornar respuesta con tokens
         return jsonify({
@@ -72,9 +79,11 @@ def register():
         }), 201
         
     except ValidationError as e:
+        print('ValidationError:', str(e))
         raise ApiValidationError(str(e.messages))
     except Exception as e:
         db.session.rollback()
+        print('Exception general:', str(e))
         raise ApiValidationError(str(e))
 
 @auth_bp.route('/verify-email', methods=['GET'])

@@ -32,6 +32,10 @@ const UserSearch = ({ setError }) => {
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
 
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `${API_URL}/${API_MODE}`;
+
   const handleSearch = async (e) => {
     e.preventDefault();
     
@@ -46,7 +50,7 @@ const UserSearch = ({ setError }) => {
     setLoading(true);
     
     try {
-      const response = await axios.get('/api/tiktok/user-by-username', {
+      const response = await axios.get(`${API_BASE_URL}/tiktok/user-by-username`, {
         params: { username: cleanUsername },
         headers: {
           'Authorization': `Bearer ${token}`

@@ -49,7 +49,10 @@ const HashtagSearch = ({ setError }) => {
     setLoading(true);
     
     try {
-      const response = await axios.get('/api/instagram-realtime/hashtags', {
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+      const API_BASE_URL = `${API_URL}/${API_MODE}`;
+      const response = await axios.get(`${API_BASE_URL}/instagram-realtime/hashtags`, {
         params: { hashtag: cleanHashtag },
         headers: {
           'Authorization': `Bearer ${token}`
@@ -57,6 +60,7 @@ const HashtagSearch = ({ setError }) => {
       });
       
       setHashtagData(response.data);
+      console.log('Respuesta hashtagData:', response.data);
       setError(null);
     } catch (err) {
       console.error('Error fetching hashtag:', err);
@@ -197,14 +201,7 @@ const HashtagSearch = ({ setError }) => {
                 ))}
               </Grid>
             </Box>
-          ) : (
-        <Paper elevation={0} sx={{ p: 3, textAlign: 'center', bgcolor: 'background.default' }}>
-          <Typography variant="h6">No se encontraron publicaciones con este hashtag</Typography>
-          <Typography variant="body2" color="text.secondary">
-            Intenta con otro hashtag o verifica que esté escrito correctamente.
-          </Typography>
-        </Paper>
-          )}
+          ) : null}
         </Box>
       )}
     </Box>

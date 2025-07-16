@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { 
-  Box, 
-  Card, 
-  CardContent, 
-  TextField, 
-  Button, 
-  Grid, 
-  Typography, 
+import React, { useState } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Grid,
+  TextField,
   CircularProgress,
   Paper,
   List,
@@ -19,24 +19,22 @@ import {
   IconButton,
   Tooltip
 } from '@mui/material';
-import { 
-  PlaylistPlay, 
-  Search,
-  PlayArrow,
-  VideoLibrary,
-  Download
-} from '@mui/icons-material';
+import { Search, PlaylistPlay, PlayArrow } from '@mui/icons-material';
 import axios from 'axios';
+import { APP_CONFIG } from '../../../config/constants';
 
 const PlaylistDetails = ({ setError, selectedPlaylist, setSelectedPlaylist, onSelectVideo }) => {
   const [playlistId, setPlaylistId] = useState('');
-  const [loading, setLoading] = useState(false);
   const [playlistData, setPlaylistData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `${APP_CONFIG.API_URL}/${API_MODE}`;
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    if (!playlistId) {
-      setError('Por favor ingresa un ID de lista de reproducción');
+    if (!playlistId.trim()) {
+      setError('Por favor ingresa un ID o URL de lista de reproducción.');
       return;
     }
     // Validar que no sea una URL de video
@@ -55,7 +53,7 @@ const PlaylistDetails = ({ setError, selectedPlaylist, setSelectedPlaylist, onSe
     console.log('ID de playlist enviado al backend:', cleanId);
     setLoading(true);
     try {
-      const response = await axios.get('/api/youtube/playlist/details', {
+      const response = await axios.get(`${API_BASE_URL}/youtube-media/playlist/details`, {
         params: { playlistId: cleanId }
       });
       setPlaylistData(response.data);

@@ -43,6 +43,7 @@ def create_app(config_object):
     from api.routes.whois_lookup import whois_lookup_bp
     from api.routes.pdf_converter import pdf_converter_bp
     from api.routes.pagespeed_insights import pagespeed_bp
+    from api.routes.ssl_checker import ssl_checker_bp
     
     # Registrar blueprints con prefijos de versión
     version_prefix = f"/api/{app.config.get('MODE', 'beta_v1')}"
@@ -66,6 +67,7 @@ def create_app(config_object):
     app.register_blueprint(whois_lookup_bp, url_prefix=f'{version_prefix}/whois-lookup')
     app.register_blueprint(pdf_converter_bp, url_prefix=f'{version_prefix}/pdf-converter')
     app.register_blueprint(pagespeed_bp, url_prefix=f'{version_prefix}/pagespeed-insights')
+    app.register_blueprint(ssl_checker_bp, url_prefix=f'{version_prefix}/ssl-checker')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers

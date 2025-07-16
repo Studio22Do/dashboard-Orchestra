@@ -39,7 +39,7 @@ export const loginUser = createAsyncThunk(
   async ({ email, password }, { rejectWithValue }) => {
     try {
       // Realizar petición al backend
-      const response = await axios.post(`${API_URL}/auth/login`, {
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, {
         email,
         password
       });
@@ -87,40 +87,16 @@ export const registerUser = createAsyncThunk(
 
 export const registerWithGoogle = createAsyncThunk(
   'auth/registerWithGoogle',
-  async (_, { rejectWithValue }) => {
+  async ({ google_token, user_info }, { rejectWithValue }) => {
     try {
-      // Inicializar Google OAuth (esto se implementará con el SDK de Google)
-      return new Promise((resolve, reject) => {
-        if (window.google && window.google.accounts) {
-          window.google.accounts.id.initialize({
-            client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-            callback: async (response) => {
-              try {
-                // Enviar el token de Google al backend
-                const backendResponse = await axios.post(`${API_URL}/auth/google-register`, {
-                  google_token: response.credential
-                });
-                
-                const { user, access_token } = backendResponse.data;
-                
-                // Guardar en localStorage para persistencia
-                localStorage.setItem('token', access_token);
-                
-                // Configurar token para futuras peticiones
-                setAuthToken(access_token);
-                
-                resolve({ user, token: access_token });
-              } catch (error) {
-                reject(error);
-              }
-            }
-          });
-          
-          window.google.accounts.id.prompt();
-        } else {
-          reject(new Error('Google OAuth no está disponible'));
-        }
+      const response = await axios.post(`${API_BASE_URL}/auth/google-register`, {
+        google_token,
+        user_info
       });
+      const { user, access_token } = response.data;
+      localStorage.setItem('token', access_token);
+      setAuthToken(access_token);
+      return { user, token: access_token };
     } catch (error) {
       if (error.response && error.response.data) {
         return rejectWithValue(error.response.data.message || 'Error en el registro con Google');
@@ -135,7 +111,7 @@ export const verifyEmail = createAsyncThunk(
   async ({ token }, { rejectWithValue }) => {
     try {
       // Verificar el email con el token
-      const response = await axios.post(`${API_URL}/auth/verify-email`, {
+      const response = await axios.post(`${API_BASE_URL}/auth/verify-email`, {
         verification_token: token
       });
       

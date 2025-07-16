@@ -1,18 +1,19 @@
-import { useState } from 'react';
-import { 
-  Container, 
-  Typography, 
-  TextField, 
-  Button, 
-  Card, 
-  CardContent, 
-  Grid, 
-  Box, 
+import React, { useState } from 'react';
+import {
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  TextField,
+  Button,
+  Grid,
+  Box,
   CircularProgress,
   Alert,
   Paper
 } from '@mui/material';
-import { Security, Search } from '@mui/icons-material';
+import { Security } from '@mui/icons-material';
+import { APP_CONFIG } from '../../config/constants';
 
 const SSLChecker = () => {
   const [url, setUrl] = useState('');
@@ -20,11 +21,13 @@ const SSLChecker = () => {
   const [error, setError] = useState(null);
   const [sslData, setSslData] = useState(null);
 
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `${APP_CONFIG.API_URL}/${API_MODE}`;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!url) {
-      setError('Por favor ingresa una URL para verificar');
+    if (!url.trim()) {
+      setError('Por favor ingresa una URL');
       return;
     }
     
@@ -34,7 +37,7 @@ const SSLChecker = () => {
     try {
       // Extraer solo el dominio (sin https://)
       let domain = url.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
-      const response = await fetch('/api/ssl-checker', {
+      const response = await fetch(`${API_BASE_URL}/ssl-checker`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain })
