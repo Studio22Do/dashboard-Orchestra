@@ -61,7 +61,7 @@ const PRLabsImage = () => {
       });
 
       const data = await response.json();
-      setGeneratedImage(data.image_url);
+      setGeneratedImage(data.generated_image);
     } catch (error) {
       console.error('Error:', error);
       // Manejar el error apropiadamente
@@ -171,6 +171,15 @@ const PRLabsImage = () => {
                   sx={{ mt: 2 }}
                 >
                   Abrir en Nueva Pestaña
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  href={generatedImage}
+                  download="imagen-generada.png"
+                  sx={{ mt: 2 }}
+                >
+                  Descargar Imagen
                 </Button>
               </Box>
             ) : (
