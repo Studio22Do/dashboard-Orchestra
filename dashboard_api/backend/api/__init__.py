@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 
 # Inicializar extensiones
 db = SQLAlchemy()
@@ -12,6 +13,7 @@ def create_app(config_object):
     """Fábrica de aplicación Flask"""
     app = Flask(__name__)
     app.config.from_object(config_object)
+    CORS(app)
     
     # Inicializar extensiones con la aplicación
     db.init_app(app)
@@ -47,6 +49,7 @@ def create_app(config_object):
     from api.routes.text_extract import text_extract_bp
     from api.routes.snap_video import media_downloader_bp
     from api.routes.social_media_content import social_media_content_bp
+    from api.routes.advanced_image_manipulation import advanced_image_bp
     
     # Registrar blueprints con prefijos de versión
     version_prefix = f"/api/{app.config.get('MODE', 'beta_v1')}"
@@ -74,6 +77,7 @@ def create_app(config_object):
     app.register_blueprint(text_extract_bp, url_prefix=f'{version_prefix}/text-extract')
     app.register_blueprint(media_downloader_bp, url_prefix=f'{version_prefix}/media-downloader')
     app.register_blueprint(social_media_content_bp, url_prefix=f'{version_prefix}/social-media-content')
+    app.register_blueprint(advanced_image_bp, url_prefix=f'{version_prefix}/image-manipulation')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers
