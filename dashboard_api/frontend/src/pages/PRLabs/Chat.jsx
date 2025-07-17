@@ -80,7 +80,9 @@ const PRLabsChat = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/prlabs/chat', {
+      const API_VERSION = 'beta_v2'; // O usa la variable dinámica que manejes en tu app
+      const API_BASE_URL = `/api/${API_VERSION}/prlabs`;
+      const response = await fetch(`${API_BASE_URL}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

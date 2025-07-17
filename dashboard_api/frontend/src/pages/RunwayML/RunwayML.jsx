@@ -69,8 +69,8 @@ const RunwayML = () => {
   ];
 
   const models = [
-    { value: 'gen-2', label: 'Gen-2 (Base)' },
-    { value: 'gen-2-xl', label: 'Gen-2 XL (Mejorado)' }
+    { value: 'gen2', label: 'Gen-2 (Base)' },
+    { value: 'gen2xl', label: 'Gen-2 XL (Mejorado)' }
   ];
 
   const qualities = [
@@ -166,7 +166,9 @@ const RunwayML = () => {
     }
 
     try {
-      const res = await fetch('/api/runwayml/process', {
+      const API_VERSION = "beta_v2"; // O usa la variable dinámica que manejes en tu app
+      const API_BASE_URL = `/api/${API_VERSION}`;
+      const res = await fetch(`${API_BASE_URL}/runwayml/process`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

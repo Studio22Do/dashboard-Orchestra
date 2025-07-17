@@ -6,6 +6,7 @@ runwayml_bp = Blueprint('runwayml', __name__)
 @runwayml_bp.route('/process', methods=['POST'])
 def process_runwayml():
     data = request.json
+    print('DEBUG RUNWAYML PAYLOAD:', data)
     operation = data.get('operation')
     api_key = current_app.config['RAPIDAPI_KEY']
     headers = {
@@ -68,6 +69,7 @@ def process_runwayml():
 
     try:
         response = requests.post(url, json=payload, headers=headers)
+        print('RUNWAYML RAW RESPONSE:', response.status_code, response.text)
         return jsonify(response.json()), response.status_code
     except Exception as e:
         return jsonify({'error': str(e)}), 500 

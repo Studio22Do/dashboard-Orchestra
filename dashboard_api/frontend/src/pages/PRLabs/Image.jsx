@@ -45,7 +45,9 @@ const PRLabsImage = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('/api/prlabs/image', {
+      const API_VERSION = 'beta_v2'; // O usa la variable dinámica que manejes en tu app
+      const API_BASE_URL = `/api/${API_VERSION}/prlabs`;
+      const response = await fetch(`${API_BASE_URL}/image`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -59,7 +61,7 @@ const PRLabsImage = () => {
       });
 
       const data = await response.json();
-      setGeneratedImage(data.image_url);
+      setGeneratedImage(data.generated_image);
     } catch (error) {
       console.error('Error:', error);
       // Manejar el error apropiadamente
@@ -169,6 +171,15 @@ const PRLabsImage = () => {
                   sx={{ mt: 2 }}
                 >
                   Abrir en Nueva Pestaña
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  href={generatedImage}
+                  download="imagen-generada.png"
+                  sx={{ mt: 2 }}
+                >
+                  Descargar Imagen
                 </Button>
               </Box>
             ) : (

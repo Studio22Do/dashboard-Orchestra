@@ -39,6 +39,7 @@ import {
   Instagram,
   LinkedIn
 } from '@mui/icons-material';
+import { generateSocialMediaContent } from '../../services/socialMediaContent';
 
 const AISocialMediaContent = () => {
   const [prompt, setPrompt] = useState('');
@@ -71,6 +72,14 @@ const AISocialMediaContent = () => {
     { value: 'humorous', label: 'Humorístico' }
   ];
 
+  // Mapeo de plataformas a endpoint de la API
+  const platformApiMap = {
+    instagram: 'Instagram',
+    facebook: 'Facebook',
+    twitter: 'Twitter',
+    linkedin: 'LinkedIn',
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -83,15 +92,21 @@ const AISocialMediaContent = () => {
     setError(null);
     
     try {
-      // Simulación de llamada a API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      // Construir el prompt enriquecido
+      const enrichedPrompt = `${prompt}\nTipo de contenido: ${contentTypes.find(t => t.value === contentType)?.label}.\nTono: ${tones.find(t => t.value === tone)?.label}.`;
+      const apiPlatform = platformApiMap[platform] || 'Instagram';
+      const response = await generateSocialMediaContent({
+        platform: apiPlatform,
+        text: enrichedPrompt,
+        lang: 'es', // Puedes hacer esto dinámico si lo deseas
+        length: 150 // Puedes hacer esto dinámico si lo deseas
+      });
       const newContent = {
         platform,
         contentType,
         tone,
         prompt,
-        content: `Este es un contenido generado por IA para ${platform} en formato ${contentType} con tono ${tone}. En una implementación real, este contenido sería generado por un modelo de IA.`,
+        content: response.content,
         timestamp: new Date().toLocaleString()
       };
       
@@ -100,8 +115,7 @@ const AISocialMediaContent = () => {
       setPrompt('');
       
     } catch (err) {
-      console.error('Error generating content:', err);
-      setError(err.message || 'Error al generar el contenido');
+      setError(err?.response?.data?.message || err.message || 'Error al generar el contenido');
     } finally {
       setLoading(false);
     }

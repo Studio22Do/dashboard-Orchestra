@@ -39,8 +39,11 @@ import {
   Adjust,
   Palette
 } from '@mui/icons-material';
+import { APP_CONFIG } from '../../config/constants';
 
 const AdvancedImageManipulation = () => {
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v2';
+  const API_BASE_URL = `${APP_CONFIG.API_URL}/${API_MODE}`;
   const [imageUrl, setImageUrl] = useState('');
   const [operation, setOperation] = useState('resize');
   const [parameters, setParameters] = useState({
@@ -104,7 +107,7 @@ const AdvancedImageManipulation = () => {
     setError(null);
     setProcessedImageUrl(null);
     try {
-      const response = await fetch('/api/image-manipulation', {
+      const response = await fetch(`${API_BASE_URL}/image-manipulation/image-manipulation`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

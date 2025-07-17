@@ -18,10 +18,12 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Divider
+  Divider,
+  IconButton
 } from '@mui/material';
-import { Send, SmartToy } from '@mui/icons-material';
+import { Send, SmartToy, ArrowBack } from '@mui/icons-material';
 import { prlabsService } from '../../services/prlabs';
+import { useNavigate } from 'react-router-dom';
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
@@ -30,6 +32,7 @@ const Chatbot = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
+  const navigate = useNavigate();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -71,10 +74,15 @@ const Chatbot = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" gutterBottom sx={{ color: 'white' }}>
-        <SmartToy sx={{ mr: 1, verticalAlign: 'bottom' }} />
-        Chatbot
-      </Typography>
+      <Box display="flex" alignItems="center" mb={2}>
+        <IconButton onClick={() => navigate('/prlabs')} sx={{ mr: 2 }}>
+          <ArrowBack />
+        </IconButton>
+        <Typography variant="h4" gutterBottom sx={{ color: 'white' }}>
+          <SmartToy sx={{ mr: 1, verticalAlign: 'bottom' }} />
+          Chatbot
+        </Typography>
+      </Box>
 
       <Card sx={{ height: '70vh', display: 'flex', flexDirection: 'column' }}>
         <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
