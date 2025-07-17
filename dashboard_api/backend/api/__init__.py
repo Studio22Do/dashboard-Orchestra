@@ -46,6 +46,7 @@ def create_app(config_object):
     from api.routes.ssl_checker import ssl_checker_bp
     from api.routes.text_extract import text_extract_bp
     from api.routes.snap_video import media_downloader_bp
+    from api.routes.social_media_content import social_media_content_bp
     
     # Registrar blueprints con prefijos de versión
     version_prefix = f"/api/{app.config.get('MODE', 'beta_v1')}"
@@ -72,6 +73,7 @@ def create_app(config_object):
     app.register_blueprint(ssl_checker_bp, url_prefix=f'{version_prefix}/ssl-checker')
     app.register_blueprint(text_extract_bp, url_prefix=f'{version_prefix}/text-extract')
     app.register_blueprint(media_downloader_bp, url_prefix=f'{version_prefix}/media-downloader')
+    app.register_blueprint(social_media_content_bp, url_prefix=f'{version_prefix}/social-media-content')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers
