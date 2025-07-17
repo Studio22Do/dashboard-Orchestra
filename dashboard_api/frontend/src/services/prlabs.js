@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const API_VERSION = 'beta_v2'; // O usa la variable dinámica que manejes en tu app
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// Asegúrate que REACT_APP_API_URL no incluya /api al final
+const API_URL = (process.env.REACT_APP_API_URL || 'http://localhost:5000').replace(/\/api$/, '');
 const API_BASE_URL = `${API_URL}/api/${API_VERSION}/prlabs`;
 
 const prlabsService = {

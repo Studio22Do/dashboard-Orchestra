@@ -27,14 +27,6 @@ export const PR_LABS_CONFIG = {
       apiName: 'PR Labs Image API'
     },
     {
-      id: 'text-processing',
-      title: 'Procesamiento de Texto',
-      description: 'Humanización y análisis de texto',
-      category: 'Text Processing',
-      route: '/prlabs/text',
-      apiName: 'PR Labs Text API'
-    },
-    {
       id: 'custom-chatbots',
       title: 'Chatbots Personalizados',
       description: 'Crea tu propio asistente IA',
@@ -50,14 +42,6 @@ export const PR_LABS_CONFIG = {
       route: '/prlabs/voice',
       apiName: 'PR Labs Voice API'
     },
-    {
-      id: 'ai-tools',
-      title: 'Herramientas IA',
-      description: 'Suite completa de herramientas IA',
-      category: 'AI Tools',
-      route: '/prlabs/tools',
-      apiName: 'PR Labs Tools API'
-    }
   ],
 
   API_CONFIG: {

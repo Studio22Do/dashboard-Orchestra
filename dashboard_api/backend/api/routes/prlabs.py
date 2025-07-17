@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, Response
 import requests
 from flask_jwt_extended import jwt_required
 
@@ -99,37 +99,53 @@ def generate_image():
 def text_to_speech():
     """Endpoint para convertir texto a voz usando OpenAI TTS"""
     try:
-        print("DEBUG PRLABS/VOICE PAYLOAD:", request.json)
         data = request.json
+        print("[PRLABS/VOICE] Payload recibido:", data)
         text = data.get('text')
         voice = data.get('voice', 'alloy')
         model = data.get('model', 'tts-1')
         instructions = data.get('instructions', 'Speak in a natural tone.')
 
         if not text:
+            print("[PRLABS/VOICE] FALTA EL TEXTO")
             return jsonify({'error': 'El texto es requerido'}), 400
 
         url = "https://open-ai-text-to-speech1.p.rapidapi.com/"
+        api_key = current_app.config['RAPIDAPI_KEY']
         headers = {
             "content-type": "application/json",
-            "X-RapidAPI-Key": current_app.config['RAPIDAPI_KEY'],
+            "X-RapidAPI-Key": api_key,
             "X-RapidAPI-Host": "open-ai-text-to-speech1.p.rapidapi.com"
         }
-        
         payload = {
             "model": model,
             "input": text,
             "voice": voice,
             "instructions": instructions
         }
+        print(f"[PRLABS/VOICE] URL: {url}")
+        print(f"[PRLABS/VOICE] Headers: {headers}")
+        print(f"[PRLABS/VOICE] Payload enviado a RapidAPI: {payload}")
 
         response = requests.post(url, json=payload, headers=headers)
+        print(f"[PRLABS/VOICE] Status RapidAPI: {response.status_code}")
+        print(f"[PRLABS/VOICE] Respuesta RapidAPI: {response.text[:200]}")
         response.raise_for_status()
-        return jsonify(response.json()), 200
+
+        content_type = response.headers.get('Content-Type', '')
+        if 'audio' in content_type:
+            print(f"[PRLABS/VOICE] Devolviendo audio binario al frontend. Content-Type: {content_type}")
+            return Response(response.content, mimetype=content_type)
+        else:
+            print(f"[PRLABS/VOICE] Devolviendo JSON al frontend.")
+            return jsonify(response.json()), 200
 
     except requests.exceptions.HTTPError as errh:
+        print(f"[PRLABS/VOICE] HTTPError: {errh}")
+        print(f"[PRLABS/VOICE] Respuesta RapidAPI: {response.text}")
         return jsonify({'error': str(errh), 'details': response.text}), response.status_code
     except Exception as err:
+        print(f"[PRLABS/VOICE] Exception: {err}")
         return jsonify({'error': 'Error al procesar la solicitud', 'details': str(err)}), 500
 
 @prlabs_bp.route('/text', methods=['POST'])
