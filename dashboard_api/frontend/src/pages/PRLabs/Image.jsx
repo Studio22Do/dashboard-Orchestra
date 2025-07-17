@@ -45,7 +45,9 @@ const PRLabsImage = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('/api/prlabs/image', {
+      const API_VERSION = 'beta_v2'; // O usa la variable dinámica que manejes en tu app
+      const API_BASE_URL = `/api/${API_VERSION}/prlabs`;
+      const response = await fetch(`${API_BASE_URL}/image`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
