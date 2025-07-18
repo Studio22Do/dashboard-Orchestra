@@ -1,7 +1,7 @@
 import requests
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 
-image_optimizer_bp = Blueprint('image_optimizer', __name__, url_prefix='/api/image-optimize')
+image_optimizer_bp = Blueprint('image_optimizer', __name__)
 
 @image_optimizer_bp.route('', methods=['POST'])
 def image_optimize():
@@ -15,7 +15,7 @@ def image_optimize():
 
     api_url = "https://pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com/v1/reducer.php"
     headers = {
-        "x-rapidapi-key": "9dc7412cabmsh04d2de9d55522bap1643f6jsn6e3113942f4a",  # <-- pon tu API key aquí
+        "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
         "x-rapidapi-host": "pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com"
     }
     params = {
