@@ -42,6 +42,9 @@ const PageSpeedInsights = () => {
   const [result, setResult] = useState(null);
   const theme = useTheme();
 
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `/api/${API_MODE}/pagespeed-insights`;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!url) {
@@ -54,7 +57,7 @@ const PageSpeedInsights = () => {
 
     try {
       const params = new URLSearchParams({ url: url });
-      const response = await fetch(`/api/pagespeed-insights/run?${params.toString()}`);
+      const response = await fetch(`${API_BASE_URL}/run?${params.toString()}`);
       const data = await response.json();
 
       if (!response.ok || data.error) {
