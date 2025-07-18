@@ -55,6 +55,7 @@ def create_app(config_object):
     from api.routes.similarweb import similarweb_bp
     from api.routes.google_keyword_insight import keyword_insight_bp
     from api.routes.domain_metrics import domain_metrics_bp
+    from api.routes.product_description import product_description_bp
     
     # Registrar blueprints con prefijos de versión
     version_prefix = f"/api/{app.config.get('MODE', 'beta_v1')}"
@@ -88,6 +89,7 @@ def create_app(config_object):
     app.register_blueprint(similarweb_bp, url_prefix=f'{version_prefix}/similarweb')
     app.register_blueprint(keyword_insight_bp, url_prefix=f'{version_prefix}/keyword-insight')
     app.register_blueprint(domain_metrics_bp, url_prefix=f'{version_prefix}/domain-metrics')
+    app.register_blueprint(product_description_bp, url_prefix=f'{version_prefix}/product-description')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers
