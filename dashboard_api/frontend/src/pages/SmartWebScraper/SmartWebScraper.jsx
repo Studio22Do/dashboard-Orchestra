@@ -35,6 +35,9 @@ const SmartWebScraper = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [result, setResult] = useState(null);
 
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `/api/${API_MODE}/smart-scraper`;
+
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
     setError(null);
@@ -80,7 +83,7 @@ const SmartWebScraper = () => {
           throw new Error('Operación no válida');
       }
 
-      const response = await fetch(`/api/smart-scraper${endpoint}`, {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

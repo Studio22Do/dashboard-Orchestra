@@ -51,6 +51,7 @@ def create_app(config_object):
     from api.routes.social_media_content import social_media_content_bp
     from api.routes.advanced_image_manipulation import advanced_image_bp
     from api.routes.runwayml import runwayml_bp
+    from api.routes.smart_scraper import smart_scraper_bp
     
     # Registrar blueprints con prefijos de versión
     version_prefix = f"/api/{app.config.get('MODE', 'beta_v1')}"
@@ -80,6 +81,7 @@ def create_app(config_object):
     app.register_blueprint(social_media_content_bp, url_prefix=f'{version_prefix}/social-media-content')
     app.register_blueprint(advanced_image_bp, url_prefix=f'{version_prefix}/image-manipulation')
     app.register_blueprint(runwayml_bp, url_prefix=f'{version_prefix}/runwayml')
+    app.register_blueprint(smart_scraper_bp, url_prefix=f'{version_prefix}/smart-scraper')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers
