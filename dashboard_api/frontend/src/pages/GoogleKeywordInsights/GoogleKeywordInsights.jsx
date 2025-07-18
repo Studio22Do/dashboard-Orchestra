@@ -88,6 +88,8 @@ const GoogleKeywordInsights = () => {
   const [page, setPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [countrySearch, setCountrySearch] = useState('');
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `/api/${API_MODE}/keyword-insight`;
 
   // Filtrar países basado en la búsqueda
   const getFilteredCountries = () => {
@@ -141,7 +143,7 @@ const GoogleKeywordInsights = () => {
         keyword
       };
       
-      const response = await fetch('/api/keyword-insight/', {
+      const response = await fetch(`${API_BASE_URL}/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

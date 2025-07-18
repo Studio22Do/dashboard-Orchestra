@@ -53,6 +53,7 @@ def create_app(config_object):
     from api.routes.runwayml import runwayml_bp
     from api.routes.smart_scraper import smart_scraper_bp
     from api.routes.similarweb import similarweb_bp
+    from api.routes.google_keyword_insight import keyword_insight_bp
     
     # Registrar blueprints con prefijos de versión
     version_prefix = f"/api/{app.config.get('MODE', 'beta_v1')}"
@@ -84,6 +85,7 @@ def create_app(config_object):
     app.register_blueprint(runwayml_bp, url_prefix=f'{version_prefix}/runwayml')
     app.register_blueprint(smart_scraper_bp, url_prefix=f'{version_prefix}/smart-scraper')
     app.register_blueprint(similarweb_bp, url_prefix=f'{version_prefix}/similarweb')
+    app.register_blueprint(keyword_insight_bp, url_prefix=f'{version_prefix}/keyword-insight')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers
