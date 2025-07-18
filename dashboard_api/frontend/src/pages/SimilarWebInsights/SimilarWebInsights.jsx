@@ -34,6 +34,9 @@ const SimilarWebInsights = () => {
   const [insightsData, setInsightsData] = useState(null);
   const [websiteDetails, setWebsiteDetails] = useState(null);
 
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `/api/${API_MODE}/similarweb`;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!url) {
@@ -53,14 +56,14 @@ const SimilarWebInsights = () => {
         // Si no es una URL válida, usar el texto tal cual
       }
       // 1. Obtener detalles del sitio
-      const detailsRes = await fetch(`/api/similarweb/website-details?domain=${encodeURIComponent(domain)}`, {
+      const detailsRes = await fetch(`${API_BASE_URL}/website-details?domain=${encodeURIComponent(domain)}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
       });
       const detailsData = await detailsRes.json();
       setWebsiteDetails(detailsData);
       // 2. Obtener insights
-      const response = await fetch('/api/similarweb/insights', {
+      const response = await fetch(`${API_BASE_URL}/insights`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain })
