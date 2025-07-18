@@ -73,10 +73,7 @@ const SmartWebScraper = () => {
         case 1: // Enlaces
           endpoint = '/links';
           break;
-        case 2: // Tablas
-          endpoint = '/tables';
-          break;
-        case 3: // Markdown
+        case 2: // Markdown
           endpoint = '/markdown';
           break;
         default:
@@ -129,71 +126,58 @@ const SmartWebScraper = () => {
         );
 
       case 1: // Enlaces
+        // Soporta tanto { links: [...] } como array directo
+        const linksArray = Array.isArray(result)
+          ? result
+          : Array.isArray(result.links)
+            ? result.links
+            : [];
+
         return (
           <Box>
             <Typography variant="subtitle1" gutterBottom>
-              Enlaces encontrados: {result.links?.length || 0}
+              Enlaces encontrados: {linksArray.length}
             </Typography>
-            {result.links?.map((link, index) => (
-              <Box key={index} sx={{ mb: 1 }}>
-                <Typography
-                  component="a"
-                  href={link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{ textDecoration: 'none', color: 'primary.main' }}
-                >
-                  {link}
-                </Typography>
-              </Box>
-            ))}
+            {linksArray.length === 0 ? (
+              <Typography>No se encontraron enlaces.</Typography>
+            ) : (
+              linksArray.map((link, index) => {
+                // Si es objeto {name, url}
+                if (typeof link === 'object' && link !== null) {
+                  return (
+                    <Box key={index} sx={{ mb: 1 }}>
+                      <Typography
+                        component="a"
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{ textDecoration: 'none', color: 'primary.main' }}
+                      >
+                        {link.name || link.url}
+                      </Typography>
+                    </Box>
+                  );
+                }
+                // Si es string
+                return (
+                  <Box key={index} sx={{ mb: 1 }}>
+                    <Typography
+                      component="a"
+                      href={link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      sx={{ textDecoration: 'none', color: 'primary.main' }}
+                    >
+                      {link}
+                    </Typography>
+                  </Box>
+                );
+              })
+            )}
           </Box>
         );
 
-      case 2: // Tablas
-        return (
-          <Box>
-            {result.tables?.map((table, tableIndex) => (
-              <Box key={tableIndex} sx={{ mb: 4, overflowX: 'auto' }}>
-                <Typography variant="subtitle1" gutterBottom>
-                  Tabla {tableIndex + 1}
-                </Typography>
-                <table className="min-w-full divide-y divide-gray-200">
-                  {table.headers && (
-                    <thead>
-                      <tr>
-                        {table.headers.map((header, index) => (
-                          <th
-                            key={index}
-                            className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            {header}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                  )}
-                  <tbody>
-                    {table.rows?.map((row, rowIndex) => (
-                      <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                        {row.map((cell, cellIndex) => (
-                          <td
-                            key={cellIndex}
-                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                          >
-                            {cell}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Box>
-            ))}
-          </Box>
-        );
-
-      case 3: // Markdown
+      case 2: // Markdown (ahora es el tercer tab)
         return (
           <Box sx={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
             {result.markdown || 'No se encontró contenido markdown'}
@@ -224,7 +208,6 @@ const SmartWebScraper = () => {
         >
           <Tab icon={<Search />} label="Contenido" />
           <Tab icon={<LinkIcon />} label="Enlaces" />
-          <Tab icon={<TableChart />} label="Tablas" />
           <Tab icon={<TextFields />} label="Markdown" />
         </Tabs>
       </Paper>
