@@ -55,7 +55,15 @@ const Sidebar = () => {
   return (
     <StyledDrawer variant="permanent">
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 3 }}>
-        <img src="/logo1.png" alt="Logo Sympho" style={{ width: 120, marginBottom: 16 }} />
+        <button
+          onClick={() => navigate('/')}
+          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', outline: 'none' }}
+          tabIndex={0}
+          aria-label="Ir a inicio"
+          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') navigate('/'); }}
+        >
+          <img src="/logo1.png" alt="Logo Sympho" style={{ width: 120, marginBottom: 16, display: 'block' }} />
+        </button>
       </Box>
       <Box sx={{ overflow: 'auto' }}>
         <List>
