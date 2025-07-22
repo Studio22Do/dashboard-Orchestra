@@ -138,6 +138,9 @@ const SEOMastermind = () => {
   const [orderBy, setOrderBy] = useState('difficulty');
   const [order, setOrder] = useState('asc');
 
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `/api/${API_MODE}/seo-mastermind`;
+
   const handleAnalyze = async () => {
     if (!keyword) {
       dispatch(addNotification({
@@ -151,7 +154,7 @@ const SEOMastermind = () => {
     setError(null);
 
     try {
-      const apiUrl = `${APP_CONFIG.API_URL}/seo-mastermind`;
+      const apiUrl = `${API_BASE_URL}`;
       console.log('Llamando a la API:', apiUrl);
 
       const response = await fetch(apiUrl, {

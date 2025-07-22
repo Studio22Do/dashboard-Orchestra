@@ -3,6 +3,7 @@ import requests
 
 ssl_checker_bp = Blueprint('ssl_checker', __name__)
 
+@ssl_checker_bp.route('', methods=['POST'])
 @ssl_checker_bp.route('/', methods=['POST'])
 def check_ssl():
     data = request.json

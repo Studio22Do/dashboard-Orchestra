@@ -88,6 +88,8 @@ const GoogleKeywordInsights = () => {
   const [page, setPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [countrySearch, setCountrySearch] = useState('');
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `/api/${API_MODE}/keyword-insight`;
 
   // Filtrar países basado en la búsqueda
   const getFilteredCountries = () => {
@@ -141,7 +143,7 @@ const GoogleKeywordInsights = () => {
         keyword
       };
       
-      const response = await fetch('/api/keyword-insight/', {
+      const response = await fetch(`${API_BASE_URL}/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -256,115 +258,80 @@ const GoogleKeywordInsights = () => {
                 }
               }}
             >
-              <TextField
-                size="small"
-                placeholder="Buscar país..."
-                value={countrySearch}
-                onChange={(e) => setCountrySearch(e.target.value)}
-                sx={{ m: 1, width: 'calc(100% - 16px)' }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search fontSize="small" />
-                    </InputAdornment>
-                  ),
+              <ListSubheader 
+                sx={{ 
+                  bgcolor: 'primary.dark',
+                  color: 'primary.contrastText',
+                  fontWeight: 'bold',
+                  lineHeight: '40px',
+                  borderLeft: '4px solid',
+                  borderColor: 'primary.main'
                 }}
-              />
+              >
+                EUROPA
+              </ListSubheader>
+              {COUNTRIES.EUROPA.map(country => (
+                <MenuItem key={country.code} value={country.code}>
+                  {country.name}
+                </MenuItem>
+              ))}
 
-              {!countrySearch ? (
-                <>
-                  <ListSubheader 
-                    sx={{ 
-                      bgcolor: 'primary.dark',
-                      color: 'primary.contrastText',
-                      fontWeight: 'bold',
-                      lineHeight: '40px',
-                      borderLeft: '4px solid',
-                      borderColor: 'primary.main'
-                    }}
-                  >
-                    EUROPA
-                  </ListSubheader>
-                  {COUNTRIES.EUROPA.map(country => (
-                    <MenuItem key={country.code} value={country.code}>
-                      {country.name}
-                    </MenuItem>
-                  ))}
+              <ListSubheader 
+                sx={{ 
+                  bgcolor: 'primary.dark',
+                  color: 'primary.contrastText',
+                  fontWeight: 'bold',
+                  lineHeight: '40px',
+                  mt: 1,
+                  borderLeft: '4px solid',
+                  borderColor: 'primary.main'
+                }}
+              >
+                LATINOAMÉRICA - SUDAMÉRICA
+              </ListSubheader>
+              {COUNTRIES.LATINOAMERICA.SUDAMERICA.map(country => (
+                <MenuItem key={country.code} value={country.code}>
+                  {country.name}
+                </MenuItem>
+              ))}
 
-                  <ListSubheader 
-                    sx={{ 
-                      bgcolor: 'primary.dark',
-                      color: 'primary.contrastText',
-                      fontWeight: 'bold',
-                      lineHeight: '40px',
-                      mt: 1,
-                      borderLeft: '4px solid',
-                      borderColor: 'primary.main'
-                    }}
-                  >
-                    LATINOAMÉRICA - SUDAMÉRICA
-                  </ListSubheader>
-                  {COUNTRIES.LATINOAMERICA.SUDAMERICA.map(country => (
-                    <MenuItem key={country.code} value={country.code}>
-                      {country.name}
-                    </MenuItem>
-                  ))}
+              <ListSubheader 
+                sx={{ 
+                  bgcolor: 'primary.dark',
+                  color: 'primary.contrastText',
+                  fontWeight: 'bold',
+                  lineHeight: '40px',
+                  mt: 1,
+                  borderLeft: '4px solid',
+                  borderColor: 'primary.main'
+                }}
+              >
+                LATINOAMÉRICA - CENTROAMÉRICA Y CARIBE
+              </ListSubheader>
+              {COUNTRIES.LATINOAMERICA.CENTROAMERICA.map(country => (
+                <MenuItem key={country.code} value={country.code}>
+                  {country.name}
+                </MenuItem>
+              ))}
 
-                  <ListSubheader 
-                    sx={{ 
-                      bgcolor: 'primary.dark',
-                      color: 'primary.contrastText',
-                      fontWeight: 'bold',
-                      lineHeight: '40px',
-                      mt: 1,
-                      borderLeft: '4px solid',
-                      borderColor: 'primary.main'
-                    }}
-                  >
-                    LATINOAMÉRICA - CENTROAMÉRICA Y CARIBE
-                  </ListSubheader>
-                  {COUNTRIES.LATINOAMERICA.CENTROAMERICA.map(country => (
-                    <MenuItem key={country.code} value={country.code}>
-                      {country.name}
-                    </MenuItem>
-                  ))}
-
-                  <ListSubheader 
-                    sx={{ 
-                      bgcolor: 'primary.dark',
-                      color: 'primary.contrastText',
-                      fontWeight: 'bold',
-                      lineHeight: '40px',
-                      mt: 1,
-                      borderLeft: '4px solid',
-                      borderColor: 'primary.main'
-                    }}
-                  >
-                    NORTEAMÉRICA
-                  </ListSubheader>
-                  {COUNTRIES.NORTEAMERICA.map(country => (
-                    <MenuItem key={country.code} value={country.code}>
-                      {country.name}
-                    </MenuItem>
-                  ))}
-                </>
-              ) : (
-                getFilteredCountries().map(country => (
-                  <MenuItem key={country.code} value={country.code}>
-                    {country.name} 
-                    <Typography 
-                      variant="caption" 
-                      sx={{ 
-                        ml: 1,
-                        color: 'primary.main',
-                        fontWeight: 'medium'
-                      }}
-                    >
-                      ({country.subregion || country.region})
-                    </Typography>
-                  </MenuItem>
-                ))
-              )}
+              <ListSubheader 
+                sx={{ 
+                  bgcolor: 'primary.dark',
+                  color: 'primary.contrastText',
+                  fontWeight: 'bold',
+                  lineHeight: '40px',
+                  mt: 1,
+                  borderLeft: '4px solid',
+                  borderColor: 'primary.main'
+                }}
+              >
+                NORTEAMÉRICA
+              </ListSubheader>
+              {COUNTRIES.NORTEAMERICA.map(country => (
+                <MenuItem key={country.code} value={country.code}>
+                  {country.name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
           <Button

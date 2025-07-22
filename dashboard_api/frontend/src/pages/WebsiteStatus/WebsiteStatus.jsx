@@ -20,6 +20,9 @@ const WebsiteStatus = () => {
   const [error, setError] = useState(null);
   const [statusData, setStatusData] = useState(null);
 
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `/api/${API_MODE}/website-status`;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!url) {
@@ -31,7 +34,7 @@ const WebsiteStatus = () => {
     setStatusData(null);
     try {
       let domain = url.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
-      const response = await fetch('/api/website-status', {
+      const response = await fetch(`${API_BASE_URL}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain })

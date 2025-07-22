@@ -34,6 +34,9 @@ const DomainMetrics = () => {
   const [error, setError] = useState(null);
   const [metricsData, setMetricsData] = useState(null);
 
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `/api/${API_MODE}/domain-metrics`;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!domain) {
@@ -44,7 +47,7 @@ const DomainMetrics = () => {
     setError(null);
     setMetricsData(null);
     try {
-      const response = await fetch('/api/domain-metrics', {
+      const response = await fetch(`${API_BASE_URL}/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain })

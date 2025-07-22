@@ -74,6 +74,9 @@ const WhoisLookup = () => {
     setData(null);
   };
 
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `/api/${API_MODE}/whois-lookup`;
+
   const handleSearch = async (type, input) => {
     if (!input.trim()) {
       setError('Por favor ingresa un valor para buscar');
@@ -85,9 +88,9 @@ const WhoisLookup = () => {
     setData(null);
 
     const endpoints = {
-      domain: '/api/whois-lookup/domain',
-      asn: '/api/whois-lookup/asn', 
-      ip: '/api/whois-lookup/ip'
+      domain: `${API_BASE_URL}/domain`,
+      asn: `${API_BASE_URL}/asn`,
+      ip: `${API_BASE_URL}/ip`
     };
 
     const payloads = {
@@ -109,12 +112,41 @@ const WhoisLookup = () => {
         throw new Error(result.error || `Error ${response.status}`);
       }
 
-      // La API devuelve {status, error, data}, necesitamos extraer solo data
       if (result.status === 'error') {
         throw new Error(result.error || 'Error en la consulta WHOIS');
       }
 
-      setData(result.data);
+      // Si es dominio, extraer el primer objeto relevante y mapearlo
+      if (type === 'domain' && result.data && typeof result.data === 'object') {
+        const whoisKeys = Object.keys(result.data);
+        if (whoisKeys.length > 0) {
+          const whoisData = result.data[whoisKeys[0]];
+          // Mapeo plano para el frontend
+          setData({
+            domainName: whoisData['Domain Name'] || whoisData['domainName'] || '',
+            registrar: whoisData['Registrar'] || whoisData['registrar'] || '',
+            creationDate: whoisData['Created Date'] || whoisData['creationDate'] || '',
+            expirationDate: whoisData['Expiry Date'] || whoisData['expirationDate'] || '',
+            updatedDate: whoisData['Updated Date'] || whoisData['updatedDate'] || '',
+            status: whoisData['Domain Status'] || whoisData['status'] || '',
+            nameServers: whoisData['Name Server'] || whoisData['nameServers'] || '',
+            registrantName: whoisData['Registrant Name'] || '',
+            registrantOrganization: whoisData['Registrant Organization'] || '',
+            registrantEmail: whoisData['Registrant Email'] || '',
+            registrantPhone: whoisData['Registrant Phone'] || '',
+            registrantCountry: whoisData['Registrant Country'] || '',
+            adminName: whoisData['Admin Name'] || '',
+            adminEmail: whoisData['Admin Email'] || '',
+            techName: whoisData['Tech Name'] || '',
+            techEmail: whoisData['Tech Email'] || '',
+            // Puedes agregar más campos si el frontend los usa
+          });
+        } else {
+          setData(null);
+        }
+      } else {
+        setData(result.data);
+      }
     } catch (err) {
       console.error('Error en WHOIS lookup:', err);
       setError(err.message);

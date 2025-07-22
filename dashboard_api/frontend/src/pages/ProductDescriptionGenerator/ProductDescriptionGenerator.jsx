@@ -53,6 +53,9 @@ const ProductDescriptionGenerator = () => {
     }));
   };
 
+  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+  const API_BASE_URL = `/api/${API_MODE}/product-description`;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -65,34 +68,27 @@ const ProductDescriptionGenerator = () => {
     setError(null);
     
     try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Lógica real: llamada al backend
+      const language = 'Spanish'; // Puedes hacer esto dinámico si lo deseas
+      const name = productData.name;
+      // Unimos categoría, precio y features en un solo string descriptivo
+      const description = `${productData.category}, precio: ${productData.price}. ${productData.features}`;
+      const response = await fetch(`${API_BASE_URL}/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ language, name, description })
+      });
+      const data = await response.json();
+      if (!response.ok || !data.descriptions) {
+        throw new Error(data.error || 'Error al generar la descripción');
+      }
+      // Usamos la primera descripción como título, la segunda como corta, la tercera como larga
       setGeneratedContent({
-        title: `Descubre ${productData.name} - La Mejor Opción en ${productData.category}`,
-        shortDescription: `Experimenta la excelencia con nuestro ${productData.name}. Diseñado para ofrecer el mejor rendimiento en su categoría, este producto combina calidad y funcionalidad a un precio inigualable de ${productData.price}.`,
-        longDescription: `Bienvenido a la nueva era de ${productData.category} con nuestro ${productData.name}. Este producto revolucionario ha sido diseñado pensando en las necesidades más exigentes de nuestros clientes.
-
-Características principales:
-• Diseño premium y duradero
-• Rendimiento excepcional
-• Fácil de usar y mantener
-• Garantía de satisfacción
-
-${productData.features}
-
-Invierte en calidad y confiabilidad con nuestro ${productData.name}. A un precio de ${productData.price}, este producto representa la mejor relación calidad-precio del mercado.
-
-No esperes más para experimentar la diferencia. ¡Haz tu pedido hoy mismo!`,
-        keywords: [
-          productData.name,
-          productData.category,
-          'calidad premium',
-          'mejor precio',
-          'garantía',
-          'envío rápido'
-        ],
-        metaDescription: `Descubre ${productData.name}, el mejor producto en ${productData.category}. Calidad premium a un precio de ${productData.price}. ¡Compra ahora!`
+        title: data.descriptions[0] || '',
+        shortDescription: data.descriptions[1] || '',
+        longDescription: data.descriptions[2] || '',
+        keywords: [name, productData.category, 'calidad premium', 'mejor precio', 'garantía', 'envío rápido'],
+        metaDescription: data.descriptions[3] || ''
       });
     } catch (err) {
       console.error('Error generating content:', err);
