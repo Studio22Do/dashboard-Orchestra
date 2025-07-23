@@ -32,7 +32,12 @@ import {
   Image as ImageIcon,
   Code as CodeIcon,
   Dns as DnsIcon,
-  Security as SecurityIcon
+  Security as SecurityIcon,
+  Link as LinkIcon,
+  Search as SearchIcon,
+  Tag as TagIcon,
+  Title as TitleIcon,
+  Description as DescriptionIcon
 } from '@mui/icons-material';
 
 const PageSpeedInsights = () => {
@@ -43,7 +48,7 @@ const PageSpeedInsights = () => {
   const theme = useTheme();
 
   const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
-  const API_BASE_URL = `/api/${API_MODE}/pagespeed-insights`;
+  const API_BASE_URL = `/api/${API_MODE}/website-analyzer`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,7 +62,7 @@ const PageSpeedInsights = () => {
 
     try {
       const params = new URLSearchParams({ url: url });
-      const response = await fetch(`${API_BASE_URL}/run?${params.toString()}`);
+      const response = await fetch(`${API_BASE_URL}/full-analysis?${params.toString()}`);
       const data = await response.json();
 
       if (!response.ok || data.error) {
@@ -72,24 +77,42 @@ const PageSpeedInsights = () => {
     }
   };
 
-  // Helper para obtener el color del puntaje de velocidad
-  const getSpeedColor = (loadTime) => {
-    if (loadTime <= 2) return 'success';
-    if (loadTime <= 4) return 'warning';
-    return 'error';
-  };
-
   // Helper para formatear el tiempo de carga
   const formatLoadTime = (loadTime) => {
-    if (loadTime < 1) {
-      return `${Math.round(loadTime * 1000)}ms`;
+    if (!loadTime) return '0ms';
+    // Convertir a milisegundos ya que la API devuelve segundos
+    const ms = loadTime * 1000;
+    if (ms < 1000) {
+      return `${Math.round(ms)}ms`;
     }
-    return `${loadTime.toFixed(2)}s`;
+    return `${(ms/1000).toFixed(2)}s`;
+  };
+
+  // Helper para obtener el color del puntaje de velocidad
+  const getSpeedColor = (loadTime) => {
+    if (!loadTime) return 'warning';
+    const ms = loadTime * 1000;
+    if (ms <= 500) return 'success';
+    if (ms <= 2000) return 'warning';
+    return 'error';
   };
 
   // Helper para mostrar las optimizaciones sugeridas
   const renderOptimizations = () => {
-    if (!result?.optimizations || result.optimizations.length === 0) {
+    const suggestions = [];
+    
+    // Agregar sugerencias del análisis SEO
+    if (result?.seo?.headings?.suggestion) {
+      suggestions.push(...result.seo.headings.suggestion);
+    }
+    if (result?.seo?.metadescription?.suggestion) {
+      suggestions.push(result.seo.metadescription.suggestion);
+    }
+    if (result?.seo?.webtitle?.suggestion) {
+      suggestions.push(result.seo.webtitle.suggestion);
+    }
+
+    if (suggestions.length === 0) {
       return (
         <Typography variant="body2" color="text.secondary">
           No se encontraron optimizaciones específicas para este sitio.
@@ -99,15 +122,12 @@ const PageSpeedInsights = () => {
 
     return (
       <List>
-        {result.optimizations.map((optimization, index) => (
+        {suggestions.map((suggestion, index) => (
           <ListItem key={index} sx={{ py: 1 }}>
             <ListItemIcon>
               <InfoIcon color="primary" />
             </ListItemIcon>
-            <ListItemText 
-              primary={optimization.title || optimization.suggestion}
-              secondary={optimization.description || optimization.detail}
-            />
+            <ListItemText primary={suggestion} />
           </ListItem>
         ))}
       </List>
@@ -141,10 +161,193 @@ const PageSpeedInsights = () => {
     );
   };
 
+  const renderKeywords = (keywords) => {
+    if (!keywords || !Array.isArray(keywords?.keywords)) {
+      return (
+        <Typography variant="body2" color="text.secondary">
+          No hay palabras clave disponibles
+        </Typography>
+      );
+    }
+
+    return (
+      <Grid container spacing={2} sx={{ mt: 1 }}>
+        {keywords.keywords.slice(0, 5).map((keyword, index) => (
+          <Grid item xs={12} sm={6} md={4} key={index}>
+            <Box sx={{ 
+              p: 2, 
+              border: 1, 
+              borderColor: 'divider',
+              borderRadius: 1,
+              '&:hover': {
+                bgcolor: 'action.hover'
+              }
+            }}>
+              <Typography variant="subtitle1" noWrap>
+                {keyword.keyword}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Posición: {keyword.position || 'N/A'}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Volumen: {keyword.volume || 'N/A'}
+              </Typography>
+            </Box>
+          </Grid>
+        ))}
+      </Grid>
+    );
+  };
+
+  const renderMetrics = (data) => {
+    if (!data) return null;
+
+    return (
+      <Grid container spacing={3}>
+        {/* Velocidad */}
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2, height: '100%' }}>
+            <Typography variant="h6" gutterBottom>
+              <SpeedIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+              Velocidad
+            </Typography>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                Tiempo de carga total
+              </Typography>
+              <Typography variant="h4" sx={{ mt: 1 }}>
+                {formatLoadTime(data?.speed?.data?.total_time)}
+              </Typography>
+              <LinearProgress 
+                variant="determinate" 
+                value={Math.min((data?.speed?.data?.total_time || 0) * 100, 100)}
+                color={getSpeedColor(data?.speed?.data?.total_time)}
+                sx={{ mt: 1 }}
+              />
+            </Box>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                Tamaño de página
+              </Typography>
+              <Typography variant="h6">
+                {formatBytes(data?.speed?.data?.size_download)}
+              </Typography>
+            </Box>
+          </Paper>
+        </Grid>
+
+        {/* SEO */}
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2, height: '100%' }}>
+            <Typography variant="h6" gutterBottom>
+              <SearchIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+              SEO
+            </Typography>
+            <List dense>
+              <ListItem>
+                <ListItemIcon><TitleIcon /></ListItemIcon>
+                <ListItemText 
+                  primary="Título" 
+                  secondary={`${data?.seo?.basic?.title || 'N/A'} (${data?.seo?.webtitle?.length || 0} caracteres)`}
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon><DescriptionIcon /></ListItemIcon>
+                <ListItemText 
+                  primary="Meta Descripción" 
+                  secondary={`${data?.seo?.metadescription?.description || 'N/A'} (${data?.seo?.metadescription?.length || 0} caracteres)`}
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon><LinkIcon /></ListItemIcon>
+                <ListItemText 
+                  primary="Enlaces" 
+                  secondary={`${data?.seo?.links?.count || 0} enlaces encontrados`}
+                />
+              </ListItem>
+            </List>
+          </Paper>
+        </Grid>
+
+        {/* Backlinks */}
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              <LinkIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+              Análisis de Backlinks
+            </Typography>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={6} sm={3}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h4">
+                    {data?.backlinks?.counts?.backlinks?.total || 0}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Total Backlinks
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h4">
+                    {data?.backlinks?.counts?.backlinks?.doFollow || 0}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    DoFollow
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h4">
+                    {data?.backlinks?.counts?.domains?.total || 0}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Dominios Únicos
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h4">
+                    {data?.backlinks?.counts?.backlinks?.toHomePage || 0}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    A Página Principal
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+
+        {/* Keywords */}
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              <TagIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+              Palabras Clave Principales
+            </Typography>
+            {renderKeywords(data?.keywords)}
+          </Paper>
+        </Grid>
+      </Grid>
+    );
+  };
+
+  // Helper para formatear bytes
+  const formatBytes = (bytes) => {
+    if (!bytes) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+  };
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Website Speed Test
+        Website Speed Test   AQUIU ESTOY
       </Typography>
       <Typography variant="subtitle1" gutterBottom color="text.secondary">
         Analiza la velocidad de carga y rendimiento de cualquier sitio web. 
@@ -205,116 +408,10 @@ const PageSpeedInsights = () => {
 
       {!loading && result && (
         <>
-          {/* Métricas Principales */}
-          <Card sx={{ mt: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Resultados del Análisis
-              </Typography>
-              
-              <Grid container spacing={3}>
-                {/* Tiempo de Carga Principal */}
-                <Grid item xs={12} md={6}>
-                  <Box sx={{ textAlign: 'center', p: 2 }}>
-                    <SpeedIcon 
-                      sx={{ 
-                        fontSize: 48, 
-                        color: getSpeedColor(result.load_time || result.loadTime || 0) === 'success' ? 'success.main' : 
-                               getSpeedColor(result.load_time || result.loadTime || 0) === 'warning' ? 'warning.main' : 'error.main'
-                      }} 
-                    />
-                    <Typography variant="h4" sx={{ mt: 1 }}>
-                      {formatLoadTime(result.load_time || result.loadTime || 0)}
-                    </Typography>
-                    <Typography variant="subtitle1" color="text.secondary">
-                      Tiempo de Carga
-                    </Typography>
-                    <Chip 
-                      label={
-                        getSpeedColor(result.load_time || result.loadTime || 0) === 'success' ? 'Excelente' :
-                        getSpeedColor(result.load_time || result.loadTime || 0) === 'warning' ? 'Mejorable' : 'Lento'
-                      }
-                      color={getSpeedColor(result.load_time || result.loadTime || 0)}
-                      sx={{ mt: 1 }}
-                    />
-                  </Box>
-                </Grid>
-
-                {/* Métricas Adicionales */}
-                <Grid item xs={12} md={6}>
-                  <Box sx={{ p: 2 }}>
-                    <Typography variant="h6" gutterBottom>
-                      Métricas Detectadas
-                    </Typography>
-                    
-                    {/* CDN Status */}
-                    {result.cdn_status !== undefined && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        <DnsIcon sx={{ mr: 1, color: result.cdn_status ? 'success.main' : 'warning.main' }} />
-                        <Typography variant="body2">
-                          CDN: {result.cdn_status ? 'Activo' : 'No detectado'}
-                        </Typography>
-                      </Box>
-                    )}
-
-                    {/* Compression */}
-                    {result.compression !== undefined && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        <StorageIcon sx={{ mr: 1, color: result.compression ? 'success.main' : 'warning.main' }} />
-                        <Typography variant="body2">
-                          Compresión: {result.compression ? 'Habilitada' : 'No detectada'}
-                        </Typography>
-                      </Box>
-                    )}
-
-                    {/* Page Size */}
-                    {result.page_size && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        <StorageIcon sx={{ mr: 1, color: 'info.main' }} />
-                        <Typography variant="body2">
-                          Tamaño: {result.page_size}
-                        </Typography>
-                      </Box>
-                    )}
-
-                    {/* Requests */}
-                    {result.requests && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        <CodeIcon sx={{ mr: 1, color: 'info.main' }} />
-                        <Typography variant="body2">
-                          Requests: {result.requests}
-                        </Typography>
-                      </Box>
-                    )}
-                  </Box>
-                </Grid>
-              </Grid>
-
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="subtitle1" gutterBottom>
-                  URL Analizada:
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
-                  {result.url || url}
-                </Typography>
-              </Box>
-            </CardContent>
-          </Card>
-
-          {/* Problemas Detectados */}
-          {(result.issues || result.problems) && (
-            <Card sx={{ mt: 3 }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  <WarningIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  Problemas Detectados
-                </Typography>
-                {renderIssues()}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Sugerencias de Optimización */}
+          {/* Reemplazar el contenido existente con el nuevo renderMetrics */}
+          {renderMetrics(result)}
+          
+          {/* Mantener las sugerencias y consejos generales */}
           <Card sx={{ mt: 3 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -322,11 +419,15 @@ const PageSpeedInsights = () => {
                 Sugerencias de Optimización
               </Typography>
               {renderOptimizations()}
-              
-              {/* Consejos Generales */}
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="subtitle2" gutterBottom>
-                Consejos Generales para Mejorar la Velocidad:
+            </CardContent>
+          </Card>
+
+          {/* Consejos Generales */}
+          <Card sx={{ mt: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                <InfoIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                Consejos Generales
               </Typography>
               <List dense>
                 <ListItem>
