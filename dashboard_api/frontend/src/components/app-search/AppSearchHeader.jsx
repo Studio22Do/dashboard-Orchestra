@@ -48,7 +48,7 @@ const AppSearchHeader = ({ searchQuery, setSearchQuery }) => (
         p: 0,
       }}
     >
-      Explora nuestra colección de aplicaciones que utilizan APIs de RapidAPI
+      Explora nuestra colección de aplicaciones.
     </Typography>
     <SearchField
       placeholder="Buscar Apps..."
