@@ -58,7 +58,7 @@ BLUEPRINT_MAPPING = {
     similarweb_bp: '/api/similarweb',
     keyword_insight_bp: '/api/keyword-insight',
     domain_metrics_bp: '/api/domain-metrics',
-    ahrefs_dr_bp: '/api/ahrefs-dr',
+    ahrefs_dr_bp: '/api/beta_v2/ahrefs-dr',
     pagespeed_bp: '/api/pagespeed-insights',
     ssl_checker_bp: '/api/ssl-checker',
     website_status_bp: '/api/website-status',

@@ -85,7 +85,7 @@ const AhrefsRankChecker = () => {
     
     try {
       // Llamada a authority
-      const authorityResponse = await fetch('/api/ahrefs-dr/authority', {
+      const authorityResponse = await fetch('/api/beta_v2/ahrefs-dr/authority', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url })
@@ -130,7 +130,7 @@ const AhrefsRankChecker = () => {
     // Cargar backlinks
     setLoadingAdditional(prev => ({ ...prev, backlinks: true }));
     try {
-      const backlinksResponse = await fetch('/api/ahrefs-dr/backlinks', {
+      const backlinksResponse = await fetch('/api/beta_v2/ahrefs-dr/backlinks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url })
@@ -151,7 +151,7 @@ const AhrefsRankChecker = () => {
     // Cargar broken links
     setLoadingAdditional(prev => ({ ...prev, broken: true }));
     try {
-      const brokenResponse = await fetch('/api/ahrefs-dr/broken-links', {
+      const brokenResponse = await fetch('/api/beta_v2/ahrefs-dr/broken-links', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url })
@@ -175,7 +175,7 @@ const AhrefsRankChecker = () => {
     // Cargar keywords relacionadas
     setLoadingAdditional(prev => ({ ...prev, keywords: true }));
     try {
-      const keywordsResponse = await fetch('/api/ahrefs-dr/keyword-suggestions', {
+      const keywordsResponse = await fetch('/api/beta_v2/ahrefs-dr/keyword-suggestions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
