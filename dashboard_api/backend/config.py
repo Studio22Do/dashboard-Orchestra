@@ -52,7 +52,8 @@ class Config:
     RAPIDAPI_FILE_CONVERTER_HOST = os.environ.get('RAPIDAPI_FILE_CONVERTER_HOST', 'all-in-one-file-converter.p.rapidapi.com')
     RAPIDAPI_TIKTOK_SCRAPER7_HOST = os.environ.get('RAPIDAPI_TIKTOK_SCRAPER7_HOST', 'tiktok-scraper7.p.rapidapi.com')
     RAPIDAPI_TIKTOK_SCRAPER2_HOST = os.environ.get('RAPIDAPI_TIKTOK_SCRAPER2_HOST', 'tiktok-scraper2.p.rapidapi.com')
-    RAPIDAPI_AHREFS_HOST = os.environ.get('RAPIDAPI_AHREFS_HOST', 'ahrefs2.p.rapidapi.com')
+    RAPIDAPI_AHREFS_HOST = os.environ.get('RAPIDAPI_AHREFS_HOST', 'domain-metrics-check.p.rapidapi.com')
+    RAPIDAPI_WEBSITE_ANALYZER_HOST = os.environ.get('RAPIDAPI_WEBSITE_ANALYZER_HOST', 'website-analyze-and-seo-audit-pro.p.rapidapi.com')
     
     # Configuración de Google News API
     GOOGLE_NEWS_API_HOST = os.environ.get('GOOGLE_NEWS_API_HOST', 'google-news13.p.rapidapi.com')

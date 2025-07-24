@@ -9,9 +9,15 @@ smart_scraper_bp = Blueprint('smart_scraper', __name__)
 APP_ID = "smart-scraper"
 
 # Configuración de RapidAPI
-RAPIDAPI_KEY = "9dc7412cabmsh04d2de9d55522bap1643f6jsn6e3113942f4a"
-RAPIDAPI_HOST = "smart-web-scraper-with-ai.p.rapidapi.com"
-BASE_URL = "https://smart-web-scraper-with-ai.p.rapidapi.com/api/v1/scrape"
+# NO HARDCODEES ESTO
+# RAPIDAPI_KEY = "..."
+# RAPIDAPI_HOST = "..."
+# BASE_URL = "..."
+
+# En vez de eso, dentro de la función:
+# RAPIDAPI_KEY = current_app.config['RAPIDAPI_KEY']
+# RAPIDAPI_HOST = current_app.config['RAPIDAPI_SMART_SCRAPER_HOST']
+# BASE_URL = current_app.config['RAPIDAPI_SMART_SCRAPER_URL']
 
 @smart_scraper_bp.route('/content', methods=['POST'])
 def scrape_content():
@@ -23,6 +29,10 @@ def scrape_content():
 
         if not url:
             raise ValidationError("Se requiere la URL del sitio web")
+
+        RAPIDAPI_KEY = current_app.config['RAPIDAPI_KEY']
+        RAPIDAPI_HOST = current_app.config['RAPIDAPI_SMART_SCRAPER_HOST']
+        BASE_URL = current_app.config['RAPIDAPI_SMART_SCRAPER_URL']
 
         api_url = f"{BASE_URL}/content"
         
@@ -63,6 +73,10 @@ def scrape_links():
         if not url:
             raise ValidationError("Se requiere la URL del sitio web")
 
+        RAPIDAPI_KEY = current_app.config['RAPIDAPI_KEY']
+        RAPIDAPI_HOST = current_app.config['RAPIDAPI_SMART_SCRAPER_HOST']
+        BASE_URL = current_app.config['RAPIDAPI_SMART_SCRAPER_URL']
+
         api_url = f"{BASE_URL}/links"
         
         headers = {
@@ -99,6 +113,10 @@ def scrape_tables():
         if not url:
             raise ValidationError("Se requiere la URL del sitio web")
 
+        RAPIDAPI_KEY = current_app.config['RAPIDAPI_KEY']
+        RAPIDAPI_HOST = current_app.config['RAPIDAPI_SMART_SCRAPER_HOST']
+        BASE_URL = current_app.config['RAPIDAPI_SMART_SCRAPER_URL']
+
         api_url = f"{BASE_URL}/tables"
         
         headers = {
@@ -134,6 +152,10 @@ def scrape_markdown():
 
         if not url:
             raise ValidationError("Se requiere la URL del sitio web")
+
+        RAPIDAPI_KEY = current_app.config['RAPIDAPI_KEY']
+        RAPIDAPI_HOST = current_app.config['RAPIDAPI_SMART_SCRAPER_HOST']
+        BASE_URL = current_app.config['RAPIDAPI_SMART_SCRAPER_URL']
 
         api_url = f"{BASE_URL}/markdown"
         

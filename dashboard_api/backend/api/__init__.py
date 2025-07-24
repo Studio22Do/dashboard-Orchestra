@@ -58,7 +58,9 @@ def create_app(config_object):
     from api.routes.product_description import product_description_bp
     from api.routes.website_status import website_status_bp
     from api.routes.image_optimizer import image_optimizer_bp
-    
+    from api.routes.website_analyzer import website_analyzer_bp
+    from api.routes.ahrefs_dr import ahrefs_dr_bp
+
     # Registrar blueprints con prefijos de versión
     version_prefix = f"/api/{app.config.get('MODE', 'beta_v1')}"
     
@@ -94,6 +96,8 @@ def create_app(config_object):
     app.register_blueprint(product_description_bp, url_prefix=f'{version_prefix}/product-description')
     app.register_blueprint(website_status_bp, url_prefix=f'{version_prefix}/website-status')
     app.register_blueprint(image_optimizer_bp, url_prefix=f'{version_prefix}/image-optimize')
+    app.register_blueprint(website_analyzer_bp, url_prefix=f'{version_prefix}/website-analyzer')
+    app.register_blueprint(ahrefs_dr_bp, url_prefix=f'{version_prefix}/ahrefs-dr')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers

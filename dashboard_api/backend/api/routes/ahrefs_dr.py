@@ -14,31 +14,42 @@ def ahrefs_authority():
     if not url_param.startswith(('http://', 'https://')):
         url_param = 'https://' + url_param
     
-    url = f"https://{current_app.config['RAPIDAPI_AHREFS_HOST']}/authority"
-    params = {
-        "url": url_param,
-        "mode": data.get('mode', 'subdomains')
-    }
+    # Extraer el dominio de la URL
+    from urllib.parse import urlparse
+    domain = urlparse(url_param).netloc
+    
+    url = f"https://{current_app.config['RAPIDAPI_AHREFS_HOST']}/domain-metrics/{domain}"
     headers = {
         "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
         "x-rapidapi-host": current_app.config['RAPIDAPI_AHREFS_HOST']
     }
     
-    print("Making request to Ahrefs API with:")
+    print("Making request to Domain Metrics API with:")
     print(f"URL: {url}")
-    print(f"Params: {params}")
     print(f"Headers: {headers}")
     
     try:
-        response = requests.get(url, headers=headers, params=params, timeout=20)
+        response = requests.get(url, headers=headers, timeout=20)
         print(f"Response status code: {response.status_code}")
         print(f"Response headers: {response.headers}")
         print(f"Response text: {response.text}")
         
         response.raise_for_status()
         data = response.json()
-        print("Ahrefs Authority API response (backend):", data)
-        return jsonify(data), 200
+        
+        # Mapear los datos relevantes de la respuesta
+        result = {
+            'domainRating': data.get('ahrefsDR', 0),
+            'urlRating': data.get('ahrefsRank', 0),
+            'backlinks': data.get('ahrefsBacklinks', 0),
+            'refdomains': data.get('ahrefsRefDomains', 0),
+            'traffic': data.get('ahrefsTraffic', 0),
+            'trafficValue': data.get('ahrefsTrafficValue', 0),
+            'organicKeywords': data.get('ahrefsOrganicKeywords', 0)
+        }
+        
+        print("Domain Metrics API response (backend):", result)
+        return jsonify(result), 200
     except requests.exceptions.HTTPError as errh:
         print(f"HTTP Error: {errh}")
         print(f"Response text: {response.text}")
