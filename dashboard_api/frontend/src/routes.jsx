@@ -13,6 +13,7 @@ import PRLabsTools from './pages/PRLabs/Tools';
 import Dashboard from './pages/Dashboard/Dashboard';
 import SpeechToTextAI from './pages/SpeechToTextAI/SpeechToTextAI';
 import GoogleNews from './pages/GoogleNews/GoogleNews';
+import SeoAnalyzer from './pages/SeoAnalyzer/SeoAnalyzer';
 
 const AppRoutes = () => {
     return (
@@ -20,6 +21,7 @@ const AppRoutes = () => {
             <Route path="/" element={<Layout />}>
                 <Route index element={<Dashboard />} />
                 <Route path="/apps/speech-to-text" element={<SpeechToTextAI />} />
+                <Route path="/apps/seo-analyzer" element={<SeoAnalyzer />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
 

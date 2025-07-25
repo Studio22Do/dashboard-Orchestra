@@ -20,22 +20,12 @@ def make_api_request(endpoint, method='GET', params=None, data=None):
         url = f"https://speech-to-text-ai.p.rapidapi.com/{endpoint}"
         headers = get_headers()
         
-        print("\n=== REQUEST INFO ===")
-        print(f"URL: {url}")
-        print(f"Headers: {headers}")
-        print(f"Params: {params}")
-        
         # Siempre usar GET con los parámetros como query string
         response = requests.get(url, headers=headers, params=params)
-        
-        print("\n=== RESPONSE INFO ===")
-        print(f"Status Code: {response.status_code}")
-        print(f"Response Text: {response.text}")
             
         response.raise_for_status()
         return response.json()
     except requests.RequestException as e:
-        print(f"\nERROR: {str(e)}")
         raise
 
 @speech_to_text_bp.route('/transcribe', methods=['GET', 'POST'])
@@ -48,12 +38,12 @@ def transcribe_audio():
         if not data or 'url' not in data:
             return jsonify({'error': 'Se requiere una URL de audio/video'}), 400
         url = data['url']
-        lang = data.get('language', 'en')  # Cambiado de 'auto' a 'en'
+        lang = data.get('language', 'en')
     else:  # GET
         url = request.args.get('url')
         if not url:
             return jsonify({'error': 'Se requiere una URL de audio/video'}), 400
-        lang = request.args.get('lang', 'en')  # Cambiado de 'auto' a 'en'
+        lang = request.args.get('lang', 'en')
     
     try:
         # Construir los parámetros de la petición
@@ -63,13 +53,9 @@ def transcribe_audio():
             'task': 'transcribe'
         }
         
-        print("\nParámetros de la petición:")
-        print(params)
-        
         result = make_api_request('transcribe', params=params)
         return jsonify(result), 200
     except Exception as e:
-        print(f"\nError en transcribe_audio: {str(e)}")
         return jsonify({'error': 'Error al transcribir el audio'}), 500
 
 @speech_to_text_bp.route('/queue/<task_id>/status', methods=['GET'])

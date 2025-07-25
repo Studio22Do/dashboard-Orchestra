@@ -216,6 +216,15 @@ const MOCK_APPS_DATA = [
     category: 'Web & SEO',
     route: '/apps/whois-lookup',
     apiName: 'WHOIS Lookup API'
+  },
+  {
+    id: 'seo-analyzer',
+    title: 'SEO Analyzer',
+    description: 'Analiza y optimiza el SEO de tu sitio web con recomendaciones detalladas',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Web & SEO',
+    route: '/apps/seo-analyzer',
+    apiName: 'SEO Analyzer API'
   }
 ];
 
@@ -268,14 +277,22 @@ export const purchaseApp = createAsyncThunk(
   async (appId, { rejectWithValue, getState }) => {
     const state = getState();
     const token = state.auth.token || localStorage.getItem('token');
-    // Si estamos en modo mock, simular la compra
-    if (isMockMode()) {
-      // Buscar la app en el mock
-      const app = MOCK_APPS_DATA.find(a => a.id === appId);
-      if (!app) return rejectWithValue('App no encontrada en mock');
+    
+    // Si estamos en modo mock o beta_v1, simular la compra
+    if (isMockMode() || process.env.REACT_APP_MODE === 'beta_v1') {
+      // Buscar la app en el mock o en allApps
+      const app = MOCK_APPS_DATA.find(a => a.id === appId) || state.apps.allApps.find(a => a.id === appId);
+      if (!app) return rejectWithValue('App no encontrada');
+      
       // Simular la estructura de una app comprada
-      return { ...app, app_id: app.id, is_favorite: false, purchased_at: new Date().toISOString() };
+      return { 
+        ...app, 
+        app_id: app.id, 
+        is_favorite: false, 
+        purchased_at: new Date().toISOString() 
+      };
     }
+    
     // Si hay backend, llamar al endpoint real
     try {
       const response = await axios.post(`${API_BASE_URL}/apps/user/apps/${appId}/purchase`, {}, {
