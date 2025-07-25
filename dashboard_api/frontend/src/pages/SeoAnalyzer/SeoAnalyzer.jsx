@@ -42,11 +42,13 @@ const SeoAnalyzer = () => {
     
     if (!url) {
       setError('Por favor ingresa una URL para analizar');
+      setSeoData(null); // Limpia resultado anterior si no hay URL
       return;
     }
     
     setLoading(true);
     setError(null);
+    setSeoData(null); // Limpia resultado anterior al iniciar análisis
     
     try {
       const response = await axios.post(`${API_BASE_URL}/seo-analyzer/analyze`, { url });
@@ -54,6 +56,7 @@ const SeoAnalyzer = () => {
     } catch (err) {
       console.error('Error analyzing SEO:', err);
       setError(err.response?.data?.error || 'Error al analizar el SEO del sitio');
+      setSeoData(null); // Limpia resultado anterior si hay error
     } finally {
       setLoading(false);
     }

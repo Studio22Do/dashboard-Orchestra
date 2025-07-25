@@ -19,7 +19,6 @@ def analyze_seo():
     url = data.get('url')
     
     if not url:
-        print('[SEOAnalyzer] ERROR: No se recibió URL')
         return jsonify({'error': 'Se requiere una URL para analizar'}), 400
 
     api_url = current_app.config['RAPIDAPI_WEBSITE_ANALYZER_URL']
@@ -30,16 +29,8 @@ def analyze_seo():
     params = {"url": url}
 
     try:
-        print(f"[SEOAnalyzer] URL enviada a RapidAPI: {url}")
-        print(f"[SEOAnalyzer] Endpoint: {api_url}")
-        print(f"[SEOAnalyzer] Headers: {headers}")
-        print(f"[SEOAnalyzer] Params: {params}")
         response = requests.get(api_url, headers=headers, params=params)
-        print(f"[SEOAnalyzer] Status: {response.status_code}")
-        print(f"[SEOAnalyzer] Respuesta texto: {response.text}")
-        
         if response.status_code != 200:
-            print('[SEOAnalyzer] ERROR: La API externa devolvió error')
             return jsonify({
                 'error': 'Error en la API de SEO Analyzer',
                 'details': response.text
@@ -48,7 +39,6 @@ def analyze_seo():
         result = response.json()
         
         if not result.get('success'):
-            print('[SEOAnalyzer] ERROR: La API reportó error en el JSON')
             return jsonify({
                 'error': 'La API reportó un error',
                 'details': result.get('message', 'Error desconocido')
@@ -71,11 +61,9 @@ def analyze_seo():
             'headers': http_data.get('headers', {}),
             'score': calculate_overall_score(data)
         }
-        print(f"[SEOAnalyzer] Respuesta transformada: {transformed_data}")
         return jsonify(transformed_data), 200
 
     except requests.exceptions.RequestException as e:
-        print(f"[SEOAnalyzer] Error: {str(e)}")
         return jsonify({
             'error': 'Error al conectar con el servicio de SEO Analyzer',
             'details': str(e)
