@@ -9,15 +9,6 @@ const API_BASE_URL = `${API_URL}/${API_MODE}`;
 const MOCK_APPS_DATA = [
   // Social Listening
   {
-    id: 'google-review-link',
-    title: 'Google Review Link Generator',
-    description: 'Genera enlaces directos para reseñas de Google',
-    imageUrl: 'https://cdn.pixabay.com/photo/2015/12/11/11/43/google-1088004_960_720.png',
-    category: 'Social Listening',
-    route: '/apps/google-review-link',
-    apiName: 'Google Review Link Generator API'
-  },
-  {
     id: 'google-news',
     title: 'Google News API',
     description: 'Accede a noticias en tiempo real de todo el mundo con filtros por categoría e idioma',
@@ -45,15 +36,6 @@ const MOCK_APPS_DATA = [
     apiName: 'Google Trends API'
   },
   {
-    id: 'google-paid-search',
-    title: 'Google Paid Search',
-    description: 'Analiza y optimiza tus campañas de búsqueda de pago en Google Ads',
-    imageUrl: 'https://cdn.pixabay.com/photo/2015/11/03/09/03/google-1018443_960_720.jpg',
-    category: 'Social Listening',
-    route: '/apps/paid-search',
-    apiName: 'Google Paid Search API'
-  },
-  {
     id: 'instagram-realtime',
     title: 'Instagram Realtime',
     description: 'Monitorea en tiempo real la actividad de Instagram, hashtags y menciones',
@@ -62,43 +44,7 @@ const MOCK_APPS_DATA = [
     route: '/instagram-realtime',
     apiName: 'Instagram Realtime API'
   },
-  {
-    id: 'scraptik',
-    title: 'TikTok Analytics',
-    description: 'Analiza tendencias, hashtags y contenido viral en TikTok',
-    imageUrl: 'https://cdn.pixabay.com/photo/2021/06/15/12/14/tik-tok-6338431_960_720.jpg',
-    category: 'Social Listening',
-    route: '/tiktok',
-    apiName: 'TikTok API'
-  },
   // Creative & Content
-  {
-    id: 'youtube-downloader',
-    title: 'YouTube Media Downloader',
-    description: 'Descarga videos y audio de YouTube en diferentes formatos y calidades',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/10/03/19/youtube-2625192_960_720.jpg',
-    category: 'Creative & Content',
-    route: '/youtube-media',
-    apiName: 'YouTube Media API'
-  },
-  {
-    id: 'file-converter',
-    title: 'File Converter',
-    description: 'Convierte archivos entre diferentes formatos de manera rápida y eficiente',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-    category: 'Creative & Content',
-    route: '/file-converter',
-    apiName: 'File Converter API'
-  },
-  {
-    id: 'midjourney',
-    title: 'Midjourney',
-    description: 'Genera imágenes artísticas de alta calidad con IA',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-    category: 'Creative & Content',
-    route: '/apps/midjourney',
-    apiName: 'Midjourney API'
-  },
   {
     id: 'word-count',
     title: 'Word Count',
@@ -125,24 +71,6 @@ const MOCK_APPS_DATA = [
     category: 'Creative & Content',
     route: '/apps/snap-video',
     apiName: 'Snap Video API'
-  },
-  {
-    id: 'ai-humanizer',
-    title: 'AI Humanizer',
-    description: 'Plataforma de IA avanzada para análisis y generación de contenido',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-    category: 'Creative & Content',
-    route: '/apps/ai-humanizer',
-    apiName: 'AI Humanizer API'
-  },
-  {
-    id: 'openai-tts',
-    title: 'OpenAI TTS',
-    description: 'Convierte texto a voz natural usando la tecnología de OpenAI',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-    category: 'Creative & Content',
-    route: '/apps/openai-text-to-speech',
-    apiName: 'OpenAI TTS API'
   },
   {
     id: 'genie-ai',
@@ -198,16 +126,16 @@ const MOCK_APPS_DATA = [
     route: '/prlabs',
     apiName: 'PR Labs API'
   },
-  // Web & SEO
   {
-    id: 'smart-scraper',
-    title: 'Smart Web Scraper',
-    description: 'Extrae y analiza contenido web usando IA. Obtén datos estructurados, enlaces, tablas y más.',
+    id: 'speech-to-text',
+    title: 'Speech to Text AI',
+    description: 'Transcribe audio y video desde múltiples fuentes usando IA avanzada',
     imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-    category: 'Web & SEO',
-    route: '/apps/smart-scraper',
-    apiName: 'Smart Web Scraper API'
+    category: 'Creative & Content',
+    route: '/apps/speech-to-text',
+    apiName: 'Speech to Text AI'
   },
+  // Web & SEO
   {
     id: 'similar-web',
     title: 'Similar Web Insights',
@@ -234,15 +162,6 @@ const MOCK_APPS_DATA = [
     category: 'Web & SEO',
     route: '/apps/domain-metrics',
     apiName: 'Domain Metrics API'
-  },
-  {
-    id: 'ahrefs-checker',
-    title: 'Ahrefs Checker',
-    description: 'Verifica el Domain Rating y ranking de sitios web',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-    category: 'Web & SEO',
-    route: '/apps/ahrefs-rank',
-    apiName: 'Ahrefs API'
   },
   {
     id: 'page-speed',
@@ -281,15 +200,6 @@ const MOCK_APPS_DATA = [
     apiName: 'Website Status API'
   },
   {
-    id: 'url-shortener',
-    title: 'URL Shortener',
-    description: 'Acorta URLs y genera códigos QR personalizados',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-    category: 'Web & SEO',
-    route: '/apps/url-shortener',
-    apiName: 'URL Shortener API'
-  },
-  {
     id: 'seo-mastermind',
     title: 'SEO Mastermind',
     description: 'Genera keywords, meta tags y títulos optimizados con IA',
@@ -297,15 +207,6 @@ const MOCK_APPS_DATA = [
     category: 'Web & SEO',
     route: '/apps/seo-mastermind',
     apiName: 'SEO Mastermind API'
-  },
-  {
-    id: 'image-optimizer',
-    title: 'Image Optimizer',
-    description: 'Optimiza y comprime imágenes JPEG, PNG y GIF para mejorar el rendimiento web',
-    imageUrl: 'https://cdn.pixabay.com/photo/2016/03/31/19/56/image-1295100_960_720.png',
-    category: 'Web & SEO',
-    route: '/apps/image-optimizer',
-    apiName: 'Image Optimizer API'
   },
   {
     id: 'whois-lookup',

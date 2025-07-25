@@ -50,7 +50,7 @@ const staticMenuItems = [
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const favoriteApps = useAppSelector(selectFavoriteApps);
+  const favoriteApps = useAppSelector(selectFavoriteApps) || [];
 
   return (
     <StyledDrawer variant="permanent">

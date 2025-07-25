@@ -6,5 +6,6 @@ db = SQLAlchemy()
 
 from .user import User
 from .seo_history import SEOHistory
+from .notification import Notification
 
-__all__ = ['db', 'User', 'SEOHistory'] 
+__all__ = ['db', 'User', 'SEOHistory', 'Notification'] 

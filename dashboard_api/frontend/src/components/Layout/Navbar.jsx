@@ -16,7 +16,6 @@ import {
   Switch
 } from '@mui/material';
 import { 
-  Notifications, 
   Settings, 
   AccountCircle, 
   Lock, 
@@ -32,6 +31,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks/reduxHooks';
 import { logoutUser, selectUser } from '../../redux/slices/authSlice';
 import { addNotification } from '../../redux/slices/uiSlice';
+import NotificationBell from '../NotificationBell/NotificationBell';
 
 // AppBar estilizado con colores del diseño
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -191,9 +191,7 @@ const Navbar = () => {
           Marketing Intelligence Console
         </Title>
         <IconGroup>
-          <IconButton size="medium" sx={{ color: 'white' }}>
-            <Notifications />
-          </IconButton>
+          <NotificationBell />
           <IconButton 
             size="medium" 
             sx={{ color: 'white' }}
