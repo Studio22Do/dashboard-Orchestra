@@ -119,12 +119,12 @@ const MOCK_APPS_DATA = [
   },
   {
     id: 'prlabs',
-    title: 'PR Labs',
+    title: 'sinfonIA',
     description: 'Suite de herramientas de IA para generación de texto e imágenes',
     imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
     category: 'Creative & Content',
     route: '/prlabs',
-    apiName: 'PR Labs API'
+    apiName: 'sinfonIA API'
   },
   {
     id: 'speech-to-text',

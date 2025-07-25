@@ -15,7 +15,7 @@ export const PR_LABS_CONFIG = {
       description: 'GPT-4, DeepSeek, Mixtral, y más',
       category: 'Chat Models',
       route: '/prlabs/chat',
-      apiName: 'PR Labs Chat API',
+      apiName: 'sinfonIA Chat API',
       models: ['gpt-4o-mini', 'deepseek', 'mixtral', 'gpt-3.5']
     },
     {
@@ -24,7 +24,7 @@ export const PR_LABS_CONFIG = {
       description: 'Crea imágenes asombrosas con IA',
       category: 'Image Generation',
       route: '/prlabs/image',
-      apiName: 'PR Labs Image API'
+      apiName: 'sinfonIA Image API'
     },
     {
       id: 'custom-chatbots',
@@ -32,7 +32,7 @@ export const PR_LABS_CONFIG = {
       description: 'Crea tu propio asistente IA',
       category: 'Custom Chatbots',
       route: '/prlabs/chatbot',
-      apiName: 'PR Labs Chatbot API'
+      apiName: 'sinfonIA Chatbot API'
     },
     {
       id: 'voice-features',
@@ -40,7 +40,7 @@ export const PR_LABS_CONFIG = {
       description: 'Text-to-Speech y análisis de voz',
       category: 'Voice Features',
       route: '/prlabs/voice',
-      apiName: 'PR Labs Voice API'
+      apiName: 'sinfonIA Voice API'
     },
   ],
 
