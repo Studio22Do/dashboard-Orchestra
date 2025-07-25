@@ -219,8 +219,11 @@ def login():
         }), 200
         
     except ValidationError as e:
+        print(f'[LOGIN ERROR] ValidationError: {str(e)}')
         raise ApiValidationError(str(e.messages))
     except Exception as e:
+        print(f'[LOGIN ERROR] Exception: {str(e)}')
+        print(f'[LOGIN ERROR] Type: {type(e)}')
         if isinstance(e, AuthenticationError) or isinstance(e, ApiValidationError):
             raise e
         raise ApiValidationError(str(e))

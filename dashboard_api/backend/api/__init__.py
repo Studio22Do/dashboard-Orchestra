@@ -22,6 +22,12 @@ def create_app(config_object):
     migrate.init_app(app, db)
     jwt.init_app(app)
     
+    # Configurar JWT específicamente para evitar problemas de OpenSSL
+    app.config.setdefault('JWT_ALGORITHM', 'HS256')
+    app.config.setdefault('JWT_TOKEN_LOCATION', ['headers'])
+    app.config.setdefault('JWT_HEADER_NAME', 'Authorization')
+    app.config.setdefault('JWT_HEADER_TYPE', 'Bearer')
+    
     # Inicializar rate limiter
     with app.app_context():
         from utils.rate_limiter import init_redis

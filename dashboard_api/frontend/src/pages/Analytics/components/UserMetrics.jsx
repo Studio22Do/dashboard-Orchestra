@@ -31,56 +31,36 @@ const IconBox = styled(Box)(({ theme, color }) => ({
   },
 }));
 
-const UserMetrics = () => {
-  // Datos de ejemplo - En producción vendrían de una API
-  const metrics = [
-    {
-      title: 'Usuarios Activos',
-      value: '847',
-      change: '+12%',
-      period: 'vs mes anterior',
-      icon: GroupAdd,
-      color: '#837cf2'
-    },
-    {
-      title: 'Tiempo Promedio',
-      value: '24m',
-      change: '+5%',
-      period: 'por sesión',
-      icon: AccessTime,
-      color: '#2196F3'
-    },
-    {
-      title: 'Tasa de Retorno',
-      value: '68%',
-      change: '+3%',
-      period: 'usuarios recurrentes',
-      icon: RepeatOne,
-      color: '#FF9800'
-    },
-    {
-      title: 'Crecimiento',
-      value: '32%',
-      change: '+8%',
-      period: 'nuevos usuarios',
-      icon: TrendingUp,
-      color: '#E91E63'
-    }
-  ];
+const UserMetrics = ({ metricsData = [] }) => {
+  const safeMetrics = Array.isArray(metricsData) ? metricsData : [];
+  // Si no hay datos, mostrar mensaje
+  if (!safeMetrics || safeMetrics.length === 0) {
+    return (
+      <Box textAlign="center" py={3}>
+        <Typography variant="body2" color="text.secondary">
+          No hay métricas de usuario disponibles
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Grid container spacing={2}>
-      {metrics.map((metric) => (
-        <Grid item xs={12} sm={6} key={metric.title}>
+      {safeMetrics.map((metric, index) => (
+        <Grid item xs={12} sm={6} key={metric.title || index}>
           <MetricBox>
-            <IconBox color={metric.color}>
-              <metric.icon />
+            <IconBox color={metric.color || '#837cf2'}>
+              {metric.icon === 'GroupAdd' && <GroupAdd />}
+              {metric.icon === 'AccessTime' && <AccessTime />}
+              {metric.icon === 'RepeatOne' && <RepeatOne />}
+              {metric.icon === 'TrendingUp' && <TrendingUp />}
+              {!metric.icon && <GroupAdd />}
             </IconBox>
             <Typography variant="h5" fontWeight="500">
-              {metric.value}
+              {metric.value || '0'}
             </Typography>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              {metric.title}
+              {metric.title || 'Métrica'}
             </Typography>
             <Box display="flex" alignItems="center">
               <Typography
@@ -88,10 +68,10 @@ const UserMetrics = () => {
                 color="success.main"
                 sx={{ display: 'flex', alignItems: 'center' }}
               >
-                {metric.change}
+                {metric.change || '0%'}
               </Typography>
               <Typography variant="body2" color="text.secondary" ml={1}>
-                {metric.period}
+                {metric.period || 'vs período anterior'}
               </Typography>
             </Box>
           </MetricBox>

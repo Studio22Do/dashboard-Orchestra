@@ -20,38 +20,17 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   padding: theme.spacing(2),
 }));
 
-const ApiPerformance = () => {
-  // Datos de ejemplo - En producción vendrían de una API
-  const apiData = [
-    {
-      name: 'Instagram Statistics API',
-      status: 'success',
-      responseTime: '245ms',
-      uptime: '99.9%',
-      lastCheck: '2 min ago'
-    },
-    {
-      name: 'YouTube Downloader',
-      status: 'warning',
-      responseTime: '850ms',
-      uptime: '98.5%',
-      lastCheck: '5 min ago'
-    },
-    {
-      name: 'SEO Analyzer',
-      status: 'success',
-      responseTime: '150ms',
-      uptime: '99.8%',
-      lastCheck: '1 min ago'
-    },
-    {
-      name: 'Google Trends API',
-      status: 'error',
-      responseTime: '1.2s',
-      uptime: '95.5%',
-      lastCheck: '3 min ago'
-    }
-  ];
+const ApiPerformance = ({ apiData = [] }) => {
+  // Si no hay datos, mostrar mensaje
+  if (!apiData || apiData.length === 0) {
+    return (
+      <Box textAlign="center" py={3}>
+        <Typography variant="body2" color="text.secondary">
+          No hay datos de rendimiento de APIs disponibles
+        </Typography>
+      </Box>
+    );
+  }
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -62,7 +41,20 @@ const ApiPerformance = () => {
       case 'error':
         return <Error />;
       default:
-        return null;
+        return <CheckCircle />;
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'success':
+        return 'Operativo';
+      case 'warning':
+        return 'Lento';
+      case 'error':
+        return 'Error';
+      default:
+        return 'Operativo';
     }
   };
 
@@ -79,8 +71,8 @@ const ApiPerformance = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {apiData.map((api) => (
-            <TableRow key={api.name}>
+          {apiData.map((api, index) => (
+            <TableRow key={api.name || index}>
               <StyledTableCell>
                 <Typography variant="body2">{api.name}</Typography>
               </StyledTableCell>
@@ -88,19 +80,18 @@ const ApiPerformance = () => {
                 <StatusIcon status={api.status}>
                   {getStatusIcon(api.status)}
                   <Typography variant="body2">
-                    {api.status === 'success' ? 'Operativo' :
-                     api.status === 'warning' ? 'Lento' : 'Error'}
+                    {getStatusText(api.status)}
                   </Typography>
                 </StatusIcon>
               </StyledTableCell>
               <StyledTableCell>
-                <Typography variant="body2">{api.responseTime}</Typography>
+                <Typography variant="body2">{api.responseTime || 'N/A'}</Typography>
               </StyledTableCell>
               <StyledTableCell>
-                <Typography variant="body2">{api.uptime}</Typography>
+                <Typography variant="body2">{api.uptime || 'N/A'}</Typography>
               </StyledTableCell>
               <StyledTableCell>
-                <Typography variant="body2">{api.lastCheck}</Typography>
+                <Typography variant="body2">{api.lastCheck || 'N/A'}</Typography>
               </StyledTableCell>
             </TableRow>
           ))}
