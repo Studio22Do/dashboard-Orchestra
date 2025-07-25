@@ -6,12 +6,14 @@ import random
 from api import db
 from api.models.app import App, ApiUsage
 from api.models.user import User
+from api.utils.decorators import role_required
 
 # Crear blueprint
 stats_bp = Blueprint('stats', __name__)
 
 @stats_bp.route('/dashboard', methods=['GET'])
 @jwt_required()
+@role_required('admin', 'superadmin')
 def get_dashboard_stats():
     """Obtener estadísticas para el dashboard"""
     try:
@@ -144,6 +146,7 @@ def get_mock_stats(now):
 
 @stats_bp.route('/apps/<string:app_id>', methods=['GET'])
 @jwt_required()
+@role_required('admin', 'superadmin')
 def get_app_stats(app_id):
     """Obtener estadísticas específicas de una aplicación"""
     app = App.query.get(app_id)
