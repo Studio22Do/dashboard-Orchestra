@@ -245,7 +245,7 @@ const Register = () => {
       }}
     >
       <Box sx={{ textAlign: 'center', mb: 4 }}>
-        <img src="/logo1.png" alt="Logo Sympho" style={{ width: 250, marginBottom: 16 }} />
+        <img src="/maestro.png" alt="Logo Sympho" style={{ width: 250, marginBottom: 16 }} />
         <Typography variant="h4" sx={{ color: 'white', fontWeight: 600, mb: 1 }}>
           Crear Cuenta
         </Typography>

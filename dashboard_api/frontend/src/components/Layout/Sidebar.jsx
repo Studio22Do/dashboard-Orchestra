@@ -64,7 +64,7 @@ const Sidebar = () => {
           aria-label="Ir a inicio"
           onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') navigate('/'); }}
         >
-          <img src="/logo1.png" alt="Logo Sympho" style={{ width: 120, marginBottom: 16, display: 'block' }} />
+          <img src="/maestro.png" alt="Logo Sympho" style={{ width: 120, marginBottom: 16, display: 'block' }} />
         </button>
       </Box>
       <Box sx={{ overflow: 'auto' }}>

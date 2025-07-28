@@ -201,7 +201,7 @@ const EmailVerification = () => {
       }}
     >
       <Box sx={{ textAlign: 'center', mb: 4 }}>
-        <img src="/logo1.png" alt="Logo Sympho" style={{ width: 200, marginBottom: 24 }} />
+        <img src="/maestro.png" alt="Logo Sympho" style={{ width: 200, marginBottom: 24 }} />
       </Box>
       
       <StyledPaper sx={{ maxWidth: 500, width: '100%' }}>
