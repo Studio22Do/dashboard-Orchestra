@@ -139,7 +139,7 @@ const Login = () => {
       }}
     >
       <Box sx={{ textAlign: 'center', mb: 6 }}>
-        <img src="/logo1.png" alt="Logo Sympho" style={{ width: 290, marginBottom: 24 }} />
+        <img src="/maestro.png" alt="Logo Sympho" style={{ width: 290, marginBottom: 24 }} />
       </Box>
       
       <Box

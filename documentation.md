@@ -15,6 +15,7 @@
 12. [Uso de Mock de Apps](#uso-de-mock-de-apps)
 13. [Transición a Producción](#transición-a-producción)
 14. [Sistema de Apps y Drawer](#sistema-de-apps-y-drawer)
+15. [Mejoras Recientes Implementadas](#mejoras-recientes-implementadas)
 
 ## Descripción General
 
@@ -60,6 +61,7 @@ dashboard-Orchestra/
 - Flask-JWT-Extended
 - Marshmallow
 - Redis
+- PostgreSQL (base de datos principal)
 
 ### Frontend
 - React 19
@@ -92,6 +94,7 @@ dashboard-Orchestra/
 - Advanced Image Manipulation API ✅
 - Whisper: From URL ✅
 - RunwayML ✅
+- **Speech to Text AI** ✅ (Nuevo)
 
 ### Web & SEO
 - SEO Analyzer ✅
@@ -113,6 +116,7 @@ dashboard-Orchestra/
 - Node.js 18+
 - npm o yarn
 - Redis (opcional)
+- PostgreSQL
 - Variables de entorno configuradas
 
 ### Instalación del Backend
@@ -140,6 +144,8 @@ FLASK_APP=app.py
 FLASK_ENV=development
 SECRET_KEY=tu_clave_secreta
 JWT_SECRET_KEY=tu_clave_jwt
+DATABASE_URI=postgresql://username:password@localhost/rapidapi_dashboard
+RAPIDAPI_KEY=tu_clave_rapidapi
 ```
 
 5. Inicializar base de datos:
@@ -168,7 +174,7 @@ npm install
 3. Configurar variables de entorno:
 Crear archivo `.env` con:
 ```
-REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_API_URL=http://localhost:5000
 REACT_APP_ENV=development
 ```
 
@@ -182,12 +188,25 @@ npm start
 ### Endpoints Principales
 
 - **Autenticación**:
-  - `POST /api/auth/login`: Inicio de sesión
-  - `POST /api/auth/refresh`: Actualización de token
+  - `POST /api/beta_v2/auth/login`: Inicio de sesión
+  - `POST /api/beta_v2/auth/register`: Registro de usuario
+  - `POST /api/beta_v2/auth/refresh`: Actualización de token
+  - `GET /api/beta_v2/auth/me`: Información del usuario
 
 - **Aplicaciones**:
-  - `GET /api/apps`: Lista de aplicaciones
-  - `GET /api/apps/<app_id>`: Detalles de aplicación
+  - `GET /api/beta_v2/apps`: Lista de aplicaciones
+  - `GET /api/beta_v2/apps/<app_id>`: Detalles de aplicación
+  - `GET /api/beta_v2/apps/user/favorites`: Apps favoritas
+  - `POST /api/beta_v2/apps/user/apps/<app_id>/favorite`: Marcar como favorita
+
+- **Estadísticas**:
+  - `GET /api/beta_v2/stats/dashboard`: Dashboard de Analytics
+  - `GET /api/beta_v2/stats/apps/<app_id>`: Estadísticas de app específica
+
+- **Notificaciones**:
+  - `GET /api/beta_v2/notifications`: Lista de notificaciones
+  - `GET /api/beta_v2/notifications/unread`: Notificaciones no leídas
+  - `POST /api/beta_v2/notifications/mark-read`: Marcar como leída
 
 ## Interfaz Frontend
 
@@ -196,6 +215,8 @@ npm start
 - CategorySection
 - ToolCard
 - Layout
+- Analytics Dashboard
+- NotificationBell
 
 ### Características
 - Diseño Responsivo
@@ -206,20 +227,23 @@ npm start
 - Gestión de Estado con Redux
 - Protección de Rutas
 - Integración con APIs
+- Sistema de Notificaciones
+- Dashboard de Analytics con datos reales
 
 ## Modo Desarrollo vs. Modo Producción
 
-### Modo Desarrollo
+### Modo Desarrollo (beta_v1)
 - Acceso sin autenticación
 - Datos mock para pruebas
 - Logs detallados
 - Hot-reloading
 
-### Modo Producción
+### Modo Producción (beta_v2)
 - Autenticación requerida
-- Datos reales
+- Datos reales de base de datos
 - Optimizaciones de rendimiento
 - Logs mínimos
+- Sistema de roles y permisos
 
 ## Uso de Mock de Apps
 
@@ -282,6 +306,11 @@ Esto significa que faltan dependencias que están siendo utilizadas en el códig
 - Comprobar límites de uso
 - Revisar logs de error
 
+### Problemas de Autenticación
+- Verificar que el hash de contraseña sea compatible (usar `pbkdf2:sha256`)
+- Asegurar que el usuario esté activo y verificado
+- Comprobar que la columna `password_hash` tenga suficiente espacio (255 caracteres)
+
 ## Sistema de Apps y Drawer
 
 ### Estructura de Apps
@@ -325,6 +354,7 @@ El dashboard organiza las apps en tres categorías principales:
    - Image Manipulation
    - Whisper URL
    - RunwayML
+   - **Speech to Text AI**
 
 3. **Web & SEO**
    - SEO Analyzer
@@ -418,18 +448,225 @@ El sistema soporta dos modos de operación:
 Los endpoints principales para la gestión de apps son:
 
 ```
-GET    /api/apps              - Lista todas las apps
-GET    /api/apps/user/apps    - Apps compradas
-GET    /api/apps/user/favorites - Apps favoritas
-POST   /api/apps/user/apps/{id}/purchase - Comprar app
-POST   /api/apps/user/apps/{id}/favorite - Marcar como favorita
+GET    /api/beta_v2/apps              - Lista todas las apps
+GET    /api/beta_v2/apps/user/apps    - Apps compradas
+GET    /api/beta_v2/apps/user/favorites - Apps favoritas
+POST   /api/beta_v2/apps/user/apps/{id}/purchase - Comprar app
+POST   /api/beta_v2/apps/user/apps/{id}/favorite - Marcar como favorita
 ```
 
 ### Variables de Entorno
 
 ```env
-REACT_APP_API_URL=http://localhost:5000/api  # URL del backend
-REACT_APP_ENV=development                    # Modo de operación
+REACT_APP_API_URL=http://localhost:5000  # URL del backend (sin /api al final)
+REACT_APP_ENV=development                # Modo de operación
 ```
+
+## Mejoras Recientes Implementadas
+
+### Sistema de Autenticación Mejorado
+
+#### Gestión de Contraseñas
+- **Hash Compatible**: Implementado sistema de hash `pbkdf2:sha256` compatible con werkzeug
+- **Base de Datos**: Columna `password_hash` expandida a 255 caracteres
+- **Verificación Robusta**: Sistema de verificación de contraseñas sin errores de OpenSSL
+
+#### Estructura de Usuario
+```sql
+-- Tabla users con campos mejorados
+id                   | integer (primary key)
+email                | character varying(100) (unique)
+password_hash        | character varying(255) (hash pbkdf2:sha256)
+name                 | character varying(100)
+role                 | character varying(20) (user, admin, superadmin)
+is_active            | boolean (default: true)
+is_verified          | boolean (default: false)
+version              | character varying(20) (beta_v1, beta_v2)
+```
+
+### Sistema de Control de Acceso Basado en Roles (RBAC)
+
+#### Roles Implementados
+1. **user**: Usuario normal con acceso básico
+2. **admin**: Administrador con acceso a Analytics y gestión
+3. **superadmin**: Super administrador con acceso total
+
+#### Decorador de Roles
+```python
+@role_required('admin', 'superadmin')
+def protected_endpoint():
+    # Solo accesible para admin y superadmin
+    pass
+```
+
+#### Permisos por Rol
+- **user**: Dashboard básico, apps compradas
+- **admin**: Analytics completo, métricas globales
+- **superadmin**: Todo + gestión de usuarios (futuro)
+
+### Dashboard de Analytics con Datos Reales
+
+#### Componentes Implementados
+1. **Vista General**: Métricas principales (llamadas API, usuarios activos, apps, tasa de éxito)
+2. **Uso de Herramientas**: Gráfico de uso por aplicación
+3. **Rendimiento de APIs**: Tabla de estado y rendimiento de APIs
+4. **Métricas de Usuario**: Estadísticas de usuarios y crecimiento
+
+#### Integración con Backend
+- **Endpoint**: `/api/beta_v2/stats/dashboard`
+- **Datos Reales**: Conectado a PostgreSQL
+- **Filtrado por Rol**: Diferentes métricas según el rol del usuario
+- **Estado de Carga**: Loading states y manejo de errores
+
+#### Estructura de Datos
+```javascript
+{
+  metrics: {
+    apiCalls: { value: "10", change: "+0%", label: "Llamadas API" },
+    activeUsers: { value: "5", change: "+0%", label: "Usuarios Activos" },
+    totalApps: { value: "11", change: "+0", label: "Apps Activas" },
+    successRate: { value: "99.8%", change: "+0%", label: "Tasa de Éxito" }
+  },
+  usage: [
+    { tool: "Instagram Statistics", percent: 45 },
+    { tool: "SEO Analyzer", percent: 30 }
+  ],
+  userMetrics: [
+    {
+      title: "Usuarios Activos",
+      value: "5",
+      change: "+0%",
+      period: "vs mes anterior",
+      icon: "GroupAdd",
+      color: "#837cf2"
+    }
+  ],
+  apiPerformance: [
+    {
+      name: "Instagram API",
+      status: "success",
+      responseTime: "245ms",
+      uptime: "99.9%",
+      lastCheck: "2 min ago"
+    }
+  ]
+}
+```
+
+### Sistema de Notificaciones
+
+#### Componente NotificationBell
+- **Icono de Campana**: Con badge de notificaciones no leídas
+- **Dropdown**: Lista de notificaciones recientes
+- **Acciones**: Marcar como leída, limpiar todas
+- **Persistente**: Notificaciones almacenadas en base de datos
+
+#### Modelo de Notificación
+```python
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    type = db.Column(db.String(50))  # info, warning, error, success
+    title = db.Column(db.String(200))
+    message = db.Column(db.Text)
+    category = db.Column(db.String(50))
+    read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    link = db.Column(db.String(500))
+```
+
+#### Endpoints de Notificaciones
+```
+GET    /api/beta_v2/notifications           - Lista todas las notificaciones
+GET    /api/beta_v2/notifications/unread    - Notificaciones no leídas
+POST   /api/beta_v2/notifications/mark-read - Marcar como leída
+DELETE /api/beta_v2/notifications/clear     - Limpiar todas
+```
+
+### Nuevas APIs Integradas
+
+#### Speech to Text AI
+- **Endpoint**: `/api/beta_v2/speech-to-text/transcribe`
+- **Funcionalidad**: Conversión de audio a texto desde URL
+- **Integración**: RapidAPI Speech-to-Text AI
+- **Frontend**: Componente completo con UI moderna
+
+#### SEO Analyzer Mejorado
+- **Endpoint**: `/api/beta_v2/seo-analyzer/analyze`
+- **Funcionalidad**: Análisis completo de SEO de sitios web
+- **Integración**: RapidAPI SEO Analyzer
+- **Datos**: URL, estado HTTP, HTTPS, tamaño de contenido, score
+
+### Mejoras en la Configuración
+
+#### Configuración de JWT
+```python
+# config.py
+JWT_ALGORITHM = 'HS256'
+JWT_TOKEN_LOCATION = ['headers']
+JWT_HEADER_NAME = 'Authorization'
+JWT_HEADER_TYPE = 'Bearer'
+```
+
+#### Configuración de CORS Mejorada
+```python
+# app.py
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["http://localhost:3000", "http://192.168.13.109:3000"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True,
+        "expose_headers": ["Content-Type", "Authorization"]
+    }
+})
+```
+
+### Correcciones de Bugs y Mejoras de UX
+
+#### Frontend
+- **URL Base**: Corrección automática de URLs duplicadas (`/api/api/`)
+- **Manejo de Arrays**: Protección contra errores de `.map()` en componentes
+- **Estados de Carga**: Loading states en todos los componentes
+- **Manejo de Errores**: Try-catch robusto en todas las operaciones
+
+#### Backend
+- **Validación de Datos**: Mejor validación con Marshmallow
+- **Manejo de Excepciones**: Logging detallado y respuestas consistentes
+- **Base de Datos**: Migraciones y estructura optimizada
+- **Autenticación**: Sistema robusto sin errores de OpenSSL
+
+### Gestión de Usuarios
+
+#### Comandos Útiles para Base de Datos
+```sql
+-- Verificar usuario
+SELECT id, email, name, role, is_active, is_verified FROM users WHERE email = 'user@example.com';
+
+-- Activar usuario
+UPDATE users SET is_active = true, is_verified = true WHERE email = 'user@example.com';
+
+-- Cambiar contraseña (generar hash primero)
+UPDATE users SET password_hash = 'pbkdf2:sha256:1000000$...' WHERE email = 'user@example.com';
+
+-- Cambiar rol
+UPDATE users SET role = 'admin' WHERE email = 'user@example.com';
+```
+
+#### Generación de Hash de Contraseña
+```bash
+# En el backend
+python3 -c "from werkzeug.security import generate_password_hash; print(generate_password_hash('password', method='pbkdf2:sha256'))"
+```
+
+### Próximas Funcionalidades Planificadas
+
+1. **Panel de Administración**: Gestión completa de usuarios y apps
+2. **Sistema de Planes**: Planes premium con límites de uso
+3. **Logs de Auditoría**: Registro de todas las acciones de usuarios
+4. **API Rate Limiting**: Límites de uso por usuario y plan
+5. **Notificaciones Push**: Notificaciones en tiempo real
+6. **Exportación de Datos**: Exportar métricas y reportes
+7. **Integración de Pagos**: Sistema de suscripciones
 
 ---

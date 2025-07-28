@@ -1,7 +1,11 @@
 // Configuración de la aplicación
+const rawApiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// Eliminar /api al final si existe
+const cleanApiUrl = rawApiUrl.replace(/\/api\/?$/, '');
+
 export const APP_CONFIG = {
   // URLs
-  API_URL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
+  API_URL: cleanApiUrl,
   APP_URL: process.env.REACT_APP_APP_URL || 'http://localhost:3000',
   
   // Google OAuth

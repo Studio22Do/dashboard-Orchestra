@@ -9,13 +9,8 @@ import EmailVerification from './pages/Login/EmailVerification';
 import AppCatalog from './pages/AppCatalog/AppCatalog';
 import InstagramStats from './pages/InstagramStats/InstagramStats';
 import InstagramRealtime from './pages/InstagramRealtime';
-import ScrapTik from './pages/ScrapTik';
-import YouTubeMedia from './pages/YouTubeMedia/YouTubeMedia';
-import FileConverter from './pages/FileConverter/FileConverter';
 import GoogleTrends from './pages/GoogleTrends/GoogleTrends';
-import GooglePaidSearch from './pages/GooglePaidSearch/GooglePaidSearch';
 import GoogleNews from './pages/GoogleNews/GoogleNews';
-import GoogleReviewLink from './pages/GoogleReviewLink/GoogleReviewLink';
 import Dashboard from './pages/Dashboard/Dashboard';
 import NotificationManager from './components/Notifications/NotificationManager';
 import { useAppDispatch, useAppSelector } from './redux/hooks/reduxHooks';
@@ -26,27 +21,23 @@ import Profile from './pages/Profile/Profile';
 import ChangePassword from './pages/Profile/ChangePassword';
 import SSLChecker from './pages/SSLChecker/SSLChecker';
 import WebsiteStatus from './pages/WebsiteStatus/WebsiteStatus';
-import UrlShortener from './pages/UrlShortener/UrlShortener';
 import SeoAnalyzer from './pages/SeoAnalyzer/SeoAnalyzer';
 import SimilarWebInsights from './pages/SimilarWebInsights/SimilarWebInsights';
 import GoogleKeywordInsights from './pages/GoogleKeywordInsights/GoogleKeywordInsights';
 import DomainMetrics from './pages/DomainMetrics/DomainMetrics';
-import AhrefsRankChecker from './pages/AhrefsRankChecker/AhrefsRankChecker';
 import PageSpeedInsights from './pages/PageSpeedInsights/PageSpeedInsights';
 import ProductDescriptionGenerator from './pages/ProductDescriptionGenerator/ProductDescriptionGenerator';
 import SeoMastermind from './pages/SEOMastermind/SEOMastermind';
 import WordCount from './pages/WordCount/WordCount';
 import PdfToText from './pages/PdfToText/PdfToText';
 import SnapVideo from './pages/SnapVideo/SnapVideo';
-import OpenAITextToSpeech from './pages/OpenAITextToSpeech/OpenAITextToSpeech';
 import GenieAI from './pages/GenieAI/GenieAI';
 import AISocialMediaContent from './pages/AISocialMediaContent/AISocialMediaContent';
 import AdvancedImageManipulation from './pages/AdvancedImageManipulation/AdvancedImageManipulation';
 import WhisperFromURL from './pages/WhisperFromURL/WhisperFromURL';
+import PicPulse from './pages/PicPulse/PicPulse';
 import RunwayML from './pages/RunwayML/RunwayML';
-import AIHumanizer from './pages/AIHumanizer/AIHumanizer';
 import CategoryView from './pages/CategoryView/CategoryView';
-import ImageOptimizer from './pages/ImageOptimizer/ImageOptimizer';
 import ForgotPassword from './pages/Login/ForgotPassword';
 import ResetPassword from './pages/Login/ResetPassword';
 import PRLabsDashboard from './pages/PRLabs/Dashboard';
@@ -56,8 +47,8 @@ import PRLabsText from './pages/PRLabs/Text';
 import PRLabsVoice from './pages/PRLabs/Voice';
 import PRLabsChatbot from './pages/PRLabs/Chatbot';
 import PRLabsTools from './pages/PRLabs/Tools';
-import SmartWebScraper from './pages/SmartWebScraper/SmartWebScraper';
 import WhoisLookup from './pages/WhoisLookup/WhoisLookup';
+import SpeechToTextAI from './pages/SpeechToTextAI/SpeechToTextAI';
 
 // Theme configuration function
 const createAppTheme = (mode) => createTheme({
@@ -192,10 +183,19 @@ const createAppTheme = (mode) => createTheme({
 
 // Protected Route wrapper
 const ProtectedRoute = ({ children }) => {
-  // const isAuthenticated = useAppSelector(selectIsAuthenticated);
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/login" />;
-  // }
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const mode = process.env.REACT_APP_MODE || 'beta_v1';
+  
+  // Si estamos en beta_v1, no verificar autenticación
+  if (mode === 'beta_v1') {
+    return <Layout>{children}</Layout>;
+  }
+  
+  // Si estamos en beta_v2, sí verificar autenticación
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  
   return <Layout>{children}</Layout>;
 };
 
@@ -271,33 +271,15 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/tiktok" element={
-            <ProtectedRoute>
-              <ScrapTik />
-            </ProtectedRoute>
-          } />
-          
           <Route path="/apps/trends" element={
             <ProtectedRoute>
               <GoogleTrends />
             </ProtectedRoute>
           } />
           
-          <Route path="/apps/paid-search" element={
-            <ProtectedRoute>
-              <GooglePaidSearch />
-            </ProtectedRoute>
-          } />
-
           <Route path="/apps/google-news" element={
             <ProtectedRoute>
               <GoogleNews />
-            </ProtectedRoute>
-          } />
-
-          <Route path="/apps/google-review-link" element={
-            <ProtectedRoute>
-              <GoogleReviewLink />
             </ProtectedRoute>
           } />
 
@@ -320,18 +302,6 @@ function App() {
             </ProtectedRoute>
           } />
 
-          <Route path="/youtube-media" element={
-            <ProtectedRoute>
-              <YouTubeMedia />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/file-converter" element={
-            <ProtectedRoute>
-              <FileConverter />
-            </ProtectedRoute>
-          } />
-          
           <Route path="/apps/ssl-checker" element={
             <ProtectedRoute>
               <SSLChecker />
@@ -343,22 +313,10 @@ function App() {
               <WebsiteStatus />
             </ProtectedRoute>
           } />
-          
-          <Route path="/apps/smart-scraper" element={
-            <ProtectedRoute>
-              <SmartWebScraper />
-            </ProtectedRoute>
-          } />
 
           <Route path="/apps/whois-lookup" element={
             <ProtectedRoute>
               <WhoisLookup />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/apps/whisper-url" element={
-            <ProtectedRoute>
-              <UrlShortener />
             </ProtectedRoute>
           } />
           
@@ -386,12 +344,6 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/apps/ahrefs-rank" element={
-            <ProtectedRoute>
-              <AhrefsRankChecker />
-            </ProtectedRoute>
-          } />
-          
           <Route path="/apps/page-speed" element={
             <ProtectedRoute>
               <PageSpeedInsights />
@@ -410,8 +362,6 @@ function App() {
             </ProtectedRoute>
           } />
           
-
-          
           <Route path="/apps/word-count" element={
             <ProtectedRoute>
               <WordCount />
@@ -427,12 +377,6 @@ function App() {
           <Route path="/apps/snap-video" element={
             <ProtectedRoute>
               <SnapVideo />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/apps/openai-text-to-speech" element={
-            <ProtectedRoute>
-              <OpenAITextToSpeech />
             </ProtectedRoute>
           } />
           
@@ -454,6 +398,12 @@ function App() {
             </ProtectedRoute>
           } />
           
+          <Route path="/apps/picpulse" element={
+            <ProtectedRoute>
+              <PicPulse />
+            </ProtectedRoute>
+          } />
+          
           <Route path="/apps/whisper-url" element={
             <ProtectedRoute>
               <WhisperFromURL />
@@ -466,21 +416,15 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/apps/ai-humanizer" element={
+          <Route path="/apps/speech-to-text" element={
             <ProtectedRoute>
-              <AIHumanizer />
+              <SpeechToTextAI />
             </ProtectedRoute>
           } />
           
           <Route path="/category" element={
             <ProtectedRoute>
               <CategoryView />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/apps/image-optimizer" element={
-            <ProtectedRoute>
-              <ImageOptimizer />
             </ProtectedRoute>
           } />
           

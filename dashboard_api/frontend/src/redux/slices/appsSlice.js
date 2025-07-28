@@ -9,15 +9,6 @@ const API_BASE_URL = `${API_URL}/${API_MODE}`;
 const MOCK_APPS_DATA = [
   // Social Listening
   {
-    id: 'google-review-link',
-    title: 'Google Review Link Generator',
-    description: 'Genera enlaces directos para reseñas de Google',
-    imageUrl: 'https://cdn.pixabay.com/photo/2015/12/11/11/43/google-1088004_960_720.png',
-    category: 'Social Listening',
-    route: '/apps/google-review-link',
-    apiName: 'Google Review Link Generator API'
-  },
-  {
     id: 'google-news',
     title: 'Google News API',
     description: 'Accede a noticias en tiempo real de todo el mundo con filtros por categoría e idioma',
@@ -45,15 +36,6 @@ const MOCK_APPS_DATA = [
     apiName: 'Google Trends API'
   },
   {
-    id: 'google-paid-search',
-    title: 'Google Paid Search',
-    description: 'Analiza y optimiza tus campañas de búsqueda de pago en Google Ads',
-    imageUrl: 'https://cdn.pixabay.com/photo/2015/11/03/09/03/google-1018443_960_720.jpg',
-    category: 'Social Listening',
-    route: '/apps/paid-search',
-    apiName: 'Google Paid Search API'
-  },
-  {
     id: 'instagram-realtime',
     title: 'Instagram Realtime',
     description: 'Monitorea en tiempo real la actividad de Instagram, hashtags y menciones',
@@ -62,43 +44,7 @@ const MOCK_APPS_DATA = [
     route: '/instagram-realtime',
     apiName: 'Instagram Realtime API'
   },
-  {
-    id: 'scraptik',
-    title: 'TikTok Analytics',
-    description: 'Analiza tendencias, hashtags y contenido viral en TikTok',
-    imageUrl: 'https://cdn.pixabay.com/photo/2021/06/15/12/14/tik-tok-6338431_960_720.jpg',
-    category: 'Social Listening',
-    route: '/tiktok',
-    apiName: 'TikTok API'
-  },
   // Creative & Content
-  {
-    id: 'youtube-downloader',
-    title: 'YouTube Media Downloader',
-    description: 'Descarga videos y audio de YouTube en diferentes formatos y calidades',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/10/03/19/youtube-2625192_960_720.jpg',
-    category: 'Creative & Content',
-    route: '/youtube-media',
-    apiName: 'YouTube Media API'
-  },
-  {
-    id: 'file-converter',
-    title: 'File Converter',
-    description: 'Convierte archivos entre diferentes formatos de manera rápida y eficiente',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-    category: 'Creative & Content',
-    route: '/file-converter',
-    apiName: 'File Converter API'
-  },
-  {
-    id: 'midjourney',
-    title: 'Midjourney',
-    description: 'Genera imágenes artísticas de alta calidad con IA',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-    category: 'Creative & Content',
-    route: '/apps/midjourney',
-    apiName: 'Midjourney API'
-  },
   {
     id: 'word-count',
     title: 'Word Count',
@@ -125,24 +71,6 @@ const MOCK_APPS_DATA = [
     category: 'Creative & Content',
     route: '/apps/snap-video',
     apiName: 'Snap Video API'
-  },
-  {
-    id: 'ai-humanizer',
-    title: 'AI Humanizer',
-    description: 'Plataforma de IA avanzada para análisis y generación de contenido',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-    category: 'Creative & Content',
-    route: '/apps/ai-humanizer',
-    apiName: 'AI Humanizer API'
-  },
-  {
-    id: 'openai-tts',
-    title: 'OpenAI TTS',
-    description: 'Convierte texto a voz natural usando la tecnología de OpenAI',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-    category: 'Creative & Content',
-    route: '/apps/openai-text-to-speech',
-    apiName: 'OpenAI TTS API'
   },
   {
     id: 'genie-ai',
@@ -172,6 +100,15 @@ const MOCK_APPS_DATA = [
     apiName: 'Image Manipulation API'
   },
   {
+    id: 'picpulse',
+    title: 'PicPulse',
+    description: 'Análisis de calidad de imágenes con IA psicológica y estética',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/apps/picpulse',
+    apiName: 'PicPulse API'
+  },
+  {
     id: 'whisper-url',
     title: 'Whisper URL',
     description: 'Transcribe audio desde URLs usando el modelo Whisper',
@@ -191,23 +128,23 @@ const MOCK_APPS_DATA = [
   },
   {
     id: 'prlabs',
-    title: 'PR Labs',
+    title: 'sinfonIA',
     description: 'Suite de herramientas de IA para generación de texto e imágenes',
     imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
     category: 'Creative & Content',
     route: '/prlabs',
-    apiName: 'PR Labs API'
+    apiName: 'sinfonIA API'
+  },
+  {
+    id: 'speech-to-text',
+    title: 'Speech to Text AI',
+    description: 'Transcribe audio y video desde múltiples fuentes usando IA avanzada',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/apps/speech-to-text',
+    apiName: 'Speech to Text AI'
   },
   // Web & SEO
-  {
-    id: 'smart-scraper',
-    title: 'Smart Web Scraper',
-    description: 'Extrae y analiza contenido web usando IA. Obtén datos estructurados, enlaces, tablas y más.',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-    category: 'Web & SEO',
-    route: '/apps/smart-scraper',
-    apiName: 'Smart Web Scraper API'
-  },
   {
     id: 'similar-web',
     title: 'Similar Web Insights',
@@ -234,15 +171,6 @@ const MOCK_APPS_DATA = [
     category: 'Web & SEO',
     route: '/apps/domain-metrics',
     apiName: 'Domain Metrics API'
-  },
-  {
-    id: 'ahrefs-checker',
-    title: 'Ahrefs Checker',
-    description: 'Verifica el Domain Rating y ranking de sitios web',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-    category: 'Web & SEO',
-    route: '/apps/ahrefs-rank',
-    apiName: 'Ahrefs API'
   },
   {
     id: 'page-speed',
@@ -281,15 +209,6 @@ const MOCK_APPS_DATA = [
     apiName: 'Website Status API'
   },
   {
-    id: 'url-shortener',
-    title: 'URL Shortener',
-    description: 'Acorta URLs y genera códigos QR personalizados',
-    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-    category: 'Web & SEO',
-    route: '/apps/url-shortener',
-    apiName: 'URL Shortener API'
-  },
-  {
     id: 'seo-mastermind',
     title: 'SEO Mastermind',
     description: 'Genera keywords, meta tags y títulos optimizados con IA',
@@ -299,15 +218,6 @@ const MOCK_APPS_DATA = [
     apiName: 'SEO Mastermind API'
   },
   {
-    id: 'image-optimizer',
-    title: 'Image Optimizer',
-    description: 'Optimiza y comprime imágenes JPEG, PNG y GIF para mejorar el rendimiento web',
-    imageUrl: 'https://cdn.pixabay.com/photo/2016/03/31/19/56/image-1295100_960_720.png',
-    category: 'Web & SEO',
-    route: '/apps/image-optimizer',
-    apiName: 'Image Optimizer API'
-  },
-  {
     id: 'whois-lookup',
     title: 'WHOIS Lookup Service',
     description: 'Consulta información detallada de registro para dominios, direcciones IP y números ASN',
@@ -315,6 +225,15 @@ const MOCK_APPS_DATA = [
     category: 'Web & SEO',
     route: '/apps/whois-lookup',
     apiName: 'WHOIS Lookup API'
+  },
+  {
+    id: 'seo-analyzer',
+    title: 'SEO Analyzer',
+    description: 'Analiza y optimiza el SEO de tu sitio web con recomendaciones detalladas',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Web & SEO',
+    route: '/apps/seo-analyzer',
+    apiName: 'SEO Analyzer API'
   }
 ];
 
@@ -367,14 +286,22 @@ export const purchaseApp = createAsyncThunk(
   async (appId, { rejectWithValue, getState }) => {
     const state = getState();
     const token = state.auth.token || localStorage.getItem('token');
-    // Si estamos en modo mock, simular la compra
-    if (isMockMode()) {
-      // Buscar la app en el mock
-      const app = MOCK_APPS_DATA.find(a => a.id === appId);
-      if (!app) return rejectWithValue('App no encontrada en mock');
+    
+    // Si estamos en modo mock o beta_v1, simular la compra
+    if (isMockMode() || process.env.REACT_APP_MODE === 'beta_v1') {
+      // Buscar la app en el mock o en allApps
+      const app = MOCK_APPS_DATA.find(a => a.id === appId) || state.apps.allApps.find(a => a.id === appId);
+      if (!app) return rejectWithValue('App no encontrada');
+      
       // Simular la estructura de una app comprada
-      return { ...app, app_id: app.id, is_favorite: false, purchased_at: new Date().toISOString() };
+      return { 
+        ...app, 
+        app_id: app.id, 
+        is_favorite: false, 
+        purchased_at: new Date().toISOString() 
+      };
     }
+    
     // Si hay backend, llamar al endpoint real
     try {
       const response = await axios.post(`${API_BASE_URL}/apps/user/apps/${appId}/purchase`, {}, {

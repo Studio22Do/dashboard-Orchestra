@@ -1,36 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-// Datos de ejemplo para estadísticas
-const MOCK_STATS_DATA = {
-  appUsage: [
-    { id: 'instagram', name: 'Instagram Statistics', count: 245, color: '#E1306C' },
-    { id: 'weather', name: 'Weather Forecast', count: 186, color: '#4A90E2' },
-    { id: 'currency', name: 'Currency Converter', count: 125, color: '#5CB85C' },
-    { id: 'stocks', name: 'Stock Market', count: 98, color: '#F7A35C' }
-  ],
-  totalApps: 6,
-  totalQueries: 654,
-  apiCalls: {
-    thisWeek: 432,
-    lastWeek: 389,
-    percentChange: 11
-  },
-  activeUsers: 18,
-  lastUpdated: new Date().toISOString()
-};
+import axios from 'axios';
+import { APP_CONFIG } from '../../config/constants';
 
 // Estado inicial
 const initialState = {
-  appUsage: [],
-  totalApps: 0,
-  totalQueries: 0,
-  apiCalls: {
-    thisWeek: 0,
-    lastWeek: 0,
-    percentChange: 0
+  metrics: {
+    apiCalls: { value: '0', change: '0%', label: 'Llamadas API', icon: 'Speed' },
+    activeUsers: { value: '0', change: '0%', label: 'Usuarios Activos', icon: 'People' },
+    totalApps: { value: '0', change: '0', label: 'Apps Activas', icon: 'AppsIcon' },
+    successRate: { value: '0%', change: '0%', label: 'Tasa de Éxito', icon: 'TrendingUp' },
   },
-  activeUsers: 0,
-  lastUpdated: null,
+  usage: [],
+  userMetrics: [],
+  apiPerformance: [],
   loading: false,
   error: null,
 };
@@ -38,14 +20,31 @@ const initialState = {
 // Acciones asíncronas
 export const fetchDashboardStats = createAsyncThunk(
   'stats/fetchDashboardStats',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
-      // Simular una llamada a la API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const state = getState();
+      const token = state.auth.token;
       
-      return MOCK_STATS_DATA;
+      if (!token) {
+        throw new Error('No hay token de autenticación');
+      }
+
+      const response = await axios.get(
+        `${APP_CONFIG.API_URL}/api/beta_v2/stats/dashboard`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.message || 'Error al cargar las estadísticas');
+      console.error('Error fetching dashboard stats:', error);
+      return rejectWithValue(
+        error.response?.data?.error || error.message || 'Error al cargar las estadísticas'
+      );
     }
   }
 );
@@ -67,12 +66,10 @@ const statsSlice = createSlice({
       })
       .addCase(fetchDashboardStats.fulfilled, (state, action) => {
         state.loading = false;
-        state.appUsage = action.payload.appUsage;
-        state.totalApps = action.payload.totalApps;
-        state.totalQueries = action.payload.totalQueries;
-        state.apiCalls = action.payload.apiCalls;
-        state.activeUsers = action.payload.activeUsers;
-        state.lastUpdated = action.payload.lastUpdated;
+        state.metrics = action.payload.metrics || state.metrics;
+        state.usage = action.payload.usage || [];
+        state.userMetrics = action.payload.userMetrics || [];
+        state.apiPerformance = action.payload.apiPerformance || [];
       })
       .addCase(fetchDashboardStats.rejected, (state, action) => {
         state.loading = false;
@@ -83,13 +80,12 @@ const statsSlice = createSlice({
 
 export const { clearStats } = statsSlice.actions;
 
+// Selectores
 export const selectStats = (state) => state.stats;
-export const selectAppUsage = (state) => state.stats.appUsage;
-export const selectApiCalls = (state) => state.stats.apiCalls;
-export const selectActiveUsers = (state) => state.stats.activeUsers;
-export const selectTotalApps = (state) => state.stats.totalApps;
-export const selectTotalQueries = (state) => state.stats.totalQueries;
-export const selectLastUpdated = (state) => state.stats.lastUpdated;
+export const selectMetrics = (state) => state.stats.metrics;
+export const selectUsage = (state) => state.stats.usage;
+export const selectUserMetrics = (state) => state.stats.userMetrics;
+export const selectApiPerformance = (state) => state.stats.apiPerformance;
 export const selectStatsLoading = (state) => state.stats.loading;
 export const selectStatsError = (state) => state.stats.error;
 

@@ -207,10 +207,50 @@ def get_user_apps():
 @jwt_required()
 def get_user_favorites():
     """Obtener las apps favoritas del usuario autenticado"""
-    user_id = get_jwt_identity()
-    user_apps = UserApp.query.filter_by(user_id=user_id, is_favorite=True).all()
-    apps = [ua.app.to_dict() | {'is_favorite': ua.is_favorite, 'purchased_at': ua.purchased_at.isoformat() if ua.purchased_at else None} for ua in user_apps]
-    return jsonify({'apps': apps}), 200
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+        
+    # En beta_v1 mostramos todos los favoritos
+    # En beta_v2 solo mostramos favoritos de apps compradas
+    if user.version == 'beta_v2':
+        user_apps = UserApp.query.filter_by(
+            user_id=current_user_id, 
+            is_favorite=True
+        ).all()
+    else:
+        # En beta_v1 mostramos todos los favoritos
+        user_apps = UserApp.query.filter_by(
+            user_id=current_user_id, 
+            is_favorite=True
+        ).all()
+    
+    # Incluir información detallada de cada app
+    apps = []
+    for ua in user_apps:
+        app_data = ua.app.to_dict()
+        app_data.update({
+            'is_favorite': True,
+            'purchased_at': ua.purchased_at.isoformat() if ua.purchased_at else None,
+            'category': ua.app.category
+        })
+        apps.append(app_data)
+    
+    # Agrupar por categoría
+    categories = {}
+    for app in apps:
+        cat = app['category']
+        if cat not in categories:
+            categories[cat] = []
+        categories[cat].append(app)
+    
+    return jsonify({
+        'favorites': apps,
+        'by_category': categories,
+        'total': len(apps)
+    }), 200
 
 @apps_bp.route('/user/apps/<string:app_id>/purchase', methods=['POST'])
 @jwt_required()
@@ -243,39 +283,39 @@ def purchase_app(app_id):
     db.session.commit()
     return jsonify({'message': 'App comprada exitosamente', 'app': user_app.to_dict()}), 201
 
-# @jwt_required()
 @apps_bp.route('/user/apps/<string:app_id>/favorite', methods=['POST'])
+@jwt_required()
 def toggle_favorite_app(app_id):
     """Marcar o desmarcar una app como favorita"""
-    # En desarrollo, usamos un user_id fijo (por ejemplo, 1)
-    user_id = 1
+    # Obtener el usuario actual según la versión
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     
-    # Verificar si el usuario existe, si no, crearlo
-    user = User.query.get(user_id)
     if not user:
-        user = User(id=user_id, email=f'dev_user_{user_id}@example.com', username=f'dev_user_{user_id}')
-        db.session.add(user)
-        db.session.commit()
+        return jsonify({'error': 'Usuario no encontrado'}), 404
     
     # Verificar si la app existe
     app = App.query.get(app_id)
     if not app:
         return jsonify({'error': f'App {app_id} no encontrada'}), 404
     
-    # Verificar si el usuario tiene la app, si no, comprarla
-    user_app = UserApp.query.filter_by(user_id=user_id, app_id=app_id).first()
+    # Verificar si el usuario tiene la app
+    user_app = UserApp.query.filter_by(user_id=current_user_id, app_id=app_id).first()
     if not user_app:
-        user_app = UserApp(user_id=user_id, app_id=app_id)
-        db.session.add(user_app)
-        db.session.commit()
-    
+        # Si estamos en beta_v1, permitir marcar como favorito sin comprar
+        if user.version == 'beta_v1':
+            user_app = UserApp(user_id=current_user_id, app_id=app_id)
+            db.session.add(user_app)
+        else:
+            return jsonify({'error': 'Debes comprar la app antes de marcarla como favorita'}), 403
     # Alternar favorito
     user_app.is_favorite = not user_app.is_favorite
     db.session.commit()
     
     return jsonify({
         'message': 'Estado de favorito actualizado',
-        'app': user_app.to_dict()
+        'is_favorite': user_app.is_favorite,
+        'app': app.to_dict() | {'is_favorite': user_app.is_favorite}
     }), 200 
 
 @apps_bp.route('/generate-qr', methods=['POST'])

@@ -10,6 +10,7 @@ import { styled } from '@mui/material/styles';
 import { useAppSelector } from '../../redux/hooks/reduxHooks';
 import { selectFavoriteApps } from '../../redux/slices/appsSlice';
 import StarIcon from '@mui/icons-material/Star';
+import { selectUser } from '../../redux/slices/authSlice';
 
 const DRAWER_WIDTH = 240;
 
@@ -50,7 +51,8 @@ const staticMenuItems = [
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const favoriteApps = useAppSelector(selectFavoriteApps);
+  const favoriteApps = useAppSelector(selectFavoriteApps) || [];
+  // const user = useAppSelector(selectUser); // Ya no se usa aquí
 
   return (
     <StyledDrawer variant="permanent">
@@ -62,12 +64,12 @@ const Sidebar = () => {
           aria-label="Ir a inicio"
           onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') navigate('/'); }}
         >
-          <img src="/logo1.png" alt="Logo Sympho" style={{ width: 120, marginBottom: 16, display: 'block' }} />
+          <img src="/maestro.png" alt="Logo Sympho" style={{ width: 120, marginBottom: 16, display: 'block' }} />
         </button>
       </Box>
       <Box sx={{ overflow: 'auto' }}>
         <List>
-          {/* Menú estático */}
+          {/* Menú estático siempre visible */}
           {staticMenuItems.map((item) => (
             <NavButton
               key={item.text}

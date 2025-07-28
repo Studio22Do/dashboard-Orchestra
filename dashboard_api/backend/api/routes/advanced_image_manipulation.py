@@ -15,7 +15,7 @@ ENDPOINTS = {
     'convert': 'convert',
 }
 
-@advanced_image_bp.route('/image-manipulation', methods=['POST'])
+@advanced_image_bp.route('', methods=['POST'])
 def image_manipulation():
     data = request.json
     operation = data.get('operation')
@@ -29,6 +29,10 @@ def image_manipulation():
 
     url = f"https://advanced-image-manipulation-api.p.rapidapi.com/{ENDPOINTS[operation]}"
     querystring = {'source_url': source_url}
+    
+    # Agregar timestamp para evitar caché
+    import time
+    querystring['_t'] = str(int(time.time()))
 
     if operation == 'convert':
         convert_to = params.get('convert_to')
@@ -36,7 +40,35 @@ def image_manipulation():
             return jsonify({'error': 'El formato de conversión es obligatorio'}), 400
         querystring['convert_to'] = convert_to
     else:
-        querystring.update({k: v for k, v in params.items() if v})
+        # Solo incluir parámetros específicos para cada operación
+        if operation == 'thumbnail':
+            if 'width' in params:
+                querystring['width'] = params['width']
+            if 'height' in params:
+                querystring['height'] = params['height']
+        elif operation == 'resize':
+            if 'width' in params:
+                querystring['width'] = params['width']
+            if 'height' in params:
+                querystring['height'] = params['height']
+        elif operation == 'blur':
+            if 'blur' in params:
+                querystring['blur'] = params['blur']
+        elif operation == 'crop':
+            if 'left' in params:
+                querystring['left'] = params['left']
+            if 'upper' in params:
+                querystring['upper'] = params['upper']
+            if 'right' in params:
+                querystring['right'] = params['right']
+            if 'lower' in params:
+                querystring['lower'] = params['lower']
+        elif operation == 'rotate':
+            if 'angle' in params:
+                querystring['angle'] = params['angle']
+        elif operation == 'transpose':
+            if 'method' in params:
+                querystring['method'] = params['method']
 
     headers = {
         "x-rapidapi-key": os.environ.get('RAPIDAPI_KEY', ''),
@@ -44,9 +76,13 @@ def image_manipulation():
     }
 
     try:
+        print(f"[IMAGE MANIPULATION] URL: {url}")
+        print(f"[IMAGE MANIPULATION] Source URL: {source_url}")
+        print(f"[IMAGE MANIPULATION] Params: {querystring}")
         response = requests.get(url, headers=headers, params=querystring, timeout=20)
         response.raise_for_status()
         data = response.json()
+        print(f"[IMAGE MANIPULATION] Response: {data}")
         # La API devuelve {"urls": ["url1", ...]} para la imagen procesada
         return jsonify(data), 200
     except requests.exceptions.HTTPError as errh:

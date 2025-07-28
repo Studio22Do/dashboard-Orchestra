@@ -36,6 +36,10 @@ class Config:
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+    JWT_ALGORITHM = 'HS256'  # Usar algoritmo más simple
+    JWT_TOKEN_LOCATION = ['headers']
+    JWT_HEADER_NAME = 'Authorization'
+    JWT_HEADER_TYPE = 'Bearer'
     
     # Configuración de SQLAlchemy
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -54,6 +58,7 @@ class Config:
     RAPIDAPI_TIKTOK_SCRAPER2_HOST = os.environ.get('RAPIDAPI_TIKTOK_SCRAPER2_HOST', 'tiktok-scraper2.p.rapidapi.com')
     RAPIDAPI_AHREFS_HOST = os.environ.get('RAPIDAPI_AHREFS_HOST', 'domain-metrics-check.p.rapidapi.com')
     RAPIDAPI_WEBSITE_ANALYZER_HOST = os.environ.get('RAPIDAPI_WEBSITE_ANALYZER_HOST', 'website-analyze-and-seo-audit-pro.p.rapidapi.com')
+    RAPIDAPI_WEBSITE_ANALYZER_URL = os.environ.get('RAPIDAPI_WEBSITE_ANALYZER_URL')
     
     # Configuración de Google News API
     GOOGLE_NEWS_API_HOST = os.environ.get('GOOGLE_NEWS_API_HOST', 'google-news13.p.rapidapi.com')

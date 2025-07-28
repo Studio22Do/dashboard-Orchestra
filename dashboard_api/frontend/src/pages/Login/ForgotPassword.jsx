@@ -62,7 +62,7 @@ const ForgotPassword = () => {
       padding: 16
     }}>
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <img src="/logo1.png" alt="Logo Sympho" style={{ width: 290, marginBottom: 24 }} />
+        <img src="/maestro.png" alt="Logo Sympho" style={{ width: 290, marginBottom: 24 }} />
       </div>
       <form onSubmit={handleSubmit} style={{
         padding: 32,

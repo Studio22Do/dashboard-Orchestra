@@ -65,23 +65,6 @@ const Dashboard = () => {
       icon: Search,
       tools: [
         {
-          id: 'google-review-link',
-          title: 'Google Review Link Generator',
-          icon: Link,
-          onClick: () => {
-            setSelectedApp({
-              id: 'google-review-link',
-              title: 'Google Review Link Generator',
-              description: 'Genera enlaces directos para reseñas de Google',
-              imageUrl: 'https://cdn.pixabay.com/photo/2015/12/11/11/43/google-1088004_960_720.png',
-              category: 'Social Listening',
-              route: '/apps/google-review-link',
-              apiName: 'Google Review Link Generator API',
-            });
-            setDrawerOpen(true);
-          }
-        },
-        {
           id: 'instagram-stats',
           title: 'Instagram Statistics API',
           icon: Instagram,
@@ -133,23 +116,6 @@ const Dashboard = () => {
           }
         },
         {
-          id: 'google-paid-search',
-          title: 'Google Paid Search API',
-          icon: MonetizationOn,
-          onClick: () => {
-            setSelectedApp({
-              id: 'google-paid-search',
-              title: 'Google Paid Search',
-              description: 'Analiza y optimiza tus campañas de búsqueda de pago en Google Ads',
-              imageUrl: 'https://cdn.pixabay.com/photo/2015/11/03/09/03/google-1018443_960_720.jpg',
-              category: 'Social Listening',
-              route: '/apps/paid-search',
-              apiName: 'Google Paid Search API',
-            });
-            setDrawerOpen(true);
-          }
-        },
-        {
           id: 'instagram-realtime',
           title: 'Instagram Realtime API',
           icon: AlternateEmail,
@@ -165,23 +131,6 @@ const Dashboard = () => {
             });
             setDrawerOpen(true);
           }
-        },
-        {
-          id: 'scraptik',
-          title: 'TikTok API',
-          icon: Videocam,
-          onClick: () => {
-            setSelectedApp({
-              id: 'scraptik',
-              title: 'TikTok Analytics',
-              description: 'Analiza tendencias, hashtags y contenido viral en TikTok',
-              imageUrl: 'https://cdn.pixabay.com/photo/2021/06/15/12/14/tik-tok-6338431_960_720.jpg',
-              category: 'Social Listening',
-              route: '/tiktok',
-              apiName: 'TikTok API',
-            });
-            setDrawerOpen(true);
-          }
         }
       ]
     },
@@ -190,41 +139,6 @@ const Dashboard = () => {
       title: 'Creative & Content',
       icon: Palette,
       tools: [
-        {
-          id: 'youtube-downloader',
-          title: 'YouTube Media Downloader',
-          icon: YouTube,
-          onClick: () => {
-            setSelectedApp({
-              id: 'youtube-downloader',
-              title: 'YouTube Media Downloader',
-              description: 'Descarga videos y audio de YouTube en diferentes formatos y calidades',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/10/03/19/youtube-2625192_960_720.jpg',
-              category: 'Creative & Content',
-              route: '/youtube-media',
-              apiName: 'YouTube Media API',
-            });
-            setDrawerOpen(true);
-          }
-        },
-        {
-          id: 'file-converter',
-          title: 'All-in-One File Converter',
-          icon: Transform,
-          onClick: () => {
-            setSelectedApp({
-              id: 'file-converter',
-              title: 'File Converter',
-              description: 'Convierte archivos entre diferentes formatos de manera rápida y eficiente',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-              category: 'Creative & Content',
-              route: '/file-converter',
-              apiName: 'File Converter API',
-            });
-            setDrawerOpen(true);
-          }
-        },
-
         {
           id: 'word-count',
           title: 'Word Count',
@@ -272,40 +186,6 @@ const Dashboard = () => {
               category: 'Creative & Content',
               route: '/apps/snap-video',
               apiName: 'Snap Video API',
-            });
-            setDrawerOpen(true);
-          }
-        },
-        {
-          id: 'ai-humanizer',
-          title: 'AI Humanizer API',
-          icon: Architecture,
-          onClick: () => {
-            setSelectedApp({
-              id: 'ai-humanizer',
-              title: 'AI Humanizer',
-              description: 'Plataforma de IA avanzada para análisis y generación de contenido',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-              category: 'Creative & Content',
-              route: '/apps/ai-humanizer',
-              apiName: 'AI Humanizer API',
-            });
-            setDrawerOpen(true);
-          }
-        },
-        {
-          id: 'openai-tts',
-          title: 'OpenAI Text to Speech',
-          icon: Mic,
-          onClick: () => {
-            setSelectedApp({
-              id: 'openai-tts',
-              title: 'OpenAI TTS',
-              description: 'Convierte texto a voz natural usando la tecnología de OpenAI',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-              category: 'Creative & Content',
-              route: '/apps/openai-text-to-speech',
-              apiName: 'OpenAI TTS API',
             });
             setDrawerOpen(true);
           }
@@ -397,17 +277,34 @@ const Dashboard = () => {
         },
         {
           id: 'prlabs',
-          title: 'PR Labs',
+          title: 'sinfonIA',
           icon: Psychology,
           onClick: () => {
             setSelectedApp({
               id: 'prlabs',
-              title: 'PR Labs',
+              title: 'sinfonIA',
               description: 'Suite de herramientas de IA para generación de texto e imágenes',
               imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
               category: 'Creative & Content',
               route: '/prlabs',
-              apiName: 'PR Labs API',
+              apiName: 'sinfonIA',
+            });
+            setDrawerOpen(true);
+          }
+        },
+        {
+          id: 'speech-to-text',
+          title: 'Speech to Text AI',
+          icon: Mic,
+          onClick: () => {
+            setSelectedApp({
+              id: 'speech-to-text',
+              title: 'Speech to Text AI',
+              description: 'Transcribe audio y video desde múltiples fuentes usando IA avanzada',
+              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              category: 'Creative & Content',
+              route: '/apps/speech-to-text',
+              apiName: 'Speech to Text AI',
             });
             setDrawerOpen(true);
           }
@@ -419,23 +316,6 @@ const Dashboard = () => {
       title: 'Web & SEO',
       icon: Language,
       tools: [
-        {
-          id: 'smart-scraper',
-          title: 'Smart Web Scraper con IA',
-          icon: Code,
-          onClick: () => {
-            setSelectedApp({
-              id: 'smart-scraper',
-              title: 'Smart Web Scraper con IA',
-              description: 'Extrae y analiza contenido de cualquier página web usando inteligencia artificial',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-              category: 'Web & SEO',
-              route: '/apps/smart-scraper',
-              apiName: 'Smart Web Scraper API',
-            });
-            setDrawerOpen(true);
-          }
-        },
         {
           id: 'seo-analyzer',
           title: 'SEO Analyzer',
@@ -500,23 +380,6 @@ const Dashboard = () => {
               category: 'Web & SEO',
               route: '/apps/domain-metrics',
               apiName: 'Domain Metrics API',
-            });
-            setDrawerOpen(true);
-          }
-        },
-        {
-          id: 'ahrefs-checker',
-          title: 'Ahrefs DR & Rank Checker',
-          icon: Assessment,
-          onClick: () => {
-            setSelectedApp({
-              id: 'ahrefs-checker',
-              title: 'Ahrefs Checker',
-              description: 'Verifica el Domain Rating y ranking de sitios web',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-              category: 'Web & SEO',
-              route: '/apps/ahrefs-rank',
-              apiName: 'Ahrefs API',
             });
             setDrawerOpen(true);
           }
@@ -590,23 +453,6 @@ const Dashboard = () => {
           }
         },
         {
-          id: 'url-shortener',
-          title: 'QR Code Generator',
-          icon: Link,
-          onClick: () => {
-            setSelectedApp({
-              id: 'url-shortener',
-              title: 'URL Shortener',
-              description: 'Acorta URLs y genera códigos QR personalizados',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
-              category: 'Web & SEO',
-              route: '/apps/url-shortener',
-              apiName: 'URL Shortener API',
-            });
-            setDrawerOpen(true);
-          }
-        },
-        {
           id: 'seo-mastermind',
           title: 'SEO Mastermind – AI Keyword, Meta & Title Generator',
           icon: Settings,
@@ -636,23 +482,6 @@ const Dashboard = () => {
               category: 'Web & SEO',
               route: '/apps/whois-lookup',
               apiName: 'WHOIS Lookup API',
-            });
-            setDrawerOpen(true);
-          }
-        },
-        {
-          id: 'image-optimizer',
-          title: 'Image Optimizer',
-          icon: PhotoCamera,
-          onClick: () => {
-            setSelectedApp({
-              id: 'image-optimizer',
-              title: 'Image Optimizer',
-              description: 'Optimiza y comprime imágenes JPEG, PNG y GIF para mejorar el rendimiento web',
-              imageUrl: 'https://cdn.pixabay.com/photo/2016/03/31/19/56/image-1295100_960_720.png',
-              category: 'Web & SEO',
-              route: '/apps/image-optimizer',
-              apiName: 'ShortPixel Image Optimiser',
             });
             setDrawerOpen(true);
           }

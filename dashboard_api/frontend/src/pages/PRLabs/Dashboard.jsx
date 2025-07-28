@@ -92,7 +92,7 @@ const PRLabsDashboard = () => {
         </IconButton>
         <Box>
           <Typography variant="h4" fontWeight="bold">
-            PR Labs AI Suite
+          sinfonIA AI Suite
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
             Suite completa de herramientas de IA para potenciar tu productividad

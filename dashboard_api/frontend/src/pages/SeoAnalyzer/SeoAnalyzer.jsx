@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from 'axios';
 import { 
   Container, 
   Typography, 
@@ -26,6 +27,10 @@ import {
   Info
 } from '@mui/icons-material';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+const API_BASE_URL = `${API_URL}/${API_MODE}`;
+
 const SeoAnalyzer = () => {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,64 +42,21 @@ const SeoAnalyzer = () => {
     
     if (!url) {
       setError('Por favor ingresa una URL para analizar');
+      setSeoData(null); // Limpia resultado anterior si no hay URL
       return;
     }
     
     setLoading(true);
     setError(null);
+    setSeoData(null); // Limpia resultado anterior al iniciar análisis
     
     try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setSeoData({
-        score: 85,
-        title: {
-          length: 55,
-          hasKeywords: true,
-          issues: []
-        },
-        meta: {
-          description: 'Descripción de ejemplo para el sitio web',
-          length: 155,
-          hasKeywords: true,
-          issues: []
-        },
-        headings: {
-          h1: 1,
-          h2: 4,
-          h3: 8,
-          issues: []
-        },
-        images: {
-          total: 12,
-          withAlt: 10,
-          withoutAlt: 2,
-          issues: ['2 imágenes sin texto alternativo']
-        },
-        links: {
-          total: 45,
-          internal: 38,
-          external: 7,
-          broken: 0,
-          issues: []
-        },
-        performance: {
-          loadTime: 2.3,
-          issues: []
-        },
-        mobile: {
-          responsive: true,
-          issues: []
-        },
-        security: {
-          hasSSL: true,
-          issues: []
-        }
-      });
+      const response = await axios.post(`${API_BASE_URL}/seo-analyzer/analyze`, { url });
+      setSeoData(response.data);
     } catch (err) {
       console.error('Error analyzing SEO:', err);
-      setError(err.message || 'Error al analizar el SEO del sitio');
+      setError(err.response?.data?.error || 'Error al analizar el SEO del sitio');
+      setSeoData(null); // Limpia resultado anterior si hay error
     } finally {
       setLoading(false);
     }
@@ -202,19 +164,19 @@ const SeoAnalyzer = () => {
                     <Box sx={{ width: '100%', mr: 1 }}>
                       <LinearProgress 
                         variant="determinate" 
-                        value={seoData.score} 
+                        value={seoData.score ?? 0} 
                         sx={{ 
                           height: 10, 
                           borderRadius: 5,
                           backgroundColor: 'background.paper',
                           '& .MuiLinearProgress-bar': {
-                            backgroundColor: getScoreColor(seoData.score)
+                            backgroundColor: getScoreColor(seoData.score ?? 0)
                           }
                         }}
                       />
                     </Box>
-                    <Typography variant="h6" color={getScoreColor(seoData.score)}>
-                      {seoData.score}%
+                    <Typography variant="h6" color={getScoreColor(seoData.score ?? 0)}>
+                      {seoData.score ?? 0}%
                     </Typography>
                   </Box>
                 </CardContent>
@@ -225,32 +187,56 @@ const SeoAnalyzer = () => {
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
-                    Título y Meta Descripción
+                    Información General
                   </Typography>
                   <List>
                     <ListItem>
                       <ListItemIcon>
-                        {seoData.title.hasKeywords ? 
-                          <CheckCircle color="success" /> : 
-                          <Error color="error" />
-                        }
+                        <Info color="info" />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="Título" 
-                        secondary={`${seoData.title.length} caracteres`} 
+                        primary="URL Analizada" 
+                        secondary={seoData.url || 'No disponible'} 
                       />
                     </ListItem>
                     <Divider />
                     <ListItem>
                       <ListItemIcon>
-                        {seoData.meta.hasKeywords ? 
-                          <CheckCircle color="success" /> : 
-                          <Error color="error" />
-                        }
+                        <Info color="info" />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="Meta Descripción" 
-                        secondary={`${seoData.meta.length} caracteres`} 
+                        primary="Tipo de Entrada" 
+                        secondary={seoData.input_type || 'No disponible'} 
+                      />
+                    </ListItem>
+                    <Divider />
+                    <ListItem>
+                      <ListItemIcon>
+                        <Info color="info" />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="HTTP Status" 
+                        secondary={seoData.http_status ?? 'No disponible'} 
+                      />
+                    </ListItem>
+                    <Divider />
+                    <ListItem>
+                      <ListItemIcon>
+                        <Info color="info" />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="¿Usa HTTPS?" 
+                        secondary={seoData.using_https === true ? 'Sí' : seoData.using_https === false ? 'No' : 'No disponible'} 
+                      />
+                    </ListItem>
+                    <Divider />
+                    <ListItem>
+                      <ListItemIcon>
+                        <Info color="info" />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Tamaño de Contenido (KB)" 
+                        secondary={seoData.content_size?.kb ?? 'No disponible'} 
                       />
                     </ListItem>
                   </List>
@@ -262,130 +248,23 @@ const SeoAnalyzer = () => {
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
-                    Estructura de Encabezados
+                    Headers HTTP
                   </Typography>
                   <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <Info color="info" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="H1" 
-                        secondary={`${seoData.headings.h1} encontrado(s)`} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Info color="info" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="H2" 
-                        secondary={`${seoData.headings.h2} encontrado(s)`} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Info color="info" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="H3" 
-                        secondary={`${seoData.headings.h3} encontrado(s)`} 
-                      />
-                    </ListItem>
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Imágenes
-                  </Typography>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <Info color="info" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Total de Imágenes" 
-                        secondary={seoData.images.total} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        {seoData.images.withoutAlt === 0 ? 
-                          <CheckCircle color="success" /> : 
-                          <Warning color="warning" />
-                        }
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Imágenes sin Alt" 
-                        secondary={seoData.images.withoutAlt} 
-                      />
-                    </ListItem>
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Enlaces
-                  </Typography>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <Info color="info" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Total de Enlaces" 
-                        secondary={seoData.links.total} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Info color="info" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Enlaces Internos" 
-                        secondary={seoData.links.internal} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Info color="info" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Enlaces Externos" 
-                        secondary={seoData.links.external} 
-                      />
-                    </ListItem>
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Problemas Detectados
-                  </Typography>
-                  <List>
-                    {renderIssuesList(seoData.images.issues)}
-                    {renderIssuesList(seoData.links.issues)}
-                    {renderIssuesList(seoData.performance.issues)}
-                    {renderIssuesList(seoData.mobile.issues)}
-                    {renderIssuesList(seoData.security.issues)}
+                    {seoData.headers && Object.entries(seoData.headers).length > 0 ? (
+                      Object.entries(seoData.headers).map(([key, value]) => (
+                        <ListItem key={key}>
+                          <ListItemIcon>
+                            <Info color="info" />
+                          </ListItemIcon>
+                          <ListItemText primary={key} secondary={value} />
+                        </ListItem>
+                      ))
+                    ) : (
+                      <ListItem>
+                        <ListItemText primary="No hay headers disponibles" />
+                      </ListItem>
+                    )}
                   </List>
                 </CardContent>
               </Card>

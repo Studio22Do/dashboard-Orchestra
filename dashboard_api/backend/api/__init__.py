@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+from config import get_config
+from api.routes.seo_analyzer import seo_analyzer_bp
 
 # Inicializar extensiones
 db = SQLAlchemy()
@@ -20,6 +22,12 @@ def create_app(config_object):
     migrate.init_app(app, db)
     jwt.init_app(app)
     
+    # Configurar JWT específicamente para evitar problemas de OpenSSL
+    app.config.setdefault('JWT_ALGORITHM', 'HS256')
+    app.config.setdefault('JWT_TOKEN_LOCATION', ['headers'])
+    app.config.setdefault('JWT_HEADER_NAME', 'Authorization')
+    app.config.setdefault('JWT_HEADER_TYPE', 'Bearer')
+    
     # Inicializar rate limiter
     with app.app_context():
         from utils.rate_limiter import init_redis
@@ -29,6 +37,7 @@ def create_app(config_object):
     from api.routes.auth import auth_bp
     from api.routes.apps import apps_bp
     from api.routes.stats import stats_bp
+    from api.routes.notifications import notifications_bp
     from api.routes.instagram import instagram_bp
     from api.routes.google_trends import google_trends_bp
     from api.routes.google_paid_search import google_paid_search_bp
@@ -60,6 +69,8 @@ def create_app(config_object):
     from api.routes.image_optimizer import image_optimizer_bp
     from api.routes.website_analyzer import website_analyzer_bp
     from api.routes.ahrefs_dr import ahrefs_dr_bp
+    from api.routes.speech_to_text import speech_to_text_bp
+    from api.routes.picpulse import picpulse_bp
 
     # Registrar blueprints con prefijos de versión
     version_prefix = f"/api/{app.config.get('MODE', 'beta_v1')}"
@@ -67,6 +78,7 @@ def create_app(config_object):
     app.register_blueprint(auth_bp, url_prefix=f'{version_prefix}/auth')
     app.register_blueprint(apps_bp, url_prefix=f'{version_prefix}/apps')
     app.register_blueprint(stats_bp, url_prefix=f'{version_prefix}/stats')
+    app.register_blueprint(notifications_bp, url_prefix=f'{version_prefix}')
     app.register_blueprint(instagram_bp, url_prefix=f'{version_prefix}/instagram')
     app.register_blueprint(google_trends_bp, url_prefix=f'{version_prefix}/trends')
     app.register_blueprint(google_paid_search_bp, url_prefix=f'{version_prefix}/paid-search')
@@ -98,6 +110,9 @@ def create_app(config_object):
     app.register_blueprint(image_optimizer_bp, url_prefix=f'{version_prefix}/image-optimize')
     app.register_blueprint(website_analyzer_bp, url_prefix=f'{version_prefix}/website-analyzer')
     app.register_blueprint(ahrefs_dr_bp, url_prefix=f'{version_prefix}/ahrefs-dr')
+    app.register_blueprint(speech_to_text_bp, url_prefix=f'{version_prefix}/speech-to-text')
+    app.register_blueprint(seo_analyzer_bp, url_prefix=f'{version_prefix}/seo-analyzer')
+    app.register_blueprint(picpulse_bp, url_prefix=f'{version_prefix}/picpulse')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers
