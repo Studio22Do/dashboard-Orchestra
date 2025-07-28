@@ -14,6 +14,7 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import SpeechToTextAI from './pages/SpeechToTextAI/SpeechToTextAI';
 import GoogleNews from './pages/GoogleNews/GoogleNews';
 import SeoAnalyzer from './pages/SeoAnalyzer/SeoAnalyzer';
+import PicPulse from './pages/PicPulse/PicPulse';
 
 const AppRoutes = () => {
     return (
@@ -35,6 +36,7 @@ const AppRoutes = () => {
                 <Route path="/prlabs/tools" element={<PRLabsTools />} />
 
                 <Route path="/apps/google-news" element={<GoogleNews />} />
+                <Route path="/apps/picpulse" element={<PicPulse />} />
             </Route>
         </Routes>
     );

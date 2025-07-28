@@ -35,6 +35,7 @@ import GenieAI from './pages/GenieAI/GenieAI';
 import AISocialMediaContent from './pages/AISocialMediaContent/AISocialMediaContent';
 import AdvancedImageManipulation from './pages/AdvancedImageManipulation/AdvancedImageManipulation';
 import WhisperFromURL from './pages/WhisperFromURL/WhisperFromURL';
+import PicPulse from './pages/PicPulse/PicPulse';
 import RunwayML from './pages/RunwayML/RunwayML';
 import CategoryView from './pages/CategoryView/CategoryView';
 import ForgotPassword from './pages/Login/ForgotPassword';
@@ -394,6 +395,12 @@ function App() {
           <Route path="/apps/advanced-image" element={
             <ProtectedRoute>
               <AdvancedImageManipulation />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/apps/picpulse" element={
+            <ProtectedRoute>
+              <PicPulse />
             </ProtectedRoute>
           } />
           

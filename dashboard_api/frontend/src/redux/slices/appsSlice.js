@@ -100,6 +100,15 @@ const MOCK_APPS_DATA = [
     apiName: 'Image Manipulation API'
   },
   {
+    id: 'picpulse',
+    title: 'PicPulse',
+    description: 'Análisis de calidad de imágenes con IA psicológica y estética',
+    imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+    category: 'Creative & Content',
+    route: '/apps/picpulse',
+    apiName: 'PicPulse API'
+  },
+  {
     id: 'whisper-url',
     title: 'Whisper URL',
     description: 'Transcribe audio desde URLs usando el modelo Whisper',
