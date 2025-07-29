@@ -95,61 +95,63 @@ const PRLabsImage = () => {
               Configuración
             </Typography>
             
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              label="Describe la imagen que quieres generar"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              sx={{ mb: 3 }}
-            />
+            <Box component="form" onSubmit={(e) => { e.preventDefault(); handleGenerate(); }}>
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                label="Describe la imagen que quieres generar"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                sx={{ mb: 3 }}
+              />
 
-            <Typography gutterBottom>Dimensiones</Typography>
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  type="number"
-                  label="Ancho"
-                  value={width}
-                  onChange={(e) => setWidth(Number(e.target.value))}
-                  InputProps={{ inputProps: { min: 256, max: 1024, step: 64 } }}
-                />
+              <Typography gutterBottom>Dimensiones</Typography>
+              <Grid container spacing={2} sx={{ mb: 3 }}>
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    label="Ancho"
+                    value={width}
+                    onChange={(e) => setWidth(Number(e.target.value))}
+                    InputProps={{ inputProps: { min: 256, max: 1024, step: 64 } }}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    label="Alto"
+                    value={height}
+                    onChange={(e) => setHeight(Number(e.target.value))}
+                    InputProps={{ inputProps: { min: 256, max: 1024, step: 64 } }}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  type="number"
-                  label="Alto"
-                  value={height}
-                  onChange={(e) => setHeight(Number(e.target.value))}
-                  InputProps={{ inputProps: { min: 256, max: 1024, step: 64 } }}
-                />
-              </Grid>
-            </Grid>
 
-            <Typography gutterBottom>Pasos de Generación: {steps}</Typography>
-            <Slider
-              value={steps}
-              onChange={(_, value) => setSteps(value)}
-              min={1}
-              max={4}
-              step={1}
-              marks
-              sx={{ mb: 3 }}
-            />
+              <Typography gutterBottom>Pasos de Generación: {steps}</Typography>
+              <Slider
+                value={steps}
+                onChange={(_, value) => setSteps(value)}
+                min={1}
+                max={4}
+                step={1}
+                marks
+                sx={{ mb: 3 }}
+              />
 
-            <Button
-              fullWidth
-              variant="contained"
-              size="large"
-              onClick={handleGenerate}
-              disabled={!prompt.trim() || loading}
-              startIcon={loading ? <CircularProgress size={20} /> : <ImageIcon />}
-            >
-              {loading ? 'Generando...' : 'Generar Imagen'}
-            </Button>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                size="large"
+                disabled={!prompt.trim() || loading}
+                startIcon={loading ? <CircularProgress size={20} /> : <ImageIcon />}
+              >
+                {loading ? 'Generando...' : 'Generar Imagen'}
+              </Button>
+            </Box>
           </Paper>
         </Grid>
 

@@ -84,67 +84,69 @@ const OpenAITextToSpeech = () => {
             </Typography>
 
             <Paper sx={{ p: 3, mt: 3 }}>
-                <FormControl fullWidth sx={{ mb: 2 }}>
-                    <TextField
-                        label="Texto a convertir"
-                        multiline
-                        rows={4}
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                        error={!text && error}
-                        helperText={!text && error ? error : ''}
-                        required
-                    />
-                </FormControl>
-
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                    <FormControl sx={{ minWidth: 120 }}>
-                        <InputLabel>Voz</InputLabel>
-                        <Select value={voice} onChange={(e) => setVoice(e.target.value)} label="Voz">
-                            <MenuItem value="alloy">Alloy</MenuItem>
-                            <MenuItem value="echo">Echo</MenuItem>
-                            <MenuItem value="fable">Fable</MenuItem>
-                            <MenuItem value="onyx">Onyx</MenuItem>
-                            <MenuItem value="nova">Nova</MenuItem>
-                            <MenuItem value="shimmer">Shimmer</MenuItem>
-                        </Select>
+                <Box component="form" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                        <TextField
+                            label="Texto a convertir"
+                            multiline
+                            rows={4}
+                            value={text}
+                            onChange={(e) => setText(e.target.value)}
+                            error={!text && error}
+                            helperText={!text && error ? error : ''}
+                            required
+                        />
                     </FormControl>
 
-                    <FormControl sx={{ minWidth: 120 }}>
-                        <InputLabel>Formato</InputLabel>
-                        <Select value={format} onChange={(e) => setFormat(e.target.value)} label="Formato">
-                            <MenuItem value="mp3">MP3</MenuItem>
-                            <MenuItem value="opus">Opus</MenuItem>
-                            <MenuItem value="aac">AAC</MenuItem>
-                            <MenuItem value="flac">FLAC</MenuItem>
-                        </Select>
+                    <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                        <FormControl sx={{ minWidth: 120 }}>
+                            <InputLabel>Voz</InputLabel>
+                            <Select value={voice} onChange={(e) => setVoice(e.target.value)} label="Voz">
+                                <MenuItem value="alloy">Alloy</MenuItem>
+                                <MenuItem value="echo">Echo</MenuItem>
+                                <MenuItem value="fable">Fable</MenuItem>
+                                <MenuItem value="onyx">Onyx</MenuItem>
+                                <MenuItem value="nova">Nova</MenuItem>
+                                <MenuItem value="shimmer">Shimmer</MenuItem>
+                            </Select>
+                        </FormControl>
+
+                        <FormControl sx={{ minWidth: 120 }}>
+                            <InputLabel>Formato</InputLabel>
+                            <Select value={format} onChange={(e) => setFormat(e.target.value)} label="Formato">
+                                <MenuItem value="mp3">MP3</MenuItem>
+                                <MenuItem value="opus">Opus</MenuItem>
+                                <MenuItem value="aac">AAC</MenuItem>
+                                <MenuItem value="flac">FLAC</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
+
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                        <TextField
+                            label="Instrucciones de tono"
+                            value={instructions}
+                            onChange={(e) => setInstructions(e.target.value)}
+                            placeholder="Speak in a natural tone."
+                        />
                     </FormControl>
-                </Box>
 
-                <FormControl fullWidth sx={{ mb: 2 }}>
-                    <TextField
-                        label="Instrucciones de tono"
-                        value={instructions}
-                        onChange={(e) => setInstructions(e.target.value)}
-                        placeholder="Speak in a natural tone."
-                    />
-                </FormControl>
-
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                    <Button
-                        variant="contained"
-                        onClick={handleSubmit}
-                        disabled={loading || !text}
-                    >
-                        {loading ? <CircularProgress size={24} /> : 'Generar Audio'}
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        onClick={handleTest}
-                        disabled={loading}
-                    >
-                        Probar Funcionalidad
-                    </Button>
+                    <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            disabled={loading || !text}
+                        >
+                            {loading ? <CircularProgress size={24} /> : 'Generar Audio'}
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            onClick={handleTest}
+                            disabled={loading}
+                        >
+                            Probar Funcionalidad
+                        </Button>
+                    </Box>
                 </Box>
 
                 {error && (

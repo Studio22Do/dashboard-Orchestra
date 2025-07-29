@@ -282,35 +282,37 @@ const SEOMastermind = () => {
           </Typography>
         </Box>
 
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12} md={8}>
-            <StyledTextField
-              fullWidth
-              label="Ingresa una keyword"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="Ej: marketing digital"
-              InputProps={{
-                endAdornment: (
-                  <IconButton onClick={handleAnalyze} disabled={loading}>
-                    {loading ? <CircularProgress size={24} /> : <SearchIcon />}
-                  </IconButton>
-                ),
-              }}
-            />
+        <Box component="form" onSubmit={(e) => { e.preventDefault(); handleAnalyze(); }}>
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} md={8}>
+              <StyledTextField
+                fullWidth
+                label="Ingresa una keyword"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder="Ej: marketing digital"
+                InputProps={{
+                  endAdornment: (
+                    <IconButton type="submit" disabled={loading}>
+                      {loading ? <CircularProgress size={24} /> : <SearchIcon />}
+                    </IconButton>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <StyledButton
+                type="submit"
+                fullWidth
+                variant="contained"
+                disabled={loading}
+                startIcon={loading ? <CircularProgress size={20} /> : <SearchIcon />}
+              >
+                {loading ? 'Analizando...' : 'Analizar Keyword'}
+              </StyledButton>
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <StyledButton
-              fullWidth
-              variant="contained"
-              onClick={handleAnalyze}
-              disabled={loading}
-              startIcon={loading ? <CircularProgress size={20} /> : <SearchIcon />}
-            >
-              {loading ? 'Analizando...' : 'Analizar Keyword'}
-            </StyledButton>
-          </Grid>
-        </Grid>
+        </Box>
 
         {error && (
           <Alert severity="error" sx={{ mb: 3 }}>

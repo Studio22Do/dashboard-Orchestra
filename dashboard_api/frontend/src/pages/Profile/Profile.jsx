@@ -122,7 +122,7 @@ const Profile = () => {
               {editMode ? 'Guardar' : 'Editar'}
             </Button>
           </Box>
-          <Box component="form" sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' } }}>
+          <Box component="form" onSubmit={(e) => { e.preventDefault(); if (editMode) handleSave(); }} sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' } }}>
             <TextField
               label="Nombre"
               name="name"
