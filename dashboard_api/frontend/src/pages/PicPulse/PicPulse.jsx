@@ -1,99 +1,156 @@
 import React, { useState } from 'react';
 import {
-  Container,
+  Paper,
   Typography,
   Button,
-  Card,
-  CardContent,
-  Grid,
-  Box,
-  CircularProgress,
-  Alert,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Paper,
-  Chip,
-  LinearProgress,
-  Divider,
-  IconButton,
+  styled,
+  Alert,
+  Box,
+  CircularProgress,
   Tooltip
 } from '@mui/material';
-import {
-  Psychology,
-  Image,
-  TrendingUp,
-  Speed,
-  Memory,
-  Download,
-  History,
-  Refresh,
-  Info
-} from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
-import { APP_CONFIG } from '../../config/constants';
+import axios from 'axios';
+
+const API_MODE = 'beta_v1'; // Hardcodeamos el modo para asegurar que funcione
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  marginBottom: theme.spacing(3),
-  marginTop: '5em',
-  borderRadius: 12,
-  boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+  backgroundColor: '#272038',
+  color: '#ffffff',
+  padding: '24px',
+  marginBottom: '24px',
+  borderRadius: '12px',
+  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+  marginTop: '5em'
 }));
 
-const ScoreCard = styled(Card)(({ theme, score }) => {
-  let color = theme.palette.error.main;
-  if (score >= 850) color = theme.palette.success.main;
-  else if (score >= 800) color = theme.palette.info.main;
-  else if (score >= 780) color = theme.palette.warning.main;
-  else if (score >= 750) color = theme.palette.secondary.main;
-  
-  return {
-    border: `2px solid ${color}`,
-    borderRadius: 12,
-    transition: 'all 0.3s ease',
-    '&:hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: `0 8px 25px ${color}20`
-    }
-  };
+const ImagePreview = styled('img')({
+  maxWidth: '100%',
+  maxHeight: '300px',
+  marginTop: '20px',
+  border: '2px dashed #6c5ce7',
+  borderRadius: '8px',
+  padding: '10px'
+});
+
+const DropZone = styled('div')(({ isDragging }) => ({
+  border: `2px dashed ${isDragging ? '#6c5ce7' : '#444'}`,
+  borderRadius: '8px',
+  padding: '20px',
+  textAlign: 'center',
+  cursor: 'pointer',
+  marginTop: '20px',
+  backgroundColor: isDragging ? 'rgba(108, 92, 231, 0.1)' : 'transparent',
+  transition: 'all 0.3s ease'
+}));
+
+const ResultCard = styled(Paper)({
+  backgroundColor: '#2d2649',
+  padding: '15px',
+  marginTop: '20px',
+  borderRadius: '8px'
 });
 
 const PicPulse = () => {
-  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
-  const API_BASE_URL = `${APP_CONFIG.API_URL}/api/${API_MODE}`;
-  
   const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [gender, setGender] = useState('Male');
-  const [ageGroup, setAgeGroup] = useState('25-34');
-  const [analysisType, setAnalysisType] = useState('basic');
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [gender, setGender] = useState('Female');
+  const [ageGroup, setAgeGroup] = useState('45-54');
+  const [isDragging, setIsDragging] = useState(false);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
 
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      if (file.type.startsWith('image/')) {
-        setSelectedFile(file);
-        setPreviewUrl(URL.createObjectURL(file));
-        setError(null);
-      } else {
-        setError('Por favor selecciona un archivo de imagen válido (JPG, PNG)');
-      }
+  const validateFile = (file) => {
+    // Validar tipo de archivo
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    if (!validTypes.includes(file.type)) {
+      throw new Error('Solo se permiten archivos PNG y JPG/JPEG');
     }
+
+    // Validar tamaño (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      throw new Error('El archivo no debe superar los 5MB');
+    }
+
+    // Validar nombre (no espacios ni caracteres especiales)
+    if (/[^a-zA-Z0-9._-]/.test(file.name)) {
+      throw new Error('El nombre del archivo solo debe contener letras, números, guiones y puntos');
+    }
+
+    // Validar dimensiones mínimas/máximas
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width < 100 || img.height < 100) {
+          reject(new Error('La imagen debe tener al menos 100x100 píxeles'));
+        } else if (img.width > 4000 || img.height > 4000) {
+          reject(new Error('La imagen no debe exceder 4000x4000 píxeles'));
+        } else {
+          resolve();
+        }
+      };
+      img.onerror = () => reject(new Error('No se pudo cargar la imagen para validación'));
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleFileSelect = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      await validateFile(file);
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      setError('');
+    } catch (err) {
+      setError(err.message);
+      setSelectedFile(null);
+      setPreviewUrl('');
+    }
+  };
+
+  const handleDrop = async (event) => {
+    event.preventDefault();
+    setIsDragging(false);
+
+    const file = event.dataTransfer.files?.[0];
+    if (!file) return;
+
+    try {
+      await validateFile(file);
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      setError('');
+    } catch (err) {
+      setError(err.message);
+      setSelectedFile(null);
+      setPreviewUrl('');
+    }
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
   };
 
   const handleAnalyze = async () => {
     if (!selectedFile) {
-      setError('Por favor selecciona una imagen para analizar');
+      setError('Por favor selecciona una imagen');
       return;
     }
 
     setLoading(true);
-    setError(null);
+    setError('');
+    setResult(null);
 
     const formData = new FormData();
     formData.append('image', selectedFile);
@@ -101,203 +158,141 @@ const PicPulse = () => {
     formData.append('age_group', ageGroup);
 
     try {
-      const endpoint = analysisType === 'detailed' ? 'analyze-detailed' : 'analyze';
-      const response = await fetch(`${API_BASE_URL}/picpulse/${endpoint}`, {
-        method: 'POST',
-        body: formData
-      });
+      console.log('Enviando solicitud a:', `/api/${API_MODE}/picpulse/analyze-detailed`);
+      const response = await axios.post(
+        `/api/${API_MODE}/picpulse/analyze-detailed`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setResult(data);
+      console.log('Respuesta:', response.data);
+      setResult(response.data);
     } catch (err) {
-      setError('Error al analizar la imagen: ' + err.message);
+      console.error('Error completo:', err);
+      setError(err.response?.data?.details || err.response?.data?.error || 'Error al analizar la imagen');
     } finally {
       setLoading(false);
     }
   };
 
-  const renderScore = (score) => {
-    let label = 'Bajo impacto';
-    if (score >= 850) label = '¡Excelente!';
-    else if (score >= 800) label = 'Muy bueno';
-    else if (score >= 780) label = 'Bueno';
-    else if (score >= 750) label = 'Aceptable';
-
-    return (
-      <ScoreCard score={score}>
-        <CardContent>
-          <Typography variant="h3" align="center" gutterBottom>
-            {score}
-          </Typography>
-          <Typography variant="subtitle1" align="center" color="textSecondary">
-            {label}
-          </Typography>
-        </CardContent>
-      </ScoreCard>
-    );
-  };
-
   return (
-    <Container maxWidth="lg">
-      <StyledPaper>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <Typography variant="h4" gutterBottom>
-              PicPulse - Análisis de Imágenes
+    <StyledPaper>
+      <Typography variant="h4" gutterBottom>
+        PicPulse - Análisis de Imágenes
+      </Typography>
+      <Typography variant="subtitle1" gutterBottom>
+        Analiza el impacto psicológico y la calidad de tus imágenes usando IA avanzada
+      </Typography>
+
+      <Alert severity="info" sx={{ mt: 2, mb: 2 }}>
+        Para mejores resultados:
+        <ul>
+          <li>Usa imágenes de logos o diseños de marca</li>
+          <li>Evita fotos de personas o capturas de pantalla</li>
+          <li>Formato PNG o JPG/JPEG (max 5MB)</li>
+          <li>Dimensiones entre 100x100 y 4000x4000 píxeles</li>
+          <li>Nombres sin espacios ni caracteres especiales</li>
+        </ul>
+      </Alert>
+
+      <FormControl fullWidth sx={{ mt: 2 }}>
+        <InputLabel>Género Objetivo</InputLabel>
+        <Select
+          value={gender}
+          onChange={(e) => setGender(e.target.value)}
+          label="Género Objetivo"
+        >
+          <MenuItem value="Female">Femenino</MenuItem>
+          <MenuItem value="Male">Masculino</MenuItem>
+        </Select>
+      </FormControl>
+
+      <FormControl fullWidth sx={{ mt: 2 }}>
+        <InputLabel>Grupo de Edad</InputLabel>
+        <Select
+          value={ageGroup}
+          onChange={(e) => setAgeGroup(e.target.value)}
+          label="Grupo de Edad"
+        >
+          <MenuItem value="18-24">18-24 años</MenuItem>
+          <MenuItem value="25-34">25-34 años</MenuItem>
+          <MenuItem value="35-44">35-44 años</MenuItem>
+          <MenuItem value="45-54">45-54 años</MenuItem>
+          <MenuItem value="55+">55+ años</MenuItem>
+        </Select>
+      </FormControl>
+
+      <input
+        type="file"
+        accept="image/png,image/jpeg"
+        onChange={handleFileSelect}
+        style={{ display: 'none' }}
+        id="file-input"
+      />
+
+      <DropZone
+        isDragging={isDragging}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onClick={() => document.getElementById('file-input').click()}
+      >
+        <Typography>
+          {isDragging ? 'Suelta la imagen aquí' : 'Arrastra una imagen aquí o haz clic para seleccionar'}
+        </Typography>
+      </DropZone>
+
+      {previewUrl && (
+        <Box sx={{ textAlign: 'center' }}>
+          <ImagePreview src={previewUrl} alt="Preview" />
+        </Box>
+      )}
+
+      {error && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      )}
+
+      <Button
+        variant="contained"
+        onClick={handleAnalyze}
+        disabled={!selectedFile || loading}
+        fullWidth
+        sx={{ mt: 2 }}
+      >
+        {loading ? <CircularProgress size={24} color="inherit" /> : 'Analizar Imagen'}
+      </Button>
+
+      {result && (
+        <ResultCard>
+          <Typography variant="h6" gutterBottom>
+            Resultados del Análisis
+          </Typography>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body1">
+              <Tooltip title="Tiempo estimado que un usuario prestaría atención a la imagen">
+                <span>⏱️ Tiempo de Atención: {result.attention_time_ms}ms</span>
+              </Tooltip>
             </Typography>
-            <Typography variant="body1" color="textSecondary" paragraph>
-              Analiza el impacto psicológico y la calidad de tus imágenes usando IA avanzada
+            <Typography variant="body1">
+              <Tooltip title="Probabilidad de que la imagen sea del agrado del público objetivo">
+                <span>👍 Probabilidad de Gustar: {Math.round(result.probability_of_liking * 100)}%</span>
+              </Tooltip>
             </Typography>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Box
-              sx={{
-                border: '2px dashed #ccc',
-                borderRadius: 2,
-                p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                '&:hover': { borderColor: 'primary.main' }
-              }}
-              onClick={() => document.getElementById('imageInput').click()}
-            >
-              {previewUrl ? (
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  style={{ maxWidth: '100%', maxHeight: 300, borderRadius: 8 }}
-                />
-              ) : (
-                <Box>
-                  <Image sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
-                  <Typography>
-                    Haz clic o arrastra una imagen aquí
-                  </Typography>
-                </Box>
-              )}
-              <input
-                type="file"
-                id="imageInput"
-                accept="image/*"
-                onChange={handleFileSelect}
-                style={{ display: 'none' }}
-              />
-            </Box>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Género Objetivo</InputLabel>
-                  <Select
-                    value={gender}
-                    onChange={(e) => setGender(e.target.value)}
-                    label="Género Objetivo"
-                  >
-                    <MenuItem value="Male">Masculino</MenuItem>
-                    <MenuItem value="Female">Femenino</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Grupo de Edad</InputLabel>
-                  <Select
-                    value={ageGroup}
-                    onChange={(e) => setAgeGroup(e.target.value)}
-                    label="Grupo de Edad"
-                  >
-                    <MenuItem value="18-24">18-24 años</MenuItem>
-                    <MenuItem value="25-34">25-34 años</MenuItem>
-                    <MenuItem value="35-44">35-44 años</MenuItem>
-                    <MenuItem value="45-54">45-54 años</MenuItem>
-                    <MenuItem value="55+">55+ años</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Tipo de Análisis</InputLabel>
-                  <Select
-                    value={analysisType}
-                    onChange={(e) => setAnalysisType(e.target.value)}
-                    label="Tipo de Análisis"
-                  >
-                    <MenuItem value="basic">Básico</MenuItem>
-                    <MenuItem value="detailed">Detallado</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  onClick={handleAnalyze}
-                  disabled={!selectedFile || loading}
-                  startIcon={loading ? <CircularProgress size={20} /> : <Psychology />}
-                >
-                  {loading ? 'Analizando...' : 'Analizar Imagen'}
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-
-          {error && (
-            <Grid item xs={12}>
-              <Alert severity="error">{error}</Alert>
-            </Grid>
-          )}
-
-          {result && (
-            <Grid item xs={12}>
-              <StyledPaper>
-                <Typography variant="h5" gutterBottom>
-                  Resultados del Análisis
-                </Typography>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} md={4}>
-                    {renderScore(result.overall_impact_score)}
-                  </Grid>
-                  <Grid item xs={12} md={8}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12}>
-                        <Typography variant="subtitle1">
-                          Tiempo de Atención: {result.attention_time}ms
-                        </Typography>
-                        <LinearProgress
-                          variant="determinate"
-                          value={Math.min((1000 - result.attention_time) / 10, 100)}
-                          sx={{ mt: 1 }}
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Typography variant="subtitle1">
-                          Memorabilidad: {result.memorability}%
-                        </Typography>
-                        <LinearProgress
-                          variant="determinate"
-                          value={result.memorability}
-                          sx={{ mt: 1 }}
-                        />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </StyledPaper>
-            </Grid>
-          )}
-        </Grid>
-      </StyledPaper>
-    </Container>
+            <Typography variant="body1">
+              <Tooltip title="Puntuación general combinada de la imagen">
+                <span>🎯 Puntuación Combinada: {result.combined_score}/1000</span>
+              </Tooltip>
+            </Typography>
+          </Box>
+        </ResultCard>
+      )}
+    </StyledPaper>
   );
 };
 
