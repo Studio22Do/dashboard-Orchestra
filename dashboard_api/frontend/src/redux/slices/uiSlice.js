@@ -11,6 +11,11 @@ const initialState = {
     settingsModal: false,
   },
   theme: localStorage.getItem('theme') || 'light',
+  density: (() => {
+    const savedDensity = localStorage.getItem('density');
+    const validDensities = ['compacta', 'normal', 'amplia'];
+    return validDensities.includes(savedDensity) ? savedDensity : 'normal';
+  })(), // compacta, normal, amplia
   loading: {
     global: false,
   },
@@ -71,6 +76,19 @@ const uiSlice = createSlice({
       localStorage.setItem('theme', action.payload);
     },
     
+    // Densidad
+    setDensity: (state, action) => {
+      state.density = action.payload;
+      localStorage.setItem('density', action.payload);
+    },
+    cycleDensity: (state) => {
+      const densities = ['compacta', 'normal', 'amplia'];
+      const currentIndex = densities.indexOf(state.density);
+      const nextIndex = (currentIndex + 1) % densities.length;
+      state.density = densities[nextIndex];
+      localStorage.setItem('density', state.density);
+    },
+    
     // Loading
     setGlobalLoading: (state, action) => {
       state.loading.global = action.payload;
@@ -88,6 +106,8 @@ export const {
   closeModal,
   toggleTheme,
   setTheme,
+  setDensity,
+  cycleDensity,
   setGlobalLoading,
 } = uiSlice.actions;
 
@@ -96,6 +116,7 @@ export const selectNotifications = (state) => state.ui.notifications;
 export const selectDrawerOpen = (state) => state.ui.drawer.open;
 export const selectModals = (state) => state.ui.modals;
 export const selectTheme = (state) => state.ui.theme;
+export const selectDensity = (state) => state.ui.density;
 export const selectGlobalLoading = (state) => state.ui.loading.global;
 
 export default uiSlice.reducer; 

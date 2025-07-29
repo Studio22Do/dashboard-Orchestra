@@ -30,7 +30,7 @@ import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks/reduxHooks';
 import { logoutUser, selectUser } from '../../redux/slices/authSlice';
-import { addNotification } from '../../redux/slices/uiSlice';
+import { addNotification, cycleDensity, selectDensity } from '../../redux/slices/uiSlice';
 import NotificationBell from '../NotificationBell/NotificationBell';
 
 // AppBar estilizado con colores del diseño
@@ -101,6 +101,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
+  const density = useAppSelector(selectDensity);
   
   // Estados para los menús
   const [anchorEl, setAnchorEl] = useState(null);
@@ -144,6 +145,17 @@ const Navbar = () => {
     // Aquí iría la lógica para cambiar el idioma
     dispatch(addNotification({
       message: 'Cambio de idioma próximamente',
+      type: 'info'
+    }));
+  };
+
+  const handleDensityChange = () => {
+    dispatch(cycleDensity());
+    const densityNames = { compacta: 'Compacta', normal: 'Normal', amplia: 'Amplia' };
+    const nextDensities = { compacta: 'normal', normal: 'amplia', amplia: 'compacta' };
+    const nextDensity = nextDensities[density];
+    dispatch(addNotification({
+      message: `Densidad cambiada a ${densityNames[nextDensity]}`,
       type: 'info'
     }));
   };
@@ -292,13 +304,13 @@ const Navbar = () => {
                 Interfaz
               </Typography>
             </Box>
-            <MenuItem>
+            <MenuItem onClick={handleDensityChange}>
               <ListItemIcon>
                 <ViewCompact fontSize="small" />
               </ListItemIcon>
               <ListItemText 
                 primary="Densidad"
-                secondary="Normal"
+                secondary={density === 'compacta' ? 'Compacta (4 por fila)' : density === 'normal' ? 'Normal (2 por fila)' : 'Amplia (3 por fila)'}
               />
             </MenuItem>
           </Menu>
