@@ -5,7 +5,7 @@ import { Home, ChevronRight } from '@mui/icons-material';
 
 const Breadcrumbs = ({ items = [] }) => {
   return (
-    <Box sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
+    <Box sx={{ pt: 3, mb: 3, display: 'flex', alignItems: 'center' }}>
       <MuiBreadcrumbs
         separator={<ChevronRight fontSize="small" sx={{ color: 'text.secondary' }} />}
         aria-label="breadcrumb"
