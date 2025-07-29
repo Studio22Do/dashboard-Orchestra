@@ -136,7 +136,7 @@ const SimilarWebInsights = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 0 }}>
+    <Container maxWidth="lg" sx={{ pt: 3, pb: 0 }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Similar Web Insights
       </Typography>
