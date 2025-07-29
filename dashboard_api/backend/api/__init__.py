@@ -5,6 +5,7 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from config import get_config
 from api.routes.seo_analyzer import seo_analyzer_bp
+from api.routes.picpulse import picpulse_bp
 
 # Inicializar extensiones
 db = SQLAlchemy()
@@ -111,7 +112,6 @@ def create_app(config_object):
     app.register_blueprint(website_analyzer_bp, url_prefix=f'{version_prefix}/website-analyzer')
     app.register_blueprint(ahrefs_dr_bp, url_prefix=f'{version_prefix}/ahrefs-dr')
     app.register_blueprint(speech_to_text_bp, url_prefix=f'{version_prefix}/speech-to-text')
-    app.register_blueprint(seo_analyzer_bp, url_prefix=f'{version_prefix}/seo-analyzer')
     app.register_blueprint(picpulse_bp, url_prefix=f'{version_prefix}/picpulse')
     
     # Configurar manejadores de errores

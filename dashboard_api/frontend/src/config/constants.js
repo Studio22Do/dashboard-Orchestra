@@ -78,6 +78,24 @@ export const APPS = {
         api_key_required: true,
         subscription_required: true
     },
+    PICPULSE: {
+        id: 'picpulse',
+        name: 'PicPulse',
+        description: 'Análisis psicológico y de calidad de imágenes con IA',
+        category: 'Creative & Content',
+        icon: 'psychology',
+        path: '/picpulse',
+        features: [
+            'Análisis de impacto visual (0-999)',
+            'Evaluación psicológica de imágenes',
+            'Predicción de tiempo de atención',
+            'Análisis de memorabilidad',
+            'Optimización para diferentes grupos demográficos',
+            'Análisis detallado de elementos visuales'
+        ],
+        api_key_required: true,
+        subscription_required: false
+    },
     // ... existing apps ...
 };
 

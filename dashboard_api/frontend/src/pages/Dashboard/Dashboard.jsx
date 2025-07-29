@@ -308,6 +308,23 @@ const Dashboard = () => {
             });
             setDrawerOpen(true);
           }
+        },
+        {
+          id: 'picpulse',
+          title: 'PicPulse',
+          icon: Psychology,
+          onClick: () => {
+            setSelectedApp({
+              id: 'picpulse',
+              title: 'PicPulse',
+              description: 'Análisis psicológico y de calidad de imágenes con IA',
+              imageUrl: 'https://cdn.pixabay.com/photo/2017/01/31/15/33/analysis-2025795_1280.png',
+              category: 'Creative & Content',
+              route: '/apps/picpulse',
+              apiName: 'PicPulse API',
+            });
+            setDrawerOpen(true);
+          }
         }
       ]
     },
