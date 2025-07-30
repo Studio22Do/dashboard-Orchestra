@@ -145,17 +145,17 @@ const CategoryView = () => {
     }, [dispatch, allApps.length]);
 
     // Filtrar apps por categoría
-    const categoryApps = useMemo(() => {
-        // Caso especial para Social Listening/Social Media
-        if (categoryFromState === "Social Media") {
-            return allApps.filter(
-                (app) =>
-                    app.category === "Social Media" ||
-                    app.category === "Social Listening"
-            );
-        }
-        return allApps.filter((app) => app.category === categoryFromState);
-    }, [allApps, categoryFromState]);
+    // const categoryApps = useMemo(() => {
+    //     // Caso especial para Social Listening/Social Media
+    //     if (categoryFromState === "Social Media") {
+    //         return allApps.filter(
+    //             (app) =>
+    //                 app.category === "Social Media" ||
+    //                 app.category === "Social Listening"
+    //         );
+    //     }
+    //     return allApps.filter((app) => app.category === categoryFromState);
+    // }, [allApps, categoryFromState]);
 
     // Obtener subcategorías únicas
     const subcategories = useMemo(() => {
@@ -252,7 +252,7 @@ const CategoryView = () => {
     // Obtener el nombre de la categoría para mostrar
     const getCategoryDisplayName = () => {
         switch (categoryFromState) {
-            case "Social Media":
+            
             case "Social Listening":
                 return "Social Listening";
             case "Creative & Content":
@@ -267,7 +267,7 @@ const CategoryView = () => {
     // Obtener ícono para la categoría
     const getCategoryIcon = () => {
         switch (categoryFromState) {
-            case "Social Media":
+            
             case "Social Listening":
                 return <ChatIcon />;
             case "Creative & Content":

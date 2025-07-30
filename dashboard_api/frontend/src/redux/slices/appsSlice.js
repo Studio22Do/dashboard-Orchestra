@@ -18,22 +18,13 @@ const MOCK_APPS_DATA = [
     apiName: 'Google News API'
   },
   {
-    id: 'instagram-stats',
+    id: 'PROBANDO',
     title: 'Instagram Statistics',
     description: 'Analiza perfiles de Instagram, obtén estadísticas y monitorea crecimiento',
     imageUrl: 'https://cdn.pixabay.com/photo/2016/08/09/17/52/instagram-1581266_960_720.jpg',
     category: 'Social Media',
     route: '/apps/instagram',
-    apiName: 'Instagram Statistics API'
-  },
-  {
-    id: 'google-trends',
-    title: 'Google Trends',
-    description: 'Analiza tendencias de búsqueda en Google y obtén insights valiosos',
-    imageUrl: 'https://cdn.pixabay.com/photo/2015/11/03/09/03/google-1018443_960_720.jpg',
-    category: 'Social Listening',
-    route: '/apps/trends',
-    apiName: 'Google Trends API'
+    apiName: 'PROBANDO'
   },
   {
     id: 'instagram-realtime',

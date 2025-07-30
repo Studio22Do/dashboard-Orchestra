@@ -9,7 +9,7 @@ import EmailVerification from './pages/Login/EmailVerification';
 import AppCatalog from './pages/AppCatalog/AppCatalog';
 import InstagramStats from './pages/InstagramStats/InstagramStats';
 import InstagramRealtime from './pages/InstagramRealtime';
-import GoogleTrends from './pages/GoogleTrends/GoogleTrends';
+
 import GoogleNews from './pages/GoogleNews/GoogleNews';
 import Dashboard from './pages/Dashboard/Dashboard';
 import NotificationManager from './components/Notifications/NotificationManager';
@@ -271,11 +271,7 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/apps/trends" element={
-            <ProtectedRoute>
-              <GoogleTrends />
-            </ProtectedRoute>
-          } />
+
           
           <Route path="/apps/google-news" element={
             <ProtectedRoute>

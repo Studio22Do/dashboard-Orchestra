@@ -81,23 +81,7 @@ const Dashboard = () => {
             setDrawerOpen(true);
           }
         },
-        {
-          id: 'google-trends',
-          title: 'Google Trends',
-          icon: TrendingUp,
-          onClick: () => {
-            setSelectedApp({
-              id: 'google-trends',
-              title: 'Google Trends',
-              description: 'Analiza tendencias de búsqueda en Google, explora datos de popularidad y patrones de búsqueda',
-              imageUrl: 'https://cdn.pixabay.com/photo/2015/11/03/09/03/google-1018443_960_720.jpg',
-              category: 'Social Listening',
-              route: '/apps/trends',
-              apiName: 'Google Trends API',
-            });
-            setDrawerOpen(true);
-          }
-        },
+
         {
           id: 'google-news',
           title: 'Google News API',

@@ -5,19 +5,13 @@ from api.routes.instagram import instagram_bp
 from .instagram_realtime import instagram_blueprint as instagram_realtime_bp
 import sys
 import os
-from api.routes.youtube_media import youtube_media_bp
 from api.routes.auth_google import auth_google_bp
-from api.routes.openai_tts import openai_tts_bp
-from api.routes.google_review_link import google_review_link_bp
 
 # Añadir el directorio raíz al path de Python para importar correctamente
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from api.routes.auth import auth_bp
-from api.routes.google_trends import google_trends_bp
 from api.routes.google_paid_search import google_paid_search_bp
 from api.routes.apps import apps_bp
-from api.routes.tiktok_api import tiktok_api_bp
-from api.routes.file_converter import file_converter_bp
 from api.routes.text_extract import text_extract_bp
 from api.routes.pdf_converter import pdf_converter_bp
 from api.routes.snap_video import snap_video_bp
@@ -43,11 +37,8 @@ BLUEPRINT_MAPPING = {
     instagram_bp: '/api/instagram',
     instagram_realtime_bp: '/api/instagram-realtime',
     auth_bp: '/api/auth',
-    google_trends_bp: '/api/trends',
     google_paid_search_bp: '/api/paid-search',
     apps_bp: '/api/apps',
-    tiktok_api_bp: '/api/tiktok',
-    file_converter_bp: '/api/file-converter',
     text_extract_bp: '/api/text-extract',
     pdf_converter_bp: '/api/pdf-converter',
     snap_video_bp: '/api/snap-video',
@@ -63,12 +54,8 @@ BLUEPRINT_MAPPING = {
     ssl_checker_bp: '/api/ssl-checker',
     website_status_bp: '/api/website-status',
     seo_mastermind_bp: '/api/seo-mastermind',
-    image_optimizer_bp: '/api/image-optimize',
-    youtube_media_bp: '/api/youtube',
     auth_google_bp: '/api/auth/google',
-    prlabs_bp: '/api/prlabs',
-    openai_tts_bp: '/api/openai-tts',
-    google_review_link_bp: '/api/google-review-link'
+    prlabs_bp: '/api/prlabs'
 }
 
 def register_blueprints(app):
