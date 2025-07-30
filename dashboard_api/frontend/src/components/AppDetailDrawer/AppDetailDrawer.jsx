@@ -1,7 +1,7 @@
 import React from 'react';
 import { Drawer, Box, Typography, Button, Divider } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { purchaseApp, selectPurchasedApps } from '../../redux/slices/appsSlice';
+import { purchaseApp, selectCanUseApp, selectUserRequests } from '../../redux/slices/appsSlice';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
@@ -12,7 +12,10 @@ const AppDetailDrawer = ({
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const purchasedApps = useSelector(selectPurchasedApps);
+  
+  // Nueva lógica basada en requests
+  const canUseApp = useSelector(state => selectCanUseApp(state, app?.id));
+  const userRequests = useSelector(selectUserRequests);
 
   if (!app) return null;
 
@@ -26,16 +29,31 @@ const AppDetailDrawer = ({
     apiName = 'Sin API'
   } = app;
 
-  const isPurchased = purchasedApps.some(a => a.id === id || a.app_id === id);
-
   const handleAction = () => {
-    if (isPurchased) {
+    if (canUseApp) {
       navigate(route);
       onClose();
     } else {
+      // En beta_v2, mostrar plan o comprar requests
       dispatch(purchaseApp(id));
       onClose();
     }
+  };
+
+  const getButtonText = () => {
+    if (canUseApp) {
+      return 'Abrir';
+    } else {
+      return 'Agregar';
+    }
+  };
+
+  const getButtonVariant = () => {
+    return canUseApp ? 'contained' : 'outlined';
+  };
+
+  const getButtonColor = () => {
+    return canUseApp ? 'primary' : 'success';
   };
 
   return (
@@ -92,18 +110,23 @@ const AppDetailDrawer = ({
           <Typography variant="subtitle2" sx={{ mb: 1, color: 'rgba(255,255,255,0.7)' }}>
             Categoría: {category}
           </Typography>
-          <Typography variant="subtitle2" sx={{ mb: 3, color: 'rgba(255,255,255,0.7)' }}>
+          <Typography variant="subtitle2" sx={{ mb: 1, color: 'rgba(255,255,255,0.7)' }}>
             API: {apiName}
           </Typography>
+          {process.env.REACT_APP_MODE === 'beta_v2' && (
+            <Typography variant="subtitle2" sx={{ mb: 3, color: 'rgba(255,255,255,0.7)' }}>
+              Requests disponibles: {userRequests}
+            </Typography>
+          )}
           <Button
-            variant={isPurchased ? 'contained' : 'outlined'}
-            color={isPurchased ? 'primary' : 'success'}
+            variant={getButtonVariant()}
+            color={getButtonColor()}
             fullWidth
             sx={{ mt: 2 }}
             onClick={handleAction}
             autoFocus={false}
           >
-            {isPurchased ? 'Abrir' : 'Agregar'}
+            {getButtonText()}
           </Button>
         </Box>
       </Box>
@@ -121,8 +144,8 @@ AppDetailDrawer.propTypes = {
     imageUrl: PropTypes.string,
     category: PropTypes.string,
     route: PropTypes.string,
-    apiName: PropTypes.string
-  })
+    apiName: PropTypes.string,
+  }),
 };
 
 export default AppDetailDrawer; 

@@ -1,39 +1,29 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
 import {
-    Container,
+    Box,
     Typography,
     TextField,
+    InputAdornment,
     Button,
     Card,
     CardContent,
-    CardMedia,
     CardActions,
-    Grid,
-    Box,
-    CircularProgress,
-    Alert,
-    Paper,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    Divider,
-    IconButton,
-    Tooltip,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel,
+    CardMedia,
     Chip,
     Tabs,
     Tab,
+    Divider,
+    IconButton,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    Grid,
     Breadcrumbs,
     Link,
     Skeleton,
+    Tooltip,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-
 import {
     Search as SearchIcon,
     ArrowBack as ArrowBackIcon,
@@ -50,20 +40,23 @@ import {
     ShoppingCart as ShoppingCartIcon,
     Sort as SortIcon,
 } from "@mui/icons-material";
-
-import { useAppDispatch, useAppSelector } from "../../redux/hooks/reduxHooks";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import {
-    selectAllApps,
+    fetchApps,
+    selectApps,
+    selectCategories,
     selectAppsLoading,
-    fetchAllApps,
+    purchaseApp,
     toggleFavoriteApp,
-    selectPurchasedApps,
-    purchaseApp
+    selectCanUseApp,
+    selectUserRequests,
 } from "../../redux/slices/appsSlice";
 import AppDetailDrawer from "../../components/AppDetailDrawer/AppDetailDrawer";
+import { styled } from "@mui/material/styles";
 
 // Estilos personalizados
-const CategoryContainer = styled(Container)(({ theme }) => ({
+const CategoryContainer = styled(Box)(({ theme }) => ({
     padding: theme.spacing(3),
     paddingTop: theme.spacing(2),
 }));
@@ -119,52 +112,39 @@ const StyledBadge = styled(Chip)(({ theme, variant }) => ({
 
 const CategoryView = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-    const dispatch = useAppDispatch();
-    const allApps = useAppSelector(selectAllApps) || [];
-    const loading = useAppSelector(selectAppsLoading);
-    const purchasedApps = useAppSelector(selectPurchasedApps);
-
-    // Obtener la categoría desde el estado de ubicación
-    const categoryFromState = location.state?.preselectedCategory || "";
-
-    // Estados
+    const { category } = useParams();
+    const dispatch = useDispatch();
+    
+    // Estados locales
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedSubcategory, setSelectedSubcategory] = useState("all");
-    const [sortBy, setSortBy] = useState("popular");
     const [filterStatus, setFilterStatus] = useState("all");
-    const [viewMode, setViewMode] = useState("grid");
-    const [selectedApp, setSelectedApp] = useState(null);
+    const [sortBy, setSortBy] = useState("popular");
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [selectedApp, setSelectedApp] = useState(null);
+
+    // Estados de Redux
+    const apps = useSelector(selectApps);
+    const categories = useSelector(selectCategories);
+    const loading = useSelector(selectAppsLoading);
 
     // Cargar apps al montar el componente
     useEffect(() => {
-        if (allApps.length === 0) {
-            dispatch(fetchAllApps());
-        }
-    }, [dispatch, allApps.length]);
+        dispatch(fetchApps());
+    }, [dispatch]);
+
+    // Obtener la categoría desde el estado o parámetros
+    const categoryFromState = category || "Creative & Content";
 
     // Filtrar apps por categoría
-    // const categoryApps = useMemo(() => {
-    //     // Caso especial para Social Listening/Social Media
-    //     if (categoryFromState === "Social Media") {
-    //         return allApps.filter(
-    //             (app) =>
-    //                 app.category === "Social Media" ||
-    //                 app.category === "Social Listening"
-    //         );
-    //     }
-    //     return allApps.filter((app) => app.category === categoryFromState);
-    // }, [allApps, categoryFromState]);
+    const categoryApps = useMemo(() => {
+        return apps.filter((app) => app.category === categoryFromState);
+    }, [apps, categoryFromState]);
 
     // Obtener subcategorías únicas
     const subcategories = useMemo(() => {
-        const subcats = [
-            ...new Set(
-                categoryApps.map((app) => app.subcategory).filter(Boolean)
-            ),
-        ];
-        return ["all", ...subcats];
+        const unique = [...new Set(categoryApps.map((app) => app.subcategory))];
+        return unique.filter(Boolean);
     }, [categoryApps]);
 
     // Filtrar y ordenar apps
@@ -175,15 +155,8 @@ const CategoryView = () => {
         if (searchQuery) {
             result = result.filter(
                 (app) =>
-                    app.title
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase()) ||
-                    app.description
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase()) ||
-                    app.apiName
-                        ?.toLowerCase()
-                        .includes(searchQuery.toLowerCase())
+                    app.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    app.description.toLowerCase().includes(searchQuery.toLowerCase())
             );
         }
 
@@ -192,13 +165,6 @@ const CategoryView = () => {
             result = result.filter(
                 (app) => app.subcategory === selectedSubcategory
             );
-        }
-
-        // Filtrar por estado
-        if (filterStatus === "purchased") {
-            result = result.filter((app) => app.isPurchased);
-        } else if (filterStatus === "not-purchased") {
-            result = result.filter((app) => !app.isPurchased);
         }
 
         // Ordenar
@@ -217,30 +183,18 @@ const CategoryView = () => {
         }
 
         return result;
-    }, [categoryApps, searchQuery, selectedSubcategory, filterStatus, sortBy]);
+    }, [categoryApps, searchQuery, selectedSubcategory, sortBy]);
 
     // Manejar favoritos
     const toggleFavorite = async (appId, event) => {
         event.stopPropagation();
-        const isPurchased = purchasedApps.some(a => a.id === appId || a.app_id === appId);
-        if (!isPurchased) {
-            // Espera a que la app esté realmente agregada
-            const result = await dispatch(purchaseApp(appId));
-            if (purchaseApp.fulfilled.match(result)) {
-                await dispatch(toggleFavoriteApp(appId));
-            } else {
-                // Opcional: muestra un error al usuario
-                return;
-            }
-        } else {
-            dispatch(toggleFavoriteApp(appId));
-        }
+        dispatch(toggleFavoriteApp(appId));
     };
 
     // Manejar compra
     const handlePurchase = (appId, event) => {
         event.stopPropagation();
-        // Aquí iría la lógica para comprar
+        dispatch(purchaseApp(appId));
     };
 
     // Manejar click en app
@@ -786,17 +740,9 @@ const CategoryView = () => {
                                                     size="small"
                                                 />
                                                 <StyledBadge
-                                                    label={
-                                                        app.isPurchased
-                                                            ? "Comprada"
-                                                            : "Disponible"
-                                                    }
+                                                    label="Disponible"
                                                     size="small"
-                                                    variant={
-                                                        app.isPurchased
-                                                            ? "purchased"
-                                                            : "available"
-                                                    }
+                                                    variant="available"
                                                 />
                                             </Box>
                                         </CardContent>
@@ -804,44 +750,21 @@ const CategoryView = () => {
                                         <CardActions
                                             sx={{ p: 2, pt: 0, mt: "auto" }}
                                         >
-                                            {app.isPurchased ? (
-                                                <Button
-                                                    variant="contained"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        navigate(app.route);
-                                                    }}
-                                                    sx={{
-                                                        bgcolor: "#837cf2",
-                                                        "&:hover": {
-                                                            bgcolor: "#6c64d3",
-                                                        },
-                                                    }}
-                                                >
-                                                    Usar ahora
-                                                </Button>
-                                            ) : (
-                                                <Button
-                                                    variant="contained"
-                                                    startIcon={
-                                                        <ShoppingCartIcon />
-                                                    }
-                                                    onClick={(e) =>
-                                                        handlePurchase(
-                                                            app.id,
-                                                            e
-                                                        )
-                                                    }
-                                                    sx={{
-                                                        bgcolor: "#837cf2",
-                                                        "&:hover": {
-                                                            bgcolor: "#6c64d3",
-                                                        },
-                                                    }}
-                                                >
-                                                    Comprar
-                                                </Button>
-                                            )}
+                                            <Button
+                                                variant="contained"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigate(app.route);
+                                                }}
+                                                sx={{
+                                                    bgcolor: "#837cf2",
+                                                    "&:hover": {
+                                                        bgcolor: "#6c64d3",
+                                                    },
+                                                }}
+                                            >
+                                                Usar ahora
+                                            </Button>
                                         </CardActions>
                                     </Box>
                                 </StyledCard>

@@ -10,17 +10,20 @@ import {
   IconButton
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { purchaseApp, toggleFavoriteApp } from '../../redux/slices/appsSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { purchaseApp, toggleFavoriteApp, selectCanUseApp } from '../../redux/slices/appsSlice';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 
-const AppCard = ({ id, title, description, imageUrl, category, route, apiName, isPurchased, is_favorite, showFavorite }) => {
+const AppCard = ({ id, title, description, imageUrl, category, route, apiName, is_favorite, showFavorite }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  
+  // Nueva lógica basada en requests
+  const canUseApp = useSelector(state => selectCanUseApp(state, id));
 
   const handleAction = () => {
-    if (isPurchased) {
+    if (canUseApp) {
       navigate(route);
     } else {
       dispatch(purchaseApp(id));
@@ -30,6 +33,18 @@ const AppCard = ({ id, title, description, imageUrl, category, route, apiName, i
   const handleToggleFavorite = (e) => {
     e.stopPropagation();
     dispatch(toggleFavoriteApp(id));
+  };
+
+  const getButtonText = () => {
+    return canUseApp ? 'Abrir App' : 'Agregar';
+  };
+
+  const getButtonVariant = () => {
+    return canUseApp ? "contained" : "outlined";
+  };
+
+  const getButtonColor = () => {
+    return canUseApp ? "primary" : "success";
   };
 
   return (
@@ -96,11 +111,11 @@ const AppCard = ({ id, title, description, imageUrl, category, route, apiName, i
         <Button 
           size="small" 
           fullWidth 
-          variant={isPurchased ? "contained" : "outlined"}
-          color={isPurchased ? "primary" : "success"}
+          variant={getButtonVariant()}
+          color={getButtonColor()}
           onClick={handleAction}
         >
-          {isPurchased ? 'Abrir App' : 'Agregar'}
+          {getButtonText()}
         </Button>
       </CardActions>
     </Card>
