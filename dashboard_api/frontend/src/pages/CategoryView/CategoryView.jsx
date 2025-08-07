@@ -79,35 +79,28 @@ const SearchInput = styled(TextField)(({ theme }) => ({
     },
 }));
 
+// Estilo de tarjeta similar a AppCard
 const StyledCard = styled(Card)(({ theme }) => ({
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    transition: 'transform 0.2s, box-shadow 0.2s',
+    '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: '0 12px 20px rgba(0,0,0,0.1)',
+    },
+    position: 'relative',
+    overflow: 'hidden',
     backgroundColor: "#272038",
     color: "white",
     borderRadius: "12px",
     border: "1px solid #3a3045",
-    transition: "all 0.3s ease-in-out",
-    "&:hover": {
-        transform: "translateY(-4px)",
-        boxShadow: "0 6px 12px rgba(131, 124, 242, 0.2)",
-    },
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
 }));
 
 const StyledCardMedia = styled(CardMedia)(({ theme }) => ({
-    height: 200,
+    height: 140,
     backgroundSize: "cover",
-}));
-
-const StyledBadge = styled(Chip)(({ theme, variant }) => ({
-    backgroundColor:
-        variant === "purchased"
-            ? "#4caf50"
-            : variant === "available"
-            ? "#837cf2"
-            : "#3a3045",
-    color: "white",
-    margin: "2px",
+    objectFit: "cover",
 }));
 
 const CategoryView = () => {
@@ -120,6 +113,7 @@ const CategoryView = () => {
     const [selectedSubcategory, setSelectedSubcategory] = useState("all");
     const [filterStatus, setFilterStatus] = useState("all");
     const [sortBy, setSortBy] = useState("popular");
+    const [viewMode, setViewMode] = useState("grid"); // Agregada la variable faltante
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [selectedApp, setSelectedApp] = useState(null);
 
@@ -138,17 +132,27 @@ const CategoryView = () => {
 
     // Filtrar apps por categoría
     const categoryApps = useMemo(() => {
+        if (!apps || !Array.isArray(apps)) {
+            return [];
+        }
         return apps.filter((app) => app.category === categoryFromState);
     }, [apps, categoryFromState]);
 
     // Obtener subcategorías únicas
     const subcategories = useMemo(() => {
+        if (!categoryApps || !Array.isArray(categoryApps)) {
+            return [];
+        }
         const unique = [...new Set(categoryApps.map((app) => app.subcategory))];
         return unique.filter(Boolean);
     }, [categoryApps]);
 
     // Filtrar y ordenar apps
     const filteredApps = useMemo(() => {
+        if (!categoryApps || !Array.isArray(categoryApps)) {
+            return [];
+        }
+        
         let result = [...categoryApps];
 
         // Filtrar por búsqueda
@@ -623,7 +627,7 @@ const CategoryView = () => {
                         </Button>
                     </Box>
                 ) : (
-                    // Grid de apps
+                    // Grid de apps con estilo AppCard
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', width: '100%', gap: '24px' }}>
                         {filteredApps.map((app) => (
                             <Box
@@ -639,134 +643,76 @@ const CategoryView = () => {
                                         cursor: "pointer",
                                     }}
                                 >
+                                    {/* Estrellita de favoritos */}
+                                    <IconButton
+                                        onClick={(e) => toggleFavorite(app.id, e)}
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 8,
+                                            right: 8,
+                                            zIndex: 2,
+                                            color: app.is_favorite ? '#FFD600' : 'rgba(255,255,255,0.5)',
+                                            background: 'rgba(30,30,40,0.7)',
+                                            '&:hover': { color: '#FFD600', background: 'rgba(30,30,40,0.9)' }
+                                        }}
+                                        size="small"
+                                    >
+                                        {app.is_favorite ? <StarIcon /> : <StarBorderIcon />}
+                                    </IconButton>
+
                                     <StyledCardMedia
+                                        component="img"
                                         image={
-                                            app.imageUrl ||
-                                            "https://via.placeholder.com/400x200"
+                                            app.imageUrl || app.image_url || "/app-placeholder.svg"
                                         }
                                         title={app.title}
-                                        sx={{
-                                            width:
-                                                viewMode === "list"
-                                                    ? "30%"
-                                                    : "100%",
-                                            height:
-                                                viewMode === "list"
-                                                    ? "auto"
-                                                    : 200,
+                                        onError={(e) => {
+                                            // Si la imagen falla, usar el placeholder SVG
+                                            e.target.src = "/app-placeholder.svg";
                                         }}
                                     />
-                                    <Box
-                                        sx={{
-                                            display: "flex",
-                                            flexDirection: "column",
-                                            width:
-                                                viewMode === "list"
-                                                    ? "70%"
-                                                    : "100%",
-                                            flex: 1,
-                                        }}
-                                    >
-                                        <CardContent>
-                                            <Box
-                                                sx={{
-                                                    display: "flex",
-                                                    justifyContent:
-                                                        "space-between",
-                                                    alignItems: "flex-start",
-                                                    mb: 1,
-                                                }}
-                                            >
-                                                <Typography
-                                                    variant="h6"
-                                                    component="h3"
-                                                    gutterBottom
-                                                >
-                                                    {app.title}
-                                                </Typography>
-                                                <Tooltip
-                                                    title={
-                                                        app.is_favorite
-                                                            ? "Quitar de favoritos"
-                                                            : "Añadir a favoritos"
-                                                    }
-                                                >
-                                                    <IconButton
-                                                        size="small"
-                                                        onClick={(e) =>
-                                                            toggleFavorite(
-                                                                app.id,
-                                                                e
-                                                            )
-                                                        }
-                                                        sx={{
-                                                            color: app.is_favorite
-                                                                ? "yellow"
-                                                                : "white",
-                                                        }}
-                                                    >
-                                                        {app.is_favorite ? (
-                                                            <StarIcon />
-                                                        ) : (
-                                                            <StarBorderIcon />
-                                                        )}
-                                                    </IconButton>
-                                                </Tooltip>
-                                            </Box>
-
-                                            <Typography
-                                                variant="body2"
-                                                color="text.secondary"
-                                                sx={{ mb: 2 }}
-                                            >
-                                                {app.description}
+                                    
+                                    <CardContent sx={{ flexGrow: 1 }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                            <Typography gutterBottom variant="h6" component="div" noWrap>
+                                                {app.title}
                                             </Typography>
-
-                                            <Box
-                                                sx={{
-                                                    display: "flex",
-                                                    flexWrap: "wrap",
-                                                    gap: 0.5,
-                                                }}
-                                            >
-                                                {app.subcategory && (
-                                                    <StyledBadge
-                                                        label={app.subcategory}
-                                                        size="small"
-                                                    />
-                                                )}
-                                                <StyledBadge
-                                                    label={`API: ${app.apiName}`}
-                                                    size="small"
-                                                />
-                                                <StyledBadge
-                                                    label="Disponible"
-                                                    size="small"
-                                                    variant="available"
-                                                />
-                                            </Box>
-                                        </CardContent>
-
-                                        <CardActions
-                                            sx={{ p: 2, pt: 0, mt: "auto" }}
+                                            <Chip 
+                                                label={app.category} 
+                                                size="small" 
+                                                color="primary" 
+                                                variant="outlined"
+                                                sx={{ ml: 1, fontSize: '0.7rem' }}
+                                            />
+                                        </Box>
+                                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                            {app.description}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                            API: {app.apiName}
+                                        </Typography>
+                                    </CardContent>
+                                    
+                                    <CardActions sx={{ p: 2, pt: 0 }}>
+                                        <Button 
+                                            size="small" 
+                                            fullWidth 
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigate(app.route);
+                                            }}
+                                            sx={{
+                                                bgcolor: "#837cf2",
+                                                "&:hover": {
+                                                    bgcolor: "#6c64d3",
+                                                },
+                                            }}
                                         >
-                                            <Button
-                                                variant="contained"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    navigate(app.route);
-                                                }}
-                                                sx={{
-                                                    bgcolor: "#837cf2",
-                                                    "&:hover": {
-                                                        bgcolor: "#6c64d3",
-                                                    },
-                                                }}
-                                            >
-                                                Usar ahora
-                                            </Button>
-                                        </CardActions>
-                                    </Box>
+                                            Usar ahora
+                                        </Button>
+                                    </CardActions>
                                 </StyledCard>
                             </Box>
                         ))}
