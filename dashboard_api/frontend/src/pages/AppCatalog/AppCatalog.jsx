@@ -9,18 +9,28 @@ import {
   Tabs, 
   Tab,
   Divider,
-  Button
+  Button,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { Search, ArrowBack } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppCard from '../../components/AppCard/AppCard';
-import { useAppSelector } from '../../redux/hooks/reduxHooks';
-import { selectPurchasedApps } from '../../redux/slices/appsSlice';
+import { useAppSelector, useAppDispatch } from '../../redux/hooks/reduxHooks';
+import { selectPurchasedApps, fetchPurchasedApps } from '../../redux/slices/appsSlice';
 
 const AppCatalog = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const purchasedApps = useAppSelector(selectPurchasedApps);
+  const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
+
+  // Cargar apps compradas cuando se visita la página
+  useEffect(() => {
+    console.log('Cargando apps compradas desde AppCatalog...');
+    dispatch(fetchPurchasedApps());
+  }, [dispatch]);
 
   // Obtener categorías únicas de las apps compradas
   const CATEGORIES = ['All', ...Array.from(new Set(purchasedApps.map(app => app.category)))];
@@ -43,6 +53,10 @@ const AppCatalog = () => {
     const matchesCategory = activeCategory === 'All' || app.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const handleCloseNotification = () => {
+    setNotification({ ...notification, open: false });
+  };
 
   return (
     <Box sx={{ width: '100%', px: 0, py: 4 }}>
@@ -121,6 +135,18 @@ const AppCatalog = () => {
           </Box>
         )}
       </Box>
+
+      {/* Notificación para toolbox */}
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={3000}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={handleCloseNotification} severity={notification.severity} sx={{ width: '100%' }}>
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

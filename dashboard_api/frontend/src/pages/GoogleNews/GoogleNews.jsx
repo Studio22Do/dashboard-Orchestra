@@ -22,7 +22,6 @@ import {
   Paper
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
-import Breadcrumbs from '../../components/common/Breadcrumbs';
 
 // Base URL de la API
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -113,14 +112,8 @@ const GoogleNews = () => {
   }, []);
 
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth="xl" sx={{ mt: 3 }}>
       <Box sx={{ mb: 4 }}>
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', href: '/' },
-            { label: 'Google News', href: '/apps/google-news' },
-          ]}
-        />
         <Typography variant="h4" component="h1" gutterBottom>
           Google News
         </Typography>
