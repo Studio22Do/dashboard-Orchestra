@@ -31,7 +31,64 @@ const AppDetailDrawer = ({
     purchasedApp.id === app?.id || purchasedApp.app_id === app?.id
   );
 
-  // ... resto del código igual hasta el return ...
+  // Extraer datos de la app
+  const title = app?.title || 'App';
+  const description = app?.description || 'Descripción no disponible';
+  const category = app?.category || 'Sin categoría';
+  const apiName = app?.api_name || 'API';
+  const imageUrl = app?.image_url || app?.imageUrl;
+
+  // Determinar si mostrar icono por defecto
+  const shouldShowDefaultIcon = !imageUrl || imageError;
+
+  // Funciones para el botón
+  const getButtonVariant = () => {
+    if (isAlreadyInToolbox) return 'outlined';
+    return canUseApp ? 'contained' : 'outlined';
+  };
+
+  const getButtonColor = () => {
+    if (isAlreadyInToolbox) return 'success';
+    return canUseApp ? 'primary' : 'secondary';
+  };
+
+  const getButtonText = () => {
+    if (isAlreadyInToolbox) return 'Abrir App';
+    return canUseApp ? 'Abrir App' : 'Agregar';
+  };
+
+  const handleAction = async () => {
+    if (!app) return;
+
+    try {
+      if (isAlreadyInToolbox) {
+        // Navegar a la app
+        navigate(app.route);
+        onClose();
+      } else {
+        // Comprar/agregar la app
+        await dispatch(purchaseApp(app.id)).unwrap();
+        setNotification({
+          open: true,
+          message: 'App agregada exitosamente',
+          severity: 'success'
+        });
+        // Recargar apps
+        dispatch(fetchAllApps());
+        dispatch(fetchPurchasedApps());
+      }
+    } catch (error) {
+      setNotification({
+        open: true,
+        message: error.message || 'Error al procesar la solicitud',
+        severity: 'error'
+      });
+    }
+  };
+
+  const handleCloseNotification = () => {
+    setNotification({ ...notification, open: false });
+  };
 
   return (
     <>
