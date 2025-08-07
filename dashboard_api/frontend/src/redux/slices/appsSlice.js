@@ -53,12 +53,36 @@ export const fetchFavoriteApps = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token || localStorage.getItem('token');
+      console.log('Fetching favorite apps with token:', token);
+      
       const response = await axios.get(`${API_BASE_URL}/apps/user/favorites`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      return response.data.apps;
+      
+      console.log('Favorite apps response:', response.data);
+      
+      // El backend devuelve { favorites: [...], by_category: {...}, total: number }
+      if (!response.data.favorites || response.data.favorites.length === 0) {
+        console.log('No favorite apps found, returning empty array');
+        return [];
+      }
+      
+      // Remover duplicados antes de retornar
+      const uniqueFavorites = response.data.favorites.filter((app, index, self) => {
+        const appId = app.app_id || app.id;
+        return index === self.findIndex(a => (a.app_id || a.id) === appId);
+      });
+      
+      console.log('Returning unique favorite apps:', uniqueFavorites.length);
+      console.log('Unique favorite apps IDs:', uniqueFavorites.map(app => app.app_id || app.id));
+      
+      return uniqueFavorites;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Error al obtener apps favoritas');
+      console.error('Error fetching favorite apps:', error);
+      console.error('Error response:', error.response);
+      
+      // En caso de error, retornar array vacío
+      return [];
     }
   }
 );
@@ -120,15 +144,41 @@ export const purchaseApp = createAsyncThunk(
 
 export const toggleFavoriteApp = createAsyncThunk(
   'apps/toggleFavoriteApp',
-  async (appId, { rejectWithValue, getState }) => {
+  async (appId, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getState().auth.token || localStorage.getItem('token');
+      console.log('ToggleFavoriteApp - Token:', token);
+      console.log('ToggleFavoriteApp - AppId:', appId);
+      
       const response = await axios.post(`${API_BASE_URL}/apps/user/apps/${appId}/favorite`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      
+      console.log('ToggleFavoriteApp - Response:', response.data);
+      
+      // Después de cambiar el favorito, recargar las apps favoritas
+      console.log('Recargando apps favoritas...');
+      await dispatch(fetchFavoriteApps());
+      
       return response.data.app;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Error al actualizar favorito');
+      console.error('Error en toggleFavoriteApp:', error);
+      console.error('Error response:', error.response);
+      
+      // Manejar diferentes tipos de errores
+      if (error.response?.status === 401) {
+        return rejectWithValue('Error de autenticación. Por favor, inicia sesión nuevamente.');
+      } else if (error.response?.status === 422) {
+        return rejectWithValue('Error de validación. Verifica tu sesión.');
+      } else if (error.response?.status === 404) {
+        return rejectWithValue('Aplicación no encontrada.');
+      } else if (error.response?.status === 403) {
+        return rejectWithValue('Debes comprar la app antes de marcarla como favorita.');
+      } else if (!error.response) {
+        return rejectWithValue('Error de conexión con el servidor.');
+      } else {
+        return rejectWithValue(error.response?.data?.message || 'Error al actualizar favorito');
+      }
     }
   }
 );
@@ -284,7 +334,9 @@ const appsSlice = createSlice({
       })
       .addCase(fetchFavoriteApps.fulfilled, (state, action) => {
         state.loading = false;
+        // Limpiar y reemplazar las apps favoritas para evitar duplicados
         state.favoriteApps = action.payload;
+        console.log('Redux - Updated favoriteApps:', state.favoriteApps.length);
       })
       .addCase(fetchFavoriteApps.rejected, (state, action) => {
         state.loading = false;
@@ -306,9 +358,17 @@ const appsSlice = createSlice({
         }
         // Actualiza la lista de favoritas
         if (action.payload.is_favorite) {
-          state.favoriteApps.push(action.payload);
+          // Verificar si ya existe antes de agregar
+          const exists = state.favoriteApps.some(app => 
+            (app.app_id || app.id) === (action.payload.app_id || action.payload.id)
+          );
+          if (!exists) {
+            state.favoriteApps.push(action.payload);
+          }
         } else {
-          state.favoriteApps = state.favoriteApps.filter(app => app.app_id !== action.payload.app_id && app.id !== action.payload.app_id);
+          state.favoriteApps = state.favoriteApps.filter(app => 
+            (app.app_id || app.id) !== (action.payload.app_id || action.payload.id)
+          );
         }
       })
       .addCase(fetchAllApps.pending, (state) => {
