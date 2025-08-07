@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Drawer, Box, Typography, Button, Divider } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { purchaseApp, selectCanUseApp, selectUserRequests } from '../../redux/slices/appsSlice';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { Apps as DefaultAppIcon } from '@mui/icons-material';
 
 const AppDetailDrawer = ({ 
   open = false, 
@@ -12,10 +13,16 @@ const AppDetailDrawer = ({
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [imageError, setImageError] = useState(false);
   
   // Nueva lógica basada en requests
   const canUseApp = useSelector(state => selectCanUseApp(state, app?.id));
   const userRequests = useSelector(selectUserRequests);
+
+  // Reset image error when app changes
+  React.useEffect(() => {
+    setImageError(false);
+  }, [app?.id]);
 
   if (!app) return null;
 
@@ -56,6 +63,8 @@ const AppDetailDrawer = ({
     return canUseApp ? 'primary' : 'success';
   };
 
+  const shouldShowDefaultIcon = !imageUrl || imageError;
+
   return (
     <Drawer 
       anchor="right" 
@@ -90,7 +99,7 @@ const AppDetailDrawer = ({
       >
         <Box sx={{ width: '100%', maxWidth: 340 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            {imageUrl && (
+            {imageUrl && !imageError && (
               <img 
                 src={imageUrl} 
                 alt={title} 
@@ -98,10 +107,28 @@ const AppDetailDrawer = ({
                   width: 56, 
                   height: 56, 
                   borderRadius: 12, 
-                  marginRight: 16,
+                  marginRight: '16px',
                   objectFit: 'cover'
                 }} 
+                onError={() => setImageError(true)}
               />
+            )}
+            {shouldShowDefaultIcon && (
+              <Box
+                sx={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 12,
+                  marginRight: '16px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white'
+                }}
+              >
+                <DefaultAppIcon sx={{ fontSize: 32 }} />
+              </Box>
             )}
             <Typography variant="h5" sx={{ fontWeight: 600 }}>{title}</Typography>
           </Box>
@@ -111,11 +138,11 @@ const AppDetailDrawer = ({
             Categoría: {category}
           </Typography>
           <Typography variant="subtitle2" sx={{ mb: 1, color: 'rgba(255,255,255,0.7)' }}>
-            API: {apiName}
+            Costo de crédito: {apiName}
           </Typography>
           {process.env.REACT_APP_MODE === 'beta_v2' && (
             <Typography variant="subtitle2" sx={{ mb: 3, color: 'rgba(255,255,255,0.7)' }}>
-              Requests disponibles: {userRequests}
+              Créditos disponibles: {userRequests}
             </Typography>
           )}
           <Button

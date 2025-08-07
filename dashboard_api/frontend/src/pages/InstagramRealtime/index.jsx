@@ -13,7 +13,6 @@ import {
   Person, 
   Tag 
 } from '@mui/icons-material';
-import Breadcrumbs from '../../components/common/Breadcrumbs';
 
 // Importar los componentes reales de implementación
 import ProfileSearch from './components/ProfileSearch';
@@ -30,14 +29,8 @@ const InstagramRealtime = () => {
   };
 
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth="xl" sx={{ mt: 3 }}>
       <Box sx={{ mb: 4 }}>
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', href: '/' },
-            { label: 'Instagram Realtime', href: '/instagram-realtime' },
-          ]}
-        />
         <Typography variant="h4" component="h1" gutterBottom>
           Instagram Realtime
         </Typography>

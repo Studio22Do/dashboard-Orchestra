@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Container,
   Paper,
   Typography,
   Button,
@@ -23,8 +24,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: '24px',
   marginBottom: '24px',
   borderRadius: '12px',
-  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-  marginTop: '5em'
+  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
 }));
 
 const ImagePreview = styled('img')({
@@ -180,119 +180,125 @@ const PicPulse = () => {
   };
 
   return (
-    <StyledPaper>
-      <Typography variant="h4" gutterBottom>
-        PicPulse - Análisis de Imágenes
-      </Typography>
-      <Typography variant="subtitle1" gutterBottom>
-        Analiza el impacto psicológico y la calidad de tus imágenes usando IA avanzada
-      </Typography>
-
-      <Alert severity="info" sx={{ mt: 2, mb: 2 }}>
-        Para mejores resultados:
-        <ul>
-          <li>Usa imágenes de logos o diseños de marca</li>
-          <li>Evita fotos de personas o capturas de pantalla</li>
-          <li>Formato PNG o JPG/JPEG (max 5MB)</li>
-          <li>Dimensiones entre 100x100 y 4000x4000 píxeles</li>
-          <li>Nombres sin espacios ni caracteres especiales</li>
-        </ul>
-      </Alert>
-
-      <FormControl fullWidth sx={{ mt: 2 }}>
-        <InputLabel>Género Objetivo</InputLabel>
-        <Select
-          value={gender}
-          onChange={(e) => setGender(e.target.value)}
-          label="Género Objetivo"
-        >
-          <MenuItem value="Female">Femenino</MenuItem>
-          <MenuItem value="Male">Masculino</MenuItem>
-        </Select>
-      </FormControl>
-
-      <FormControl fullWidth sx={{ mt: 2 }}>
-        <InputLabel>Grupo de Edad</InputLabel>
-        <Select
-          value={ageGroup}
-          onChange={(e) => setAgeGroup(e.target.value)}
-          label="Grupo de Edad"
-        >
-          <MenuItem value="18-24">18-24 años</MenuItem>
-          <MenuItem value="25-34">25-34 años</MenuItem>
-          <MenuItem value="35-44">35-44 años</MenuItem>
-          <MenuItem value="45-54">45-54 años</MenuItem>
-          <MenuItem value="55+">55+ años</MenuItem>
-        </Select>
-      </FormControl>
-
-      <input
-        type="file"
-        accept="image/png,image/jpeg"
-        onChange={handleFileSelect}
-        style={{ display: 'none' }}
-        id="file-input"
-      />
-
-      <DropZone
-        isDragging={isDragging}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onClick={() => document.getElementById('file-input').click()}
-      >
-        <Typography>
-          {isDragging ? 'Suelta la imagen aquí' : 'Arrastra una imagen aquí o haz clic para seleccionar'}
+    <Container maxWidth="xl" sx={{ mt: 3 }}>
+      <Box mb={4}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          PicPulse - Análisis de Imágenes
         </Typography>
-      </DropZone>
+        <Typography variant="subtitle1" color="text.secondary" paragraph>
+          Analiza el impacto psicológico y la calidad de tus imágenes usando IA avanzada
+        </Typography>
+      </Box>
 
-      {previewUrl && (
-        <Box sx={{ textAlign: 'center' }}>
-          <ImagePreview src={previewUrl} alt="Preview" />
-        </Box>
-      )}
-
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
-
-      <Button
-        variant="contained"
-        onClick={handleAnalyze}
-        disabled={!selectedFile || loading}
-        fullWidth
-        sx={{ mt: 2 }}
-      >
-        {loading ? <CircularProgress size={24} color="inherit" /> : 'Analizar Imagen'}
-      </Button>
-
-      {result && (
-        <ResultCard>
+      <StyledPaper>
+        <Alert severity="info" sx={{ mb: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Resultados del Análisis
+            Para mejores resultados:
           </Typography>
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="body1">
-              <Tooltip title="Tiempo estimado que un usuario prestaría atención a la imagen">
-                <span>⏱️ Tiempo de Atención: {result.attention_time_ms}ms</span>
-              </Tooltip>
-            </Typography>
-            <Typography variant="body1">
-              <Tooltip title="Probabilidad de que la imagen sea del agrado del público objetivo">
-                <span>👍 Probabilidad de Gustar: {Math.round(result.probability_of_liking * 100)}%</span>
-              </Tooltip>
-            </Typography>
-            <Typography variant="body1">
-              <Tooltip title="Puntuación general combinada de la imagen">
-                <span>🎯 Puntuación Combinada: {result.combined_score}/1000</span>
-              </Tooltip>
-            </Typography>
+          <ul>
+            <li>Usa imágenes de logos o diseños de marca</li>
+            <li>Evita fotos de personas o capturas de pantalla</li>
+            <li>Formato PNG o JPG/JPEG (max 5MB)</li>
+            <li>Dimensiones entre 100x100 y 4000x4000 píxeles</li>
+            <li>Nombres sin espacios ni caracteres especiales</li>
+          </ul>
+        </Alert>
+
+        <FormControl fullWidth sx={{ mb: 3 }}>
+          <InputLabel>Género Objetivo</InputLabel>
+          <Select
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            label="Género Objetivo"
+          >
+            <MenuItem value="Female">Femenino</MenuItem>
+            <MenuItem value="Male">Masculino</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth sx={{ mb: 3 }}>
+          <InputLabel>Grupo de Edad</InputLabel>
+          <Select
+            value={ageGroup}
+            onChange={(e) => setAgeGroup(e.target.value)}
+            label="Grupo de Edad"
+          >
+            <MenuItem value="18-24">18-24 años</MenuItem>
+            <MenuItem value="25-34">25-34 años</MenuItem>
+            <MenuItem value="35-44">35-44 años</MenuItem>
+            <MenuItem value="45-54">45-54 años</MenuItem>
+            <MenuItem value="55+">55+ años</MenuItem>
+          </Select>
+        </FormControl>
+
+        <input
+          type="file"
+          accept="image/png,image/jpeg"
+          onChange={handleFileSelect}
+          style={{ display: 'none' }}
+          id="file-input"
+        />
+
+        <DropZone
+          isDragging={isDragging}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onClick={() => document.getElementById('file-input').click()}
+        >
+          <Typography>
+            {isDragging ? 'Suelta la imagen aquí' : 'Arrastra una imagen aquí o haz clic para seleccionar'}
+          </Typography>
+        </DropZone>
+
+        {previewUrl && (
+          <Box sx={{ textAlign: 'center', mt: 2 }}>
+            <ImagePreview src={previewUrl} alt="Preview" />
           </Box>
-        </ResultCard>
-      )}
-    </StyledPaper>
+        )}
+
+        {error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        <Button
+          variant="contained"
+          onClick={handleAnalyze}
+          disabled={!selectedFile || loading}
+          fullWidth
+          sx={{ mt: 3, height: '56px' }}
+        >
+          {loading ? <CircularProgress size={24} color="inherit" /> : 'Analizar Imagen'}
+        </Button>
+
+        {result && (
+          <ResultCard>
+            <Typography variant="h6" gutterBottom>
+              Resultados del Análisis
+            </Typography>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body1">
+                <Tooltip title="Tiempo estimado que un usuario prestaría atención a la imagen">
+                  <span>⏱️ Tiempo de Atención: {result.attention_time_ms}ms</span>
+                </Tooltip>
+              </Typography>
+              <Typography variant="body1">
+                <Tooltip title="Probabilidad de que la imagen sea del agrado del público objetivo">
+                  <span>👍 Probabilidad de Gustar: {Math.round(result.probability_of_liking * 100)}%</span>
+                </Tooltip>
+              </Typography>
+              <Typography variant="body1">
+                <Tooltip title="Puntuación general combinada de la imagen">
+                  <span>🎯 Puntuación Combinada: {result.combined_score}/1000</span>
+                </Tooltip>
+              </Typography>
+            </Box>
+          </ResultCard>
+        )}
+      </StyledPaper>
+    </Container>
   );
 };
 
