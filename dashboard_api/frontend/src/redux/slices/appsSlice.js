@@ -71,33 +71,49 @@ const isMockMode = () => {
 
 export const purchaseApp = createAsyncThunk(
   'apps/purchaseApp',
-  async (appId, { rejectWithValue, getState }) => {
+  async (appId, { rejectWithValue, getState, dispatch }) => {
     const state = getState();
     const token = state.auth.token || localStorage.getItem('token');
     
-    // Si estamos en modo mock o beta_v1, simular la compra
-    if (isMockMode() || process.env.REACT_APP_MODE === 'beta_v1') {
-      // Buscar la app en allApps
-      const app = state.apps.allApps.find(a => a.id === appId);
-      if (!app) return rejectWithValue('App no encontrada');
-      
-      // Simular la estructura de una app comprada
-      return { 
-        ...app, 
-        app_id: app.id, 
-        is_favorite: false, 
-        purchased_at: new Date().toISOString() 
-      };
-    }
+    console.log('PurchaseApp - Token:', token);
+    console.log('PurchaseApp - AppId:', appId);
+    console.log('PurchaseApp - AllApps length:', state.apps.allApps.length);
     
-    // Si hay backend, llamar al endpoint real
+    // Solo usar peticiones reales al backend
     try {
+      console.log('Intentando comprar app en backend...');
+      console.log('URL:', `${API_BASE_URL}/apps/user/apps/${appId}/purchase`);
+      console.log('Headers:', { Authorization: `Bearer ${token}` });
+      
       const response = await axios.post(`${API_BASE_URL}/apps/user/apps/${appId}/purchase`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      
+      console.log('Respuesta del backend:', response.data);
+      
+      // Después de una compra exitosa, recargar las apps compradas
+      console.log('Recargando apps compradas...');
+      await dispatch(fetchPurchasedApps());
+      
       return response.data.app;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Error al comprar app');
+      console.error('Error en purchaseApp:', error);
+      console.error('Error response:', error.response);
+      
+      // Manejar diferentes tipos de errores
+      if (error.response?.status === 401) {
+        return rejectWithValue('Error de autenticación. Por favor, inicia sesión nuevamente.');
+      } else if (error.response?.status === 422) {
+        return rejectWithValue('Error de validación. Verifica tu sesión.');
+      } else if (error.response?.status === 404) {
+        return rejectWithValue('Aplicación no encontrada.');
+      } else if (error.response?.status === 403) {
+        return rejectWithValue('No tienes permisos para realizar esta acción.');
+      } else if (!error.response) {
+        return rejectWithValue('Error de conexión con el servidor.');
+      } else {
+        return rejectWithValue(error.response?.data?.message || 'Error al comprar app');
+      }
     }
   }
 );
@@ -123,17 +139,36 @@ export const fetchAllApps = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token || localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/apps`, {
-        headers: { Authorization: `Bearer ${token}` }
+      console.log('Fetching all apps with token:', token);
+      console.log('API_BASE_URL:', API_BASE_URL);
+      console.log('Full URL:', `${API_BASE_URL}/apps/`);
+      
+      const response = await axios.get(`${API_BASE_URL}/apps/`, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
+      
+      console.log('Apps response:', response.data);
+      
       // Si la respuesta es vacía, usar array vacío
       if (!response.data.apps || response.data.apps.length === 0) {
+        console.log('No apps found in response, using empty array');
         return [];
       }
+      
+      console.log('Returning apps:', response.data.apps.length);
       return response.data.apps;
     } catch (error) {
-      // Si hay error de red o backend, usar array vacío
-      return [];
+      console.error('Error fetching all apps:', error);
+      console.error('Error response:', error.response);
+      console.error('Error status:', error.response?.status);
+      console.error('Error data:', error.response?.data);
+      
+      // Si hay error de red o backend, devolver error
+      console.log('Error fetching apps from backend');
+      return rejectWithValue('Error al cargar las aplicaciones desde el backend');
     }
   }
 );
