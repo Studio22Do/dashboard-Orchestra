@@ -120,6 +120,7 @@ const CategoryView = () => {
     const [selectedSubcategory, setSelectedSubcategory] = useState("all");
     const [filterStatus, setFilterStatus] = useState("all");
     const [sortBy, setSortBy] = useState("popular");
+    const [viewMode, setViewMode] = useState("grid"); // Agregada la variable faltante
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [selectedApp, setSelectedApp] = useState(null);
 
@@ -138,17 +139,27 @@ const CategoryView = () => {
 
     // Filtrar apps por categoría
     const categoryApps = useMemo(() => {
+        if (!apps || !Array.isArray(apps)) {
+            return [];
+        }
         return apps.filter((app) => app.category === categoryFromState);
     }, [apps, categoryFromState]);
 
     // Obtener subcategorías únicas
     const subcategories = useMemo(() => {
+        if (!categoryApps || !Array.isArray(categoryApps)) {
+            return [];
+        }
         const unique = [...new Set(categoryApps.map((app) => app.subcategory))];
         return unique.filter(Boolean);
     }, [categoryApps]);
 
     // Filtrar y ordenar apps
     const filteredApps = useMemo(() => {
+        if (!categoryApps || !Array.isArray(categoryApps)) {
+            return [];
+        }
+        
         let result = [...categoryApps];
 
         // Filtrar por búsqueda

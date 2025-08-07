@@ -193,7 +193,7 @@ export const fetchApps = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token || localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/apps`, {
+      const response = await axios.get(`${API_BASE_URL}/apps/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
