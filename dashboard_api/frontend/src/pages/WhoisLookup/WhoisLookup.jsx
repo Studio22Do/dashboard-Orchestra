@@ -543,13 +543,15 @@ const WhoisLookup = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        WHOIS Lookup Service
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Consulta información detallada de registro para dominios, números ASN e direcciones IP
-      </Typography>
+    <Container maxWidth="lg" sx={{ mt: 3 }}>
+      <Box mb={4}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          WHOIS Lookup Service
+        </Typography>
+        <Typography variant="body1" color="text.secondary" paragraph>
+          Consulta información detallada de registro para dominios, números ASN e direcciones IP
+        </Typography>
+      </Box>
 
       <Paper sx={{ mb: 4 }}>
         <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">

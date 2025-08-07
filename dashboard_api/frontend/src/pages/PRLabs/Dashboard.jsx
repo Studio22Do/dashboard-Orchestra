@@ -11,7 +11,6 @@ import {
   RecordVoiceOver as VoiceIcon,
   Speed as PerformanceIcon,
   Insights as InsightsIcon,
-  ArrowBack,
   Build
 } from '@mui/icons-material';
 import { PR_LABS_CONFIG } from '../../config/prlabs';
@@ -29,26 +28,32 @@ const FeatureCard = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
+  backgroundColor: '#1a1a2e',
+  color: 'white',
   '&:hover': {
     transform: 'translateY(-4px)',
     boxShadow: theme.shadows[4],
     '& .icon-wrapper': {
-      backgroundColor: theme.palette.primary.dark,
+      backgroundColor: '#6a4c93',
       transform: 'scale(1.1)'
     }
   }
 }));
 
 const IconWrapper = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
+  backgroundColor: '#6a4c93',
+  color: 'white',
   borderRadius: '50%',
-  padding: theme.spacing(2),
+  width: 80,
+  height: 80,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   marginBottom: theme.spacing(2),
   transition: 'all 0.3s ease',
+  '& svg': {
+    fontSize: 40,
+  }
 }));
 
 const StatsCard = styled(Paper)(({ theme }) => ({
@@ -84,20 +89,15 @@ const PRLabsDashboard = () => {
   };
 
   return (
-    <DashboardContainer>
-      {/* Header with Back Button */}
-      <Box display="flex" alignItems="center" mb={4}>
-        <IconButton onClick={() => navigate('/')} sx={{ mr: 2 }}>
-          <ArrowBack />
-        </IconButton>
-        <Box>
-          <Typography variant="h4" fontWeight="bold">
+    <DashboardContainer sx={{ mt: 3 }}>
+      {/* Header without Back Button */}
+      <Box mb={4}>
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
           sinfonIA AI Suite
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            Suite completa de herramientas de IA para potenciar tu productividad
-          </Typography>
-        </Box>
+        </Typography>
+        <Typography variant="subtitle1" color="text.secondary">
+          Suite completa de herramientas de IA para potenciar tu productividad
+        </Typography>
       </Box>
 
       {/* Quick Stats */}

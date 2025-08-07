@@ -27,7 +27,6 @@ import {
   ContentCopy as CopyIcon,
   Download as DownloadIcon
 } from '@mui/icons-material';
-import Breadcrumbs from '../../components/common/Breadcrumbs';
 
 // Base URL de la API
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -166,14 +165,8 @@ const SpeechToTextAI = () => {
   };
 
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth="xl" sx={{ mt: 3 }}>
       <Box sx={{ mb: 4 }}>
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', href: '/' },
-            { label: 'Speech to Text AI', href: '/apps/speech-to-text' },
-          ]}
-        />
         <Typography variant="h4" component="h1" gutterBottom>
           Speech to Text AI
         </Typography>

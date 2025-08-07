@@ -24,10 +24,48 @@ import {
   Person,
   Palette,
   Language,
-  ViewCompact
+  ViewCompact,
+  // Iconos para las aplicaciones
+  Instagram,
+  Google,
+  YouTube,
+  Description,
+  Psychology,
+  ChatBubble,
+  Image,
+  TextFields,
+  Mic,
+  SmartToy,
+  Build,
+  TrendingUp,
+  Paid,
+  Article,
+  MusicNote,
+  Transform,
+  Security,
+  Language as LanguageIcon,
+  Dns,
+  Analytics,
+  Speed,
+  ShoppingCart,
+  Settings as SettingsIcon,
+  Functions,
+  PictureAsPdf,
+  VideoLibrary,
+  AutoAwesome,
+  ContentCopy,
+  Translate,
+  Link,
+  Assessment,
+  Cloud,
+  RecordVoiceOver,
+  TextSnippet,
+  ShortText,
+  QrCode,
+  Visibility
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks/reduxHooks';
 import { logoutUser, selectUser } from '../../redux/slices/authSlice';
 import { addNotification } from '../../redux/slices/uiSlice';
@@ -57,6 +95,40 @@ const Title = styled(Typography)({
   fontSize: 22,
   letterSpacing: 0.5,
   fontFamily: 'inherit',
+});
+
+// Header dinámico con logo y título
+const DynamicHeader = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 16,
+});
+
+const AppIcon = styled(Box)({
+  width: 40,
+  height: 40,
+  borderRadius: 8,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  color: 'white',
+  '& svg': {
+    fontSize: 24,
+  },
+});
+
+const AppTitle = styled(Typography)({
+  color: '#fff',
+  fontWeight: 500,
+  fontSize: 20,
+  letterSpacing: 0.3,
+});
+
+const AppSubtitle = styled(Typography)({
+  color: 'rgba(255, 255, 255, 0.7)',
+  fontSize: 14,
+  fontWeight: 400,
 });
 
 const IconGroup = styled(Box)({
@@ -99,6 +171,7 @@ const SearchField = styled(TextField)(({ theme }) => ({
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   
@@ -111,6 +184,269 @@ const Navbar = () => {
   // Estados para las configuraciones
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
+
+  // Datos de las aplicaciones con iconos específicos
+  const getAppData = (pathname) => {
+    const appsData = {
+      '/': {
+        title: 'Marketing Intelligence Console',
+        icon: null,
+        subtitle: null
+      },
+      '/apps': {
+        title: 'ToolBox',
+        icon: null,
+        subtitle: null
+      },
+      '/analytics': {
+        title: 'Analytics',
+        icon: Analytics,
+        subtitle: null
+      },
+      '/prlabs': {
+        title: 'sinfonIA AI Suite',
+        icon: Psychology,
+        subtitle: 'Suite completa de herramientas de IA'
+      },
+      '/prlabs/chat': {
+        title: 'sinfonIA Chat',
+        icon: ChatBubble,
+        subtitle: 'Chat inteligente con IA'
+      },
+      '/prlabs/image': {
+        title: 'sinfonIA Image Generation',
+        icon: Image,
+        subtitle: 'Generación de imágenes con IA'
+      },
+      '/prlabs/text': {
+        title: 'sinfonIA Text Processing',
+        icon: TextFields,
+        subtitle: 'Procesamiento de texto inteligente'
+      },
+      '/prlabs/voice': {
+        title: 'sinfonIA Voice Features',
+        icon: Mic,
+        subtitle: 'Funciones de voz con IA'
+      },
+      '/prlabs/chatbot': {
+        title: 'sinfonIA Custom Chatbots',
+        icon: SmartToy,
+        subtitle: 'Chatbots personalizados'
+      },
+      '/prlabs/tools': {
+        title: 'sinfonIA AI Tools',
+        icon: Build,
+        subtitle: 'Herramientas de IA avanzadas'
+      },
+      '/apps/instagram': {
+        title: 'Instagram Statistics',
+        icon: Instagram,
+        subtitle: 'API de estadísticas de Instagram'
+      },
+      '/instagram-realtime': {
+        title: 'Instagram Realtime',
+        icon: Instagram,
+        subtitle: 'Monitoreo en tiempo real'
+      },
+      '/apps/google-trends': {
+        title: 'Google Trends',
+        icon: TrendingUp,
+        subtitle: 'Tendencias de búsqueda'
+      },
+      '/apps/google-paid-search': {
+        title: 'Google Paid Search',
+        icon: Paid,
+        subtitle: 'Búsqueda de pago'
+      },
+      '/apps/google-news': {
+        title: 'Google News',
+        icon: Article,
+        subtitle: 'Noticias en tiempo real'
+      },
+      '/apps/tiktok': {
+        title: 'ScrapTik Analytics',
+        icon: MusicNote,
+        subtitle: 'Análisis de TikTok'
+      },
+      '/apps/youtube-media': {
+        title: 'YouTube Media Downloader',
+        icon: YouTube,
+        subtitle: 'Descarga de medios'
+      },
+      '/apps/file-converter': {
+        title: 'All-in-One File Converter',
+        icon: Transform,
+        subtitle: 'Conversor de archivos'
+      },
+      '/apps/ssl-checker': {
+        title: 'SSL Checker',
+        icon: Security,
+        subtitle: 'Verificación de certificados SSL'
+      },
+      '/apps/website-status': {
+        title: 'Website Status Checker',
+        icon: LanguageIcon,
+        subtitle: 'Estado de sitios web'
+      },
+      '/apps/whois-lookup': {
+        title: 'WHOIS Lookup',
+        icon: Dns,
+        subtitle: 'Consulta de información de dominio'
+      },
+      '/apps/seo-analyzer': {
+        title: 'SEO Analyzer',
+        icon: Analytics,
+        subtitle: 'Análisis de SEO'
+      },
+      '/apps/similar-web': {
+        title: 'SimilarWeb Insights',
+        icon: Visibility,
+        subtitle: 'Análisis de competencia'
+      },
+      '/apps/keyword-insights': {
+        title: 'Google Keyword Insights',
+        icon: Google,
+        subtitle: 'Análisis de palabras clave'
+      },
+      '/apps/domain-metrics': {
+        title: 'Domain Metrics',
+        icon: Assessment,
+        subtitle: 'Métricas de dominio'
+      },
+      '/apps/page-speed': {
+        title: 'Page Speed Insights',
+        icon: Speed,
+        subtitle: 'Análisis de velocidad'
+      },
+      '/apps/product-description': {
+        title: 'Product Description Generator',
+        icon: ShoppingCart,
+        subtitle: 'Generador de descripciones'
+      },
+      '/apps/seo-mastermind': {
+        title: 'SEO Mastermind',
+        icon: SettingsIcon,
+        subtitle: 'Generador de keywords y meta tags'
+      },
+      '/apps/word-count': {
+        title: 'Word Count',
+        icon: Functions,
+        subtitle: 'Contador de palabras'
+      },
+      '/apps/pdf-to-text': {
+        title: 'PDF to Text Converter',
+        icon: PictureAsPdf,
+        subtitle: 'Conversor de PDF a texto'
+      },
+      '/apps/snap-video': {
+        title: 'Media Downloader',
+        icon: VideoLibrary,
+        subtitle: 'Descarga de medios'
+      },
+      '/apps/genie-ai': {
+        title: 'GenieAI',
+        icon: AutoAwesome,
+        subtitle: 'ChatGPT-3 Model'
+      },
+      '/apps/ai-social-media': {
+        title: 'AI Social Media Content',
+        icon: ContentCopy,
+        subtitle: 'Generador de contenido'
+      },
+      '/apps/advanced-image': {
+        title: 'Advanced Image Manipulation',
+        icon: Transform,
+        subtitle: 'Manipulación avanzada de imágenes'
+      },
+      '/apps/picpulse': {
+        title: 'PicPulse',
+        icon: Image,
+        subtitle: 'Análisis de imágenes'
+      },
+      '/apps/whisper-url': {
+        title: 'Whisper from URL',
+        icon: Cloud,
+        subtitle: 'Transcripción de audio'
+      },
+      '/apps/runway-ml': {
+        title: 'RunwayML',
+        icon: Psychology,
+        subtitle: 'Plataforma de IA multimedia'
+      },
+      '/apps/speech-to-text': {
+        title: 'Speech to Text AI',
+        icon: RecordVoiceOver,
+        subtitle: 'Conversión de voz a texto'
+      },
+      '/apps/ai-humanizer': {
+        title: 'AI Humanizer',
+        icon: Translate,
+        subtitle: 'Humanización de texto con IA'
+      },
+      '/apps/url-shortener': {
+        title: 'URL Shortener',
+        icon: Link,
+        subtitle: 'Acortador de URLs'
+      },
+      '/apps/ahrefs-rank': {
+        title: 'Ahrefs Rank Checker',
+        icon: Assessment,
+        subtitle: 'Verificación de ranking'
+      },
+      '/profile': {
+        title: 'Mi Perfil',
+        icon: Person,
+        subtitle: null
+      },
+      '/login': {
+        title: 'Iniciar Sesión',
+        icon: null,
+        subtitle: null
+      },
+      '/register': {
+        title: 'Registro',
+        icon: null,
+        subtitle: null
+      },
+      '/verify-email': {
+        title: 'Verificar Email',
+        icon: null,
+        subtitle: null
+      },
+      '/forgot-password': {
+        title: 'Recuperar Contraseña',
+        icon: null,
+        subtitle: null
+      },
+      '/reset-password': {
+        title: 'Restablecer Contraseña',
+        icon: null,
+        subtitle: null
+      }
+    };
+
+    // Buscar la ruta exacta primero
+    if (appsData[pathname]) {
+      return appsData[pathname];
+    }
+
+    // Si no encuentra la ruta exacta, buscar rutas que contengan el pathname
+    for (const [route, data] of Object.entries(appsData)) {
+      if (pathname.startsWith(route) && route !== '/') {
+        return data;
+      }
+    }
+
+    // Si no encuentra nada, devolver el título por defecto
+    return {
+      title: 'Marketing Intelligence Console',
+      icon: null,
+      subtitle: null
+    };
+  };
+
+  // Obtener los datos de la aplicación actual
+  const currentApp = getAppData(location.pathname);
   
   // Controladores para el menú de usuario
   const handleOpenMenu = (event) => {
@@ -187,9 +523,23 @@ const Navbar = () => {
   return (
     <StyledAppBar position="static">
       <NavbarContent>
-        <Title>
-          Marketing Intelligence Console
-        </Title>
+        <DynamicHeader>
+          {currentApp.icon && (
+            <AppIcon>
+              <currentApp.icon />
+            </AppIcon>
+          )}
+          <Box>
+            <AppTitle>
+              {currentApp.title}
+            </AppTitle>
+            {currentApp.subtitle && (
+              <AppSubtitle>
+                {currentApp.subtitle}
+              </AppSubtitle>
+            )}
+          </Box>
+        </DynamicHeader>
         <IconGroup>
           <NotificationBell />
           <IconButton 

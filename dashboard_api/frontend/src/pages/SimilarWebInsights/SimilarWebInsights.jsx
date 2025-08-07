@@ -136,15 +136,17 @@ const SimilarWebInsights = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 0 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Similar Web Insights
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Analiza el tráfico y las métricas de cualquier sitio web
-      </Typography>
+    <Container maxWidth="lg" sx={{ mt: 3 }}>
+      <Box mb={4}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Similar Web Insights
+        </Typography>
+        <Typography variant="body1" color="text.secondary" paragraph>
+          Analiza el tráfico y las métricas de cualquier sitio web
+        </Typography>
+      </Box>
 
-      <Card sx={{ mb: 1 }}>
+      <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box component="form" onSubmit={handleSubmit}>
             <Grid container spacing={2} alignItems="center">

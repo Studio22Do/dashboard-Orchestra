@@ -1,5 +1,7 @@
 dashboard_api/backend/logs/
 dashboard_api/backend/venv/
+dashboard_api/backend/.venv/
+dashboard_api/backend/.env/
 dashboard_api/backend/logs/app.log
 dashboard_api/backend/logs/app.log.1
 dashboard_api/backend/logs/app.log.2
