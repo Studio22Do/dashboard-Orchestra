@@ -102,6 +102,21 @@ def credits_required(amount=1):
                             }
                             print(f"[CREDITS_DEBUG] Credits info agregado: {response_data['credits_info']}")
                         return jsonify(response_data), status_code
+                    elif hasattr(result, 'json') and callable(getattr(result, 'json', None)):
+                        # Es un Response object de Flask
+                        print(f"[CREDITS_DEBUG] Es un Response object, extrayendo datos")
+                        try:
+                            response_data = result.json
+                            if isinstance(response_data, dict):
+                                response_data['credits_info'] = {
+                                    'deducted': amount,
+                                    'remaining': user.credits
+                                }
+                                print(f"[CREDITS_DEBUG] Credits info agregado a Response: {response_data['credits_info']}")
+                            return result
+                        except Exception as e:
+                            print(f"[CREDITS_DEBUG] Error extrayendo datos del Response: {e}")
+                            return result
                     else:
                         # Si no es una tupla, convertir a JSON y agregar credits_info
                         print(f"[CREDITS_DEBUG] Resultado no es tupla, convirtiendo a JSON")

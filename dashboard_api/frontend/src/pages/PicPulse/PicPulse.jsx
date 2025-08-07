@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-const API_MODE = 'beta_v1'; // Hardcodeamos el modo para asegurar que funcione
+const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   backgroundColor: '#272038',

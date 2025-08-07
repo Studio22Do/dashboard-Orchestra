@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app
+from flask_jwt_extended import jwt_required
 import requests
 import logging
 import re
@@ -16,6 +17,7 @@ def sanitize_filename(filename):
     return f"image.{ext}"
 
 @picpulse_bp.route('/analyze', methods=['POST'])
+@jwt_required()
 @credits_required(amount=2)  # PicPulse cuesta 2 puntos
 def analyze_image():
     """Endpoint para análisis básico de imagen con PicPulse"""
@@ -42,6 +44,22 @@ def analyze_image():
            image_file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
             logger.error("[PICPULSE] Tipo de archivo no permitido: %s", image_file.filename)
             return jsonify({'error': 'Tipo de archivo no permitido. Solo PNG, JPG, JPEG'}), 400
+        
+        # Verificar el tamaño del archivo (máximo 2MB)
+        image_file.seek(0, 2)  # Ir al final del archivo
+        file_size = image_file.tell()  # Obtener el tamaño
+        image_file.seek(0)  # Volver al inicio
+        
+        max_size = 2 * 1024 * 1024  # 2MB en bytes
+        if file_size > max_size:
+            logger.error("[PICPULSE] Archivo demasiado grande: %s bytes", file_size)
+            return jsonify({
+                'error': 'Archivo demasiado grande. Máximo 2MB permitido.',
+                'file_size': file_size,
+                'max_size': max_size
+            }), 400
+        
+        logger.info("[PICPULSE] Tamaño del archivo: %s bytes", file_size)
         
         # Obtener parámetros con valores por defecto
         gender = request.form.get('gender', 'Male')
@@ -107,6 +125,7 @@ def analyze_image():
         }), 500
 
 @picpulse_bp.route('/analyze-detailed', methods=['POST'])
+@jwt_required()
 @credits_required(amount=2)  # PicPulse detailed cuesta 2 puntos
 def analyze_image_detailed():
     """Endpoint para análisis detallado de imagen con PicPulse"""
@@ -136,6 +155,22 @@ def analyze_image_detailed():
            image_file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
             logger.error("[PICPULSE] Tipo de archivo no permitido: %s", image_file.filename)
             return jsonify({'error': 'Tipo de archivo no permitido. Solo PNG, JPG, JPEG'}), 400
+        
+        # Verificar el tamaño del archivo (máximo 2MB)
+        image_file.seek(0, 2)  # Ir al final del archivo
+        file_size = image_file.tell()  # Obtener el tamaño
+        image_file.seek(0)  # Volver al inicio
+        
+        max_size = 2 * 1024 * 1024  # 2MB en bytes
+        if file_size > max_size:
+            logger.error("[PICPULSE] Archivo demasiado grande: %s bytes", file_size)
+            return jsonify({
+                'error': 'Archivo demasiado grande. Máximo 2MB permitido.',
+                'file_size': file_size,
+                'max_size': max_size
+            }), 400
+        
+        logger.info("[PICPULSE] Tamaño del archivo: %s bytes", file_size)
         
         gender = request.form.get('gender', 'Male')
         age_group = request.form.get('age_group', '25-34')
