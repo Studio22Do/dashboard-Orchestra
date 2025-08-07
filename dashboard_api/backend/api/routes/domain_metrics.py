@@ -1,9 +1,11 @@
 from flask import Blueprint, request, jsonify, current_app
 import requests
+from api.utils.decorators import credits_required
 
 domain_metrics_bp = Blueprint('domain_metrics', __name__)
 
 @domain_metrics_bp.route('/', methods=['POST'])
+@credits_required(amount=1)
 def domain_metrics():
     data = request.json
     domain = data.get('domain')

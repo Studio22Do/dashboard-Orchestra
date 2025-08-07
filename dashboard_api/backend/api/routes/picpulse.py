@@ -3,6 +3,7 @@ import requests
 import logging
 import re
 import json
+from api.utils.decorators import credits_required
 
 picpulse_bp = Blueprint('picpulse', __name__)
 logger = logging.getLogger(__name__)
@@ -15,6 +16,7 @@ def sanitize_filename(filename):
     return f"image.{ext}"
 
 @picpulse_bp.route('/analyze', methods=['POST'])
+@credits_required(amount=2)  # PicPulse cuesta 2 puntos
 def analyze_image():
     """Endpoint para análisis básico de imagen con PicPulse"""
     try:
@@ -105,6 +107,7 @@ def analyze_image():
         }), 500
 
 @picpulse_bp.route('/analyze-detailed', methods=['POST'])
+@credits_required(amount=2)  # PicPulse detailed cuesta 2 puntos
 def analyze_image_detailed():
     """Endpoint para análisis detallado de imagen con PicPulse"""
     try:
