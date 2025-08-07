@@ -207,7 +207,7 @@ function App() {
   // Forzar estado de autenticación a true para desarrollo
   useEffect(() => {
     // Establecer autenticación a true aunque no haya token
-      // dispatch(setAuth(true));
+      dispatch(setAuth(true));
   }, [dispatch]);
   
   // Crear tema basado en el modo seleccionado

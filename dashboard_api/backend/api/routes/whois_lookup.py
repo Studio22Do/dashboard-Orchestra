@@ -1,3 +1,5 @@
+from flask_jwt_extended import jwt_required
+from api.utils.decorators import credits_required
 from flask import Blueprint, request, jsonify, current_app
 import requests
 
@@ -10,6 +12,8 @@ def handle_options():
     return '', 200
 
 @whois_lookup_bp.route('/domain', methods=['POST'])
+@jwt_required()
+@credits_required(amount=1)
 def get_domain_whois():
     """Obtener información WHOIS de un dominio"""
     data = request.json
@@ -50,6 +54,8 @@ def get_domain_whois():
         }), 500
 
 @whois_lookup_bp.route('/asn', methods=['POST'])
+@jwt_required()
+@credits_required(amount=1)
 def get_asn_whois():
     """Obtener información WHOIS de un ASN"""
     data = request.json
@@ -91,6 +97,8 @@ def get_asn_whois():
         }), 500
 
 @whois_lookup_bp.route('/ip', methods=['POST'])
+@jwt_required()
+@credits_required(amount=1)
 def get_ip_whois():
     """Obtener información WHOIS de una IP"""
     data = request.json

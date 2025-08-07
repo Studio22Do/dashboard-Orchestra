@@ -103,9 +103,15 @@ def credits_required(amount=1):
                             print(f"[CREDITS_DEBUG] Credits info agregado: {response_data['credits_info']}")
                         return jsonify(response_data), status_code
                     else:
-                        # Si no es una tupla, simplemente retornar el resultado sin modificar
-                        print(f"[CREDITS_DEBUG] Resultado no es tupla, retornando sin modificar")
-                        return result
+                        # Si no es una tupla, convertir a JSON y agregar credits_info
+                        print(f"[CREDITS_DEBUG] Resultado no es tupla, convirtiendo a JSON")
+                        if isinstance(result, dict):
+                            result['credits_info'] = {
+                                'deducted': amount,
+                                'remaining': user.credits
+                            }
+                            print(f"[CREDITS_DEBUG] Credits info agregado: {result['credits_info']}")
+                        return jsonify(result)
                         
                 except Exception as e:
                     # Si hay error, revertir el descuento de créditos

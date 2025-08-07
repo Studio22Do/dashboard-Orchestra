@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import {
   Container,
   Typography,
@@ -58,6 +59,7 @@ const TabPanel = ({ children, value, index, ...other }) => (
 
 const WhoisLookup = () => {
   const theme = useTheme();
+  const token = useSelector((state) => state.auth.token);
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -102,7 +104,10 @@ const WhoisLookup = () => {
     try {
       const response = await fetch(endpoints[type], {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(payloads[type])
       });
 
