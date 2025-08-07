@@ -39,6 +39,8 @@ import {
     Chat as ChatIcon,
     ShoppingCart as ShoppingCartIcon,
     Sort as SortIcon,
+    ViewModule,
+    ViewComfy,
 } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -113,7 +115,8 @@ const CategoryView = () => {
     const [selectedSubcategory, setSelectedSubcategory] = useState("all");
     const [filterStatus, setFilterStatus] = useState("all");
     const [sortBy, setSortBy] = useState("popular");
-    const [viewMode, setViewMode] = useState("grid"); // Agregada la variable faltante
+    const [viewMode, setViewMode] = useState("grid");
+    const [gridLayout, setGridLayout] = useState("2"); // '2', '6', '8'
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [selectedApp, setSelectedApp] = useState(null);
 
@@ -188,6 +191,20 @@ const CategoryView = () => {
 
         return result;
     }, [categoryApps, searchQuery, selectedSubcategory, sortBy]);
+
+    // Función para obtener el ancho de las cards según el layout
+    const getCardWidth = () => {
+        switch (gridLayout) {
+            case '2':
+                return { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(50% - 12px)' };
+            case '6':
+                return { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(33.333% - 16px)', lg: 'calc(33.333% - 16px)' };
+            case '8':
+                return { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)', lg: 'calc(25% - 18px)' };
+            default:
+                return { xs: '100%', sm: 'calc(50% - 12px)' };
+        }
+    };
 
     // Manejar favoritos
     const toggleFavorite = async (appId, event) => {
@@ -371,6 +388,54 @@ const CategoryView = () => {
                                 width: { xs: "100%", md: "auto" },
                             }}
                         >
+                            {/* Botones de filtro por cuadrícula */}
+                            <Box sx={{ display: "flex", gap: 1, mr: 2 }}>
+                                <Tooltip title="2 columnas">
+                                    <IconButton
+                                        onClick={() => setGridLayout('2')}
+                                        sx={{
+                                            color: gridLayout === '2' ? '#837cf2' : 'rgba(255, 255, 255, 0.7)',
+                                            backgroundColor: gridLayout === '2' ? 'rgba(131, 124, 242, 0.1)' : 'transparent',
+                                            '&:hover': {
+                                                backgroundColor: gridLayout === '2' ? 'rgba(131, 124, 242, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                                            }
+                                        }}
+                                    >
+                                        <ViewListIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                
+                                <Tooltip title="3 columnas">
+                                    <IconButton
+                                        onClick={() => setGridLayout('6')}
+                                        sx={{
+                                            color: gridLayout === '6' ? '#837cf2' : 'rgba(255, 255, 255, 0.7)',
+                                            backgroundColor: gridLayout === '6' ? 'rgba(131, 124, 242, 0.1)' : 'transparent',
+                                            '&:hover': {
+                                                backgroundColor: gridLayout === '6' ? 'rgba(131, 124, 242, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                                            }
+                                        }}
+                                    >
+                                        <ViewComfy />
+                                    </IconButton>
+                                </Tooltip>
+                                
+                                <Tooltip title="4 columnas">
+                                    <IconButton
+                                        onClick={() => setGridLayout('8')}
+                                        sx={{
+                                            color: gridLayout === '8' ? '#837cf2' : 'rgba(255, 255, 255, 0.7)',
+                                            backgroundColor: gridLayout === '8' ? 'rgba(131, 124, 242, 0.1)' : 'transparent',
+                                            '&:hover': {
+                                                backgroundColor: gridLayout === '8' ? 'rgba(131, 124, 242, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                                            }
+                                        }}
+                                    >
+                                        <ViewModule />
+                                    </IconButton>
+                                </Tooltip>
+                            </Box>
+
                             <FormControl
                                 variant="outlined"
                                 size="small"
@@ -556,7 +621,7 @@ const CategoryView = () => {
                             <Box 
                                 key={item} 
                                 sx={{ 
-                                    width: { xs: '100%', sm: 'calc(50% - 12px)' }, 
+                                    width: getCardWidth(), 
                                     boxSizing: 'border-box' 
                                 }}
                             >
@@ -633,7 +698,7 @@ const CategoryView = () => {
                             <Box
                                 key={app.id}
                                 sx={{ 
-                                    width: { xs: '100%', sm: 'calc(50% - 12px)' }, 
+                                    width: getCardWidth(), 
                                     boxSizing: 'border-box' 
                                 }}
                             >
