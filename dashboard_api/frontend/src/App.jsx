@@ -14,7 +14,7 @@ import GoogleNews from './pages/GoogleNews/GoogleNews';
 import Dashboard from './pages/Dashboard/Dashboard';
 import NotificationManager from './components/Notifications/NotificationManager';
 import { useAppDispatch, useAppSelector } from './redux/hooks/reduxHooks';
-import { selectIsAuthenticated, setAuth } from './redux/slices/authSlice';
+import { selectIsAuthenticated, setAuth, fetchUserInfo } from './redux/slices/authSlice';
 import { selectTheme } from './redux/slices/uiSlice';
 import Analytics from './pages/Analytics/Analytics';
 import Profile from './pages/Profile/Profile';
@@ -181,6 +181,17 @@ const createAppTheme = (mode) => createTheme({
   },
 });
 
+// Función para verificar si un token JWT ha expirado
+const isTokenExpired = (token) => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const now = Math.floor(Date.now() / 1000);
+    return payload.exp < now;
+  } catch (error) {
+    return true; // Si hay error al decodificar, considerar como expirado
+  }
+};
+
 // Protected Route wrapper
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
@@ -204,10 +215,20 @@ function App() {
   const themeMode = useAppSelector(selectTheme);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   
-  // Forzar estado de autenticación a true para desarrollo
+  // Verificar token al inicializar la aplicación
   useEffect(() => {
-    // Establecer autenticación a true aunque no haya token
-      // dispatch(setAuth(true));
+    const token = localStorage.getItem('token');
+    
+    if (token && !isTokenExpired(token)) {
+      // Token válido, restaurar autenticación
+      dispatch(setAuth(true));
+      // Opcional: cargar información del usuario
+      dispatch(fetchUserInfo());
+    } else if (token && isTokenExpired(token)) {
+      // Token expirado, limpiarlo
+      localStorage.removeItem('token');
+      dispatch(setAuth(false));
+    }
   }, [dispatch]);
   
   // Crear tema basado en el modo seleccionado

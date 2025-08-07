@@ -28,7 +28,6 @@ const AppCatalog = () => {
 
   // Cargar apps compradas cuando se visita la página
   useEffect(() => {
-    console.log('Cargando apps compradas desde AppCatalog...');
     dispatch(fetchPurchasedApps());
   }, [dispatch]);
 
