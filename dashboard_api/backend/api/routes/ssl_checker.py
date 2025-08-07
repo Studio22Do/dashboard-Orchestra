@@ -1,10 +1,14 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
 import requests
+from api.utils.decorators import credits_required
 
+# Crear blueprint
 ssl_checker_bp = Blueprint('ssl_checker', __name__)
 
-@ssl_checker_bp.route('', methods=['POST'])
-@ssl_checker_bp.route('/', methods=['POST'])
+@ssl_checker_bp.route('/check', methods=['POST'])
+@jwt_required()
+@credits_required(amount=1)
 def check_ssl():
     data = request.json
     domain = data.get('domain')

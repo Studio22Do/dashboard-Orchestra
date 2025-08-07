@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Drawer, Box, Typography, Button, Divider } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { purchaseApp, selectCanUseApp, selectUserRequests } from '../../redux/slices/appsSlice';
+import { purchaseApp, selectCanUseApp } from '../../redux/slices/appsSlice';
+import { selectCreditsBalance } from '../../redux/slices/creditsSlice';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Apps as DefaultAppIcon } from '@mui/icons-material';
@@ -17,7 +18,7 @@ const AppDetailDrawer = ({
   
   // Nueva lógica basada en requests
   const canUseApp = useSelector(state => selectCanUseApp(state, app?.id));
-  const userRequests = useSelector(selectUserRequests);
+  const userCredits = useSelector(selectCreditsBalance);
 
   // Reset image error when app changes
   React.useEffect(() => {
@@ -138,11 +139,11 @@ const AppDetailDrawer = ({
             Categoría: {category}
           </Typography>
           <Typography variant="subtitle2" sx={{ mb: 1, color: 'rgba(255,255,255,0.7)' }}>
-            Costo de crédito: {apiName}
+            API: {apiName}
           </Typography>
           {process.env.REACT_APP_MODE === 'beta_v2' && (
             <Typography variant="subtitle2" sx={{ mb: 3, color: 'rgba(255,255,255,0.7)' }}>
-              Créditos disponibles: {userRequests}
+              Créditos disponibles: {userCredits}
             </Typography>
           )}
           <Button

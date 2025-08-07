@@ -1,10 +1,16 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
 import requests
+import os
+from api.utils.decorators import credits_required
 
+# Crear blueprint
 pdf_converter_bp = Blueprint('pdf_converter', __name__)
 
-@pdf_converter_bp.route('/to-text', methods=['POST'])
-def pdf_to_text():
+@pdf_converter_bp.route('/convert', methods=['POST'])
+@jwt_required()
+@credits_required(amount=1)
+def convert_pdf():
     # Verificar si es una subida de archivo o una URL
     if 'pdfFile' in request.files:
         # Caso: Archivo subido

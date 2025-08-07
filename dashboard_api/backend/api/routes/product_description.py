@@ -1,10 +1,15 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
 import requests
+from api.utils.decorators import credits_required
 
+# Crear blueprint
 product_description_bp = Blueprint('product_description', __name__)
 
 @product_description_bp.route('/generate', methods=['POST'])
-def generate_product_description():
+@jwt_required()
+@credits_required(amount=1)
+def generate_description():
     data = request.json
     language = data.get('language', 'English')
     name = data.get('name')

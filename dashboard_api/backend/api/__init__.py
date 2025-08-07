@@ -64,6 +64,7 @@ def create_app(config_object):
     from api.routes.ahrefs_dr import ahrefs_dr_bp
     from api.routes.speech_to_text import speech_to_text_bp
     from api.routes.picpulse import picpulse_bp
+    from api.routes.credits import credits_bp
 
     # Registrar blueprints con prefijos de versión
     version_prefix = f"/api/{app.config.get('MODE', 'beta_v1')}"
@@ -97,6 +98,7 @@ def create_app(config_object):
     app.register_blueprint(ahrefs_dr_bp, url_prefix=f'{version_prefix}/ahrefs-dr')
     app.register_blueprint(speech_to_text_bp, url_prefix=f'{version_prefix}/speech-to-text')
     app.register_blueprint(picpulse_bp, url_prefix=f'{version_prefix}/picpulse')
+    app.register_blueprint(credits_bp, url_prefix=f'{version_prefix}/credits')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers

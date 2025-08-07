@@ -191,6 +191,29 @@ export const changePassword = createAsyncThunk(
   }
 );
 
+export const fetchUserInfo = createAsyncThunk(
+  'auth/fetchUserInfo',
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const token = getState().auth.token || localStorage.getItem('token');
+      
+      if (!token) {
+        return rejectWithValue('No hay token de autenticación');
+      }
+      
+      setAuthToken(token);
+      
+      const response = await axios.get(`${API_BASE_URL}/auth/me`);
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data.message || 'Error al obtener información del usuario');
+      }
+      return rejectWithValue(error.message || 'Error al obtener información del usuario');
+    }
+  }
+);
+
 // Slice
 const authSlice = createSlice({
   name: 'auth',
@@ -320,6 +343,20 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.passwordChangeSuccess = false;
+      })
+      // Fetch User Info
+      .addCase(fetchUserInfo.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserInfo.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.error = null;
+      })
+      .addCase(fetchUserInfo.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
