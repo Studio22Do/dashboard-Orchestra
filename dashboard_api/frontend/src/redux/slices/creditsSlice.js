@@ -8,24 +8,18 @@ const API_BASE_URL = `${API_URL}/${API_MODE}`;
 // Interceptor para actualizar créditos automáticamente
 axios.interceptors.response.use(
   (response) => {
-    console.log('[CREDITS_INTERCEPTOR] Response recibida:', response.data);
     // Si la respuesta contiene información de créditos, actualizar el store
     if (response.data && response.data.credits_info) {
-      console.log('[CREDITS_INTERCEPTOR] Credits info encontrado:', response.data.credits_info);
       // Importar el store dinámicamente para evitar circular imports
       import('../store').then(({ default: store }) => {
-        console.log('[CREDITS_INTERCEPTOR] Store importado, dispatchando setBalance:', response.data.credits_info.remaining);
         store.dispatch(setBalance(response.data.credits_info.remaining));
       }).catch(error => {
-        console.error('[CREDITS_INTERCEPTOR] Error importando store:', error);
+        // Error silencioso para evitar ruido en consola
       });
-    } else {
-      console.log('[CREDITS_INTERCEPTOR] No credits_info en response');
     }
     return response;
   },
   (error) => {
-    console.error('[CREDITS_INTERCEPTOR] Error en response:', error);
     return Promise.reject(error);
   }
 );

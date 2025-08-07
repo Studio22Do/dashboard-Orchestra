@@ -11,9 +11,11 @@ import {
   Divider,
   Button,
   Snackbar,
-  Alert
+  Alert,
+  IconButton,
+  Tooltip
 } from '@mui/material';
-import { Search, ArrowBack } from '@mui/icons-material';
+import { Search, ArrowBack, ViewModule, ViewComfy, ViewList } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppCard from '../../components/AppCard/AppCard';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks/reduxHooks';
@@ -28,7 +30,6 @@ const AppCatalog = () => {
 
   // Cargar apps compradas cuando se visita la página
   useEffect(() => {
-    console.log('Cargando apps compradas desde AppCatalog...');
     dispatch(fetchPurchasedApps());
   }, [dispatch]);
 
@@ -37,6 +38,7 @@ const AppCatalog = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [gridLayout, setGridLayout] = useState('2'); // '2', '6', '8'
 
   // Verificar si hay una categoría preseleccionada (desde Dashboard)
   useEffect(() => {
@@ -53,6 +55,20 @@ const AppCatalog = () => {
     const matchesCategory = activeCategory === 'All' || app.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Función para obtener el ancho de las cards según el layout
+  const getCardWidth = () => {
+    switch (gridLayout) {
+      case '2':
+        return { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(50% - 12px)' };
+      case '6':
+        return { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(33.333% - 16px)', lg: 'calc(33.333% - 16px)' };
+      case '8':
+        return { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)', lg: 'calc(25% - 18px)' };
+      default:
+        return { xs: '100%', sm: 'calc(50% - 12px)' };
+    }
+  };
 
   const handleCloseNotification = () => {
     setNotification({ ...notification, open: false });
@@ -77,23 +93,72 @@ const AppCatalog = () => {
         Explora tus aplicaciones agregadas para {activeCategory === 'All' ? 'todas las categorías' : activeCategory.toLowerCase()}
       </Typography>
 
-      <Box sx={{ mb: 4, px: { xs: 2, md: 6 } }} style={{  }}>
-        <TextField
+      <Box sx={{ mb: 4, px: { xs: 2, md: 6 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+          <TextField
+            placeholder="Buscar herramientas..."
+            variant="outlined"
+            size="small"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ flexGrow: 1 }}
+          />
           
-          placeholder="Buscar herramientas..."
-          variant="outlined"
-          size="small"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ mb: 2 }}
-        />
+          {/* Botones de filtro por cuadrícula */}
+          <Box sx={{ display: 'flex', gap: 1, ml: 2 }}>
+            <Tooltip title="2 columnas">
+              <IconButton
+                onClick={() => setGridLayout('2')}
+                sx={{
+                  color: gridLayout === '2' ? '#837cf2' : 'rgba(255, 255, 255, 0.7)',
+                  backgroundColor: gridLayout === '2' ? 'rgba(131, 124, 242, 0.1)' : 'transparent',
+                  '&:hover': {
+                    backgroundColor: gridLayout === '2' ? 'rgba(131, 124, 242, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                  }
+                }}
+              >
+                <ViewList />
+              </IconButton>
+            </Tooltip>
+            
+            <Tooltip title="3 columnas">
+              <IconButton
+                onClick={() => setGridLayout('6')}
+                sx={{
+                  color: gridLayout === '6' ? '#837cf2' : 'rgba(255, 255, 255, 0.7)',
+                  backgroundColor: gridLayout === '6' ? 'rgba(131, 124, 242, 0.1)' : 'transparent',
+                  '&:hover': {
+                    backgroundColor: gridLayout === '6' ? 'rgba(131, 124, 242, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                  }
+                }}
+              >
+                <ViewComfy />
+              </IconButton>
+            </Tooltip>
+            
+            <Tooltip title="4 columnas">
+              <IconButton
+                onClick={() => setGridLayout('8')}
+                sx={{
+                  color: gridLayout === '8' ? '#837cf2' : 'rgba(255, 255, 255, 0.7)',
+                  backgroundColor: gridLayout === '8' ? 'rgba(131, 124, 242, 0.1)' : 'transparent',
+                  '&:hover': {
+                    backgroundColor: gridLayout === '8' ? 'rgba(131, 124, 242, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                  }
+                }}
+              >
+                <ViewModule />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Box>
 
         <Tabs 
           value={activeCategory}
@@ -123,7 +188,7 @@ const AppCatalog = () => {
           filteredApps
             .filter(app => app && (app.id || app.app_id))
             .map(app => (
-              <Box key={app.app_id || app.id} sx={{ width: { xs: '100%', sm: 'calc(50% - 12px)' }, boxSizing: 'border-box'}}>
+              <Box key={app.app_id || app.id} sx={{ width: getCardWidth(), boxSizing: 'border-box'}}>
                 <AppCard {...app} showFavorite={true} is_favorite={app.is_favorite} />
               </Box>
             ))
