@@ -2,7 +2,7 @@
 Configuración de costos de créditos para cada API
 """
 
-# Costos de créditos por API
+# Costos de créditos por API (puntos a descontar al cliente)
 CREDITS_COST = {
     # Instagram APIs
     'instagram_profile': 1,
@@ -12,37 +12,39 @@ CREDITS_COST = {
     'instagram_stories': 1,
     'instagram_highlights': 1,
     'instagram_full_profile': 2,
+    'instagram_realtime': 1,
+    'instagram_stats': 1,
     
     # AI Humanizer
     'ai_humanizer': 2,
     'ai_humanizer_basic': 1,
     
     # SEO APIs
-    'seo_analyzer': 1,
+    'seo_analyzer': 2,
     'seo_mastermind': 2,
     'similarweb': 1,
-    'google_keyword_insight': 1,
+    'google_keyword_insight': 3,
     'domain_metrics': 1,
     'ahrefs_dr': 2,
     'pagespeed_insights': 1,
+    'seo_keyword_research': 3,
     
     # Content APIs
     'product_description': 1,
     'social_media_content': 2,
     'runwayml': 3,
     'speech_to_text': 1,
-    'whisper_url': 1,
+    'whisper_url': 2,
     
     # File/Media APIs
     'pdf_converter': 1,
     'snap_video': 1,
-    'advanced_image_manipulation': 2,
-    'picpulse': 1,
+    'advanced_image_manipulation': 1,
+    'picpulse': 2,
     
     # Other APIs
     'google_news': 1,
     'google_paid_search': 1,
-    'instagram_realtime': 1,
     'whois_lookup': 1,
     'website_status': 1,
     'ssl_checker': 1,
@@ -51,6 +53,10 @@ CREDITS_COST = {
     'prlabs_image': 2,
     'prlabs_text': 1,
     'prlabs_voice': 2,
+    'qrcode_generator': 1,
+    'word_count': 2,
+    'perplexity': 1,
+    'mediafy_api': 1,
 }
 
 def get_credits_cost(api_name):
@@ -85,6 +91,8 @@ def get_api_cost_by_endpoint(endpoint_path):
         '/instagram/stories': 'instagram_stories',
         '/instagram/highlights': 'instagram_highlights',
         '/instagram/full-profile': 'instagram_full_profile',
+        '/instagram-realtime/profile': 'instagram_realtime',
+        '/instagram-stats/check': 'instagram_stats',
         
         # AI Humanizer
         '/ai-humanizer/': 'ai_humanizer',
@@ -98,6 +106,7 @@ def get_api_cost_by_endpoint(endpoint_path):
         '/domain-metrics/check': 'domain_metrics',
         '/ahrefs-dr/check': 'ahrefs_dr',
         '/pagespeed-insights/analyze': 'pagespeed_insights',
+        '/seo-keyword-research/generate': 'seo_keyword_research',
         
         # Content
         '/product-description/generate': 'product_description',
@@ -115,7 +124,6 @@ def get_api_cost_by_endpoint(endpoint_path):
         # Other
         '/google-news/search': 'google_news',
         '/paid-search/analyze': 'google_paid_search',
-        '/instagram-realtime/profile': 'instagram_realtime',
         '/whois-lookup/lookup': 'whois_lookup',
         '/website-status/check': 'website_status',
         '/ssl-checker/check': 'ssl_checker',
@@ -124,6 +132,10 @@ def get_api_cost_by_endpoint(endpoint_path):
         '/prlabs/image': 'prlabs_image',
         '/prlabs/text': 'prlabs_text',
         '/prlabs/voice': 'prlabs_voice',
+        '/qrcode-generator/generate': 'qrcode_generator',
+        '/word-count/calculate': 'word_count',
+        '/perplexity/calculate': 'perplexity',
+        '/mediafy-api/analyze': 'mediafy_api',
     }
     
     api_name = path_mapping.get(endpoint_path)

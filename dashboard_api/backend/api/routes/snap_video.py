@@ -1,11 +1,13 @@
 from flask import Blueprint, request, jsonify, current_app
 import requests
 import logging
+from api.utils.decorators import credits_required
 
 media_downloader_bp = Blueprint('media_downloader', __name__)
 logger = logging.getLogger(__name__)
 
 @media_downloader_bp.route('/download', methods=['POST'])
+@credits_required(amount=1)  # Snap Video cuesta 1 punto
 def download_media():
     """Descargar videos y audio de múltiples plataformas"""
     data = request.json

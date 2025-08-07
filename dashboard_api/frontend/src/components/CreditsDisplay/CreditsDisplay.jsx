@@ -44,7 +44,7 @@ const CreditsDisplay = () => {
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
       <AccountBalanceWallet sx={{ fontSize: 20, color: 'primary.main' }} />
       <Chip
-        label={`${credits} créditos`}
+        label={`${credits} puntos`}
         size="small"
         color={credits > 10 ? 'success' : credits > 5 ? 'warning' : 'error'}
         variant="outlined"

@@ -41,6 +41,39 @@ const AppDetailDrawer = ({
   // Determinar si mostrar icono por defecto
   const shouldShowDefaultIcon = !imageUrl || imageError;
 
+  // Obtener puntos requeridos basado en el ID de la app
+  const getRequiredPoints = (appId) => {
+    const pointsMap = {
+      'whois-lookup': 1,
+      'google-news': 1,
+      'picpulse': 2,
+      'mediafy-api': 1,
+      'perplexity': 1,
+      'advanced-image-manipulation': 1,
+      'whisper-url': 2,
+      'ai-social-media': 2,
+      'ecommerce-description': 1,
+      'seo-analyzer': 2,
+      'chat-gpt-4': 1,
+      'seo-keyword-research': 3,
+      'website-status': 1,
+      'qrcode-generator': 1,
+      'text-extract': 1,
+      'ssl-checker': 1,
+      'domain-metrics': 1,
+      'google-keyword': 3,
+      'similar-web': 1,
+      'runwayml': 3,
+      'speech-to-text': 1,
+      'snap-video': 1,
+      'pdf-to-text': 1,
+      'word-count': 2,
+    };
+    return pointsMap[appId] || 1;
+  };
+
+  const requiredPoints = getRequiredPoints(app?.id);
+
   // Funciones para el botón
   const getButtonVariant = () => {
     if (isAlreadyInToolbox) return 'outlined';
@@ -164,11 +197,11 @@ const AppDetailDrawer = ({
               Categoría: {category}
             </Typography>
             <Typography variant="subtitle2" sx={{ mb: 1, color: 'rgba(255,255,255,0.7)' }}>
-              API: {apiName}
+              Puntos requeridos: {requiredPoints}
             </Typography>
             {process.env.REACT_APP_MODE === 'beta_v2' && (
               <Typography variant="subtitle2" sx={{ mb: 3, color: 'rgba(255,255,255,0.7)' }}>
-                Créditos disponibles: {userCredits}
+                Puntos disponibles: {userCredits}
               </Typography>
             )}
             {isAlreadyInToolbox && (
