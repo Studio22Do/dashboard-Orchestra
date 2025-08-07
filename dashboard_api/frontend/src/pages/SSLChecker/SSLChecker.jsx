@@ -22,7 +22,7 @@ const SSLChecker = () => {
   const [sslData, setSslData] = useState(null);
 
   const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
-  const API_BASE_URL = `${APP_CONFIG.API_URL}/${API_MODE}`;
+  const API_BASE_URL = `${APP_CONFIG.API_URL}/api/${API_MODE}`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,9 +37,12 @@ const SSLChecker = () => {
     try {
       // Extraer solo el dominio (sin https://)
       let domain = url.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
-      const response = await fetch(`${API_BASE_URL}/ssl-checker`, {
+      const response = await fetch(`${API_BASE_URL}/ssl-checker/check`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
         body: JSON.stringify({ domain })
       });
       const data = await response.json();
@@ -48,7 +51,8 @@ const SSLChecker = () => {
         setLoading(false);
         return;
       }
-      setSslData(data);
+      // Usar data.data si existe, sino usar data directamente
+      setSslData(data.data || data);
     } catch (err) {
       console.error('Error checking SSL:', err);
       setError(err.message || 'Error al verificar el certificado SSL');
@@ -175,7 +179,7 @@ const SSLChecker = () => {
                     Válido desde
                   </Typography>
                   <Typography variant="h6">
-                    {formatDate(sslData.validFromDate || sslData.certDetails?.validFrom_time_t * 1000)}
+                    {formatDate(sslData.validFrom || sslData.validFromDate)}
                   </Typography>
                 </CardContent>
               </Card>
@@ -187,7 +191,7 @@ const SSLChecker = () => {
                     Válido hasta
                   </Typography>
                   <Typography variant="h6">
-                    {formatDate(sslData.expiry || sslData.certDetails?.validTo_time_t * 1000)}
+                    {formatDate(sslData.validUntil || sslData.expiry)}
                   </Typography>
                 </CardContent>
               </Card>
@@ -208,22 +212,10 @@ const SSLChecker = () => {
               <Card>
                 <CardContent>
                   <Typography variant="subtitle1" color="text.secondary">
-                    Lifespan (días)
-                  </Typography>
-                  <Typography variant="h6">
-                    {sslData.lifespanInDays ?? '-'}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="subtitle1" color="text.secondary">
                     Dominio analizado
                   </Typography>
                   <Typography variant="h6">
-                    {sslData.final_url || sslData.original_url || '-'}
+                    {sslData.domain || sslData.final_url || sslData.original_url || '-'}
                   </Typography>
                 </CardContent>
               </Card>

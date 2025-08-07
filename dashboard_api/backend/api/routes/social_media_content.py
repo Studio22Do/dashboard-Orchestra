@@ -1,12 +1,15 @@
 from flask import Blueprint, request, jsonify, current_app
 import requests
 import logging
+from api.utils.decorators import credits_required
+from flask_jwt_extended import jwt_required
 
 social_media_content_bp = Blueprint('social_media_content', __name__)
 logger = logging.getLogger(__name__)
 
-# @jwt_required()  # Comentado para pruebas sin autenticación
 @social_media_content_bp.route('/generate', methods=['POST'])
+# @jwt_required()  # Comentado temporalmente para pruebas
+@credits_required(amount=2)  # Social Media Content cuesta 2 puntos
 def generate_social_media_content():
     """Genera contenido para redes sociales usando la API externa"""
     try:
@@ -58,7 +61,17 @@ def generate_social_media_content():
         if response.status_code != 200:
             return jsonify({'error': 'Error en la API externa', 'details': response.text}), response.status_code
 
-        return jsonify(response.json()), 200
+        # Asegurar que la respuesta sea serializable
+        try:
+            response_data = response.json()
+            return jsonify(response_data), 200
+        except Exception as e:
+            # Si no se puede parsear como JSON, devolver el texto
+            return jsonify({
+                'content': response.text,
+                'status': 'success',
+                'message': 'Content generated successfully'
+            }), 200
 
     except requests.exceptions.RequestException as e:
         print(f"[SocialMediaContent] Error de conexión: {str(e)}")
