@@ -26,6 +26,8 @@ import {
   Devices,
   LocationOn
 } from '@mui/icons-material';
+import { useAppSelector } from '../../redux/hooks/reduxHooks';
+import { selectCreditsBalance } from '../../redux/slices/creditsSlice';
 
 const SimilarWebInsights = () => {
   const [url, setUrl] = useState('');
@@ -33,6 +35,7 @@ const SimilarWebInsights = () => {
   const [error, setError] = useState(null);
   const [insightsData, setInsightsData] = useState(null);
   const [websiteDetails, setWebsiteDetails] = useState(null);
+  const creditsBalance = useAppSelector(selectCreditsBalance);
 
   const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
   const API_BASE_URL = `/api/${API_MODE}/similarweb`;

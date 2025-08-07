@@ -17,12 +17,14 @@ import AppCard from '../../components/AppCard/AppCard';
 import { useAppSelector } from '../../redux/hooks/reduxHooks';
 import { selectPurchasedApps } from '../../redux/slices/appsSlice';
 import { selectDensity } from '../../redux/slices/uiSlice';
+import { selectCreditsBalance } from '../../redux/slices/creditsSlice';
 
 const AppCatalog = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const purchasedApps = useAppSelector(selectPurchasedApps);
   const density = useAppSelector(selectDensity);
+  const creditsBalance = useAppSelector(selectCreditsBalance);
 
   // Obtener categorías únicas de las apps compradas
   const CATEGORIES = ['All', ...Array.from(new Set(purchasedApps.map(app => app.category)))];
