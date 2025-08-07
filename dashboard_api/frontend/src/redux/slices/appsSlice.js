@@ -53,17 +53,13 @@ export const fetchFavoriteApps = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token || localStorage.getItem('token');
-      console.log('Fetching favorite apps with token:', token);
       
       const response = await axios.get(`${API_BASE_URL}/apps/user/favorites`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      console.log('Favorite apps response:', response.data);
-      
       // El backend devuelve { favorites: [...], by_category: {...}, total: number }
       if (!response.data.favorites || response.data.favorites.length === 0) {
-        console.log('No favorite apps found, returning empty array');
         return [];
       }
       
@@ -73,14 +69,8 @@ export const fetchFavoriteApps = createAsyncThunk(
         return index === self.findIndex(a => (a.app_id || a.id) === appId);
       });
       
-      console.log('Returning unique favorite apps:', uniqueFavorites.length);
-      console.log('Unique favorite apps IDs:', uniqueFavorites.map(app => app.app_id || app.id));
-      
       return uniqueFavorites;
     } catch (error) {
-      console.error('Error fetching favorite apps:', error);
-      console.error('Error response:', error.response);
-      
       // En caso de error, retornar array vacío
       return [];
     }
@@ -99,31 +89,17 @@ export const purchaseApp = createAsyncThunk(
     const state = getState();
     const token = state.auth.token || localStorage.getItem('token');
     
-    console.log('PurchaseApp - Token:', token);
-    console.log('PurchaseApp - AppId:', appId);
-    console.log('PurchaseApp - AllApps length:', state.apps.allApps.length);
-    
     // Solo usar peticiones reales al backend
     try {
-      console.log('Intentando comprar app en backend...');
-      console.log('URL:', `${API_BASE_URL}/apps/user/apps/${appId}/purchase`);
-      console.log('Headers:', { Authorization: `Bearer ${token}` });
-      
       const response = await axios.post(`${API_BASE_URL}/apps/user/apps/${appId}/purchase`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      console.log('Respuesta del backend:', response.data);
-      
       // Después de una compra exitosa, recargar las apps compradas
-      console.log('Recargando apps compradas...');
       await dispatch(fetchPurchasedApps());
       
       return response.data.app;
     } catch (error) {
-      console.error('Error en purchaseApp:', error);
-      console.error('Error response:', error.response);
-      
       // Manejar diferentes tipos de errores
       if (error.response?.status === 401) {
         return rejectWithValue('Error de autenticación. Por favor, inicia sesión nuevamente.');
@@ -147,24 +123,16 @@ export const toggleFavoriteApp = createAsyncThunk(
   async (appId, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getState().auth.token || localStorage.getItem('token');
-      console.log('ToggleFavoriteApp - Token:', token);
-      console.log('ToggleFavoriteApp - AppId:', appId);
       
       const response = await axios.post(`${API_BASE_URL}/apps/user/apps/${appId}/favorite`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      console.log('ToggleFavoriteApp - Response:', response.data);
-      
       // Después de cambiar el favorito, recargar las apps favoritas
-      console.log('Recargando apps favoritas...');
       await dispatch(fetchFavoriteApps());
       
       return response.data.app;
     } catch (error) {
-      console.error('Error en toggleFavoriteApp:', error);
-      console.error('Error response:', error.response);
-      
       // Manejar diferentes tipos de errores
       if (error.response?.status === 401) {
         return rejectWithValue('Error de autenticación. Por favor, inicia sesión nuevamente.');
@@ -189,9 +157,6 @@ export const fetchAllApps = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token || localStorage.getItem('token');
-      console.log('Fetching all apps with token:', token);
-      console.log('API_BASE_URL:', API_BASE_URL);
-      console.log('Full URL:', `${API_BASE_URL}/apps/`);
       
       const response = await axios.get(`${API_BASE_URL}/apps/`, {
         headers: { 
@@ -200,24 +165,14 @@ export const fetchAllApps = createAsyncThunk(
         }
       });
       
-      console.log('Apps response:', response.data);
-      
       // Si la respuesta es vacía, usar array vacío
       if (!response.data.apps || response.data.apps.length === 0) {
-        console.log('No apps found in response, using empty array');
         return [];
       }
       
-      console.log('Returning apps:', response.data.apps.length);
       return response.data.apps;
     } catch (error) {
-      console.error('Error fetching all apps:', error);
-      console.error('Error response:', error.response);
-      console.error('Error status:', error.response?.status);
-      console.error('Error data:', error.response?.data);
-      
       // Si hay error de red o backend, devolver error
-      console.log('Error fetching apps from backend');
       return rejectWithValue('Error al cargar las aplicaciones desde el backend');
     }
   }
@@ -336,7 +291,6 @@ const appsSlice = createSlice({
         state.loading = false;
         // Limpiar y reemplazar las apps favoritas para evitar duplicados
         state.favoriteApps = action.payload;
-        console.log('Redux - Updated favoriteApps:', state.favoriteApps.length);
       })
       .addCase(fetchFavoriteApps.rejected, (state, action) => {
         state.loading = false;
