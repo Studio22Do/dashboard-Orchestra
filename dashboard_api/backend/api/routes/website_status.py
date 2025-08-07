@@ -1,10 +1,15 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
 import requests
+from api.utils.decorators import credits_required
 
+# Crear blueprint
 website_status_bp = Blueprint('website_status', __name__)
 
-@website_status_bp.route('/', methods=['POST'])
-def check_website_status():
+@website_status_bp.route('/check', methods=['POST'])
+@jwt_required()
+@credits_required(amount=1)
+def check_status():
     data = request.json
     domain = data.get('domain')
     if not domain:

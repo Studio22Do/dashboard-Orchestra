@@ -16,13 +16,15 @@ class User(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     plan = db.Column(db.String(20), default='basic')  # Plan del usuario: basic, pro, premium
     version = db.Column(db.String(20), default='beta_v1')  # Versión: beta_v1 o beta_v2
+    credits = db.Column(db.Integer, default=250)  # Créditos iniciales por defecto
     
-    def __init__(self, email, password, name, role='user', version='beta_v1'):
+    def __init__(self, email, password, name, role='user', version='beta_v1', credits=250):
         self.email = email
         self.password = password  # Utiliza el setter para hashear automáticamente
         self.name = name
         self.role = role
         self.version = version
+        self.credits = credits
     
     @property
     def password(self):
@@ -47,12 +49,29 @@ class User(db.Model):
             'role': self.role,
             'plan': self.plan,
             'version': self.version,
+            'credits': self.credits,  # Agregar esta línea
             'is_active': self.is_active,
             'created_at': self.created_at.isoformat() if self.created_at else None,
         }
     
     def __repr__(self):
         return f'<User {self.email}>'
+
+    def has_credits(self, amount=1):
+        """Verificar si el usuario tiene suficientes créditos"""
+        return self.credits >= amount
+
+    def deduct_credits(self, amount=1):
+        """Descontar créditos del usuario"""
+        if self.has_credits(amount):
+            self.credits -= amount
+            return True
+        return False
+
+    def add_credits(self, amount):
+        """Agregar créditos al usuario"""
+        self.credits += amount
+        return self.credits
 
 # Crear usuario de prueba para desarrollo
 def create_test_user():

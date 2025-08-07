@@ -70,6 +70,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks/reduxHooks';
 import { logoutUser, selectUser } from '../../redux/slices/authSlice';
 import { addNotification } from '../../redux/slices/uiSlice';
 import NotificationBell from '../NotificationBell/NotificationBell';
+import CreditsDisplay from '../CreditsDisplay/CreditsDisplay';
 
 // AppBar estilizado con colores del diseño
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -541,6 +542,7 @@ const Navbar = () => {
           </Box>
         </DynamicHeader>
         <IconGroup>
+          <CreditsDisplay />
           <NotificationBell />
           <IconButton 
             size="medium" 

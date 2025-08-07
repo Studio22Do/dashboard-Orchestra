@@ -1,10 +1,16 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
 import requests
+import os
+from api.utils.decorators import credits_required
 
+# Crear blueprint
 similarweb_bp = Blueprint('similarweb', __name__)
 
 @similarweb_bp.route('/insights', methods=['POST'])
-def get_similarweb_insights():
+@jwt_required()
+@credits_required(amount=1)
+def get_insights():
     data = request.json
     domain = data.get('domain')
     if not domain:

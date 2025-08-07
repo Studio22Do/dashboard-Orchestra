@@ -1,42 +1,34 @@
 """Módulo para humanización de texto AI"""
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
 import requests
 import os
 import logging
+from api.utils.decorators import credits_required
 
+# Configuración de logging
 logger = logging.getLogger(__name__)
 
+# Crear blueprint
 ai_humanizer_bp = Blueprint('ai_humanizer', __name__)
 
 @ai_humanizer_bp.route('/test', methods=['POST'])
 def ai_humanizer_test():
-    """Endpoint de prueba para verificar la funcionalidad del frontend"""
+    """Endpoint de prueba para AI Humanizer"""
     try:
-        data = request.json
-        text = data.get('text', 'Texto de prueba')
-        
-        # Simulamos una respuesta exitosa
-        result = {
-            "contenido_generado": f"Texto humanizado de prueba: {text} - Este es un ejemplo de cómo se vería el contenido procesado por la API de AI Humanizer.",
-            "metadatos": {
-                "tipo": "texto",
-                "idioma": "es",
-                "tono": "profesional",
-                "longitud": "media"
-            }
-        }
-        
-        logger.info("Endpoint de prueba de AI Humanizer ejecutado exitosamente")
-        return jsonify(result), 200
-        
+        return jsonify({
+            'message': 'AI Humanizer API funcionando correctamente',
+            'status': 'success'
+        }), 200
     except Exception as e:
-        logger.error(f"Error en endpoint de prueba de AI Humanizer: {str(e)}")
         return jsonify({
             'error': 'Error en el endpoint de prueba',
             'details': str(e)
         }), 500
 
 @ai_humanizer_bp.route('/', methods=['POST'])
+@jwt_required()
+@credits_required(amount=2)  # AI Humanizer cuesta 2 créditos
 def ai_humanizer():
     try:
         data = request.json
@@ -143,6 +135,8 @@ def ai_humanizer():
         }), 500
 
 @ai_humanizer_bp.route('/basic', methods=['POST'])
+@jwt_required()
+@credits_required(amount=1)  # AI Humanizer Basic cuesta 1 crédito
 def ai_humanizer_basic():
     """Endpoint para modo Basic que devuelve alternativas con scores"""
     try:
