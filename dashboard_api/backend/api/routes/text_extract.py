@@ -1,9 +1,13 @@
 from flask import Blueprint, request, jsonify, current_app
 import requests
+from flask_jwt_extended import jwt_required
+from api.utils.decorators import credits_required
 
 text_extract_bp = Blueprint('text_extract', __name__)
 
 @text_extract_bp.route('/extract', methods=['POST'])
+@jwt_required()
+@credits_required(amount=1)
 def extract_text():
     data = request.json
     url_to_extract = data.get('url')

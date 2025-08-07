@@ -9,6 +9,7 @@ class UserSchema(Schema):
     role = fields.Str(load_default='user', validate=validate.OneOf(['admin', 'user']))
     is_active = fields.Bool(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
+    credits = fields.Int(dump_only=True)  # Agregar campo credits
 
 class LoginSchema(Schema):
     """Esquema para validar datos de inicio de sesión"""

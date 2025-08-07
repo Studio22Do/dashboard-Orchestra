@@ -1,23 +1,27 @@
-import logging
 import requests
 from flask import Blueprint, jsonify, current_app, request
-from utils.decorators import handle_api_errors
+from flask_jwt_extended import jwt_required
+import os
+import logging
+from api.utils.decorators import credits_required
 
 logger = logging.getLogger(__name__)
 
+# Crear blueprint
 google_news_bp = Blueprint('google_news', __name__)
 
 def get_headers():
-    """Obtiene los headers necesarios para la API de Google News"""
+    """Obtiene los headers para la API de Google News"""
     return {
         "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
         "x-rapidapi-host": current_app.config['GOOGLE_NEWS_API_HOST']
     }
 
 def make_api_request(endpoint, params=None):
-    """Función auxiliar para hacer peticiones a la API de Google News"""
+    """Realiza una petición a la API de Google News"""
     try:
         url = f"{current_app.config['GOOGLE_NEWS_API_BASE_URL']}/{endpoint}"
+        params = params or {}
         headers = get_headers()
         
         logger.debug(f"Realizando petición a Google News API: {url}")
@@ -30,7 +34,6 @@ def make_api_request(endpoint, params=None):
         raise
 
 @google_news_bp.route('/latest', methods=['GET'])
-@handle_api_errors
 def get_latest_news():
     """Obtiene las últimas noticias"""
     lr = request.args.get('lr', current_app.config['GOOGLE_NEWS_DEFAULT_LANGUAGE'])
@@ -43,7 +46,6 @@ def get_latest_news():
         return jsonify({'error': 'Error al obtener las noticias'}), 500
 
 @google_news_bp.route('/world', methods=['GET'])
-@handle_api_errors
 def get_world_news():
     """Obtiene noticias mundiales"""
     lr = request.args.get('lr', current_app.config['GOOGLE_NEWS_DEFAULT_LANGUAGE'])
@@ -56,7 +58,6 @@ def get_world_news():
         return jsonify({'error': 'Error al obtener las noticias mundiales'}), 500
 
 @google_news_bp.route('/category/<category>', methods=['GET'])
-@handle_api_errors
 def get_category_news(category):
     """Obtiene noticias por categoría"""
     valid_categories = ['business', 'entertainment', 'health', 'science', 'sport', 'technology']
@@ -73,8 +74,9 @@ def get_category_news(category):
         logger.error(f"Error obteniendo noticias de {category}: {str(e)}")
         return jsonify({'error': f'Error al obtener las noticias de {category}'}), 500
 
-@google_news_bp.route('/search', methods=['GET'])
-@handle_api_errors
+@google_news_bp.route('/search', methods=['POST'])
+@jwt_required()
+@credits_required(amount=1)
 def search_news():
     """Busca noticias por palabra clave"""
     keyword = request.args.get('keyword')
@@ -91,7 +93,6 @@ def search_news():
         return jsonify({'error': 'Error en la búsqueda de noticias'}), 500
 
 @google_news_bp.route('/search/suggest', methods=['GET'])
-@handle_api_errors
 def get_search_suggestions():
     """Obtiene sugerencias de búsqueda"""
     keyword = request.args.get('keyword')
@@ -108,7 +109,6 @@ def get_search_suggestions():
         return jsonify({'error': 'Error al obtener sugerencias'}), 500
 
 @google_news_bp.route('/languages', methods=['GET'])
-@handle_api_errors
 def get_languages():
     """Obtiene los idiomas disponibles"""
     try:

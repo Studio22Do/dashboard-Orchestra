@@ -1,6 +1,9 @@
 from flask import Blueprint, request, jsonify, current_app
+from flask_jwt_extended import jwt_required
 import requests
 import logging
+import os
+from api.utils.decorators import credits_required
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +16,8 @@ def handle_options():
     return '', 200
 
 @seo_analyzer_bp.route('/analyze', methods=['POST'])
+@jwt_required()
+@credits_required(amount=1)
 def analyze_seo():
     """Analizar SEO de una URL usando la API de SEO Analyzer"""
     data = request.get_json()

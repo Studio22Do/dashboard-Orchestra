@@ -359,13 +359,29 @@ export const selectCanUseApp = (state, appId) => {
 };
 
 export const selectUserRequests = (state) => {
-  // TODO: Implementar lógica real de requests
-  // Por ahora, retornamos un valor falso para beta_v2
+  const user = state.auth.user;
   const mode = process.env.REACT_APP_MODE || 'beta_v1';
+  
+  // En beta_v1, requests ilimitados (demo)
   if (mode === 'beta_v1') {
-    return 999; // Requests ilimitados en demo
+    return 999;
   }
-  return 250; // Requests iniciales en beta_v2
+  
+  // En beta_v2, usar créditos del slice de créditos
+  if (mode === 'beta_v2') {
+    // Priorizar créditos del slice de créditos si está disponible
+    if (state.credits && state.credits.balance !== undefined) {
+      return state.credits.balance;
+    }
+    
+    // Fallback a créditos del usuario si están disponibles
+    if (user && user.credits !== undefined) {
+      return user.credits;
+    }
+  }
+  
+  // Fallback si no hay usuario o créditos
+  return 0;
 };
 
 export default appsSlice.reducer; 

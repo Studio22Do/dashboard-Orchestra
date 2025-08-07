@@ -6,6 +6,7 @@ import logging
 
 from api.utils.error_handlers import ValidationError
 from api.utils.rapidapi import get_rapidapi_headers, call_rapidapi
+from api.utils.decorators import credits_required
 
 # Configuración de logging
 logger = logging.getLogger(__name__)
@@ -40,6 +41,7 @@ def validate_username(username: str) -> None:
 # Rutas Premium API
 @instagram_bp.route('/profile/username', methods=['GET'])
 @jwt_required()
+@credits_required(amount=1)
 def get_profile_by_username():
     """Obtener perfil de Instagram por username usando la Premium API"""
     username = request.args.get('username')
@@ -54,6 +56,7 @@ def get_profile_by_username():
 
 @instagram_bp.route('/followers', methods=['GET'])
 @jwt_required()
+@credits_required(amount=1)
 def get_followers():
     """Obtener followers de un usuario de Instagram"""
     username = request.args.get('username')
@@ -69,6 +72,7 @@ def get_followers():
 
 @instagram_bp.route('/following', methods=['GET'])
 @jwt_required()
+@credits_required(amount=1)
 def get_following():
     """Obtener following de un usuario de Instagram"""
     username = request.args.get('username')
@@ -84,6 +88,7 @@ def get_following():
 
 @instagram_bp.route('/posts', methods=['GET'])
 @jwt_required()
+@credits_required(amount=1)
 def get_posts():
     """Obtener posts de un usuario de Instagram"""
     username = request.args.get('username')
