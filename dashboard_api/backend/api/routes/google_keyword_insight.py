@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify, current_app
 import requests
+from flask_jwt_extended import jwt_required
+from api.utils.decorators import credits_required
 
 keyword_insight_bp = Blueprint('keyword_insight', __name__)
 
@@ -11,7 +13,15 @@ ENDPOINTS = {
     'topkeys': 'topkeys/',
 }
 
+@keyword_insight_bp.route('', methods=['OPTIONS'])
+@keyword_insight_bp.route('/', methods=['OPTIONS'])
+def handle_options():
+    return '', 200
+
+@keyword_insight_bp.route('', methods=['POST'])
 @keyword_insight_bp.route('/', methods=['POST'])
+@jwt_required()
+@credits_required(amount=3)
 def keyword_insight():
     data = request.json
     endpoint = data.get('endpoint')
@@ -39,6 +49,7 @@ def keyword_insight():
         return jsonify({'error': 'Error de conexión con la API externa', 'details': str(err)}), 502
 
 @keyword_insight_bp.route('/locations', methods=['GET'])
+@jwt_required()
 def get_locations():
     url = "https://google-keyword-insight1.p.rapidapi.com/locations/"
     headers = {
@@ -53,6 +64,7 @@ def get_locations():
         return jsonify({'error': 'Error de conexión con la API externa', 'details': str(err)}), 502
 
 @keyword_insight_bp.route('/languages', methods=['GET'])
+@jwt_required()
 def get_languages():
     url = "https://google-keyword-insight1.p.rapidapi.com/languages/"
     headers = {
