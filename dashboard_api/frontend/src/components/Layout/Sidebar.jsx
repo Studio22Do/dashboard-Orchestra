@@ -145,26 +145,14 @@ const Sidebar = () => {
 
   // Cargar apps favoritas cuando se monta el sidebar
   useEffect(() => {
-    console.log('Cargando apps favoritas desde Sidebar...');
     dispatch(fetchFavoriteApps());
   }, [dispatch]);
-
-  // Debug: mostrar información de las apps favoritas
-  useEffect(() => {
-    console.log('Sidebar - Favorite apps:', favoriteApps);
-    console.log('Sidebar - Favorite apps length:', favoriteApps.length);
-    if (favoriteApps.length > 0) {
-      console.log('Sidebar - Favorite apps IDs:', favoriteApps.map(app => app.app_id || app.id));
-    }
-  }, [favoriteApps]);
 
   // Remover duplicados basándose en app_id o id
   const uniqueFavoriteApps = favoriteApps.filter((app, index, self) => {
     const appId = app.app_id || app.id;
     return index === self.findIndex(a => (a.app_id || a.id) === appId);
   });
-
-  console.log('Sidebar - Unique favorite apps:', uniqueFavoriteApps.length);
 
   return (
     <StyledDrawer variant="permanent">

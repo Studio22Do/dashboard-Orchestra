@@ -12,17 +12,46 @@ const TEST_CREDENTIALS = {
   password: 'test123',
 };
 
-// Estado inicial
-const initialState = {
-  user: null,
-  token: "null", // Token falso para desarrollo
-  isAuthenticated: false, // Siempre autenticado para desarrollo
-  loading: false,
-  error: null,
-  passwordChangeSuccess: false,
-  registrationSuccess: false,
-  emailVerificationSent: false,
+// Función para verificar si un token JWT ha expirado
+const isTokenExpired = (token) => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const now = Math.floor(Date.now() / 1000);
+    return payload.exp < now;
+  } catch (error) {
+    return true; // Si hay error al decodificar, considerar como expirado
+  }
 };
+
+// Función para verificar si hay un token válido en localStorage
+const getInitialAuthState = () => {
+  const token = localStorage.getItem('token');
+  if (token && !isTokenExpired(token)) {
+    return {
+      user: null,
+      token: token,
+      isAuthenticated: true,
+      loading: false,
+      error: null,
+      passwordChangeSuccess: false,
+      registrationSuccess: false,
+      emailVerificationSent: false,
+    };
+  }
+  return {
+    user: null,
+    token: null,
+    isAuthenticated: false,
+    loading: false,
+    error: null,
+    passwordChangeSuccess: false,
+    registrationSuccess: false,
+    emailVerificationSent: false,
+  };
+};
+
+// Estado inicial
+const initialState = getInitialAuthState();
 
 // Configuración de axios con token
 const setAuthToken = (token) => {
@@ -32,6 +61,12 @@ const setAuthToken = (token) => {
     delete axios.defaults.headers.common['Authorization'];
   }
 };
+
+// Configurar token inicial si existe
+const initialToken = localStorage.getItem('token');
+if (initialToken && !isTokenExpired(initialToken)) {
+  setAuthToken(initialToken);
+}
 
 // Acciones asíncronas
 export const loginUser = createAsyncThunk(
