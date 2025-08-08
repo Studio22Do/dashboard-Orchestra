@@ -39,7 +39,8 @@ import {
   Settings,
   PhotoCamera,
   Psychology,
-  Dns
+  Dns,
+  QrCode
 } from '@mui/icons-material';
 import AppDetailDrawer from '../../components/AppDetailDrawer/AppDetailDrawer';
 import AppSearchHeader from '../../components/app-search/AppSearchHeader';
@@ -317,6 +318,23 @@ const Dashboard = () => {
       title: 'Web & SEO',
       icon: Language,
       tools: [
+        {
+          id: 'qr-generator',
+          title: 'QR Code Generator',
+          icon: QrCode,
+          onClick: () => {
+            setSelectedApp({
+              id: 'qr-generator',
+              title: 'QR Code Generator',
+              description: 'Genera códigos QR personalizables (PNG/JPEG/SVG) para texto, URL, WiFi, email, SMS y más',
+              imageUrl: 'https://placehold.co/800x400/1a1a1a/ffffff?text=QR+Code+Generator',
+              category: 'Web & SEO',
+              route: '/apps/qr-generator',
+              apiName: 'QRCode Smart Generator'
+            });
+            setDrawerOpen(true);
+          }
+        },
         {
           id: 'seo-analyzer',
           title: 'SEO Analyzer',

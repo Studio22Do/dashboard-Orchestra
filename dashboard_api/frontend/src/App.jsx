@@ -49,6 +49,7 @@ import PRLabsChatbot from './pages/PRLabs/Chatbot';
 import PRLabsTools from './pages/PRLabs/Tools';
 import WhoisLookup from './pages/WhoisLookup/WhoisLookup';
 import SpeechToTextAI from './pages/SpeechToTextAI/SpeechToTextAI';
+import QRCodeGenerator from './pages/QRCodeGenerator/QRCodeGenerator';
 
 // Theme configuration function
 const createAppTheme = (mode) => createTheme({
@@ -307,6 +308,12 @@ function App() {
           <Route path="/apps/website-status" element={
             <ProtectedRoute>
               <WebsiteStatus />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/apps/qr-generator" element={
+            <ProtectedRoute>
+              <QRCodeGenerator />
             </ProtectedRoute>
           } />
 
