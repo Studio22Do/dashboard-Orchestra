@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required
 import requests
 import os
@@ -31,7 +31,13 @@ def get_insights():
     except requests.exceptions.RequestException as err:
         return jsonify({'error': 'Error de conexión con la API externa', 'details': str(err)}), 502 
 
+@similarweb_bp.route('/website-details', methods=['OPTIONS'])
+def website_details_options():
+    return '', 200
+
 @similarweb_bp.route('/website-details', methods=['GET'])
+@jwt_required()
+@credits_required(amount=1)
 def get_website_details():
     domain = request.args.get('domain')
     if not domain:
@@ -46,6 +52,9 @@ def get_website_details():
     try:
         response = requests.get(url, headers=headers, params=params, timeout=20)
         response.raise_for_status()
+        # Manejar caso de HTML devuelto por error/protección
+        if 'text/html' in response.headers.get('content-type', ''):
+            return jsonify({'error': 'La API devolvió HTML (posible bloqueo o parámetros inválidos).', 'details': response.text[:200]}), 502
         return jsonify(response.json()), 200
     except requests.exceptions.HTTPError as errh:
         return jsonify({'error': str(errh), 'details': response.text}), response.status_code

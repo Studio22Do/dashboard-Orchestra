@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { 
   Container, 
   Typography, 
@@ -34,6 +35,7 @@ import {
 } from '@mui/icons-material';
 
 const ProductDescriptionGenerator = () => {
+  const token = useSelector((state) => state.auth.token);
   const [productData, setProductData] = useState({
     name: '',
     category: '',
@@ -75,7 +77,10 @@ const ProductDescriptionGenerator = () => {
       const description = `${productData.category}, precio: ${productData.price}. ${productData.features}`;
       const response = await fetch(`${API_BASE_URL}/generate`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ language, name, description })
       });
       const data = await response.json();

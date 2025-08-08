@@ -13,12 +13,15 @@ import {
   Paper
 } from '@mui/material';
 import { Public, CheckCircle, Cancel } from '@mui/icons-material';
+import { useAppDispatch } from '../../redux/hooks/reduxHooks';
+import { setBalance } from '../../redux/slices/creditsSlice';
 
 const WebsiteStatus = () => {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [statusData, setStatusData] = useState(null);
+  const dispatch = useAppDispatch();
 
   const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
   const API_BASE_URL = `/api/${API_MODE}/website-status`;
@@ -34,9 +37,12 @@ const WebsiteStatus = () => {
     setStatusData(null);
     try {
       let domain = url.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
-      const response = await fetch(`${API_BASE_URL}`, {
+      const response = await fetch(`${API_BASE_URL}/check`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('token') ? { 'Authorization': `Bearer ${localStorage.getItem('token')}` } : {})
+        },
         body: JSON.stringify({ domain })
       });
       const data = await response.json();
@@ -46,6 +52,9 @@ const WebsiteStatus = () => {
         return;
       }
       setStatusData(data);
+      if (data && data.credits_info && typeof data.credits_info.remaining === 'number') {
+        dispatch(setBalance(data.credits_info.remaining));
+      }
     } catch (err) {
       setError(err.message || 'Error al verificar el estado del sitio');
     } finally {

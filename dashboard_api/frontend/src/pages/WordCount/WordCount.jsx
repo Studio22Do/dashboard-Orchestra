@@ -40,7 +40,7 @@ const WordCount = () => {
   const [extracting, setExtracting] = useState(false);
 
   const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
-  const API_BASE_URL = `${APP_CONFIG.API_URL}/${API_MODE}`;
+  const API_BASE_URL = `${APP_CONFIG.API_URL}/api/${API_MODE}`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,35 +56,77 @@ const WordCount = () => {
     try {
       // Aquí irá la lógica de la API cuando esté disponible
       // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const words = text.trim().split(/\s+/);
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Tokenización básica (incluye acentos)
+      const wordMatches = text.toLowerCase().match(/[\p{L}\p{M}']+/gu) || [];
+      const words = wordMatches.filter(Boolean);
       const characters = text.length;
-      const sentences = text.split(/[.!?]+/).filter(Boolean);
+      const sentences = (text.match(/[^.!?\n]+[.!?\n]+/g) || []).map(s => s.trim()).filter(Boolean);
       const paragraphs = text.split(/\n\s*\n/).filter(Boolean);
-      const uniqueWords = new Set(words.map(word => word.toLowerCase())).size;
-      
-      // Calcular tiempo de lectura (palabras por minuto)
+      const uniqueWords = new Set(words).size;
+
+      // Tiempo de lectura (palabras por minuto)
       const wordsPerMinute = 200;
-      const readingTime = Math.ceil(words.length / wordsPerMinute);
-      
-      // Calcular densidad de palabras clave
-      const wordFrequency = {};
-      words.forEach(word => {
-        const cleanWord = word.toLowerCase().replace(/[.,!?]/g, '');
-        if (cleanWord.length > 3) { // Ignorar palabras cortas
-          wordFrequency[cleanWord] = (wordFrequency[cleanWord] || 0) + 1;
-        }
-      });
-      
-      const topKeywords = Object.entries(wordFrequency)
-        .sort(([,a], [,b]) => b - a)
+      const readingTime = Math.ceil((words.length || 0) / wordsPerMinute);
+
+      // Conteo aproximado de sílabas (agrupaciones de vocales)
+      const vowelsRe = /[aeiouáéíóúü]+/gi;
+      const countSyllablesInWord = (w) => {
+        const matches = (w.normalize('NFC').match(vowelsRe) || []).length;
+        return Math.max(matches, 1);
+      };
+      const totalSyllables = words.reduce((sum, w) => sum + countSyllablesInWord(w), 0);
+
+      const wordsCount = Math.max(words.length, 1);
+      const sentencesCount = Math.max(sentences.length || 1, 1);
+      const syllablesPerWord = totalSyllables / wordsCount;
+      const wordsPerSentence = wordsCount / sentencesCount;
+
+      // Índices de legibilidad en español
+      const fernandezHuerta = Number((206.84 - 0.60 * (syllablesPerWord * 100) - 1.02 * wordsPerSentence).toFixed(2));
+      const szigrisztPazos = Number((206.835 - 62.3 * syllablesPerWord - wordsPerSentence).toFixed(2));
+      const gutierrezPolini = Number((95.2 - 9.7 * syllablesPerWord - 0.35 * wordsPerSentence).toFixed(2));
+
+      // Detección muy simple de idioma (ES) por stopwords
+      const esStop = new Set(['de','la','que','el','en','y','a','los','se','del','las','por','un','para','con','no','una','su','al','lo','como','más','pero','sus','le','ya','o','fue','este','ha','sí','porque','esta','son','entre','cuando','muy','sin','sobre','también','me','hasta','hay','donde','quien','desde','todo','nos','durante','todos','uno','les','ni','contra','otros','ese','eso','ante','ellos','e','esto','mi','antes','algunos','qué','unos','yo','otro','otras','otra','él']);
+      const stopCount = words.reduce((acc, w) => acc + (esStop.has(w) ? 1 : 0), 0);
+      const stopRatio = words.length ? stopCount / words.length : 0;
+      const detectedLang = stopRatio > 0.2 ? 'es' : 'desconocido';
+
+      // Densidad de palabras clave y n-gramas (ignorando stopwords y palabras cortas)
+      const validForKeywords = (w) => w.length > 3 && !esStop.has(w);
+      const filtered = words.filter(validForKeywords);
+      const freq = {};
+      filtered.forEach(w => { freq[w] = (freq[w] || 0) + 1; });
+      const topKeywords = Object.entries(freq)
+        .sort(([, a], [, b]) => b - a)
         .slice(0, 5)
-        .map(([word, count]) => ({
-          word,
-          count,
-          percentage: ((count / words.length) * 100).toFixed(1)
-        }));
+        .map(([word, count]) => ({ word, count, percentage: ((count / Math.max(filtered.length, 1)) * 100).toFixed(1) }));
+
+      const buildNgrams = (arr, n) => {
+        const map = {};
+        for (let i = 0; i <= arr.length - n; i += 1) {
+          const slice = arr.slice(i, i + n);
+          // descartar n-gramas si todos son stopwords
+          if (slice.every(w => esStop.has(w))) continue;
+          const key = slice.join(' ');
+          map[key] = (map[key] || 0) + 1;
+        }
+        return Object.entries(map).sort(([, a], [, b]) => b - a).slice(0, 5)
+          .map(([gram, count]) => ({ gram, count }));
+      };
+      const ngrams = {
+        unigrams: buildNgrams(filtered, 1).map(({ gram, count }) => ({ gram, count })),
+        bigrams: buildNgrams(filtered, 2),
+        trigrams: buildNgrams(filtered, 3)
+      };
+
+      // Oraciones cortas y largas
+      const sentenceLengths = sentences.map(s => (s.toLowerCase().match(/[\p{L}\p{M}']+/gu) || []).length);
+      const shortCount = sentenceLengths.filter(l => l > 0 && l < 10).length;
+      const longCount = sentenceLengths.filter(l => l > 25).length;
+      const avgSentenceLen = sentenceLengths.length ? (sentenceLengths.reduce((a, b) => a + b, 0) / sentenceLengths.length) : 0;
 
       setAnalysis({
         basic: {
@@ -100,6 +142,23 @@ const WordCount = () => {
           averageWordsPerSentence: (words.length / sentences.length).toFixed(1),
           averageCharactersPerWord: (characters / words.length).toFixed(1),
           uniqueWordPercentage: ((uniqueWords / words.length) * 100).toFixed(1)
+        },
+        readabilityES: {
+          fernandezHuerta,
+          szigrisztPazos,
+          gutierrezPolini,
+          syllablesPerWord: Number(syllablesPerWord.toFixed(2)),
+          wordsPerSentence: Number(wordsPerSentence.toFixed(2))
+        },
+        language: {
+          detected: detectedLang,
+          stopwordRatio: Number((stopRatio * 100).toFixed(1))
+        },
+        ngrams,
+        sentencesInfo: {
+          averageLength: Number(avgSentenceLen.toFixed(1)),
+          shortCount,
+          longCount
         }
       });
     } catch (err) {
@@ -132,7 +191,10 @@ const WordCount = () => {
     setExtracting(true);
     setError(null);
     try {
-      const response = await axios.post(`${API_BASE_URL}/text-extract/extract`, { url });
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${API_BASE_URL}/text-extract/extract`, { url }, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
       if (response.data && response.data.text) {
         setText(response.data.text);
       } else if (typeof response.data === 'string') {
@@ -370,6 +432,86 @@ const WordCount = () => {
                         secondary={`${analysis.readability.uniqueWordPercentage}%`} 
                       />
                     </ListItem>
+                    <Divider />
+                    <ListItem>
+                      <ListItemIcon>
+                        <Speed />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Fernández‑Huerta" 
+                        secondary={analysis.readabilityES.fernandezHuerta} 
+                      />
+                    </ListItem>
+                    <Divider />
+                    <ListItem>
+                      <ListItemIcon>
+                        <Speed />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Szigriszt‑Pazos" 
+                        secondary={analysis.readabilityES.szigrisztPazos} 
+                      />
+                    </ListItem>
+                    <Divider />
+                    <ListItem>
+                      <ListItemIcon>
+                        <Speed />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Gutiérrez‑Polini" 
+                        secondary={analysis.readabilityES.gutierrezPolini} 
+                      />
+                    </ListItem>
+                    <Divider />
+                    <ListItem>
+                      <ListItemIcon>
+                        <Speed />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Sílabas por Palabra / Palabras por Oración" 
+                        secondary={`${analysis.readabilityES.syllablesPerWord} / ${analysis.readabilityES.wordsPerSentence}`} 
+                      />
+                    </ListItem>
+                  </List>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    N‑gramas frecuentes
+                  </Typography>
+                  <Typography variant="subtitle2">Bigrams</Typography>
+                  <List>
+                    {analysis.ngrams.bigrams.map((b, idx) => (
+                      <ListItem key={idx}><ListItemText primary={b.gram} secondary={`${b.count} ocurrencias`} /></ListItem>
+                    ))}
+                  </List>
+                  <Divider />
+                  <Typography variant="subtitle2">Trigrams</Typography>
+                  <List>
+                    {analysis.ngrams.trigrams.map((t, idx) => (
+                      <ListItem key={idx}><ListItemText primary={t.gram} secondary={`${t.count} ocurrencias`} /></ListItem>
+                    ))}
+                  </List>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    Oraciones
+                  </Typography>
+                  <List>
+                    <ListItem><ListItemText primary="Longitud promedio" secondary={analysis.sentencesInfo.averageLength} /></ListItem>
+                    <Divider />
+                    <ListItem><ListItemText primary="Oraciones cortas (&lt;10 palabras)" secondary={analysis.sentencesInfo.shortCount} /></ListItem>
+                    <Divider />
+                    <ListItem><ListItemText primary="Oraciones largas (&gt;25 palabras)" secondary={analysis.sentencesInfo.longCount} /></ListItem>
                   </List>
                 </CardContent>
               </Card>

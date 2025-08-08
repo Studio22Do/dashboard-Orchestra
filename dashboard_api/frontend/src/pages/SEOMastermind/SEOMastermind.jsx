@@ -38,6 +38,7 @@ import {
 } from '@mui/icons-material';
 import { useAppDispatch } from '../../redux/hooks/reduxHooks';
 import { addNotification } from '../../redux/slices/uiSlice';
+import { setBalance } from '../../redux/slices/creditsSlice';
 import { APP_CONFIG } from '../../config/constants';
 
 // Componentes estilizados mejorados
@@ -157,10 +158,12 @@ const SEOMastermind = () => {
       const apiUrl = `${API_BASE_URL}`;
       console.log('Llamando a la API:', apiUrl);
 
+      const token = localStorage.getItem('token');
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify({ keyword })
       });
@@ -172,6 +175,11 @@ const SEOMastermind = () => {
 
       const data = await response.json();
       setKeywordData(data);
+
+      // Actualizar créditos si viene información del decorador
+      if (data && data.credits_info && typeof data.credits_info.remaining === 'number') {
+        dispatch(setBalance(data.credits_info.remaining));
+      }
 
       dispatch(addNotification({
         message: 'Análisis de keywords completado exitosamente',

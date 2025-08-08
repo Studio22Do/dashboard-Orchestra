@@ -12,13 +12,9 @@ const canUseApp = (user, mode) => {
     return true;
   }
   
-  // En beta_v2, verificar requests disponibles
+  // En beta_v2, TODAS las apps visibles se pueden abrir
+  // La limitación corre por puntos/créditos en cada endpoint (decoradores)
   if (mode === 'beta_v2') {
-    // Si no hay usuario, no puede usar
-    if (!user) return false;
-    
-    // Por ahora, asumimos que tiene requests disponibles
-    // TODO: Implementar lógica real de requests
     return true;
   }
   
@@ -203,7 +199,7 @@ export const fetchApps = createAsyncThunk(
       }
       
       // Extraer categorías únicas de las apps reales
-      const categories = ['All', ...Array.from(new Set(response.data.apps.map(app => app.category)))];
+      const categories = ['All', ...Array.from(new Set(response.data.apps.map(app => app.category)))]
       
       return { apps: response.data.apps, categories };
     } catch (error) {

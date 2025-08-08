@@ -9,7 +9,6 @@ import EmailVerification from './pages/Login/EmailVerification';
 import AppCatalog from './pages/AppCatalog/AppCatalog';
 import InstagramStats from './pages/InstagramStats/InstagramStats';
 import InstagramRealtime from './pages/InstagramRealtime';
-
 import GoogleNews from './pages/GoogleNews/GoogleNews';
 import Dashboard from './pages/Dashboard/Dashboard';
 import NotificationManager from './components/Notifications/NotificationManager';
@@ -49,6 +48,7 @@ import PRLabsChatbot from './pages/PRLabs/Chatbot';
 import PRLabsTools from './pages/PRLabs/Tools';
 import WhoisLookup from './pages/WhoisLookup/WhoisLookup';
 import SpeechToTextAI from './pages/SpeechToTextAI/SpeechToTextAI';
+import QRCodeGenerator from './pages/QRCodeGenerator/QRCodeGenerator';
 
 // Theme configuration function
 const createAppTheme = (mode) => createTheme({
@@ -217,6 +217,10 @@ function App() {
   
   // Verificar token al inicializar la aplicación
   useEffect(() => {
+
+    // Establecer autenticación a true aunque no haya token
+      dispatch(setAuth(true));
+
     const token = localStorage.getItem('token');
     
     if (token && !isTokenExpired(token)) {
@@ -328,6 +332,12 @@ function App() {
           <Route path="/apps/website-status" element={
             <ProtectedRoute>
               <WebsiteStatus />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/apps/qr-generator" element={
+            <ProtectedRoute>
+              <QRCodeGenerator />
             </ProtectedRoute>
           } />
 

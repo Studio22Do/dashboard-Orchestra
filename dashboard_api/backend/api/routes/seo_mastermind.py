@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify, current_app
 import requests
+from flask_jwt_extended import jwt_required
+from api.utils.decorators import credits_required
 
 seo_mastermind_bp = Blueprint('seo_mastermind', __name__)
 
@@ -11,6 +13,8 @@ def handle_options():
 
 @seo_mastermind_bp.route('', methods=['POST'])
 @seo_mastermind_bp.route('/', methods=['POST'])
+@jwt_required()
+@credits_required(amount=2)
 def generate_seo():
     """Generar análisis SEO para una keyword"""
     data = request.json

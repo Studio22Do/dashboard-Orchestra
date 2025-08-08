@@ -27,12 +27,15 @@ import {
   Storage,
   Language
 } from '@mui/icons-material';
+import { useAppDispatch } from '../../redux/hooks/reduxHooks';
+import { setBalance } from '../../redux/slices/creditsSlice';
 
 const DomainMetrics = () => {
   const [domain, setDomain] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [metricsData, setMetricsData] = useState(null);
+  const dispatch = useAppDispatch();
 
   const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
   const API_BASE_URL = `/api/${API_MODE}/domain-metrics`;
@@ -47,14 +50,21 @@ const DomainMetrics = () => {
     setError(null);
     setMetricsData(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/`, {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ domain })
       });
       const data = await response.json();
       setMetricsData(data);
       console.log('Domain Metrics API response (frontend):', data);
+      if (data && data.credits_info && typeof data.credits_info.remaining === 'number') {
+        dispatch(setBalance(data.credits_info.remaining));
+      }
       if (!response.ok || data.error) {
         setError(data.error || 'Error al analizar el dominio');
         setLoading(false);

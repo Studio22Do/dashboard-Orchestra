@@ -143,9 +143,13 @@ const GoogleKeywordInsights = () => {
         keyword
       };
       
+      const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify(payload)
       });
 
@@ -170,6 +174,16 @@ const GoogleKeywordInsights = () => {
       }));
 
       setKeywordData(mappedData);
+      try {
+        const { default: store } = await import('../../redux/store');
+        const { setBalance, fetchCreditsBalance } = await import('../../redux/slices/creditsSlice');
+        if (data && data.credits_info && typeof data.credits_info.remaining === 'number') {
+          store.dispatch(setBalance(data.credits_info.remaining));
+        } else {
+          // Si el backend no pudo adjuntar credits_info (respuesta tipo lista), refrescar saldo
+          store.dispatch(fetchCreditsBalance());
+        }
+      } catch {}
     } catch (err) {
       console.error('Error en la llamada:', err);
       setError(err.message);

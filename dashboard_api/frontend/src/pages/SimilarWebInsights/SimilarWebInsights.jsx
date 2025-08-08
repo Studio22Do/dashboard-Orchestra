@@ -56,16 +56,30 @@ const SimilarWebInsights = () => {
         // Si no es una URL válida, usar el texto tal cual
       }
       // 1. Obtener detalles del sitio
+      const token = localStorage.getItem('token');
       const detailsRes = await fetch(`${API_BASE_URL}/website-details?domain=${encodeURIComponent(domain)}`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
       });
       const detailsData = await detailsRes.json();
       setWebsiteDetails(detailsData);
+      try {
+        const { default: store } = await import('../../redux/store');
+        const { setBalance, fetchCreditsBalance } = await import('../../redux/slices/creditsSlice');
+        if (detailsData && detailsData.credits_info && typeof detailsData.credits_info.remaining === 'number') {
+          store.dispatch(setBalance(detailsData.credits_info.remaining));
+        }
+      } catch {}
       // 2. Obtener insights
       const response = await fetch(`${API_BASE_URL}/insights`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ domain })
       });
       const data = await response.json();
@@ -74,6 +88,17 @@ const SimilarWebInsights = () => {
         setLoading(false);
         return;
       }
+      // Actualizar créditos si llega credits_info; si no, refrescar saldo por si el descuento ocurrió en el backend
+      try {
+        const { default: store } = await import('../../redux/store');
+        const { setBalance, fetchCreditsBalance } = await import('../../redux/slices/creditsSlice');
+        if (data && data.credits_info && typeof data.credits_info.remaining === 'number') {
+          store.dispatch(setBalance(data.credits_info.remaining));
+        } else {
+          store.dispatch(fetchCreditsBalance());
+        }
+      } catch {}
+
       // Mapear la respuesta real a la estructura de insightsData para la UI
       const visits = data.Traffic?.Visits;
       const totalVisits = visits ? Object.values(visits).slice(-1)[0] : 'N/A';

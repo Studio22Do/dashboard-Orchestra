@@ -44,6 +44,18 @@ export const PR_LABS_CONFIG = {
     },
   ],
 
+  COSTS: {
+    CHAT: {
+      BASE: 1,
+      PREMIUM: 2,
+      VISION_EXTRA: 1,
+      PREMIUM_MODELS: ['gpt-4', 'gpt-4o', 'deepseek-r1', 'o3-mini']
+    },
+    IMAGE: 3,
+    VOICE: 2,
+    TEXT: 1
+  },
+
   API_CONFIG: {
     BASE_URL: 'https://chatgpt-42.p.rapidapi.com',
     HEADERS: {
@@ -52,4 +64,11 @@ export const PR_LABS_CONFIG = {
       'Content-Type': 'application/json'
     }
   }
+};
+
+export const getChatCost = (model = 'gpt-4o-mini', hasImage = false) => {
+  const { CHAT } = PR_LABS_CONFIG.COSTS;
+  const isPremium = CHAT.PREMIUM_MODELS.includes(model.toLowerCase());
+  const base = isPremium ? CHAT.PREMIUM : CHAT.BASE;
+  return base + (hasImage ? CHAT.VISION_EXTRA : 0);
 }; 

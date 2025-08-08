@@ -1,10 +1,18 @@
 from flask import Blueprint, request, jsonify, current_app
+from flask_jwt_extended import jwt_required
 import requests
 from api.utils.decorators import credits_required
 
 domain_metrics_bp = Blueprint('domain_metrics', __name__)
 
+@domain_metrics_bp.route('', methods=['OPTIONS'])
+@domain_metrics_bp.route('/', methods=['OPTIONS'])
+def handle_options():
+    return '', 200
+
+@domain_metrics_bp.route('', methods=['POST'])
 @domain_metrics_bp.route('/', methods=['POST'])
+@jwt_required()
 @credits_required(amount=1)
 def domain_metrics():
     data = request.json

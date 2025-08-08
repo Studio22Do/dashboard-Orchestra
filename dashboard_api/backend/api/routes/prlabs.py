@@ -1,11 +1,24 @@
 from flask import Blueprint, request, jsonify, current_app, Response
 import requests
 from flask_jwt_extended import jwt_required
+from api.utils.decorators import credits_required
+from api.utils.credits_config import compute_prlabs_chat_cost, has_image_from_payload
 
 prlabs_bp = Blueprint('prlabs', __name__)
 
+@prlabs_bp.before_request
+def debug_prlabs_headers():
+    try:
+        print("[PRLABS/DEBUG] Method:", request.method)
+        print("[PRLABS/DEBUG] Path:", request.path)
+        print("[PRLABS/DEBUG] Authorization:", request.headers.get('Authorization'))
+        print("[PRLABS/DEBUG] Content-Type:", request.headers.get('Content-Type'))
+    except Exception as e:
+        print("[PRLABS/DEBUG] Error leyendo headers:", e)
+
 @prlabs_bp.route('/chat', methods=['POST'])
-# @jwt_required()
+@jwt_required()
+@credits_required(amount=lambda: compute_prlabs_chat_cost(request.json.get('model'), has_image_from_payload(request.json)))
 def chat():
     """Endpoint para el chat con diferentes modelos de IA"""
     try:
@@ -38,10 +51,15 @@ def chat():
         return jsonify({'error': 'Error al procesar la solicitud', 'details': str(err)}), 500
 
 @prlabs_bp.route('/image', methods=['POST'])
-# @jwt_required()
+@jwt_required()
+@credits_required(amount=3)
 def generate_image():
     """Endpoint para generar imágenes con IA usando chatgpt-42.p.rapidapi.com/texttoimage o texttoimage3"""
     try:
+        # Debug headers de la solicitud entrante (para 401)
+        print("[PRLABS/IMAGE] Request headers:", dict(request.headers))
+        print("[PRLABS/IMAGE] Authorization header:", request.headers.get('Authorization'))
+
         data = request.json
         print("[PRLABS/IMAGE] Payload recibido:", data)
         text = data.get('text') or data.get('prompt')
@@ -95,10 +113,15 @@ def generate_image():
         return jsonify({'error': 'Error al procesar la solicitud', 'details': str(err)}), 500
 
 @prlabs_bp.route('/voice', methods=['POST'])
-# @jwt_required()
+@jwt_required()
+@credits_required(amount=2)
 def text_to_speech():
     """Endpoint para convertir texto a voz usando OpenAI TTS"""
     try:
+        # Debug headers de la solicitud entrante (para 401)
+        print("[PRLABS/VOICE] Request headers:", dict(request.headers))
+        print("[PRLABS/VOICE] Authorization header:", request.headers.get('Authorization'))
+
         data = request.json
         print("[PRLABS/VOICE] Payload recibido:", data)
         text = data.get('text')
@@ -149,7 +172,8 @@ def text_to_speech():
         return jsonify({'error': 'Error al procesar la solicitud', 'details': str(err)}), 500
 
 @prlabs_bp.route('/text', methods=['POST'])
-# @jwt_required()
+@jwt_required()
+@credits_required(amount=1)
 def text_generation():
     """Endpoint para generar texto con diferentes modelos"""
     try:
