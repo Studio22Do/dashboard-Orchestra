@@ -11,12 +11,16 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Grid
+  Grid,
+  Chip,
+  Tooltip
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Send as SendIcon, ArrowBack } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { PR_LABS_CONFIG } from '../../config/prlabs';
+import { PR_LABS_CONFIG, getChatCost } from '../../config/prlabs';
+import { useDispatch } from 'react-redux';
+import { setBalance } from '../../redux/slices/creditsSlice';
 
 const ChatContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(4),
@@ -51,8 +55,19 @@ const InputContainer = styled(Box)(({ theme }) => ({
   borderTop: `1px solid ${theme.palette.divider}`,
 }));
 
+const isTokenExpired = (token) => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const now = Math.floor(Date.now() / 1000);
+    return payload.exp && payload.exp <= now;
+  } catch {
+    return true;
+  }
+};
+
 const PRLabsChat = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
@@ -68,6 +83,14 @@ const PRLabsChat = () => {
   const handleSend = async () => {
     if (!message.trim()) return;
 
+    const token = localStorage.getItem('token');
+    if (!token || isTokenExpired(token)) {
+      // Evitar llamadas 401 y guiar al usuario
+      console.warn('[CHAT] Token ausente o expirado');
+      alert('Tu sesión ha expirado. Inicia sesión nuevamente para continuar.');
+      return;
+    }
+
     const userMessage = {
       content: message,
       isUser: true,
@@ -79,14 +102,13 @@ const PRLabsChat = () => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
       const API_VERSION = 'beta_v2'; // O usa la variable dinámica que manejes en tu app
       const API_BASE_URL = `/api/${API_VERSION}/prlabs`;
       const response = await fetch(`${API_BASE_URL}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           prompt: message,
@@ -94,10 +116,19 @@ const PRLabsChat = () => {
         })
       });
 
+      if (response.status === 401) {
+        alert('Sesión expirada (401). Inicia sesión nuevamente.');
+        return;
+      }
+
       const data = await response.json();
+      // Actualizar créditos si viene en la respuesta
+      if (data && data.credits_info && typeof data.credits_info.remaining === 'number') {
+        dispatch(setBalance(data.credits_info.remaining));
+      }
       
       const aiMessage = {
-        content: data.choices[0].message.content,
+        content: data.choices?.[0]?.message?.content || 'Respuesta recibida',
         isUser: false,
         timestamp: new Date().toISOString()
       };
@@ -105,11 +136,12 @@ const PRLabsChat = () => {
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
       console.error('Error:', error);
-      // Manejar el error apropiadamente
     } finally {
       setLoading(false);
     }
   };
+
+  const currentCost = getChatCost(selectedModel, false);
 
   return (
     <ChatContainer maxWidth="lg">
@@ -126,20 +158,25 @@ const PRLabsChat = () => {
             Interactúa con diferentes modelos de IA
           </Typography>
         </Box>
-        <FormControl variant="outlined" size="small" sx={{ minWidth: 200 }}>
-          <InputLabel>Modelo</InputLabel>
-          <Select
-            value={selectedModel}
-            onChange={(e) => setSelectedModel(e.target.value)}
-            label="Modelo"
-          >
-            {PR_LABS_CONFIG.FEATURES.find(f => f.id === 'chat-models').models.map(model => (
-              <MenuItem key={model} value={model}>
-                {model.toUpperCase()}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Box display="flex" alignItems="center" gap={2}>
+          <FormControl variant="outlined" size="small" sx={{ minWidth: 200 }}>
+            <InputLabel>Modelo</InputLabel>
+            <Select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              label="Modelo"
+            >
+              {PR_LABS_CONFIG.FEATURES.find(f => f.id === 'chat-models').models.map(model => (
+                <MenuItem key={model} value={model}>
+                  {model.toUpperCase()}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Tooltip title="Puntos por mensaje (éxito). Algunos modelos premium cuestan 2 puntos.">
+            <Chip color="secondary" label={`Puntos: ${currentCost}`} />
+          </Tooltip>
+        </Box>
       </Box>
 
       {/* Messages */}

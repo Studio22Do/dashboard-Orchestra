@@ -59,6 +59,28 @@ CREDITS_COST = {
     'mediafy_api': 1,
 }
 
+# ===== Helpers dinámicos PRLABS =====
+PRLABS_PREMIUM_MODELS = {'gpt-4', 'gpt-4o', 'deepseek-r1', 'o3-mini'}
+
+
+def compute_prlabs_chat_cost(model: str | None, has_image: bool = False) -> int:
+    """Calcula el costo de chat según modelo y si incluye imagen.
+    - Económicos: 1 punto (por defecto)
+    - Premium: 2 puntos
+    - Con visión: +1 punto adicional
+    """
+    model_lc = (model or '').lower()
+    base = 2 if model_lc in PRLABS_PREMIUM_MODELS else 1
+    return base + (1 if has_image else 0)
+
+
+def has_image_from_payload(payload: dict | None) -> bool:
+    if not payload:
+        return False
+    # Convención: si hay img_url o attachments
+    return bool(payload.get('img_url') or payload.get('image_url') or payload.get('images'))
+
+
 def get_credits_cost(api_name):
     """
     Obtener el costo de créditos para una API específica
@@ -70,6 +92,7 @@ def get_credits_cost(api_name):
         int: Costo en créditos (1 por defecto si no está definido)
     """
     return CREDITS_COST.get(api_name, 1)
+
 
 def get_api_cost_by_endpoint(endpoint_path):
     """

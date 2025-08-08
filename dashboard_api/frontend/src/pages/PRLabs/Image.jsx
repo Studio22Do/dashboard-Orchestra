@@ -13,11 +13,16 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  CircularProgress
+  CircularProgress,
+  Chip,
+  Tooltip
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { ArrowBack, Image as ImageIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { PR_LABS_CONFIG } from '../../config/prlabs';
+import { useDispatch } from 'react-redux';
+import { setBalance } from '../../redux/slices/creditsSlice';
 
 const ImageContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(4),
@@ -33,6 +38,7 @@ const PreviewImage = styled('img')({
 
 const PRLabsImage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [prompt, setPrompt] = useState('');
   const [width, setWidth] = useState(512);
   const [height, setHeight] = useState(512);
@@ -47,10 +53,12 @@ const PRLabsImage = () => {
     try {
       const API_VERSION = 'beta_v2'; // O usa la variable dinámica que manejes en tu app
       const API_BASE_URL = `/api/${API_VERSION}/prlabs`;
+      const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/image`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify({
           text: prompt,
@@ -61,6 +69,10 @@ const PRLabsImage = () => {
       });
 
       const data = await response.json();
+      // Actualizar créditos si viene en la respuesta (fetch no pasa por el interceptor)
+      if (data && data.credits_info && typeof data.credits_info.remaining === 'number') {
+        dispatch(setBalance(data.credits_info.remaining));
+      }
       setGeneratedImage(data.generated_image);
     } catch (error) {
       console.error('Error:', error);
@@ -85,6 +97,9 @@ const PRLabsImage = () => {
             Crea imágenes asombrosas con IA
           </Typography>
         </Box>
+        <Tooltip title="Costo por imagen generada exitosa">
+          <Chip color="secondary" label={`Puntos: ${PR_LABS_CONFIG.COSTS.IMAGE}`} />
+        </Tooltip>
       </Box>
 
       <Grid container spacing={4}>

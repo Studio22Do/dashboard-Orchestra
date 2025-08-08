@@ -13,10 +13,13 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Chip,
+  Tooltip
 } from '@mui/material';
 import { Send, TextFields } from '@mui/icons-material';
 import { prlabsService } from '../../services/prlabs';
+import { PR_LABS_CONFIG } from '../../config/prlabs';
 
 const Text = () => {
   const [prompt, setPrompt] = useState('');
@@ -42,10 +45,15 @@ const Text = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" gutterBottom sx={{ color: 'white' }}>
-        <TextFields sx={{ mr: 1, verticalAlign: 'bottom' }} />
-        Generación de Texto
-      </Typography>
+      <Box display="flex" alignItems="center" mb={2}>
+        <Typography variant="h4" gutterBottom sx={{ color: 'white', flex: 1 }}>
+          <TextFields sx={{ mr: 1, verticalAlign: 'bottom' }} />
+          Generación de Texto
+        </Typography>
+        <Tooltip title="Costo por solicitud exitosa">
+          <Chip color="secondary" label={`Puntos: ${PR_LABS_CONFIG.COSTS.TEXT}`} />
+        </Tooltip>
+      </Box>
 
       <Card>
         <CardContent>

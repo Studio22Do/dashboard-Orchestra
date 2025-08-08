@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Box, Typography, Grid, Paper, IconButton, Button, Tooltip } from '@mui/material';
+import { Container, Box, Typography, Grid, Paper, IconButton, Button, Tooltip, Chip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -13,7 +13,7 @@ import {
   Insights as InsightsIcon,
   Build
 } from '@mui/icons-material';
-import { PR_LABS_CONFIG } from '../../config/prlabs';
+import { PR_LABS_CONFIG, getChatCost } from '../../config/prlabs';
 
 const DashboardContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(4),
@@ -88,6 +88,38 @@ const PRLabsDashboard = () => {
     navigate(feature.route);
   };
 
+  const renderCostChip = (feature) => {
+    if (feature.id === 'chat-models' || feature.id === 'custom-chatbots') {
+      return (
+        <Tooltip title="Costo por solicitud exitosa. Modelos premium pueden costar 2 puntos. Con imagen: +1 punto.">
+          <Chip label={`Puntos: desde ${getChatCost('gpt-4o-mini', false)}`} size="small" color="secondary" />
+        </Tooltip>
+      );
+    }
+    if (feature.id === 'image-generation') {
+      return (
+        <Tooltip title="Costo por imagen generada exitosa">
+          <Chip label={`Puntos: ${PR_LABS_CONFIG.COSTS.IMAGE}`} size="small" color="secondary" />
+        </Tooltip>
+      );
+    }
+    if (feature.id === 'voice-features') {
+      return (
+        <Tooltip title="Costo por conversión exitosa (TTS/STT)">
+          <Chip label={`Puntos: ${PR_LABS_CONFIG.COSTS.VOICE}`} size="small" color="secondary" />
+        </Tooltip>
+      );
+    }
+    if (feature.id === 'text-processing') {
+      return (
+        <Tooltip title="Costo por solicitud exitosa">
+          <Chip label={`Puntos: ${PR_LABS_CONFIG.COSTS.TEXT}`} size="small" color="secondary" />
+        </Tooltip>
+      );
+    }
+    return null;
+  };
+
   return (
     <DashboardContainer sx={{ mt: 3 }}>
       {/* Header without Back Button */}
@@ -138,11 +170,11 @@ const PRLabsDashboard = () => {
       </Grid>
 
       {/* Features Grid */}
-      <Grid container spacing={3}>
+      <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }} gap={3}>
         {PR_LABS_CONFIG.FEATURES.map((feature) => {
           const IconComponent = getIconComponent(feature.id);
           return (
-            <Grid item xs={12} sm={6} md={4} key={feature.id}>
+            <Box key={feature.id}>
               <FeatureCard 
                 elevation={hoveredCard === feature.id ? 4 : 2}
                 onClick={() => handleFeatureClick(feature)}
@@ -158,16 +190,17 @@ const PRLabsDashboard = () => {
                 <Typography variant="body2" color="text.secondary" paragraph>
                   {feature.description}
                 </Typography>
-                <Box mt="auto">
+                <Box mt="auto" display="flex" alignItems="center" justifyContent="space-between">
                   <Typography variant="caption" color="primary">
                     {feature.category}
                   </Typography>
+                  {renderCostChip(feature)}
                 </Box>
               </FeatureCard>
-            </Grid>
+            </Box>
           );
         })}
-      </Grid>
+      </Box>
     </DashboardContainer>
   );
 };
