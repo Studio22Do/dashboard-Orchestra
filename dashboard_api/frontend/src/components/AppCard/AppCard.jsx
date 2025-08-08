@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { purchaseApp, toggleFavoriteApp, selectCanUseApp } from '../../redux/slices/appsSlice';
+import { toggleFavoriteApp, selectCanUseApp } from '../../redux/slices/appsSlice';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 
@@ -23,11 +23,8 @@ const AppCard = ({ id, title, description, imageUrl, category, route, apiName, i
   const canUseApp = useSelector(state => selectCanUseApp(state, id));
 
   const handleAction = () => {
-    if (canUseApp) {
-      navigate(route);
-    } else {
-      dispatch(purchaseApp(id));
-    }
+    // En beta_v2 abrimos siempre; el cobro va por puntos en endpoints
+    navigate(route);
   };
 
   const handleToggleFavorite = (e) => {
@@ -36,15 +33,15 @@ const AppCard = ({ id, title, description, imageUrl, category, route, apiName, i
   };
 
   const getButtonText = () => {
-    return canUseApp ? 'Abrir App' : 'Agregar';
+    return 'Abrir App';
   };
 
   const getButtonVariant = () => {
-    return canUseApp ? "contained" : "outlined";
+    return 'contained';
   };
 
   const getButtonColor = () => {
-    return canUseApp ? "primary" : "success";
+    return 'primary';
   };
 
   return (

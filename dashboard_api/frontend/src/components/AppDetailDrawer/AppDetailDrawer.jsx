@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Drawer, Box, Typography, Button, Divider, Snackbar, Alert } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { purchaseApp, selectCanUseApp, selectUserRequests, selectPurchasedApps, fetchAllApps, fetchPurchasedApps } from '../../redux/slices/appsSlice';
+import { selectCanUseApp, selectUserRequests, selectPurchasedApps, fetchAllApps, fetchPurchasedApps } from '../../redux/slices/appsSlice';
 import { selectCreditsBalance } from '../../redux/slices/creditsSlice';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -76,47 +76,22 @@ const AppDetailDrawer = ({
 
   // Funciones para el botón
   const getButtonVariant = () => {
-    if (isAlreadyInToolbox) return 'outlined';
-    return canUseApp ? 'contained' : 'outlined';
+    return 'contained';
   };
 
   const getButtonColor = () => {
-    if (isAlreadyInToolbox) return 'success';
-    return canUseApp ? 'primary' : 'secondary';
+    return 'primary';
   };
 
   const getButtonText = () => {
-    if (isAlreadyInToolbox) return 'Abrir App';
-    return canUseApp ? 'Abrir App' : 'Agregar';
+    return 'Abrir App';
   };
 
   const handleAction = async () => {
     if (!app) return;
-
-    try {
-      if (isAlreadyInToolbox) {
-        // Navegar a la app
-        navigate(app.route);
-        onClose();
-      } else {
-        // Comprar/agregar la app
-        await dispatch(purchaseApp(app.id)).unwrap();
-        setNotification({
-          open: true,
-          message: 'App agregada exitosamente',
-          severity: 'success'
-        });
-        // Recargar apps
-        dispatch(fetchAllApps());
-        dispatch(fetchPurchasedApps());
-      }
-    } catch (error) {
-      setNotification({
-        open: true,
-        message: error.message || 'Error al procesar la solicitud',
-        severity: 'error'
-      });
-    }
+    // Navegar directamente; el cobro lo maneja cada endpoint por puntos
+    navigate(app.route);
+    onClose();
   };
 
   const handleCloseNotification = () => {
@@ -202,11 +177,6 @@ const AppDetailDrawer = ({
             {process.env.REACT_APP_MODE === 'beta_v2' && (
               <Typography variant="subtitle2" sx={{ mb: 3, color: 'rgba(255,255,255,0.7)' }}>
                 Puntos disponibles: {userCredits}
-              </Typography>
-            )}
-            {isAlreadyInToolbox && (
-              <Typography variant="subtitle2" sx={{ mb: 2, color: '#4caf50', fontWeight: 600 }}>
-                ✓ Ya está en tu toolbox
               </Typography>
             )}
             <Button
