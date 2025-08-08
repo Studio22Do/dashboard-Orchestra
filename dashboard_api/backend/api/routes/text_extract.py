@@ -5,6 +5,10 @@ from api.utils.decorators import credits_required
 
 text_extract_bp = Blueprint('text_extract', __name__)
 
+@text_extract_bp.route('/extract', methods=['OPTIONS'])
+def handle_options():
+    return '', 200
+
 @text_extract_bp.route('/extract', methods=['POST'])
 @jwt_required()
 @credits_required(amount=1)
