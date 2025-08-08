@@ -93,40 +93,79 @@ def credits_required(amount=1):
                     
                     # Agregar información de créditos a la respuesta
                     print(f"[CREDITS_DEBUG] Agregando info de créditos a respuesta")
+                    
+                    # Manejar diferentes tipos de respuesta
                     if isinstance(result, tuple) and len(result) == 2:
+                        # Caso: (data, status_code)
                         response_data, status_code = result
-                        if isinstance(response_data, dict):
+                        if hasattr(response_data, 'json') and callable(getattr(response_data, 'json', None)):
+                            # Es un Response object de Flask
+                            print(f"[CREDITS_DEBUG] Es un Response object en tupla")
+                            try:
+                                # Crear nuevo Response con credits_info
+                                import json
+                                from flask import Response
+                                original_data = response_data.get_json()
+                                if isinstance(original_data, dict):
+                                    original_data['credits_info'] = {
+                                        'deducted': amount,
+                                        'remaining': user.credits
+                                    }
+                                    print(f"[CREDITS_DEBUG] Credits info agregado a Response: {original_data['credits_info']}")
+                                    return Response(
+                                        json.dumps(original_data),
+                                        status=status_code,
+                                        mimetype='application/json'
+                                    )
+                                else:
+                                    return result
+                            except Exception as e:
+                                print(f"[CREDITS_DEBUG] Error procesando Response object: {e}")
+                                return result
+                        elif isinstance(response_data, dict):
                             response_data['credits_info'] = {
                                 'deducted': amount,
                                 'remaining': user.credits
                             }
                             print(f"[CREDITS_DEBUG] Credits info agregado: {response_data['credits_info']}")
-                        return jsonify(response_data), status_code
+                            return jsonify(response_data), status_code
+                        else:
+                            return result
                     elif hasattr(result, 'json') and callable(getattr(result, 'json', None)):
-                        # Es un Response object de Flask
-                        print(f"[CREDITS_DEBUG] Es un Response object, extrayendo datos")
+                        # Es un Response object de Flask (no en tupla)
+                        print(f"[CREDITS_DEBUG] Es un Response object directo")
                         try:
-                            response_data = result.json
-                            if isinstance(response_data, dict):
-                                response_data['credits_info'] = {
+                            import json
+                            from flask import Response
+                            original_data = result.get_json()
+                            if isinstance(original_data, dict):
+                                original_data['credits_info'] = {
                                     'deducted': amount,
                                     'remaining': user.credits
                                 }
-                                print(f"[CREDITS_DEBUG] Credits info agregado a Response: {response_data['credits_info']}")
-                            return result
+                                print(f"[CREDITS_DEBUG] Credits info agregado a Response: {original_data['credits_info']}")
+                                return Response(
+                                    json.dumps(original_data),
+                                    status=result.status_code,
+                                    mimetype='application/json'
+                                )
+                            else:
+                                return result
                         except Exception as e:
-                            print(f"[CREDITS_DEBUG] Error extrayendo datos del Response: {e}")
+                            print(f"[CREDITS_DEBUG] Error procesando Response object directo: {e}")
                             return result
-                    else:
-                        # Si no es una tupla, convertir a JSON y agregar credits_info
-                        print(f"[CREDITS_DEBUG] Resultado no es tupla, convirtiendo a JSON")
-                        if isinstance(result, dict):
-                            result['credits_info'] = {
-                                'deducted': amount,
-                                'remaining': user.credits
-                            }
-                            print(f"[CREDITS_DEBUG] Credits info agregado: {result['credits_info']}")
+                    elif isinstance(result, dict):
+                        # Caso: dict directo
+                        result['credits_info'] = {
+                            'deducted': amount,
+                            'remaining': user.credits
+                        }
+                        print(f"[CREDITS_DEBUG] Credits info agregado: {result['credits_info']}")
                         return jsonify(result)
+                    else:
+                        # Caso por defecto
+                        print(f"[CREDITS_DEBUG] Caso por defecto, retornando resultado original")
+                        return result
                         
                 except Exception as e:
                     # Si hay error, revertir el descuento de créditos

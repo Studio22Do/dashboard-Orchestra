@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required
 import requests
 from api.utils.decorators import credits_required
@@ -10,6 +10,13 @@ product_description_bp = Blueprint('product_description', __name__)
 @jwt_required()
 @credits_required(amount=1)
 def generate_description():
+    print("=== DEBUG PRODUCT DESCRIPTION ===")
+    print(f"Request headers: {dict(request.headers)}")
+    print(f"Authorization header: {request.headers.get('Authorization')}")
+    print(f"Request method: {request.method}")
+    print(f"Request URL: {request.url}")
+    print("==================================")
+    
     data = request.json
     language = data.get('language', 'English')
     name = data.get('name')

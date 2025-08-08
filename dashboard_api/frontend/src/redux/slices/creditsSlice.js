@@ -15,7 +15,13 @@ axios.interceptors.response.use(
       // Importar el store dinámicamente para evitar circular imports
       import('../store').then(({ default: store }) => {
         console.log('[CREDITS_INTERCEPTOR] Store importado, dispatchando setBalance:', response.data.credits_info.remaining);
-        store.dispatch(setBalance(response.data.credits_info.remaining));
+        // Importar setBalance dinámicamente
+        import('./creditsSlice').then(({ setBalance }) => {
+          store.dispatch(setBalance(response.data.credits_info.remaining));
+          console.log('[CREDITS_INTERCEPTOR] setBalance dispatchado exitosamente');
+        }).catch(error => {
+          console.error('[CREDITS_INTERCEPTOR] Error importando setBalance:', error);
+        });
       }).catch(error => {
         console.error('[CREDITS_INTERCEPTOR] Error importando store:', error);
       });
