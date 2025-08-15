@@ -45,6 +45,25 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 
+// Configuración de la API
+const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = `${API_URL}/${API_MODE}`;
+
+// Configurar axios con el token de autenticación
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 const GoogleNews = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [data, setData] = useState(null);
@@ -73,7 +92,7 @@ const GoogleNews = () => {
 
   const loadLanguageRegions = async () => {
     try {
-      const response = await axios.get('/api/beta_v2/google-news/language-regions');
+      const response = await axios.get(`${API_BASE_URL}/google-news/language-regions`);
       if (response.data && response.data.regions) {
         setAvailableRegions(response.data.regions);
       }
@@ -97,7 +116,7 @@ const GoogleNews = () => {
     setData(null);
 
     try {
-      const response = await axios.get(`/api/beta_v2/google-news/${category}`, {
+      const response = await axios.get(`${API_BASE_URL}/google-news/${category}`, {
         params: { lr: languageRegion }
       });
       setData(response.data);
@@ -117,7 +136,7 @@ const GoogleNews = () => {
     setData(null);
 
     try {
-      const response = await axios.get('/api/beta_v2/google-news/search', {
+      const response = await axios.get(`${API_BASE_URL}/google-news/search`, {
         params: { 
           keyword: searchKeyword.trim(),
           lr: languageRegion 
@@ -293,26 +312,59 @@ const GoogleNews = () => {
                 variant="outlined"
                 sx={{ 
                   '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 1)',
-                    }
-                  }
+                    backgroundColor: 'transparent',
+                    '& fieldset': {
+                      borderColor: 'rgba(255, 255, 255, 0.3)',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: 'rgba(255, 255, 255, 0.5)',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'rgba(255, 255, 255, 0.8)',
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    '&.Mui-focused': {
+                      color: 'rgba(255, 255, 255, 1)',
+                    },
+                  },
+                  '& .MuiInputBase-input': {
+                    color: 'white',
+                    '&::placeholder': {
+                      color: 'rgba(255, 255, 255, 0.6)',
+                      opacity: 1,
+                    },
+                  },
                 }}
               />
             </Grid>
             <Grid item xs={12} md={3}>
               <FormControl fullWidth>
-                <InputLabel sx={{ color: 'white' }}>Idioma/Región</InputLabel>
+                <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>Idioma/Región</InputLabel>
                 <Select
                   value={languageRegion}
                   onChange={handleLanguageChange}
                   label="Idioma/Región"
                   sx={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 1)',
-                    }
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'transparent',
+                      '& fieldset': {
+                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgba(255, 255, 255, 0.5)',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: 'rgba(255, 255, 255, 0.8)',
+                      },
+                    },
+                    '& .MuiSelect-icon': {
+                      color: 'rgba(255, 255, 255, 0.8)',
+                    },
+                    '& .MuiSelect-select': {
+                      color: 'white',
+                    },
                   }}
                 >
                   <MenuItem value="es-ES">Español (España)</MenuItem>
