@@ -44,6 +44,7 @@ def create_app(config_object):
     from api.routes.instagram_realtime import instagram_realtime_bp
     from api.routes.ai_humanizer import ai_humanizer_bp
     from api.routes.seo_mastermind import seo_mastermind_bp
+    from api.routes.seo_analyzer import seo_analyzer_bp
     from api.routes.prlabs import prlabs_bp
     from api.routes.google_news import google_news_bp
     from api.routes.whois_lookup import whois_lookup_bp
@@ -60,12 +61,14 @@ def create_app(config_object):
     from api.routes.domain_metrics import domain_metrics_bp
     from api.routes.product_description import product_description_bp
     from api.routes.website_status import website_status_bp
-    from api.routes.website_analyzer import website_analyzer_bp
+    from api.routes.website_analyzer import website_analyzer_pro_bp
     from api.routes.ahrefs_dr import ahrefs_dr_bp
     from api.routes.speech_to_text import speech_to_text_bp
     from api.routes.picpulse import picpulse_bp
     from api.routes.credits import credits_bp
     from api.routes.qrcode_generator import qrcode_generator_bp
+    from api.routes.mediafy import mediafy_bp
+    from api.routes.perplexity import perplexity_bp
 
     # Registrar blueprints con prefijos de versión
     version_prefix = f"/api/{app.config.get('MODE', 'beta_v1')}"
@@ -79,6 +82,7 @@ def create_app(config_object):
     app.register_blueprint(instagram_realtime_bp, url_prefix=f'{version_prefix}/instagram-realtime')
     app.register_blueprint(ai_humanizer_bp, url_prefix=f'{version_prefix}/ai-humanizer')
     app.register_blueprint(seo_mastermind_bp, url_prefix=f'{version_prefix}/seo-mastermind')
+    app.register_blueprint(seo_analyzer_bp, url_prefix=f'{version_prefix}/seo-analyzer')
     app.register_blueprint(prlabs_bp, url_prefix=f'{version_prefix}/prlabs')
     app.register_blueprint(google_news_bp, url_prefix=f'{version_prefix}/google-news')
     app.register_blueprint(whois_lookup_bp, url_prefix=f'{version_prefix}/whois-lookup')
@@ -95,12 +99,14 @@ def create_app(config_object):
     app.register_blueprint(domain_metrics_bp, url_prefix=f'{version_prefix}/domain-metrics')
     app.register_blueprint(product_description_bp, url_prefix=f'{version_prefix}/product-description')
     app.register_blueprint(website_status_bp, url_prefix=f'{version_prefix}/website-status')
-    app.register_blueprint(website_analyzer_bp, url_prefix=f'{version_prefix}/website-analyzer')
+    app.register_blueprint(website_analyzer_pro_bp, url_prefix=f'{version_prefix}/website-analyzer')
     app.register_blueprint(ahrefs_dr_bp, url_prefix=f'{version_prefix}/ahrefs-dr')
     app.register_blueprint(speech_to_text_bp, url_prefix=f'{version_prefix}/speech-to-text')
     app.register_blueprint(picpulse_bp, url_prefix=f'{version_prefix}/picpulse')
     app.register_blueprint(credits_bp, url_prefix=f'{version_prefix}/credits')
     app.register_blueprint(qrcode_generator_bp, url_prefix=f'{version_prefix}/qrcode-generator')
+    app.register_blueprint(mediafy_bp, url_prefix=f'{version_prefix}/mediafy')
+    app.register_blueprint(perplexity_bp, url_prefix=f'{version_prefix}/perplexity')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers

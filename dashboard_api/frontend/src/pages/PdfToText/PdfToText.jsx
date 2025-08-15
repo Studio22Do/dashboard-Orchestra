@@ -1,5 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setBalance } from '../../redux/slices/creditsSlice';
 import { 
   Container, 
   Typography, 
@@ -34,6 +36,8 @@ import {
 import axios from 'axios';
 
 const PdfToText = () => {
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token);
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -84,12 +88,18 @@ const PdfToText = () => {
       const formData = new FormData();
       formData.append('pdfFile', file);
       
-      // Llamar a la API real de PDF to Text
-      const response = await axios.post('/api/pdf-converter/to-text', formData, {
+      // Llamar a la API real de PDF to Text con la ruta correcta
+      const response = await axios.post('/api/beta_v2/pdf-converter/to-text', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
         }
       });
+      
+      // Actualizar créditos si la respuesta los incluye
+      if (response.data && response.data.credits_info && typeof response.data.credits_info.remaining === 'number') {
+        dispatch(setBalance(response.data.credits_info.remaining));
+      }
       
       if (response.data && response.data.status === 'Success' && Array.isArray(response.data.data)) {
         // Combinar el texto de todas las páginas
@@ -134,14 +144,26 @@ const PdfToText = () => {
 
   const handleExtractFromUrl = async () => {
     if (!pdfUrl.trim()) {
-      setError('Por favor ingresa una URL de PDF válida');
+      setError('Por favor ingresa una URL de PDF');
       return;
     }
     setExtracting(true);
     setError(null);
     setExtractedPages(null);
     try {
-      const response = await axios.post('/api/pdf-converter/to-text', { pdfUrl });
+      // Usar el endpoint correcto para URLs de PDF
+      const response = await axios.get('/api/beta_v2/pdf-converter/to-text-url', {
+        params: { pdfUrl },
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      // Actualizar créditos si la respuesta los incluye
+      if (response.data && response.data.credits_info && typeof response.data.credits_info.remaining === 'number') {
+        dispatch(setBalance(response.data.credits_info.remaining));
+      }
+      
       if (response.data && response.data.status === 'Success' && Array.isArray(response.data.data)) {
         setExtractedPages(response.data.data);
       } else {
@@ -179,12 +201,16 @@ const PdfToText = () => {
     setImgResultType(null);
     try {
       const formData = new FormData();
-      formData.append('file', imgFile);
+      formData.append('pdfFile', imgFile); // Corregir nombre del campo
       formData.append('imgFormat', imgFormat);
       // Puedes agregar startPage/endPage si lo deseas
-      const response = await axios.post('/api/pdf-converter/to-image', formData, {
+      const response = await axios.post('/api/beta_v2/pdf-converter/to-image', formData, {
         responseType: 'blob',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
+      
       const contentType = response.headers['content-type'];
       const blob = new Blob([response.data], { type: contentType });
       const url = URL.createObjectURL(blob);

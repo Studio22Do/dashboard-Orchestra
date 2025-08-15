@@ -7,8 +7,9 @@ import Login from './pages/Login/Login';
 import Register from './pages/Login/Register';
 import EmailVerification from './pages/Login/EmailVerification';
 import AppCatalog from './pages/AppCatalog/AppCatalog';
-import InstagramStats from './pages/InstagramStats/InstagramStats';
 import InstagramRealtime from './pages/InstagramRealtime';
+import MediafyAPI from './pages/MediafyAPI/MediafyAPI';
+import PerplexityAPI from './pages/PerplexityAPI/PerplexityAPI';
 import GoogleNews from './pages/GoogleNews/GoogleNews';
 import Dashboard from './pages/Dashboard/Dashboard';
 import NotificationManager from './components/Notifications/NotificationManager';
@@ -284,9 +285,15 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/apps/instagram" element={
+          <Route path="/apps/mediafy" element={
             <ProtectedRoute>
-              <InstagramStats />
+              <MediafyAPI />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/apps/perplexity" element={
+            <ProtectedRoute>
+              <PerplexityAPI />
             </ProtectedRoute>
           } />
           

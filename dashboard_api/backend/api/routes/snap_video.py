@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app
+from flask_jwt_extended import jwt_required
 import requests
 import logging
 from api.utils.decorators import credits_required
@@ -6,10 +7,20 @@ from api.utils.decorators import credits_required
 media_downloader_bp = Blueprint('media_downloader', __name__)
 logger = logging.getLogger(__name__)
 
+@media_downloader_bp.route('', methods=['OPTIONS'])
+@media_downloader_bp.route('/', methods=['OPTIONS'])
+def handle_options():
+    """Manejar peticiones OPTIONS para CORS"""
+    return '', 200
+
 @media_downloader_bp.route('/download', methods=['POST'])
+@jwt_required()
 @credits_required(amount=1)  # Snap Video cuesta 1 punto
 def download_media():
     """Descargar videos y audio de múltiples plataformas"""
+    print(f"[MediaDownloader] === INICIO DESCARGA ===")
+    print(f"[MediaDownloader] Modo actual: {current_app.config.get('MODE', 'N/A')}")
+    
     data = request.json
     media_url = data.get('url')
     if not media_url:
@@ -75,8 +86,13 @@ def download_media():
         return jsonify({"error": "Error interno del servidor", "details": str(e)}), 500
 
 @media_downloader_bp.route('/test', methods=['POST'])
+@jwt_required()
+@credits_required(amount=1)  # Test también cuesta 1 punto
 def test_download():
     """Endpoint de prueba que simula una respuesta exitosa"""
+    print(f"[MediaDownloader] === INICIO TEST ===")
+    print(f"[MediaDownloader] Modo actual: {current_app.config.get('MODE', 'N/A')}")
+    
     data = request.json
     media_url = data.get('url', 'test-url')
     

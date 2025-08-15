@@ -17,7 +17,7 @@ def handle_options():
 
 @seo_analyzer_bp.route('/analyze', methods=['POST'])
 @jwt_required()
-@credits_required(amount=1)
+@credits_required(amount=2)
 def analyze_seo():
     """Analizar SEO de una URL usando la API de SEO Analyzer"""
     data = request.get_json()
@@ -26,15 +26,23 @@ def analyze_seo():
     if not url:
         return jsonify({'error': 'Se requiere una URL para analizar'}), 400
 
-    api_url = current_app.config['RAPIDAPI_WEBSITE_ANALYZER_URL']
+    api_url = "https://seo-analyzer3.p.rapidapi.com/seo-audit-basic"
     headers = {
         "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
-        "x-rapidapi-host": current_app.config['RAPIDAPI_WEBSITE_ANALYZER_HOST']
+        "x-rapidapi-host": "seo-analyzer3.p.rapidapi.com"
     }
     params = {"url": url}
 
     try:
+        print(f"[SEOAnalyzer] === INICIO ANÁLISIS SEO ===")
+        print(f"[SEOAnalyzer] Modo actual: {current_app.config.get('MODE', 'N/A')}")
+        print(f"[SEOAnalyzer] URL a analizar: {url}")
+        print(f"[SEOAnalyzer] Llamando a RapidAPI con: {params}")
+        
         response = requests.get(api_url, headers=headers, params=params)
+        print(f"[SEOAnalyzer] Status: {response.status_code}")
+        print(f"[SEOAnalyzer] Response: {response.text[:500]}...")
+        
         if response.status_code != 200:
             return jsonify({
                 'error': 'Error en la API de SEO Analyzer',
@@ -66,6 +74,10 @@ def analyze_seo():
             'headers': http_data.get('headers', {}),
             'score': calculate_overall_score(data)
         }
+        
+        print(f"[SEOAnalyzer] Análisis completado exitosamente para: {url}")
+        print(f"[SEOAnalyzer] Score calculado: {transformed_data['score']}")
+        
         return jsonify(transformed_data), 200
 
     except requests.exceptions.RequestException as e:

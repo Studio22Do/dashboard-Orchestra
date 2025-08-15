@@ -1,93 +1,202 @@
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required
+import logging
 import requests
-import os
+from flask import Blueprint, jsonify, current_app, request
+from flask_jwt_extended import jwt_required
 from api.utils.decorators import credits_required
 
-# Crear blueprint
+logger = logging.getLogger(__name__)
+
 pdf_converter_bp = Blueprint('pdf_converter', __name__)
 
-@pdf_converter_bp.route('/convert', methods=['POST'])
-@jwt_required()
-@credits_required(amount=1)
-def convert_pdf():
-    # Verificar si es una subida de archivo o una URL
-    if 'pdfFile' in request.files:
-        # Caso: Archivo subido
-        file = request.files['pdfFile']
-        if not file:
-            return jsonify({'error': 'No PDF file provided'}), 400
-        
-        start_page = request.form.get('startPage', '0')
-        end_page = request.form.get('endPage', '0')
-        
-        api_url = "https://pdf-converter-api.p.rapidapi.com/PdfToText"
-        headers = {
-            "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
-            "x-rapidapi-host": "pdf-converter-api.p.rapidapi.com"
-        }
-        params = {
-            "startPage": start_page,
-            "endPage": end_page
-        }
-        files = {"pdfFile": (file.filename, file.stream, file.mimetype)}
-        response = requests.post(api_url, headers=headers, params=params, files=files)
-        
-    else:
-        # Caso: URL de PDF
-        data = request.json
-        pdf_url = data.get('pdfUrl')
-        start_page = data.get('startPage', 0)
-        end_page = data.get('endPage', 0)
-        if not pdf_url:
-            return jsonify({'error': 'pdfUrl is required'}), 400
-
-        api_url = "https://pdf-converter-api.p.rapidapi.com/PdfToText"
-        headers = {
-            "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
-            "x-rapidapi-host": "pdf-converter-api.p.rapidapi.com"
-        }
-        params = {
-            "pdfUrl": pdf_url,
-            "startPage": start_page,
-            "endPage": end_page
-        }
-        response = requests.get(api_url, headers=headers, params=params)
-    
-    try:
-        return jsonify(response.json()), response.status_code
-    except Exception:
-        return response.text, response.status_code
-
-@pdf_converter_bp.route('/to-image', methods=['POST'])
-def pdf_to_image():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No PDF file provided'}), 400
-    file = request.files['file']
-    img_format = request.form.get('imgFormat', 'tifflzw')
-    start_page = request.form.get('startPage', '0')
-    end_page = request.form.get('endPage', '0')
-
-    api_url = "https://pdf-converter-api.p.rapidapi.com/PdfToImage"
-    headers = {
+def get_headers():
+    """Obtiene los headers necesarios para la API de PDF Converter"""
+    return {
         "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
         "x-rapidapi-host": "pdf-converter-api.p.rapidapi.com"
     }
-    params = {
-        "imgFormat": img_format,
-        "startPage": start_page,
-        "endPage": end_page
-    }
-    files = {"pdfFile": (file.filename, file.stream, file.mimetype)}
-    response = requests.post(api_url, headers=headers, params=params, files=files)
-    # Si la respuesta es una imagen, devolverla como archivo
-    if response.status_code == 200 and response.headers.get('Content-Type', '').startswith('image'):
-        return response.content, 200, {
-            'Content-Type': response.headers['Content-Type'],
-            'Content-Disposition': f'attachment; filename={file.filename}.{img_format}'
-        }
-    # Si es JSON, devolver el error
+
+@pdf_converter_bp.route('/to-text', methods=['POST'])
+@jwt_required()
+@credits_required(amount=1)
+def pdf_to_text():
+    """Convierte PDF subido a texto"""
     try:
-        return jsonify(response.json()), response.status_code
-    except Exception:
-        return response.text, response.status_code 
+        # Verificar que se haya enviado un archivo
+        if 'pdfFile' not in request.files:
+            return jsonify({'error': 'No se envió ningún archivo PDF'}), 400
+        
+        pdf_file = request.files['pdfFile']
+        if pdf_file.filename == '':
+            return jsonify({'error': 'No se seleccionó ningún archivo'}), 400
+        
+        # Verificar que sea un PDF
+        if not pdf_file.filename.lower().endswith('.pdf'):
+            return jsonify({'error': 'Solo se aceptan archivos PDF'}), 400
+        
+        # Obtener parámetros opcionales
+        start_page = request.form.get('startPage', '0')
+        end_page = request.form.get('endPage', '0')
+        
+        # Preparar archivo para la API
+        files = {'pdfFile': (pdf_file.filename, pdf_file.read(), 'application/pdf')}
+        params = {
+            'startPage': start_page,
+            'endPage': end_page
+        }
+        
+        # Llamar a la API de PDF Converter
+        url = "https://pdf-converter-api.p.rapidapi.com/PdfToText"
+        headers = get_headers()
+        
+        response = requests.post(url, headers=headers, params=params, files=files)
+        response.raise_for_status()
+        
+        result = response.json()
+        return jsonify(result), 200
+        
+    except requests.RequestException as e:
+        logger.error(f"Error en API PDF Converter: {str(e)}")
+        return jsonify({'error': 'Error al convertir el PDF'}), 500
+    except Exception as e:
+        logger.error(f"Error inesperado: {str(e)}")
+        return jsonify({'error': 'Error interno del servidor'}), 500
+
+@pdf_converter_bp.route('/to-text-url', methods=['GET'])
+@jwt_required()
+@credits_required(amount=1)
+def pdf_to_text_url():
+    """Convierte PDF desde URL a texto"""
+    try:
+        pdf_url = request.args.get('pdfUrl')
+        if not pdf_url:
+            return jsonify({'error': 'Se requiere pdfUrl'}), 400
+        
+        # Obtener parámetros opcionales
+        start_page = request.args.get('startPage', '0')
+        end_page = request.args.get('endPage', '0')
+        
+        # Llamar a la API de PDF Converter
+        url = "https://pdf-converter-api.p.rapidapi.com/PdfToText"
+        headers = get_headers()
+        params = {
+            'pdfUrl': pdf_url,
+            'startPage': start_page,
+            'endPage': end_page
+        }
+        
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        
+        result = response.json()
+        return jsonify(result), 200
+        
+    except requests.RequestException as e:
+        logger.error(f"Error en API PDF Converter URL: {str(e)}")
+        return jsonify({'error': 'Error al convertir el PDF desde URL'}), 500
+    except Exception as e:
+        logger.error(f"Error inesperado: {str(e)}")
+        return jsonify({'error': 'Error interno del servidor'}), 500
+
+@pdf_converter_bp.route('/to-image', methods=['POST'])
+@jwt_required()
+@credits_required(amount=2)
+def pdf_to_image():
+    """Convierte PDF subido a imagen"""
+    try:
+        # Verificar que se haya enviado un archivo
+        if 'pdfFile' not in request.files:
+            return jsonify({'error': 'No se envió ningún archivo PDF'}), 400
+        
+        pdf_file = request.files['pdfFile']
+        if pdf_file.filename == '':
+            return jsonify({'error': 'No se seleccionó ningún archivo'}), 400
+        
+        # Verificar que sea un PDF
+        if not pdf_file.filename.lower().endswith('.pdf'):
+            return jsonify({'error': 'Solo se aceptan archivos PDF'}), 400
+        
+        # Obtener parámetros opcionales
+        img_format = request.form.get('imgFormat', 'tifflzw')
+        start_page = request.form.get('startPage', '0')
+        end_page = request.form.get('endPage', '0')
+        
+        # Preparar archivo para la API
+        files = {'pdfFile': (pdf_file.filename, pdf_file.read(), 'application/pdf')}
+        params = {
+            'imgFormat': img_format,
+            'startPage': start_page,
+            'endPage': end_page
+        }
+        
+        # Llamar a la API de PDF Converter
+        url = "https://pdf-converter-api.p.rapidapi.com/PdfToImage"
+        headers = get_headers()
+        
+        response = requests.post(url, headers=headers, params=params, files=files)
+        response.raise_for_status()
+        
+        # Para imágenes, devolver el contenido binario con headers apropiados
+        content_type = 'image/tiff' if img_format == 'tifflzw' else 'image/jpeg'
+        filename = f"{pdf_file.filename.replace('.pdf', '')}.{img_format}"
+        
+        return response.content, 200, {
+            'Content-Type': content_type,
+            'Content-Disposition': f'attachment; filename="{filename}"'
+        }
+        
+    except requests.RequestException as e:
+        logger.error(f"Error en API PDF Converter Image: {str(e)}")
+        return jsonify({'error': 'Error al convertir el PDF a imagen'}), 500
+    except Exception as e:
+        logger.error(f"Error inesperado: {str(e)}")
+        return jsonify({'error': 'Error interno del servidor'}), 500
+
+@pdf_converter_bp.route('/to-image-url', methods=['GET'])
+@jwt_required()
+@credits_required(amount=2)
+def pdf_to_image_url():
+    """Convierte PDF desde URL a imagen"""
+    try:
+        pdf_url = request.args.get('pdfUrl')
+        if not pdf_url:
+            return jsonify({'error': 'Se requiere pdfUrl'}), 400
+        
+        # Obtener parámetros opcionales
+        img_format = request.args.get('imgFormat', 'tifflzw')
+        start_page = request.args.get('startPage', '0')
+        end_page = request.args.get('endPage', '0')
+        
+        # Llamar a la API de PDF Converter
+        url = "https://pdf-converter-api.p.rapidapi.com/PdfToImage"
+        headers = get_headers()
+        params = {
+            'pdfUrl': pdf_url,
+            'imgFormat': img_format,
+            'startPage': start_page,
+            'endPage': end_page
+        }
+        
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        
+        # Para imágenes, devolver el contenido binario con headers apropiados
+        content_type = 'image/tiff' if img_format == 'tifflzw' else 'image/jpeg'
+        filename = f"converted_pdf.{img_format}"
+        
+        return response.content, 200, {
+            'Content-Type': content_type,
+            'Content-Disposition': f'attachment; filename="{filename}"'
+        }
+        
+    except requests.RequestException as e:
+        logger.error(f"Error en API PDF Converter Image URL: {str(e)}")
+        return jsonify({'error': 'Error al convertir el PDF desde URL a imagen'}), 500
+    except Exception as e:
+        logger.error(f"Error inesperado: {str(e)}")
+        return jsonify({'error': 'Error interno del servidor'}), 500
+
+# Handlers para CORS preflight
+@pdf_converter_bp.route('', methods=['OPTIONS'])
+@pdf_converter_bp.route('/', methods=['OPTIONS'])
+def handle_options():
+    return '', 200 

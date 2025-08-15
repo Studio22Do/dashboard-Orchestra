@@ -42,7 +42,7 @@ import {
 const RunwayML = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [operation, setOperation] = useState('generate');
-  const [model, setModel] = useState('gen-2');
+  const [model, setModel] = useState('gen2');  // Valor por defecto correcto
   const [prompt, setPrompt] = useState('');
   const [parameters, setParameters] = useState({
     duration: 4,
@@ -61,6 +61,11 @@ const RunwayML = () => {
   const [time, setTime] = useState(4);
   const [imageAsEndFrame, setImageAsEndFrame] = useState(false);
   const [flip, setFlip] = useState(false);
+  
+  // Nuevos estados para el flujo asíncrono
+  const [taskId, setTaskId] = useState(null);
+  const [taskStatus, setTaskStatus] = useState(null);
+  const [isPolling, setIsPolling] = useState(false);
 
   const operations = [
     { value: 'generate', label: 'Generar Video', icon: <Movie /> },
@@ -70,7 +75,7 @@ const RunwayML = () => {
 
   const models = [
     { value: 'gen2', label: 'Gen-2 (Base)' },
-    { value: 'gen2xl', label: 'Gen-2 XL (Mejorado)' }
+    { value: 'gen3', label: 'Gen-3 (Avanzado)' }
   ];
 
   const qualities = [
@@ -168,9 +173,21 @@ const RunwayML = () => {
     try {
       const API_VERSION = "beta_v2"; // O usa la variable dinámica que manejes en tu app
       const API_BASE_URL = `/api/${API_VERSION}`;
+      
+      // Obtener el token JWT del localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No hay token de autenticación. Por favor inicia sesión nuevamente.');
+        setLoading(false);
+        return;
+      }
+      
       const res = await fetch(`${API_BASE_URL}/runwayml/process`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(payload)
       });
       const data = await res.json();
@@ -179,23 +196,64 @@ const RunwayML = () => {
         setLoading(false);
         return;
       }
-      // Suponemos que la respuesta contiene una URL del video generado
-      setGeneratedVideo({
-        videoUrl: data.result_url || data.url || data.video_url || '',
-        raw: data,
-        operation: op,
-        model,
-        prompt,
-        imgPrompt,
-        width,
-        height,
-        motion,
-        seed,
-        time,
-        imageAsEndFrame,
-        flip,
-        timestamp: new Date().toLocaleString()
-      });
+
+      // Verificar si la respuesta contiene un UUID (task en cola)
+      if (data.uuid && (data.status === 'Task is in queue' || data.status === 'queued')) {
+        console.log('Task en cola, UUID:', data.uuid);
+        setTaskId(data.uuid);
+        setTaskStatus('queued');
+        
+        // Mostrar mensaje de que el video está en proceso
+        setGeneratedVideo({
+          videoUrl: '', // No hay video aún
+          raw: data,
+          operation: op,
+          model,
+          prompt,
+          imgPrompt,
+          width,
+          height,
+          motion,
+          seed,
+          time,
+          imageAsEndFrame,
+          flip,
+          timestamp: new Date().toLocaleString(),
+          metadata: {
+            duration: parameters.duration || 4,
+            fps: parameters.fps || 24,
+            quality: parameters.quality || 'high',
+            resolution: `${width}x${height}`
+          }
+        });
+
+        // Iniciar polling del estado
+        pollTaskStatus(data.uuid);
+      } else {
+        // Respuesta directa (caso raro, pero por si acaso)
+        setGeneratedVideo({
+          videoUrl: data.result_url || data.url || data.video_url || '',
+          raw: data,
+          operation: op,
+          model,
+          prompt,
+          imgPrompt,
+          width,
+          height,
+          motion,
+          seed,
+          time,
+          imageAsEndFrame,
+          flip,
+          timestamp: new Date().toLocaleString(),
+          metadata: {
+            duration: data.metadata?.duration || parameters.duration || 4,
+            fps: data.metadata?.fps || parameters.fps || 24,
+            quality: data.metadata?.quality || parameters.quality || 'high',
+            resolution: data.metadata?.resolution || `${width}x${height}`
+          }
+        });
+      }
       setHistory(prev => [{
         videoUrl: data.result_url || data.url || data.video_url || '',
         raw: data,
@@ -210,7 +268,14 @@ const RunwayML = () => {
         time,
         imageAsEndFrame,
         flip,
-        timestamp: new Date().toLocaleString()
+        timestamp: new Date().toLocaleString(),
+        // Agregar metadata con valores por defecto para evitar errores
+        metadata: {
+          duration: data.metadata?.duration || parameters.duration || 4,
+          fps: data.metadata?.fps || parameters.fps || 24,
+          quality: data.metadata?.quality || parameters.quality || 'high',
+          resolution: data.metadata?.resolution || `${width}x${height}`
+        }
       }, ...prev]);
       setPrompt('');
       setImgPrompt('');
@@ -234,6 +299,163 @@ const RunwayML = () => {
 
   const handleClearHistory = () => {
     setHistory([]);
+  };
+
+  // Función para consultar el estado del task
+  const checkTaskStatus = async (uuid) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No hay token de autenticación');
+        return null;
+      }
+
+      const API_VERSION = "beta_v2";
+      const API_BASE_URL = `/api/${API_VERSION}`;
+      
+      const response = await fetch(`${API_BASE_URL}/runwayml/status/${uuid}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al consultar estado: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error consultando estado:', error);
+      return null;
+    }
+  };
+
+  // Función para obtener el resultado del task
+  const getTaskResult = async (uuid) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No hay token de autenticación');
+        return null;
+      }
+
+      const API_VERSION = "beta_v2";
+      const API_BASE_URL = `/api/${API_VERSION}`;
+      
+      const response = await fetch(`${API_BASE_URL}/runwayml/result/${uuid}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al obtener resultado: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error obteniendo resultado:', error);
+      return null;
+    }
+  };
+
+  // Función para hacer polling del estado
+  const pollTaskStatus = async (uuid) => {
+    setIsPolling(true);
+    let attempts = 0;
+    const maxAttempts = 60; // Máximo 5 minutos (5s * 60)
+    
+    const poll = async () => {
+      if (attempts >= maxAttempts) {
+        setError('Tiempo de espera agotado. El video puede estar listo más tarde.');
+        setIsPolling(false);
+        return;
+      }
+
+      const statusData = await checkTaskStatus(uuid);
+      if (!statusData) {
+        attempts++;
+        setTimeout(poll, 5000); // Consultar cada 5 segundos
+        return;
+      }
+
+      console.log('Estado del task:', statusData);
+      
+      if (statusData.status === 'completed' || statusData.status === 'success') {
+        // Task completado, obtener resultado
+        const resultData = await getTaskResult(uuid);
+        if (resultData) {
+          console.log('Resultado del task:', resultData);
+          
+          // Procesar el video real
+          setGeneratedVideo({
+            videoUrl: resultData.video_url || resultData.url || resultData.result_url || '',
+            raw: resultData,
+            operation: operation,
+            model,
+            prompt,
+            imgPrompt,
+            width,
+            height,
+            motion,
+            seed,
+            time,
+            imageAsEndFrame,
+            flip,
+            timestamp: new Date().toLocaleString(),
+            metadata: {
+              duration: resultData.duration || parameters.duration || 4,
+              fps: resultData.fps || parameters.fps || 24,
+              quality: resultData.quality || parameters.quality || 'high',
+              resolution: resultData.resolution || `${width}x${height}`
+            }
+          });
+          
+          setHistory(prev => [{
+            videoUrl: resultData.video_url || resultData.url || resultData.result_url || '',
+            raw: resultData,
+            operation: operation,
+            model,
+            prompt,
+            imgPrompt,
+            width,
+            height,
+            motion,
+            seed,
+            time,
+            imageAsEndFrame,
+            flip,
+            timestamp: new Date().toLocaleString(),
+            metadata: {
+              duration: resultData.duration || parameters.duration || 4,
+              fps: resultData.fps || parameters.fps || 24,
+              quality: resultData.quality || parameters.quality || 'high',
+              resolution: resultData.resolution || `${width}x${height}`
+            }
+          }, ...prev]);
+        }
+        
+        setIsPolling(false);
+        setTaskId(null);
+        setTaskStatus(null);
+      } else if (statusData.status === 'failed' || statusData.status === 'error') {
+        setError(`Error en la generación del video: ${statusData.message || 'Error desconocido'}`);
+        setIsPolling(false);
+        setTaskId(null);
+        setTaskStatus(null);
+      } else {
+        // Task aún en progreso
+        setTaskStatus(statusData.status);
+        attempts++;
+        setTimeout(poll, 5000);
+      }
+    };
+
+    poll();
   };
 
   return (
@@ -382,6 +604,21 @@ const RunwayML = () => {
               <CircularProgress />
               <Typography variant="body1" sx={{ mt: 2 }}>
                 Procesando video...
+              </Typography>
+            </Box>
+          )}
+
+          {isPolling && taskId && (
+            <Box sx={{ mb: 4, textAlign: 'center' }}>
+              <CircularProgress />
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                Generando video... (Task ID: {taskId})
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Estado: {taskStatus || 'En cola'}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Esto puede tomar varios minutos. El video aparecerá automáticamente cuando esté listo.
               </Typography>
             </Box>
           )}
