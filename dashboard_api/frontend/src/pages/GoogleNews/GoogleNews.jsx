@@ -215,16 +215,6 @@ const GoogleNews = () => {
                 </IconButton>
               </Tooltip>
             )}
-            <Tooltip title="Compartir">
-              <IconButton size="small" color="secondary">
-                <Share />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Guardar">
-              <IconButton size="small" color="info">
-                <BookmarkBorder />
-              </IconButton>
-            </Tooltip>
           </Box>
           
           {item.hasSubnews && (
