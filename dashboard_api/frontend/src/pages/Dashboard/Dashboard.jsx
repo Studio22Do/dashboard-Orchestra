@@ -67,18 +67,35 @@ const Dashboard = () => {
       icon: Search,
       tools: [
         {
-          id: 'instagram-stats',
-          title: 'Instagram Statistics API',
+          id: 'instagram',
+          title: 'Mediafy API Pro',
           icon: Instagram,
           onClick: () => {
             setSelectedApp({
-              id: 'instagram-stats',
-              title: 'Instagram Statistics',
-              description: 'Analiza perfiles de Instagram, obtén estadísticas y monitorea crecimiento',
-              imageUrl: 'https://cdn.pixabay.com/photo/2016/08/09/17/52/instagram-1581266_960_720.jpg',
+              id: 'instagram',
+              title: 'Mediafy API Pro',
+              description: 'Análisis completo de Instagram: perfiles, posts, hashtags, usuarios y ubicaciones',
+              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
               category: 'Social Media',
-              route: '/apps/instagram',
-              apiName: 'Instagram Statistics API',
+              route: '/apps/mediafy',
+              apiName: 'Mediafy API Pro',
+            });
+            setDrawerOpen(true);
+          }
+        },
+        {
+          id: 'perplexity',
+          title: 'Perplexity API Pro',
+          icon: Psychology,
+          onClick: () => {
+            setSelectedApp({
+              id: 'perplexity',
+              title: 'Perplexity API Pro',
+              description: 'Búsquedas inteligentes con IA - Análisis avanzado de Google data',
+              imageUrl: 'https://cdn.pixabay.com/photo/2016/11/19/18/06/feet-1840619_960_720.jpg',
+              category: 'AI & Analytics',
+              route: '/apps/perplexity',
+              apiName: 'Perplexity API Pro',
             });
             setDrawerOpen(true);
           }
