@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setBalance } from '../../redux/slices/creditsSlice';
 import {
   Container,
   Typography,
@@ -22,7 +24,8 @@ import {
   ListItemText,
   Divider,
   Chip,
-  Link
+  Link,
+  AlertTitle
 } from '@mui/material';
 import {
   Send,
@@ -39,6 +42,8 @@ import {
 } from '@mui/icons-material';
 
 const WhisperFromURL = () => {
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token);
   const [url, setUrl] = useState('');
   const [language, setLanguage] = useState('auto');
   const [model, setModel] = useState('whisper-1');
@@ -84,32 +89,49 @@ const WhisperFromURL = () => {
     setLoading(true);
     setError(null);
     setTranscription(null);
+    
     try {
-      const response = await fetch('/api/whisper-url', {
+      // Usar la ruta correcta del backend para Whisper from URL
+      const response = await fetch('/api/beta_v2/speech-to-text/whisper-url', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           audio_url: url,
           language,
           model
         })
       });
+      
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Error al transcribir el audio');
       }
+      
       const data = await response.json();
       
-      // Verificar si hay un mensaje específico (audio sin texto audible)
-      const transcriptionText = data.message || data.text || data.transcription || 'No se recibió transcripción';
-      const hasNoSpeech = data.message && !data.text;
+      // Actualizar créditos si la respuesta los incluye
+      if (data && data.credits_info && typeof data.credits_info.remaining === 'number') {
+        dispatch(setBalance(data.credits_info.remaining));
+      }
+      
+      // Extraer la transcripción del objeto response
+      const transcriptionText = data.response?.text || data.message || data.text || data.transcription || 'No se recibió transcripción';
+      const hasNoSpeech = data.response?.text ? false : (data.message && !data.text);
       
       const newTranscription = {
         url,
         language,
         model,
         text: transcriptionText,
-        metadata: data.metadata || {},
+        metadata: {
+          duration: data.response?.duration || data.metadata?.duration,
+          words: data.response?.text?.split(' ').length || data.metadata?.words,
+          confidence: data.response?.confidence || data.metadata?.confidence,
+          segments: data.response?.segments || data.metadata?.segments
+        },
         timestamp: new Date().toLocaleString(),
         hasNoSpeech: hasNoSpeech
       };
@@ -151,8 +173,25 @@ const WhisperFromURL = () => {
         Whisper: Transcripción desde URL
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        Transcribe audio desde URLs usando el modelo Whisper de OpenAI
+        Transcribe audio desde URLs directas de archivos de audio usando el modelo Whisper de OpenAI
       </Typography>
+      
+      {/* Chip de costo */}
+      <Box sx={{ mb: 3 }}>
+        <Chip 
+          label="Costo: 1 punto" 
+          color="primary" 
+          variant="outlined"
+          icon={<Speed />}
+        />
+      </Box>
+      
+      {/* Alerta informativa */}
+      <Alert severity="info" sx={{ mb: 3 }}>
+        <AlertTitle>Formato de URLs</AlertTitle>
+        Solo se aceptan URLs directas de archivos de audio (MP3, WAV, M4A, MPGA, AAC, OGG, FLAC, WMA). 
+        Para YouTube y otras plataformas, usa "Speech to Text AI".
+      </Alert>
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
@@ -163,12 +202,12 @@ const WhisperFromURL = () => {
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
-                      label="URL del Audio"
+                      label="URL del Archivo de Audio"
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                       required
                       placeholder="https://ejemplo.com/audio.mp3"
-                      helperText="Ingresa la URL del archivo de audio a transcribir"
+                      helperText="Solo URLs directas de archivos de audio (MP3, WAV, M4A, MPGA, AAC, OGG, FLAC, WMA)"
                     />
                   </Grid>
                   
@@ -396,7 +435,7 @@ const WhisperFromURL = () => {
                 <ListItem>
                   <ListItemText
                     primary="Formatos soportados"
-                    secondary="MP3, WAV, M4A, MP4, MPEG, MPGA, WEBM"
+                    secondary="MP3, WAV, M4A, MPGA, AAC, OGG, FLAC, WMA (solo audio)"
                   />
                 </ListItem>
                 <Divider />
