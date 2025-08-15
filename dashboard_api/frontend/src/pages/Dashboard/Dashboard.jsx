@@ -44,6 +44,7 @@ import {
 } from '@mui/icons-material';
 import AppDetailDrawer from '../../components/AppDetailDrawer/AppDetailDrawer';
 import AppSearchHeader from '../../components/app-search/AppSearchHeader';
+import picpulseLogo from '../../assets/images/apps/picpulse.png';
 const DashboardContainer = styled(Container)(({ theme }) => ({
   paddingTop: 0,
   paddingBottom: theme.spacing(4),
@@ -303,7 +304,7 @@ const Dashboard = () => {
               id: 'picpulse',
               title: 'PicPulse',
               description: 'Análisis psicológico y de calidad de imágenes con IA',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/01/31/15/33/analysis-2025795_1280.png',
+              imageUrl: picpulseLogo,
               category: 'Creative & Content',
               route: '/apps/picpulse',
               apiName: 'PicPulse API',

@@ -27,6 +27,7 @@ CREDITS_COST = {
     'domain_metrics': 1,
     'ahrefs_dr': 2,
     'pagespeed_insights': 1,
+    'website_analyzer': 2,  # Análisis completo de velocidad, SEO y dominio
     'seo_keyword_research': 3,
     
     # Content APIs

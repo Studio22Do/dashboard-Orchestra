@@ -107,6 +107,45 @@ def create_app():
             raise e
         raise ApiValidationError(str(e))
 
+@apps_bp.route('/debug/create-picpulse', methods=['POST'])
+@jwt_required()
+def debug_create_picpulse():
+    """Endpoint temporal para crear la app de PicPulse con la imagen correcta"""
+    try:
+        # Verificar si ya existe
+        existing_app = App.query.get('picpulse')
+        if existing_app:
+            # Actualizar la imagen
+            existing_app.image_url = '/assets/images/apps/picpulse.png'
+            db.session.commit()
+            return jsonify({
+                'message': 'App PicPulse actualizada con nueva imagen',
+                'app': app_schema.dump(existing_app)
+            }), 200
+        
+        # Crear nueva app
+        app = App(
+            id='picpulse',
+            title='PicPulse',
+            description='Análisis psicológico y de calidad de imágenes con IA',
+            image_url='/assets/images/apps/picpulse.png',
+            category='Creative & Content',
+            route='/apps/picpulse',
+            api_name='PicPulse API'
+        )
+        
+        db.session.add(app)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'App PicPulse creada exitosamente',
+            'app': app_schema.dump(app)
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 @apps_bp.route('/<string:app_id>', methods=['PUT'])
 @jwt_required()
 def update_app(app_id):

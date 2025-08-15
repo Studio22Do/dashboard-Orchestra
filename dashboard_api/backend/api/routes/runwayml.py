@@ -1,9 +1,13 @@
 from flask import Blueprint, request, jsonify, current_app
+from flask_jwt_extended import jwt_required
 import requests
+from api.utils.decorators import credits_required
 
 runwayml_bp = Blueprint('runwayml', __name__)
 
 @runwayml_bp.route('/process', methods=['POST'])
+@jwt_required()
+@credits_required(amount=3)  # RunwayML cuesta 3 puntos
 def process_runwayml():
     data = request.json
     print('DEBUG RUNWAYML PAYLOAD:', data)
@@ -72,4 +76,51 @@ def process_runwayml():
         print('RUNWAYML RAW RESPONSE:', response.status_code, response.text)
         return jsonify(response.json()), response.status_code
     except Exception as e:
-        return jsonify({'error': str(e)}), 500 
+        return jsonify({"error": "Error interno del servidor", "details": str(e)}), 500
+
+@runwayml_bp.route('/status/<uuid>', methods=['GET'])
+@jwt_required()
+@credits_required(amount=0)  # Consultar estado no cuesta puntos
+def check_task_status(uuid):
+    """Verificar el estado de un task de RunwayML"""
+    try:
+        api_url = f"https://runwayml.p.rapidapi.com/status"
+        headers = {
+            "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
+            "x-rapidapi-host": "runwayml.p.rapidapi.com"
+        }
+        params = {"uuid": uuid}
+        
+        response = requests.get(api_url, headers=headers, params=params, timeout=30)
+        
+        if response.status_code != 200:
+            return jsonify({"error": "Error al consultar estado", "details": response.text}), response.status_code
+        
+        return jsonify(response.json()), 200
+        
+    except Exception as e:
+        logger.error(f"Error consultando estado: {str(e)}")
+        return jsonify({"error": "Error interno del servidor", "details": str(e)}), 500
+
+@runwayml_bp.route('/result/<uuid>', methods=['GET'])
+@jwt_required()
+@credits_required(amount=0)  # Obtener resultado no cuesta puntos
+def get_task_result(uuid):
+    """Obtener el resultado de un task completado de RunwayML"""
+    try:
+        api_url = f"https://runwayml.p.rapidapi.com/queue/{uuid}/result"
+        headers = {
+            "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
+            "x-rapidapi-host": "runwayml.p.rapidapi.com"
+        }
+        
+        response = requests.get(api_url, headers=headers, timeout=30)
+        
+        if response.status_code != 200:
+            return jsonify({"error": "Error al obtener resultado", "details": response.text}), response.status_code
+        
+        return jsonify(response.json()), 200
+        
+    except Exception as e:
+        logger.error(f"Error obteniendo resultado: {str(e)}")
+        return jsonify({"error": "Error interno del servidor", "details": str(e)}), 500 

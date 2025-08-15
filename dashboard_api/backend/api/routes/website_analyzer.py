@@ -1,10 +1,12 @@
 from flask import Blueprint, request, jsonify, current_app
+from flask_jwt_extended import jwt_required
 import requests
 import logging
 import json
 from urllib.parse import urlparse
+from api.utils.decorators import credits_required
 
-website_analyzer_bp = Blueprint('website_analyzer', __name__)
+website_analyzer_pro_bp = Blueprint('website_analyzer_pro', __name__)
 logger = logging.getLogger(__name__)
 
 def print_analysis_results(data_type, response):
@@ -58,7 +60,15 @@ def print_analysis_results(data_type, response):
         print("❌ Error decodificando JSON")
         print(f"Respuesta raw: {response.text[:200]}...")
 
-@website_analyzer_bp.route('/full-analysis', methods=['GET'])
+@website_analyzer_pro_bp.route('', methods=['OPTIONS'])
+@website_analyzer_pro_bp.route('/', methods=['OPTIONS'])
+def handle_options():
+    """Manejar peticiones OPTIONS para CORS"""
+    return '', 200
+
+@website_analyzer_pro_bp.route('/full-analysis', methods=['GET'])
+@jwt_required()
+@credits_required(amount=2)  # Análisis completo cuesta 2 puntos
 def full_analysis():
     """Realiza un análisis completo del sitio web incluyendo velocidad, SEO y dominio"""
     url = request.args.get('url')
@@ -71,14 +81,16 @@ def full_analysis():
         if not domain:
             domain = url.split('/')[0]
 
-        api_base = f"https://{current_app.config['RAPIDAPI_WEBSITE_ANALYZER_HOST']}"
+        # CORRECCIÓN FORZADA: Usar la API correcta directamente
+        api_base = "https://website-analyze-and-seo-audit-pro.p.rapidapi.com"
         headers = {
             "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
-            "x-rapidapi-host": current_app.config['RAPIDAPI_WEBSITE_ANALYZER_HOST']
+            "x-rapidapi-host": "website-analyze-and-seo-audit-pro.p.rapidapi.com"
         }
 
         print(f"\nIniciando análisis para: {url}")
         print(f"Dominio extraído: {domain}")
+        print(f"Config RAPIDAPI_WEBSITE_ANALYZER_HOST: {current_app.config.get('RAPIDAPI_WEBSITE_ANALYZER_HOST', 'NO_DEFINIDO')}")
         print(f"Headers: {headers}")
 
         # 1. Análisis de Velocidad
@@ -184,7 +196,9 @@ def full_analysis():
             'details': str(e)
         }), 500
 
-@website_analyzer_bp.route('/speed', methods=['GET'])
+@website_analyzer_pro_bp.route('/speed', methods=['GET'])
+@jwt_required()
+@credits_required(amount=1)  # Análisis de velocidad cuesta 1 punto
 def analyze_speed():
     """Analiza solo la velocidad del sitio web"""
     url = request.args.get('url')
@@ -192,13 +206,15 @@ def analyze_speed():
         return jsonify({'error': 'URL es requerida'}), 400
 
     try:
-        api_url = f"https://{current_app.config['RAPIDAPI_WEBSITE_ANALYZER_HOST']}/speed.php"
+        # CORRECCIÓN FORZADA: Usar la API correcta directamente
+        api_url = "https://website-analyze-and-seo-audit-pro.p.rapidapi.com/speed.php"
         headers = {
             "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
-            "x-rapidapi-host": current_app.config['RAPIDAPI_WEBSITE_ANALYZER_HOST']
+            "x-rapidapi-host": "website-analyze-and-seo-audit-pro.p.rapidapi.com"
         }
         
         logger.info(f"Analizando velocidad para: {url}")
+        print(f"[DEBUG] RAPIDAPI_WEBSITE_ANALYZER_HOST: {current_app.config.get('RAPIDAPI_WEBSITE_ANALYZER_HOST', 'NO_DEFINIDO')}")
         response = requests.get(api_url, headers=headers, params={"website": url})
         response.raise_for_status()
         
@@ -211,7 +227,9 @@ def analyze_speed():
             'details': str(e)
         }), 500
 
-@website_analyzer_bp.route('/seo', methods=['GET'])
+@website_analyzer_pro_bp.route('/seo', methods=['GET'])
+@jwt_required()
+@credits_required(amount=1)  # Análisis SEO cuesta 1 punto
 def analyze_seo():
     """Analiza solo el SEO del sitio web"""
     url = request.args.get('url')
@@ -219,13 +237,15 @@ def analyze_seo():
         return jsonify({'error': 'URL es requerida'}), 400
 
     try:
-        api_url = f"https://{current_app.config['RAPIDAPI_WEBSITE_ANALYZER_HOST']}/onpagepro.php"
+        # CORRECCIÓN FORZADA: Usar la API correcta directamente
+        api_url = "https://website-analyze-and-seo-audit-pro.p.rapidapi.com/onpagepro.php"
         headers = {
             "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
-            "x-rapidapi-host": current_app.config['RAPIDAPI_WEBSITE_ANALYZER_HOST']
+            "x-rapidapi-host": "website-analyze-and-seo-audit-pro.p.rapidapi.com"
         }
         
         logger.info(f"Analizando SEO para: {url}")
+        print(f"[DEBUG] RAPIDAPI_WEBSITE_ANALYZER_HOST: {current_app.config.get('RAPIDAPI_WEBSITE_ANALYZER_HOST', 'NO_DEFINIDO')}")
         response = requests.get(api_url, headers=headers, params={"website": url})
         response.raise_for_status()
         

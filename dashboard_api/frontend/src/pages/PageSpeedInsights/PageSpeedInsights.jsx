@@ -62,7 +62,20 @@ const PageSpeedInsights = () => {
 
     try {
       const params = new URLSearchParams({ url: url });
-      const response = await fetch(`${API_BASE_URL}/full-analysis?${params.toString()}`);
+      
+      // Obtener el token JWT del localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No hay token de autenticación. Por favor inicia sesión nuevamente.');
+        setLoading(false);
+        return;
+      }
+      
+      const response = await fetch(`${API_BASE_URL}/full-analysis?${params.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const data = await response.json();
 
       if (!response.ok || data.error) {

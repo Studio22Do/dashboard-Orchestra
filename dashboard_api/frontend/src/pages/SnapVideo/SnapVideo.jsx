@@ -38,7 +38,7 @@ const SnapVideo = () => {
   const [videoInfo, setVideoInfo] = useState(null);
 
   const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
-  const API_BASE_URL = `${APP_CONFIG.API_URL}/${API_MODE}`;
+  const API_BASE_URL = `${APP_CONFIG.API_URL}/api/${API_MODE}`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -1,7 +1,9 @@
 import logging
 import requests
 from flask import Blueprint, jsonify, current_app, request
+from flask_jwt_extended import jwt_required
 from utils.decorators import handle_api_errors
+from api.utils.decorators import credits_required
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +31,8 @@ def make_api_request(endpoint, method='GET', params=None, data=None):
         raise
 
 @speech_to_text_bp.route('/transcribe', methods=['GET', 'POST'])
+@jwt_required()
+@credits_required(amount=1)
 @handle_api_errors
 def transcribe_audio():
     """Transcribe audio desde una URL"""
