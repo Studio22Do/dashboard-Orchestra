@@ -91,7 +91,7 @@ const CardContentFade = styled('div')(({ theme, isvisible }) => ({
 
 const ToolCard = ({ 
   title = 'Sin título', 
-  icon: Icon, 
+  imageUrl, 
   onClick = () => {} 
 }) => {
   const cardRef = useRef(null);
@@ -152,7 +152,18 @@ const ToolCard = ({
     >
       <CardContentFade isvisible={isVisible ? 1 : 0}>
         <IconContainer>
-          {Icon && <Icon />}
+          {imageUrl && (
+            <img 
+              src={imageUrl} 
+              alt={title}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                borderRadius: '8px'
+              }}
+            />
+          )}
         </IconContainer>
         <StyledContent>
           <Typography 
@@ -177,7 +188,7 @@ const ToolCard = ({
 
 ToolCard.propTypes = {
   title: PropTypes.string.isRequired,
-  icon: PropTypes.elementType,
+  imageUrl: PropTypes.string,
   onClick: PropTypes.func
 };
 

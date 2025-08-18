@@ -6,6 +6,7 @@ import { selectCreditsBalance } from '../../redux/slices/creditsSlice';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Apps as DefaultAppIcon } from '@mui/icons-material';
+import backgroundDrawer from '../../assets/images/apps/background/background-drawer.png';
 
 const AppDetailDrawer = ({ 
   open = false, 
@@ -108,7 +109,10 @@ const AppDetailDrawer = ({
           sx: { 
             width: 400, 
             p: 0, 
-            background: '#1a1530', 
+            background: `url(${backgroundDrawer})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
             color: 'white',
             '&:focus': {
               outline: 'none'

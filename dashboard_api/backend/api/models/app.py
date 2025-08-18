@@ -9,6 +9,7 @@ class App(db.Model):
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(255))
+    icon_url = db.Column(db.String(255))
     category = db.Column(db.String(50), nullable=False, index=True)
     route = db.Column(db.String(100), nullable=False)
     api_name = db.Column(db.String(100), nullable=False)
@@ -19,7 +20,7 @@ class App(db.Model):
     # Relación con los registros de uso de la API
     usage_records = db.relationship('ApiUsage', back_populates='app', lazy='dynamic')
     
-    def __init__(self, id, title, description, category, route, api_name, image_url=None):
+    def __init__(self, id, title, description, category, route, api_name, image_url=None, icon_url=None):
         self.id = id
         self.title = title
         self.description = description
@@ -27,6 +28,7 @@ class App(db.Model):
         self.route = route
         self.api_name = api_name
         self.image_url = image_url
+        self.icon_url = icon_url
     
     def to_dict(self):
         """Convertir a diccionario para respuestas JSON"""
@@ -35,6 +37,7 @@ class App(db.Model):
             'title': self.title,
             'description': self.description,
             'imageUrl': self.image_url,
+            'iconUrl': self.icon_url,
             'category': self.category,
             'route': self.route,
             'apiName': self.api_name,
