@@ -3,48 +3,40 @@ import { Container, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import CategorySection from '../../components/CategorySection/CategorySection';
+// Solo iconos para categorías principales
 import { 
   Search, // Social Listening icon
-  Palette, // UX/UI icon
-  Language, // Web icon
-  Instagram,
-  TrendingUp,
-  YouTube,
-  Description,
-  Speed,
-  Analytics,
-  MonetizationOn,
-  AlternateEmail,
-  Videocam,
-  Transform,
-  PictureAsPdf,
-  AudioFile,
-  Image,
-  Mic,
-  Code,
-  ChatBubble,
-  Architecture,
-  Cloud,
-  Assessment,
-  Insights,
-  Summarize,
-  Storage,
-  BarChart,
-  Https,
-  Public,
-  Link,
-  DomainVerification,
-  ShoppingCart,
-  Visibility,
-  Settings,
-  PhotoCamera,
-  Psychology,
-  Dns,
-  QrCode
+  Palette, // Creative & Content icon
+  Language, // Web & SEO icon
 } from '@mui/icons-material';
 import AppDetailDrawer from '../../components/AppDetailDrawer/AppDetailDrawer';
 import AppSearchHeader from '../../components/app-search/AppSearchHeader';
-import picpulseLogo from '../../assets/images/apps/picpulse.png';
+import picpulseicon from '../../assets/images/apps/icons/Picpulseicon.png';
+import mediafyLogo from '../../assets/images/apps/icons/mediafyicon.png';
+import perplexityLogo from '../../assets/images/apps/icons/perplexityicon.png';
+import googleNewsLogo from '../../assets/images/apps/icons/googlenewsicon.png';
+import instagramRealtimeLogo from '../../assets/images/apps/icons/mediafyicon.png';
+import wordCountLogo from '../../assets/images/apps/icons/wordcounticon.png';
+import pdfToTextLogo from '../../assets/images/apps/icons/pdftotexticon.png';
+import snapVideoLogo from '../../assets/images/apps/icons/snapvideoicon.png';
+import genieAILogo from '../../assets/images/apps/icons/chatgpt4icon.png';
+import aiSocialMediaLogo from '../../assets/images/apps/icons/contentcreatoricon.png';
+import imageManipulationLogo from '../../assets/images/apps/icons/imagetransform-1.png';
+import whisperLogo from '../../assets/images/apps/icons/whispericon.png';
+import runwayMLLogo from '../../assets/images/apps/icons/runawayicon.png';
+import prlabsLogo from '../../assets/images/apps/icons/chatgpt4icon.png';
+import speechToTextLogo from '../../assets/images/apps/icons/speechtotexticon.png';
+import qrGeneratorLogo from '../../assets/images/apps/icons/qrgeneratorcode.png';
+import seoAnalyzerLogo from '../../assets/images/apps/icons/seoanalyzericon.png';
+import similarWebLogo from '../../assets/images/apps/icons/similarwebicon.png';
+import googleKeywordLogo from '../../assets/images/apps/icons/keywordinsightsicon.png';
+import domainMetricsLogo from '../../assets/images/apps/icons/domaincheckericon.png';
+import pageSpeedLogo from '../../assets/images/apps/icons/webauditicon.png';
+import productDescriptionLogo from '../../assets/images/apps/icons/productdescriptionicon.png';
+import sslCheckerLogo from '../../assets/images/apps/icons/SSLcheckericon.png';
+import websiteStatusLogo from '../../assets/images/apps/icons/webstatusicon.png';
+import seoMastermindLogo from '../../assets/images/apps/icons/keywordsearchicon.png';
+import whoisLookupLogo from '../../assets/images/apps/icons/Whoisicon.png';
 const DashboardContainer = styled(Container)(({ theme }) => ({
   paddingTop: 0,
   paddingBottom: theme.spacing(4),
@@ -69,13 +61,13 @@ const Dashboard = () => {
         {
           id: 'instagram',
           title: 'Mediafy API Pro',
-          icon: Instagram,
+          imageUrl: mediafyLogo,
           onClick: () => {
             setSelectedApp({
               id: 'instagram',
               title: 'Mediafy API Pro',
               description: 'Análisis completo de Instagram: perfiles, posts, hashtags, usuarios y ubicaciones',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: mediafyLogo,
               category: 'Social Media',
               route: '/apps/mediafy',
               apiName: 'Mediafy API Pro',
@@ -84,15 +76,15 @@ const Dashboard = () => {
           }
         },
         {
-          id: 'perplexity',
-          title: 'Perplexity API Pro',
-          icon: Psychology,
+            id: 'perplexity',
+            title: 'Perplexity API Pro',
+            imageUrl: perplexityLogo,
           onClick: () => {
             setSelectedApp({
               id: 'perplexity',
               title: 'Perplexity API Pro',
               description: 'Búsquedas inteligentes con IA - Análisis avanzado de Google data',
-              imageUrl: 'https://cdn.pixabay.com/photo/2016/11/19/18/06/feet-1840619_960_720.jpg',
+              imageUrl: perplexityLogo,
               category: 'AI & Analytics',
               route: '/apps/perplexity',
               apiName: 'Perplexity API Pro',
@@ -104,13 +96,13 @@ const Dashboard = () => {
         {
           id: 'google-news',
           title: 'Google News API',
-          icon: Description,
+          imageUrl: googleNewsLogo,
           onClick: () => {
             setSelectedApp({
               id: 'google-news',
               title: 'Google News',
               description: 'Accede a noticias en tiempo real de múltiples fuentes, categorías y países',
-              imageUrl: 'https://cdn.pixabay.com/photo/2015/11/03/09/03/google-1018443_960_720.jpg',
+              imageUrl: googleNewsLogo,
               category: 'Social Listening',
               route: '/apps/google-news',
               apiName: 'Google News API',
@@ -121,13 +113,13 @@ const Dashboard = () => {
         {
           id: 'instagram-realtime',
           title: 'Instagram Realtime API',
-          icon: AlternateEmail,
+          imageUrl: instagramRealtimeLogo,
           onClick: () => {
             setSelectedApp({
               id: 'instagram-realtime',
               title: 'Instagram Realtime',
               description: 'Monitorea en tiempo real la actividad de Instagram, hashtags y menciones',
-              imageUrl: 'https://cdn.pixabay.com/photo/2016/08/09/17/52/instagram-1581266_960_720.jpg',
+              imageUrl: instagramRealtimeLogo,
               category: 'Social Listening',
               route: '/instagram-realtime',
               apiName: 'Instagram Realtime API',
@@ -145,13 +137,13 @@ const Dashboard = () => {
         {
           id: 'word-count',
           title: 'Word Count',
-          icon: Description,
+          imageUrl: wordCountLogo,
           onClick: () => {
             setSelectedApp({
               id: 'word-count',
               title: 'Word Count',
               description: 'Analiza y cuenta palabras, caracteres y párrafos en tus textos',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: wordCountLogo,
               category: 'Creative & Content',
               route: '/apps/word-count',
               apiName: 'Word Count API',
@@ -162,13 +154,13 @@ const Dashboard = () => {
         {
           id: 'pdf-to-text',
           title: 'PDF to Text Converter',
-          icon: PictureAsPdf,
+          imageUrl: pdfToTextLogo,
           onClick: () => {
             setSelectedApp({
               id: 'pdf-to-text',
               title: 'PDF to Text',
               description: 'Convierte documentos PDF a texto editable',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: pdfToTextLogo,
               category: 'Creative & Content',
               route: '/apps/pdf-to-text',
               apiName: 'PDF to Text API',
@@ -179,13 +171,13 @@ const Dashboard = () => {
         {
           id: 'snap-video',
           title: 'Snap Video',
-          icon: Videocam,
+          imageUrl: snapVideoLogo,
           onClick: () => {
             setSelectedApp({
               id: 'snap-video',
               title: 'Snap Video',
               description: 'Crea y edita videos cortos con efectos y filtros',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: snapVideoLogo,
               category: 'Creative & Content',
               route: '/apps/snap-video',
               apiName: 'Snap Video API',
@@ -196,13 +188,13 @@ const Dashboard = () => {
         {
           id: 'genie-ai',
           title: 'GenieAI - ChatGPT-3 Model',
-          icon: ChatBubble,
+          imageUrl: genieAILogo,
           onClick: () => {
             setSelectedApp({
               id: 'genie-ai',
               title: 'GenieAI',
               description: 'Asistente de IA basado en ChatGPT-3 para diversas tareas',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: genieAILogo,
               category: 'Creative & Content',
               route: '/apps/genie-ai',
               apiName: 'GenieAI API',
@@ -213,13 +205,13 @@ const Dashboard = () => {
         {
           id: 'ai-social-media',
           title: 'AI Social Media Content Generator',
-          icon: Instagram,
+          imageUrl: aiSocialMediaLogo,
           onClick: () => {
             setSelectedApp({
               id: 'ai-social-media',
               title: 'AI Social Media',
               description: 'Genera contenido optimizado para redes sociales usando IA',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: aiSocialMediaLogo,
               category: 'Creative & Content',
               route: '/apps/ai-social-media',
               apiName: 'AI Social Media API',
@@ -230,13 +222,13 @@ const Dashboard = () => {
         {
           id: 'image-manipulation',
           title: 'Advanced Image Manipulation API',
-          icon: Transform,
+          imageUrl: imageManipulationLogo,
           onClick: () => {
             setSelectedApp({
               id: 'image-manipulation',
               title: 'Image Manipulation',
               description: 'Herramientas avanzadas para edición y manipulación de imágenes',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: imageManipulationLogo,
               category: 'Creative & Content',
               route: '/apps/advanced-image',
               apiName: 'Image Manipulation API',
@@ -247,13 +239,13 @@ const Dashboard = () => {
         {
           id: 'whisper-url',
           title: 'Whisper: From URL',
-          icon: AudioFile,
+          imageUrl: whisperLogo,
           onClick: () => {
             setSelectedApp({
               id: 'whisper-url',
               title: 'Whisper URL',
               description: 'Transcribe audio desde URLs usando el modelo Whisper',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: whisperLogo,
               category: 'Creative & Content',
               route: '/apps/whisper-url',
               apiName: 'Whisper API',
@@ -264,13 +256,13 @@ const Dashboard = () => {
         {
           id: 'runwayml',
           title: 'RunwayML',
-          icon: Cloud,
+          imageUrl: runwayMLLogo,
           onClick: () => {
             setSelectedApp({
               id: 'runwayml',
               title: 'RunwayML',
               description: 'Plataforma de IA para generación y edición de contenido multimedia',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: runwayMLLogo,
               category: 'Creative & Content',
               route: '/apps/runway-ml',
               apiName: 'RunwayML API',
@@ -281,13 +273,13 @@ const Dashboard = () => {
         {
           id: 'prlabs',
           title: 'sinfonIA',
-          icon: Psychology,
+          imageUrl: prlabsLogo,
           onClick: () => {
             setSelectedApp({
               id: 'prlabs',
               title: 'sinfonIA',
               description: 'Suite de herramientas de IA para generación de texto e imágenes',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: prlabsLogo,
               category: 'Creative & Content',
               route: '/prlabs',
               apiName: 'sinfonIA',
@@ -298,13 +290,13 @@ const Dashboard = () => {
         {
           id: 'speech-to-text',
           title: 'Speech to Text AI',
-          icon: Mic,
+          imageUrl: speechToTextLogo,
           onClick: () => {
             setSelectedApp({
               id: 'speech-to-text',
               title: 'Speech to Text AI',
               description: 'Transcribe audio y video desde múltiples fuentes usando IA avanzada',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: speechToTextLogo,
               category: 'Creative & Content',
               route: '/apps/speech-to-text',
               apiName: 'Speech to Text AI',
@@ -315,20 +307,21 @@ const Dashboard = () => {
         {
           id: 'picpulse',
           title: 'PicPulse',
-          icon: Psychology,
+          imageUrl: picpulseicon,
           onClick: () => {
             setSelectedApp({
               id: 'picpulse',
               title: 'PicPulse',
               description: 'Análisis psicológico y de calidad de imágenes con IA',
-              imageUrl: picpulseLogo,
+              imageUrl: picpulseicon,
               category: 'Creative & Content',
               route: '/apps/picpulse',
-              apiName: 'PicPulse API',
+              apiName: 'PicPulse',
             });
             setDrawerOpen(true);
           }
-        }
+        },
+
       ]
     },
     {
@@ -339,13 +332,13 @@ const Dashboard = () => {
         {
           id: 'qr-generator',
           title: 'QR Code Generator',
-          icon: QrCode,
+          imageUrl: qrGeneratorLogo,
           onClick: () => {
             setSelectedApp({
               id: 'qr-generator',
               title: 'QR Code Generator',
               description: 'Genera códigos QR personalizables (PNG/JPEG/SVG) para texto, URL, WiFi, email, SMS y más',
-              imageUrl: 'https://placehold.co/800x400/1a1a1a/ffffff?text=QR+Code+Generator',
+              imageUrl: qrGeneratorLogo,
               category: 'Web & SEO',
               route: '/apps/qr-generator',
               apiName: 'QRCode Smart Generator'
@@ -356,13 +349,13 @@ const Dashboard = () => {
         {
           id: 'seo-analyzer',
           title: 'SEO Analyzer',
-          icon: Analytics,
+          imageUrl: seoAnalyzerLogo,
           onClick: () => {
             setSelectedApp({
               id: 'seo-analyzer',
               title: 'SEO Analyzer',
               description: 'Analiza y optimiza el SEO de tu sitio web',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: seoAnalyzerLogo,
               category: 'Web & SEO',
               route: '/apps/seo-analyzer',
               apiName: 'SEO Analyzer API',
@@ -373,13 +366,13 @@ const Dashboard = () => {
         {
           id: 'similar-web',
           title: 'Similar Web Insights',
-          icon: Insights,
+          imageUrl: similarWebLogo,
           onClick: () => {
             setSelectedApp({
               id: 'similar-web',
               title: 'Similar Web',
               description: 'Obtén insights detallados sobre el tráfico web y la competencia',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: similarWebLogo,
               category: 'Web & SEO',
               route: '/apps/similar-web',
               apiName: 'Similar Web API',
@@ -390,13 +383,13 @@ const Dashboard = () => {
         {
           id: 'google-keyword',
           title: 'Google Keyword Insights',
-          icon: Search,
+          imageUrl: googleKeywordLogo,
           onClick: () => {
             setSelectedApp({
               id: 'google-keyword',
               title: 'Keyword Insights',
               description: 'Analiza palabras clave y tendencias de búsqueda',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: googleKeywordLogo,
               category: 'Web & SEO',
               route: '/apps/keyword-insights',
               apiName: 'Google Keyword API',
@@ -407,13 +400,13 @@ const Dashboard = () => {
         {
           id: 'domain-metrics',
           title: 'Domain Metrics Check',
-          icon: DomainVerification,
+          imageUrl: domainMetricsLogo,
           onClick: () => {
             setSelectedApp({
               id: 'domain-metrics',
               title: 'Domain Metrics',
               description: 'Verifica métricas y salud de dominios web',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: domainMetricsLogo,
               category: 'Web & SEO',
               route: '/apps/domain-metrics',
               apiName: 'Domain Metrics API',
@@ -424,13 +417,13 @@ const Dashboard = () => {
         {
           id: 'page-speed',
           title: 'Website Speed Test',
-          icon: Speed,
+          imageUrl: pageSpeedLogo,
           onClick: () => {
             setSelectedApp({
               id: 'page-speed',
               title: 'Website Speed Test',
               description: 'Analiza la velocidad de carga y rendimiento de cualquier sitio web con métricas precisas',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: pageSpeedLogo,
               category: 'Web & SEO',
               route: '/apps/page-speed',
               apiName: 'Website Speed Test API',
@@ -441,13 +434,13 @@ const Dashboard = () => {
         {
           id: 'ecommerce-description',
           title: 'AI eCommerce Product Description Generator',
-          icon: ShoppingCart,
+          imageUrl: productDescriptionLogo,
           onClick: () => {
             setSelectedApp({
               id: 'ecommerce-description',
               title: 'Product Description Generator',
               description: 'Genera descripciones optimizadas para productos de eCommerce',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: productDescriptionLogo,
               category: 'Web & SEO',
               route: '/apps/product-description',
               apiName: 'Product Description API',
@@ -458,13 +451,13 @@ const Dashboard = () => {
         {
           id: 'ssl-checker',
           title: 'SSL Checker',
-          icon: Https,
+          imageUrl: sslCheckerLogo,
           onClick: () => {
             setSelectedApp({
               id: 'ssl-checker',
               title: 'SSL Checker',
               description: 'Verifica el estado y validez de certificados SSL',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: sslCheckerLogo,
               category: 'Web & SEO',
               route: '/apps/ssl-checker',
               apiName: 'SSL Checker API',
@@ -475,13 +468,13 @@ const Dashboard = () => {
         {
           id: 'website-status',
           title: 'Check if WEBSITE is UP or DOWN',
-          icon: Public,
+          imageUrl: websiteStatusLogo,
           onClick: () => {
             setSelectedApp({
               id: 'website-status',
               title: 'Website Status',
               description: 'Monitorea el estado y disponibilidad de sitios web',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: websiteStatusLogo,
               category: 'Web & SEO',
               route: '/apps/website-status',
               apiName: 'Website Status API',
@@ -492,13 +485,13 @@ const Dashboard = () => {
         {
           id: 'seo-mastermind',
           title: 'SEO Mastermind – AI Keyword, Meta & Title Generator',
-          icon: Settings,
+          imageUrl: seoMastermindLogo,
           onClick: () => {
             setSelectedApp({
               id: 'seo-mastermind',
               title: 'SEO Mastermind',
               description: 'Genera keywords, meta tags y títulos optimizados con IA',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: seoMastermindLogo,
               category: 'Web & SEO',
               route: '/apps/seo-mastermind',
               apiName: 'SEO Mastermind API',
@@ -509,13 +502,13 @@ const Dashboard = () => {
         {
           id: 'whois-lookup',
           title: 'WHOIS Lookup Service',
-          icon: Dns,
+          imageUrl: whoisLookupLogo,
           onClick: () => {
             setSelectedApp({
               id: 'whois-lookup',
               title: 'WHOIS Lookup Service',
               description: 'Consulta información detallada de registro para dominios, direcciones IP y números ASN',
-              imageUrl: 'https://cdn.pixabay.com/photo/2017/08/06/12/06/people-2591874_960_720.jpg',
+              imageUrl: whoisLookupLogo,
               category: 'Web & SEO',
               route: '/apps/whois-lookup',
               apiName: 'WHOIS Lookup API',
@@ -544,7 +537,6 @@ const Dashboard = () => {
           ...tool,
           title: tool.title || tool.name || 'Sin título',
           imageUrl: tool.imageUrl || tool.img || 'https://placehold.co/400x200/1a1a1a/ffffff?text=No+Image',
-          icon: tool.icon || undefined,
           onClick: tool.onClick || (() => {}),
         };
         return mappedTool;

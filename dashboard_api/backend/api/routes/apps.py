@@ -98,7 +98,6 @@ def create_app():
             'message': 'Aplicación creada exitosamente',
             'app': app_schema.dump(app)
         }), 201
-        
     except ValidationError as e:
         raise ApiValidationError(str(e.messages))
     except Exception as e:
@@ -110,13 +109,18 @@ def create_app():
 @apps_bp.route('/debug/create-picpulse', methods=['POST'])
 @jwt_required()
 def debug_create_picpulse():
-    """Endpoint temporal para crear la app de PicPulse con la imagen correcta"""
+    """Endpoint temporal para crear/actualizar PicPulse"""
     try:
         # Verificar si ya existe
         existing_app = App.query.get('picpulse')
         if existing_app:
             # Actualizar la imagen
-            existing_app.image_url = '/assets/images/apps/picpulse.png'
+            existing_app.image_url = '/assets/images/apps/icons/Picpulseicon.png'
+            existing_app.title = 'PicPulse'
+            existing_app.description = 'Análisis psicológico y de calidad de imágenes con IA'
+            existing_app.category = 'Creative & Content'
+            existing_app.route = '/apps/picpulse'
+            existing_app.api_name = 'PicPulse API'
             db.session.commit()
             return jsonify({
                 'message': 'App PicPulse actualizada con nueva imagen',
@@ -128,15 +132,13 @@ def debug_create_picpulse():
             id='picpulse',
             title='PicPulse',
             description='Análisis psicológico y de calidad de imágenes con IA',
-            image_url='/assets/images/apps/picpulse.png',
+            image_url='/assets/images/apps/icons/Picpulseicon.png',
             category='Creative & Content',
             route='/apps/picpulse',
             api_name='PicPulse API'
         )
-        
         db.session.add(app)
         db.session.commit()
-        
         return jsonify({
             'message': 'App PicPulse creada exitosamente',
             'app': app_schema.dump(app)
@@ -145,6 +147,140 @@ def debug_create_picpulse():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+@apps_bp.route('/debug/smart-update-icons', methods=['POST'])
+@jwt_required()
+def debug_smart_update_icons():
+    """Endpoint súper inteligente que analiza y mapea automáticamente"""
+    try:
+        # Obtener todas las apps
+        all_apps = App.query.filter_by(is_active=True).all()
+        
+        # Definir categorías de imágenes disponibles
+        image_categories = {
+            'social': ['mediafyicon.png', 'googlenewsicon.png', 'snapvideoicon.png'],
+            'ai': ['chatgpt4icon.png', 'contentcreatoricon.png', 'imagetransform-1.png'],
+            'tools': ['wordcounticon.png', 'pdftotexticon.png', 'whispericon.png'],
+            'seo': ['seoanalyzericon.png', 'similarwebicon.png', 'keywordinsightsicon.png'],
+            'web': ['domaincheckericon.png', 'webauditicon.png', 'webstatusicon.png'],
+            'qr': ['qrgeneratorcode.png'],
+            'ssl': ['SSLcheckericon.png'],
+            'whois': ['Whoisicon.png'],
+            'product': ['productdescriptionicon.png'],
+            'picpulse': ['Picpulseicon.png']
+        }
+        
+        # Función para encontrar la mejor imagen basándose en el contexto
+        def find_best_image(app_id, title, category):
+            app_id_lower = app_id.lower()
+            title_lower = title.lower()
+            category_lower = category.lower() if category else ''
+            
+            # Palabras clave para categorizar
+            social_keywords = ['instagram', 'tiktok', 'youtube', 'social', 'media', 'news', 'trends']
+            ai_keywords = ['ai', 'genie', 'chatgpt', 'content', 'creator', 'humanizer', 'image', 'manipulation', 'midjourney', 'runway']
+            tools_keywords = ['word', 'count', 'pdf', 'text', 'speech', 'whisper', 'converter']
+            seo_keywords = ['seo', 'similar', 'web', 'keyword', 'google', 'domain', 'metrics']
+            web_keywords = ['speed', 'website', 'status', 'ssl', 'checker', 'audit']
+            qr_keywords = ['qr', 'url', 'shortener']
+            ssl_keywords = ['ssl', 'certificate']
+            whois_keywords = ['whois', 'lookup']
+            product_keywords = ['product', 'description', 'ecommerce']
+            picpulse_keywords = ['picpulse', 'pulse']
+            
+            # Determinar categoría de la app
+            if any(keyword in app_id_lower or keyword in title_lower for keyword in social_keywords):
+                return image_categories['social'][0]  # mediafyicon.png
+            elif any(keyword in app_id_lower or keyword in title_lower for keyword in ai_keywords):
+                if 'image' in app_id_lower or 'image' in title_lower:
+                    return image_categories['ai'][2]  # imagetransform-1.png
+                elif 'content' in app_id_lower or 'content' in title_lower:
+                    return image_categories['ai'][1]  # contentcreatoricon.png
+                else:
+                    return image_categories['ai'][0]  # chatgpt4icon.png
+            elif any(keyword in app_id_lower or keyword in title_lower for keyword in tools_keywords):
+                if 'pdf' in app_id_lower or 'pdf' in title_lower:
+                    return image_categories['tools'][1]  # pdftotexticon.png
+                elif 'speech' in app_id_lower or 'speech' in title_lower:
+                    return image_categories['tools'][2]  # whispericon.png
+                else:
+                    return image_categories['tools'][0]  # wordcounticon.png
+            elif any(keyword in app_id_lower or keyword in title_lower for keyword in seo_keywords):
+                if 'similar' in app_id_lower or 'similar' in title_lower:
+                    return image_categories['seo'][1]  # similarwebicon.png
+                elif 'keyword' in app_id_lower or 'keyword' in title_lower:
+                    return image_categories['seo'][2]  # keywordinsightsicon.png
+                else:
+                    return image_categories['seo'][0]  # seoanalyzericon.png
+            elif any(keyword in app_id_lower or keyword in title_lower for keyword in web_keywords):
+                if 'ssl' in app_id_lower or 'ssl' in title_lower:
+                    return image_categories['ssl'][0]  # SSLcheckericon.png
+                elif 'status' in app_id_lower or 'status' in title_lower:
+                    return image_categories['web'][2]  # webstatusicon.png
+                else:
+                    return image_categories['web'][1]  # webauditicon.png
+            elif any(keyword in app_id_lower or keyword in title_lower for keyword in qr_keywords):
+                return image_categories['qr'][0]  # qrgeneratorcode.png
+            elif any(keyword in app_id_lower or keyword in title_lower for keyword in whois_keywords):
+                return image_categories['whois'][0]  # Whoisicon.png
+            elif any(keyword in app_id_lower or keyword in title_lower for keyword in product_keywords):
+                return image_categories['product'][0]  # productdescriptionicon.png
+            elif any(keyword in app_id_lower or keyword in title_lower for keyword in picpulse_keywords):
+                return image_categories['picpulse'][0]  # Picpulseicon.png
+            
+            # Fallback: imagen genérica
+            return 'webauditicon.png'
+        
+        updated_count = 0
+        errors = []
+        mapping_details = []
+        
+        for app in all_apps:
+            try:
+                # Encontrar la mejor imagen para icon_url
+                best_image = find_best_image(app.id, app.title, app.category)
+                new_icon_url = f'/assets/images/apps/icons/{best_image}'
+                
+                # Solo actualizar icon_url si es diferente (NO tocar image_url)
+                if app.icon_url != new_icon_url:
+                    old_icon_url = app.icon_url
+                    app.icon_url = new_icon_url
+                    updated_count += 1
+                    
+                    mapping_details.append({
+                        'app_id': app.id,
+                        'title': app.title,
+                        'old_icon_url': old_icon_url,
+                        'new_icon_url': new_icon_url,
+                        'image_url_actual': app.image_url,  # Solo para referencia
+                        'logic': f"Mapeado por categoría '{app.category}' y palabras clave"
+                    })
+                    
+                    logging.info(f"Actualizado icon_url para {app.id}: {old_icon_url} -> {new_icon_url} (image_url se mantiene intacto)")
+                    
+            except Exception as e:
+                errors.append(f"Error actualizando {app.id}: {str(e)}")
+        
+        # Commit de todos los cambios
+        db.session.commit()
+        
+        return jsonify({
+            'message': f'Actualizados {updated_count} icon_url con mapeo inteligente (image_url se mantiene intacto)',
+            'updated_count': updated_count,
+            'errors': errors,
+            'mapping_details': mapping_details,
+            'total_apps_processed': len(all_apps),
+            'algorithm': 'Mapeo inteligente basado en categorías y palabras clave - SOLO icon_url',
+            'note': 'La columna image_url no se modifica, solo se actualiza icon_url'
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error en smart_update_icons: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+
 
 @apps_bp.route('/<string:app_id>', methods=['PUT'])
 @jwt_required()

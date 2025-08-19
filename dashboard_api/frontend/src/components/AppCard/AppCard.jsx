@@ -15,7 +15,7 @@ import { toggleFavoriteApp, selectCanUseApp } from '../../redux/slices/appsSlice
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 
-const AppCard = ({ id, title, description, imageUrl, category, route, apiName, is_favorite, showFavorite }) => {
+const AppCard = ({ id, title, description, imageUrl, iconUrl, category, route, apiName, is_favorite, showFavorite }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   

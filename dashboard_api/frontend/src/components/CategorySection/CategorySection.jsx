@@ -164,7 +164,6 @@ const CategorySection = ({
               <CardContainer>
                 <ToolCard
                   title={tool.title || tool.name || 'Sin título'}
-                  icon={tool.icon}
                   imageUrl={tool.imageUrl || tool.img}
                   onClick={tool.onClick || (() => {})}
                 />
@@ -185,7 +184,6 @@ CategorySection.propTypes = {
       id: PropTypes.string.isRequired,
       title: PropTypes.string,
       name: PropTypes.string,
-      icon: PropTypes.elementType,
       imageUrl: PropTypes.string,
       img: PropTypes.string,
       onClick: PropTypes.func
