@@ -31,7 +31,7 @@ import {
   Lightbulb,
   Analytics
 } from '@mui/icons-material';
-import axios from 'axios';
+import axiosInstance from '../../config/axios';
 
 const PerplexityAPI = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -94,7 +94,7 @@ const PerplexityAPI = () => {
         return;
       }
 
-      const response = await axios.post('/api/beta_v2/perplexity/search', {
+      const response = await axiosInstance.post('/api/beta_v2/perplexity/search', {
         content: content
       });
 
@@ -346,7 +346,7 @@ const PerplexityAPI = () => {
           WebkitTextFillColor: 'transparent',
           fontWeight: 'bold'
         }}>
-          Perplexity API Pro
+          Perplexity
         </Typography>
         <Typography variant="h6" color="text.secondary" gutterBottom>
           Búsquedas inteligentes con IA - Análisis avanzado de Google data
@@ -426,7 +426,7 @@ const PerplexityAPI = () => {
           <Box sx={{ textAlign: 'center' }}>
             <Lightbulb sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
             <Typography variant="h6" gutterBottom>
-              ¿Cómo usar Perplexity API Pro?
+              ¿Cómo usar Perplexity?
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               Perplexity utiliza inteligencia artificial para analizar y organizar información de Google, 

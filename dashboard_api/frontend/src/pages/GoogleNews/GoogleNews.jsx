@@ -413,7 +413,7 @@ const GoogleNews = () => {
           WebkitTextFillColor: 'transparent',
           fontWeight: 'bold'
         }}>
-          Google News API Pro
+          Google News
         </Typography>
         <Typography variant="h6" color="text.secondary" gutterBottom>
           Noticias en tiempo real de múltiples fuentes, categorías y países
@@ -475,7 +475,7 @@ const GoogleNews = () => {
         <Paper elevation={2} sx={{ p: 3, mt: 4 }}>
           <Box sx={{ textAlign: 'center' }}>
             <Typography variant="h6" gutterBottom>
-              ¿Cómo usar Google News API Pro?
+              ¿Cómo usar Google News?
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               Selecciona una categoría de las pestañas superiores para ver las últimas noticias, 

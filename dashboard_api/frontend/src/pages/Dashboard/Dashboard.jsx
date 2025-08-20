@@ -60,34 +60,34 @@ const Dashboard = () => {
       tools: [
         {
           id: 'instagram',
-          title: 'Mediafy API Pro',
+          title: 'Mediafy',
           imageUrl: mediafyLogo,
           onClick: () => {
             setSelectedApp({
               id: 'instagram',
-              title: 'Mediafy API Pro',
+              title: 'Mediafy',
               description: 'Análisis completo de Instagram: perfiles, posts, hashtags, usuarios y ubicaciones',
               imageUrl: mediafyLogo,
               category: 'Social Media',
               route: '/apps/mediafy',
-              apiName: 'Mediafy API Pro',
+              apiName: 'Mediafy',
             });
             setDrawerOpen(true);
           }
         },
         {
             id: 'perplexity',
-            title: 'Perplexity API Pro',
+            title: 'Perplexity',
             imageUrl: perplexityLogo,
           onClick: () => {
             setSelectedApp({
               id: 'perplexity',
-              title: 'Perplexity API Pro',
+              title: 'Perplexity',
               description: 'Búsquedas inteligentes con IA - Análisis avanzado de Google data',
               imageUrl: perplexityLogo,
               category: 'AI & Analytics',
               route: '/apps/perplexity',
-              apiName: 'Perplexity API Pro',
+              apiName: 'Perplexity',
             });
             setDrawerOpen(true);
           }
@@ -95,7 +95,7 @@ const Dashboard = () => {
 
         {
           id: 'google-news',
-          title: 'Google News API',
+          title: 'Google News',
           imageUrl: googleNewsLogo,
           onClick: () => {
             setSelectedApp({
@@ -105,7 +105,7 @@ const Dashboard = () => {
               imageUrl: googleNewsLogo,
               category: 'Social Listening',
               route: '/apps/google-news',
-              apiName: 'Google News API',
+              apiName: 'Google News',
             });
             setDrawerOpen(true);
           }
