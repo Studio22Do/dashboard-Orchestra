@@ -3,43 +3,7 @@ import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Box, Typograp
 import {
   Dashboard,
   Apps,
-  Analytics,
-  Instagram,
-  Google,
-  YouTube,
-  Description,
-  Psychology,
-  ChatBubble,
-  Image,
-  TextFields,
-  Mic,
-  SmartToy,
-  Build,
-  TrendingUp,
-  Paid,
-  Article,
-  MusicNote,
-  Transform,
-  Security,
-  Language as LanguageIcon,
-  Dns,
-  Speed,
-  ShoppingCart,
-  Settings as SettingsIcon,
-  Functions,
-  PictureAsPdf,
-  VideoLibrary,
-  AutoAwesome,
-  ContentCopy,
-  Translate,
-  Link,
-  Assessment,
-  Cloud,
-  RecordVoiceOver,
-  TextSnippet,
-  ShortText,
-  QrCode,
-  Visibility
+  Analytics
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
@@ -47,6 +11,33 @@ import { useAppSelector, useAppDispatch } from '../../redux/hooks/reduxHooks';
 import { selectFavoriteApps, fetchFavoriteApps } from '../../redux/slices/appsSlice';
 import StarIcon from '@mui/icons-material/Star';
 import { selectUser } from '../../redux/slices/authSlice';
+
+// Importar logos del dashboard para mantener consistencia
+import picpulseicon from '../../assets/images/apps/icons/Picpulseicon.png';
+import mediafyLogo from '../../assets/images/apps/icons/mediafyicon.png';
+import perplexityLogo from '../../assets/images/apps/icons/perplexityicon.png';
+import googleNewsLogo from '../../assets/images/apps/icons/googlenewsicon.png';
+import wordCountLogo from '../../assets/images/apps/icons/wordcounticon.png';
+import pdfToTextLogo from '../../assets/images/apps/icons/pdftotexticon.png';
+import snapVideoLogo from '../../assets/images/apps/icons/snapvideoicon.png';
+import genieAILogo from '../../assets/images/apps/icons/chatgpt4icon.png';
+import aiSocialMediaLogo from '../../assets/images/apps/icons/contentcreatoricon.png';
+import imageManipulationLogo from '../../assets/images/apps/icons/imagetransform-1.png';
+import whisperLogo from '../../assets/images/apps/icons/whispericon.png';
+import runwayMLLogo from '../../assets/images/apps/icons/runawayicon.png';
+import prlabsLogo from '../../assets/images/apps/icons/chatgpt4icon.png';
+import speechToTextLogo from '../../assets/images/apps/icons/speechtotexticon.png';
+import qrGeneratorLogo from '../../assets/images/apps/icons/qrgeneratorcode.png';
+import seoAnalyzerLogo from '../../assets/images/apps/icons/seoanalyzericon.png';
+import similarWebLogo from '../../assets/images/apps/icons/similarwebicon.png';
+import googleKeywordLogo from '../../assets/images/apps/icons/keywordinsightsicon.png';
+import domainMetricsLogo from '../../assets/images/apps/icons/domaincheckericon.png';
+import pageSpeedLogo from '../../assets/images/apps/icons/webauditicon.png';
+import productDescriptionLogo from '../../assets/images/apps/icons/productdescriptionicon.png';
+import sslCheckerLogo from '../../assets/images/apps/icons/SSLcheckericon.png';
+import websiteStatusLogo from '../../assets/images/apps/icons/webstatusicon.png';
+import seoMastermindLogo from '../../assets/images/apps/icons/keywordsearchicon.png';
+import whoisLookupLogo from '../../assets/images/apps/icons/Whoisicon.png';
 
 const DRAWER_WIDTH = 240;
 
@@ -84,56 +75,68 @@ const staticMenuItems = [
   { text: 'Analytics', icon: <Analytics />, path: '/analytics' },
 ];
 
-// Mapeo de apps a iconos específicos
+// Mapeo de apps a logos del dashboard para mantener consistencia
 const getAppIcon = (appId) => {
-  const iconMap = {
-    'instagram-stats': <Instagram />,
-
-    'google-news': <Article />,
-    'google-keyword': <TrendingUp />,
-    'google-review-link': <Link />,
-    'google-trends': <TrendingUp />,
-    'google-paid-search': <Paid />,
-    'speech-to-text': <Mic />,
-    'openai-tts': <RecordVoiceOver />,
-    'whisper-url': <RecordVoiceOver />,
-    'image-manipulation': <Image />,
-    'ai-humanizer': <Psychology />,
-    'ai-social-media': <ContentCopy />,
-    'website-status': <Visibility />,
-    'domain-metrics': <Assessment />,
-    'genie-ai': <SmartToy />,
-    'page-speed': <Speed />,
-    'pdf-to-text': <PictureAsPdf />,
-    'picpulse': <AutoAwesome />,
-    'runwayml': <VideoLibrary />,
-    'seo-analyzer': <Build />,
-    'seo-mastermind': <Functions />,
-    'similar-web': <Assessment />,
-    'prlabs': <SmartToy />,
-    'snap-video': <VideoLibrary />,
-    'ssl-checker': <Security />,
-    'whois-lookup': <Dns />,
-    'word-count': <TextSnippet />,
-    'ecommerce-description': <ShoppingCart />,
-    'product-description': <ShoppingCart />,
-    'advanced-image': <Image />,
-    'social-media-content': <ContentCopy />,
-    'file-converter': <Transform />,
-    'qr-generator': <QrCode />,
-    'text-extract': <TextFields />,
-    'website-analyzer': <Assessment />,
-    'ahrefs-dr': <TrendingUp />,
-    'midjourney': <AutoAwesome />,
-    'youtube-media': <YouTube />,
-    'scraptik': <VideoLibrary />,
-    'file-converter-audio': <MusicNote />,
-    'file-converter-image': <Image />,
-    'file-converter-pdf': <PictureAsPdf />,
-    'file-converter-rar': <Cloud />,
+  const logoMap = {
+    // Social Media & Content
+    'instagram-stats': mediafyLogo,
+    'ai-social-media': aiSocialMediaLogo,
+    'social-media-content': aiSocialMediaLogo,
+    
+    // AI & Chat
+    'genie-ai': genieAILogo,
+    'perplexity': perplexityLogo,
+    'prlabs': prlabsLogo,
+    
+    // Image & Video
+    'picpulse': picpulseicon,
+    'runwayml': runwayMLLogo,
+    'snap-video': snapVideoLogo,
+    'image-manipulation': imageManipulationLogo,
+    'advanced-image': imageManipulationLogo,
+    
+    // Text & Documents
+    'pdf-to-text': pdfToTextLogo,
+    'word-count': wordCountLogo,
+    'text-extract': wordCountLogo,
+    'product-description': productDescriptionLogo,
+    'ecommerce-description': productDescriptionLogo,
+    
+    // SEO & Analytics
+    'seo-analyzer': seoAnalyzerLogo,
+    'seo-mastermind': seoMastermindLogo,
+    'similar-web': similarWebLogo,
+    'google-keyword': googleKeywordLogo,
+    'domain-metrics': domainMetricsLogo,
+    'page-speed': pageSpeedLogo,
+    'website-status': websiteStatusLogo,
+    'website-analyzer': websiteStatusLogo,
+    
+    // Google Services
+    'google-news': googleNewsLogo,
+    'google-keyword-insights': googleKeywordLogo,
+    
+    // Audio & Speech
+    'speech-to-text': speechToTextLogo,
+    'whisper-url': whisperLogo,
+    'openai-tts': speechToTextLogo,
+    
+    // Security & Tools
+    'ssl-checker': sslCheckerLogo,
+    'whois-lookup': whoisLookupLogo,
+    'qr-generator': qrGeneratorLogo,
+    
+    // File Conversion
+    'file-converter': imageManipulationLogo,
+    'file-converter-audio': speechToTextLogo,
+    'file-converter-image': imageManipulationLogo,
+    'file-converter-pdf': pdfToTextLogo,
+    
+    // Default fallback
+    'default': Apps
   };
   
-  return iconMap[appId] || <Apps />; // Icono por defecto
+  return logoMap[appId] || logoMap['default'];
 };
 
 const Sidebar = () => {
@@ -214,32 +217,50 @@ const Sidebar = () => {
               }} />
             </Box>
           )}
-          {uniqueFavoriteApps.map((app) => (
-            <NavButton
-              key={app.app_id || app.id}
-              onClick={() => navigate(app.route)}
-              selected={location.pathname === app.route}
-              sx={{ 
-                margin: '2px 16px',
-                '& .MuiListItemIcon-root': {
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  minWidth: 36
-                }
-              }}
-            >
-              <ListItemIcon>
-                {getAppIcon(app.app_id || app.id)}
-              </ListItemIcon>
-              <ListItemText 
-                primary={app.title}
-                primaryTypographyProps={{
-                  fontSize: '0.85rem',
-                  fontWeight: location.pathname === app.route ? 600 : 400,
-                  lineHeight: 1.2
+          {uniqueFavoriteApps.map((app) => {
+            const appIcon = getAppIcon(app.app_id || app.id);
+            const isImageIcon = typeof appIcon === 'string' || appIcon?.src;
+            
+            return (
+              <NavButton
+                key={app.app_id || app.id}
+                onClick={() => navigate(app.route)}
+                selected={location.pathname === app.route}
+                sx={{ 
+                  margin: '2px 16px',
+                  '& .MuiListItemIcon-root': {
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    minWidth: 36
+                  }
                 }}
-              />
-            </NavButton>
-          ))}
+              >
+                <ListItemIcon>
+                  {isImageIcon ? (
+                    <img 
+                      src={appIcon} 
+                      alt={app.title}
+                      style={{ 
+                        width: 24, 
+                        height: 24, 
+                        objectFit: 'contain',
+                        borderRadius: '4px'
+                      }} 
+                    />
+                  ) : (
+                    appIcon
+                  )}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={app.title}
+                  primaryTypographyProps={{
+                    fontSize: '0.85rem',
+                    fontWeight: location.pathname === app.route ? 600 : 400,
+                    lineHeight: 1.2
+                  }}
+                />
+              </NavButton>
+            );
+          })}
         </List>
       </Box>
     </StyledDrawer>
