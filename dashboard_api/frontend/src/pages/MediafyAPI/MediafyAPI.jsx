@@ -37,7 +37,7 @@ import {
   Collections,
   Label
 } from '@mui/icons-material';
-import axios from 'axios';
+import axiosInstance from '../../config/axios';
 
 const MediafyAPI = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -115,7 +115,7 @@ const MediafyAPI = () => {
           break;
       }
 
-      const response = await axios.get(endpoint, { params });
+      const response = await axiosInstance.get(endpoint, { params });
       setData(response.data);
     } catch (err) {
       setError(err.response?.data?.error || 'Error al realizar la búsqueda');
@@ -677,7 +677,7 @@ const MediafyAPI = () => {
           WebkitTextFillColor: 'transparent',
           fontWeight: 'bold'
         }}>
-          Mediafy API Pro
+          Mediafy
         </Typography>
         <Typography variant="h6" color="text.secondary" gutterBottom>
           Análisis completo de Instagram: perfiles, posts, hashtags, usuarios, ubicaciones, reels, stories, highlights y más

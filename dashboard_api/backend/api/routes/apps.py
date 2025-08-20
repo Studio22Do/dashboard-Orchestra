@@ -372,10 +372,26 @@ def record_usage(app_id):
 @apps_bp.route('/user/apps', methods=['GET'])
 @jwt_required()
 def get_user_apps():
-    """Obtener las apps compradas por el usuario autenticado"""
+    """Obtener todas las apps disponibles para el usuario autenticado"""
     user_id = get_jwt_identity()
-    user_apps = UserApp.query.filter_by(user_id=user_id).all()
-    apps = [ua.app.to_dict() | {'is_favorite': ua.is_favorite, 'purchased_at': ua.purchased_at.isoformat() if ua.purchased_at else None} for ua in user_apps]
+    
+    # Obtener todas las apps activas
+    all_apps = App.query.filter_by(is_active=True).all()
+    
+    # Obtener apps favoritas del usuario para marcar is_favorite
+    user_favorites = UserApp.query.filter_by(user_id=user_id, is_favorite=True).all()
+    favorite_app_ids = {ua.app_id for ua in user_favorites}
+    
+    # Construir respuesta con todas las apps
+    apps = []
+    for app in all_apps:
+        app_data = app.to_dict()
+        app_data.update({
+            'is_favorite': app.id in favorite_app_ids,
+            'purchased_at': None  # Ya no hay compras, solo puntos por petición
+        })
+        apps.append(app_data)
+    
     return jsonify({'apps': apps}), 200
 
 @apps_bp.route('/user/favorites', methods=['GET'])

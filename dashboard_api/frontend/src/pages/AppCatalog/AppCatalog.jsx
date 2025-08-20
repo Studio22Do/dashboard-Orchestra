@@ -20,6 +20,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import AppCard from '../../components/AppCard/AppCard';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks/reduxHooks';
 import { selectPurchasedApps, fetchPurchasedApps } from '../../redux/slices/appsSlice';
+import { getAppBanner } from '../../config/imageMapping';
 
 const AppCatalog = () => {
   const location = useLocation();
@@ -187,11 +188,21 @@ const AppCatalog = () => {
         {filteredApps.length > 0 ? (
           filteredApps
             .filter(app => app && (app.id || app.app_id))
-            .map(app => (
-              <Box key={app.app_id || app.id} sx={{ width: getCardWidth(), boxSizing: 'border-box'}}>
-                <AppCard {...app} showFavorite={true} is_favorite={app.is_favorite} />
-              </Box>
-            ))
+            .map(app => {
+              // Mapear las props para que AppCard las reciba correctamente
+              const mappedApp = {
+                ...app,
+                imageUrl: getAppBanner(app.id || app.app_id), // Usar imagen estática del mapeo
+                iconUrl: app.icon_url || app.iconUrl, // Mapear icon_url a iconUrl
+                apiName: app.api_name || app.apiName, // Mapear api_name a apiName
+              };
+              
+              return (
+                <Box key={app.app_id || app.id} sx={{ width: getCardWidth(), boxSizing: 'border-box'}}>
+                  <AppCard {...mappedApp} showFavorite={true} is_favorite={app.is_favorite} />
+                </Box>
+              );
+            })
         ) : (
           <Box>
             <Typography variant="body1" color="text.secondary">
