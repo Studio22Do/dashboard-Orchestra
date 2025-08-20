@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBalance } from '../../redux/slices/creditsSlice';
+import axiosInstance from '../../config/axios';
 import {
   Container,
   Typography,
@@ -91,26 +92,14 @@ const WhisperFromURL = () => {
     setTranscription(null);
     
     try {
-      // Usar la ruta correcta del backend para Whisper from URL
-      const response = await fetch('/api/beta_v2/speech-to-text/whisper-url', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          audio_url: url,
-          language,
-          model
-        })
+      // Usar axiosInstance para llamar al backend
+      const response = await axiosInstance.post('/api/beta_v2/speech-to-text/whisper-url', {
+        audio_url: url,
+        language,
+        model
       });
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al transcribir el audio');
-      }
-      
-      const data = await response.json();
+      const data = response.data;
       
       // Actualizar créditos si la respuesta los incluye
       if (data && data.credits_info && typeof data.credits_info.remaining === 'number') {
@@ -139,7 +128,8 @@ const WhisperFromURL = () => {
       setHistory(prev => [newTranscription, ...prev]);
       setUrl('');
     } catch (err) {
-      setError(err.message || 'Error al transcribir el audio');
+      console.error('Error transcribiendo audio:', err);
+      setError(err.response?.data?.error || err.message || 'Error al transcribir el audio');
     } finally {
       setLoading(false);
     }

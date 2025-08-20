@@ -107,7 +107,7 @@ def whisper_from_url():
         }), 400
     
     try:
-        # Usar la API específica de Whisper from URL
+        # Usar la API específica de Whisper from URL (configuración EXACTA de RapidAPI)
         url = "https://whisper-from-url.p.rapidapi.com/"
         headers = {
             "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
@@ -117,9 +117,12 @@ def whisper_from_url():
         
         payload = {
             'url': audio_url,
-            'language': language,
+            'language': language if language != 'auto' else None,
             'model': model
         }
+        
+        # Filtrar valores None del payload
+        payload = {k: v for k, v in payload.items() if v is not None}
         
         response = requests.post(url, data=payload, headers=headers)
         response.raise_for_status()
