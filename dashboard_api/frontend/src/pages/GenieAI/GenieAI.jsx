@@ -44,7 +44,7 @@ const GenieAI = () => {
   const [chatHistory, setChatHistory] = useState([]);
 
   const models = [
-    { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' },
+    { value: 'gpt-3.5-turbo', label: 'GPT-4 Turbo' },
     { value: 'gpt-4', label: 'GPT-4' },
     { value: 'gpt-4-turbo', label: 'GPT-4 Turbo' }
   ];
@@ -109,10 +109,10 @@ const GenieAI = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        GenieAI - ChatGPT-3 Model
+        ChatGPT-4
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        Interactúa con el modelo ChatGPT-3 de GenieAI para generar respuestas inteligentes
+        Interactúa con el modelo ChatGPT-4 de GenieAI para generar respuestas inteligentes
       </Typography>
 
       <Grid container spacing={3}>

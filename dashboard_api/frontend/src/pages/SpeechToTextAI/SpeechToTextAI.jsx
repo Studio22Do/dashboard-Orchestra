@@ -168,7 +168,7 @@ const SpeechToTextAI = () => {
     <Container maxWidth="xl" sx={{ mt: 3 }}>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
-          Speech to Text AI
+          Speech to Text
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph>
           Transcribe audio y video desde múltiples fuentes usando IA avanzada

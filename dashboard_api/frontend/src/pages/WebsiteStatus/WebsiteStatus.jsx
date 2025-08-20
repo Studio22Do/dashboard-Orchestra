@@ -65,7 +65,7 @@ const WebsiteStatus = () => {
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        Website Status Checker
+        Website Status
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
         Verifica si un sitio web está <b>UP</b> o <b>DOWN</b> en tiempo real.

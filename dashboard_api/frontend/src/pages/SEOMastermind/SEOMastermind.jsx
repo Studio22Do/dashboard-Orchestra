@@ -283,7 +283,7 @@ const SEOMastermind = () => {
       <StyledPaper>
         <Box sx={{ mb: 4 }}>
           <Typography variant="h4" gutterBottom>
-            SEO Mastermind - Análisis de Keywords
+          Keyword Search - Análisis de keywords
           </Typography>
           <Typography variant="body1" color="text.secondary">
             Analiza keywords y descubre oportunidades de contenido

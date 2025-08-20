@@ -221,7 +221,7 @@ const GoogleKeywordInsights = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Google Keyword Insights
+        Keyword Insights
       </Typography>
       <Typography variant="subtitle1" gutterBottom color="text.secondary">
         Analiza palabras clave y obtén insights de búsqueda de Google

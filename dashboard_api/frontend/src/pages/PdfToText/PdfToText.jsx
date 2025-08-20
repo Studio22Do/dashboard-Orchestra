@@ -245,7 +245,7 @@ const PdfToText = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        PDF to Text Converter
+        PDF to Text
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
         Convierte archivos PDF a texto editable

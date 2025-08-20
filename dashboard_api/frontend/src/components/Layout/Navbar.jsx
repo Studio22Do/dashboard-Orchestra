@@ -281,12 +281,12 @@ const Navbar = () => {
         subtitle: 'Verificación de certificados SSL'
       },
       '/apps/website-status': {
-        title: 'Website Status Checker',
+        title: 'Website Status',
         icon: LanguageIcon,
         subtitle: 'Estado de sitios web'
       },
       '/apps/whois-lookup': {
-        title: 'WHOIS Lookup',
+        title: 'WHOIS',
         icon: Dns,
         subtitle: 'Consulta de información de dominio'
       },
@@ -296,12 +296,12 @@ const Navbar = () => {
         subtitle: 'Análisis de SEO'
       },
       '/apps/similar-web': {
-        title: 'SimilarWeb Insights',
+        title: 'SimilarWeb',
         icon: Visibility,
         subtitle: 'Análisis de competencia'
       },
       '/apps/keyword-insights': {
-        title: 'Google Keyword Insights',
+        title: 'Keyword Insights',
         icon: Google,
         subtitle: 'Análisis de palabras clave'
       },
@@ -316,12 +316,12 @@ const Navbar = () => {
         subtitle: 'Análisis de velocidad'
       },
       '/apps/product-description': {
-        title: 'Product Description Generator',
+        title: 'Product Description',
         icon: ShoppingCart,
         subtitle: 'Generador de descripciones'
       },
       '/apps/seo-mastermind': {
-        title: 'SEO Mastermind',
+        title: 'Keyword Search',
         icon: SettingsIcon,
         subtitle: 'Generador de keywords y meta tags'
       },
@@ -331,7 +331,7 @@ const Navbar = () => {
         subtitle: 'Contador de palabras'
       },
       '/apps/pdf-to-text': {
-        title: 'PDF to Text Converter',
+        title: 'PDF to Text',
         icon: PictureAsPdf,
         subtitle: 'Conversor de PDF a texto'
       },
@@ -341,17 +341,17 @@ const Navbar = () => {
         subtitle: 'Descarga de medios'
       },
       '/apps/genie-ai': {
-        title: 'GenieAI',
+        title: 'ChatGPT4',
         icon: AutoAwesome,
-        subtitle: 'ChatGPT-3 Model'
+        subtitle: 'ChatGPT4'
       },
       '/apps/ai-social-media': {
-        title: 'AI Social Media Content',
+        title: 'Content Generator',
         icon: ContentCopy,
         subtitle: 'Generador de contenido'
       },
       '/apps/advanced-image': {
-        title: 'Advanced Image Manipulation',
+        title: 'Image Transform',
         icon: Transform,
         subtitle: 'Manipulación avanzada de imágenes'
       },
@@ -366,12 +366,12 @@ const Navbar = () => {
         subtitle: 'Transcripción de audio'
       },
       '/apps/runway-ml': {
-        title: 'RunwayML',
+        title: 'Runway',
         icon: Psychology,
         subtitle: 'Plataforma de IA multimedia'
       },
       '/apps/speech-to-text': {
-        title: 'Speech to Text AI',
+        title: 'Speech to Text',
         icon: RecordVoiceOver,
         subtitle: 'Conversión de voz a texto'
       },
