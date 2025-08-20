@@ -33,6 +33,7 @@ import {
   History,
   Settings
 } from '@mui/icons-material';
+import axiosInstance from '../../config/axios';
 
 const GenieAI = () => {
   const [prompt, setPrompt] = useState('');
@@ -60,9 +61,16 @@ const GenieAI = () => {
     setError(null);
     
     try {
-      // Aquí irá la lógica de la API cuando esté disponible
-      // Por ahora solo simulamos una respuesta
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Llamar a la API real de PRLabs
+      const response = await axiosInstance.post('/api/beta_v2/prlabs/chat', {
+        prompt: prompt,
+        model: model,
+        temperature: temperature
+      });
+      
+      console.log('Respuesta completa de la API:', response);
+      console.log('Response data:', response.data);
+      console.log('Response status:', response.status);
       
       const newMessage = {
         role: 'user',
@@ -72,16 +80,19 @@ const GenieAI = () => {
       
       const aiResponse = {
         role: 'assistant',
-        content: 'Esta es una respuesta simulada del modelo GenieAI. En una implementación real, esta respuesta vendría de la API de ChatGPT-3.',
+        content: response.data.response || response.data.message || response.data.content || JSON.stringify(response.data),
         timestamp: new Date().toLocaleString()
       };
+      
+      console.log('Mensaje del usuario:', newMessage);
+      console.log('Respuesta de la IA:', aiResponse);
       
       setChatHistory(prev => [...prev, newMessage, aiResponse]);
       setPrompt('');
       
     } catch (err) {
       console.error('Error generating response:', err);
-      setError(err.message || 'Error al generar la respuesta');
+      setError(err.response?.data?.error || err.message || 'Error al generar la respuesta');
     } finally {
       setLoading(false);
     }

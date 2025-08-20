@@ -50,7 +50,7 @@ class Config:
     RAPIDAPI_URL = os.environ.get('RAPIDAPI_URL', 'https://pagepeeker-shortpixel-image-optimiser-v1.p.rapidapi.com/v1/reducer.php')
     RAPIDAPI_PICPULSE_HOST = os.environ.get('RAPIDAPI_PICPULSE_HOST', 'picpulse-automated-image-quality-scoring-with-psychology-ai1.p.rapidapi.com')
     RAPIDAPI_INSTAGRAM_HOST = os.environ.get('RAPIDAPI_INSTAGRAM_HOST', 'instagram-statistics-api.p.rapidapi.com')
-    RAPIDAPI_INSTAGRAM_REALTIME_HOST = os.environ.get('RAPIDAPI_INSTAGRAM_REALTIME_HOST', 'instagram-realtimeapi.p.rapidapi.com')
+
     RAPIDAPI_GOOGLE_PAID_SEARCH_HOST = os.environ.get('RAPIDAPI_GOOGLE_PAID_SEARCH_HOST', 'google-paid-search-api.p.rapidapi.com')
     RAPIDAPI_AHREFS_HOST = os.environ.get('RAPIDAPI_AHREFS_HOST', 'domain-metrics-check.p.rapidapi.com')
     RAPIDAPI_WEBSITE_ANALYZER_HOST = os.environ.get('RAPIDAPI_WEBSITE_ANALYZER_HOST', 'website-analyze-and-seo-audit-pro.p.rapidapi.com')

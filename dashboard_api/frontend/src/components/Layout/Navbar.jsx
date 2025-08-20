@@ -244,11 +244,7 @@ const Navbar = () => {
         icon: Instagram,
         subtitle: 'API de estadísticas de Instagram'
       },
-      '/instagram-realtime': {
-        title: 'Instagram Realtime',
-        icon: Instagram,
-        subtitle: 'Monitoreo en tiempo real'
-      },
+
       '/apps/google-trends': {
         title: 'Google Trends',
         icon: TrendingUp,

@@ -20,7 +20,7 @@ APP_ID = "instagram"
 # Constantes
 PREMIUM_API_BASE = "https://instagram-premium-api-2023.p.rapidapi.com/v1/user"
 PREMIUM_API_V2_BASE = "https://instagram-premium-api-2023.p.rapidapi.com/v2"
-REALTIME_API_BASE = "https://{host}/instagram"
+
 
 def get_premium_headers():
     """Obtener headers para la API Premium"""
@@ -29,9 +29,7 @@ def get_premium_headers():
         "x-rapidapi-host": "instagram-premium-api-2023.p.rapidapi.com"
     }
 
-def get_realtime_headers():
-    """Obtener headers para la API Realtime"""
-    return get_rapidapi_headers(current_app.config['RAPIDAPI_INSTAGRAM_REALTIME_HOST'])
+
 
 def validate_username(username: str) -> None:
     """Validar que se proporcione un username"""
@@ -352,113 +350,4 @@ def proxy_media():
         print(f"Error en proxy_media: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# Rutas Realtime API
-@instagram_bp.route('/realtime/profile', methods=['GET'])
-@jwt_required()
-def get_realtime_profile():
-    """Obtener información de perfil en tiempo real"""
-    username = request.args.get('username')
-    validate_username(username)
-    
-    current_user_id = get_jwt_identity()
-    api_url = f"{REALTIME_API_BASE.format(host=current_app.config['RAPIDAPI_INSTAGRAM_REALTIME_HOST'])}/user/{username}"
-    
-    result = call_rapidapi(
-        app_id=APP_ID,
-        user_id=current_user_id,
-        method="GET",
-        url=api_url,
-        headers=get_realtime_headers()
-    )
-    
-    return jsonify(result), 200
-
-@instagram_bp.route('/realtime/posts', methods=['GET'])
-@jwt_required()
-def get_realtime_posts():
-    """Obtener publicaciones en tiempo real"""
-    username = request.args.get('username')
-    limit = request.args.get('limit', 10)
-    validate_username(username)
-    
-    current_user_id = get_jwt_identity()
-    api_url = f"{REALTIME_API_BASE.format(host=current_app.config['RAPIDAPI_INSTAGRAM_REALTIME_HOST'])}/user/{username}/posts"
-    
-    result = call_rapidapi(
-        app_id=APP_ID,
-        user_id=current_user_id,
-        method="GET",
-        url=api_url,
-        params={"count": limit},
-        headers=get_realtime_headers()
-    )
-    
-    return jsonify(result), 200
-
-@instagram_bp.route('/realtime/hashtag', methods=['GET'])
-@jwt_required()
-def get_realtime_hashtag():
-    """Obtener publicaciones con hashtag en tiempo real"""
-    tag = request.args.get('tag') or request.args.get('hashtag')
-    limit = request.args.get('limit', 10)
-    
-    if not tag:
-        raise ValidationError("Se requiere un hashtag")
-    
-    tag = tag.replace('#', '')
-    current_user_id = get_jwt_identity()
-    api_url = f"{REALTIME_API_BASE.format(host=current_app.config['RAPIDAPI_INSTAGRAM_REALTIME_HOST'])}/hashtag/{tag}/posts"
-    
-    result = call_rapidapi(
-        app_id=APP_ID,
-        user_id=current_user_id,
-        method="GET",
-        url=api_url,
-        params={"count": limit},
-        headers=get_realtime_headers()
-    )
-    
-    return jsonify(result), 200
-
-@instagram_bp.route('/realtime/comments', methods=['GET'])
-@jwt_required()
-def get_realtime_comments():
-    """Obtener comentarios de una publicación en tiempo real"""
-    post_id = request.args.get('post_id')
-    if not post_id:
-        raise ValidationError("Se requiere el ID de la publicación")
-    
-    current_user_id = get_jwt_identity()
-    api_url = f"{REALTIME_API_BASE.format(host=current_app.config['RAPIDAPI_INSTAGRAM_REALTIME_HOST'])}/posts/{post_id}/comments"
-    
-    result = call_rapidapi(
-        app_id=APP_ID,
-        user_id=current_user_id,
-        method="GET",
-        url=api_url,
-        headers=get_realtime_headers()
-    )
-    
-    return jsonify(result), 200
-
-@instagram_bp.route('/realtime/mentions', methods=['GET'])
-@jwt_required()
-def get_realtime_mentions():
-    """Obtener menciones de un usuario en tiempo real"""
-    username = request.args.get('username')
-    limit = request.args.get('limit', 10)
-    validate_username(username)
-    
-    current_user_id = get_jwt_identity()
-    api_url = f"{REALTIME_API_BASE.format(host=current_app.config['RAPIDAPI_INSTAGRAM_REALTIME_HOST'])}/user/{username}/mentions"
-    
-    result = call_rapidapi(
-        app_id=APP_ID,
-        user_id=current_user_id,
-        method="GET",
-        url=api_url,
-        params={"count": limit},
-        headers=get_realtime_headers()
-    )
-    
-    return jsonify(result), 200 
+ 

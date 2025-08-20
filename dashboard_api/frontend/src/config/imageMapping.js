@@ -29,7 +29,7 @@ import speechtotextBanner from '../assets/images/apps/banners/SPEECHTOTEXT.png';
 export const getAppBanner = (appId) => {
   const bannerMap = {
     // Social Media & Listening
-    'instagram-realtime': mediafyBanner,
+
     'instagram-stats': mediafyBanner,
     'mediafy': mediafyBanner,
     

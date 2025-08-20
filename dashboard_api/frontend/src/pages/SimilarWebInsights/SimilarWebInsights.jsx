@@ -26,6 +26,7 @@ import {
   Devices,
   LocationOn
 } from '@mui/icons-material';
+import axiosInstance from '../../config/axios';
 
 const SimilarWebInsights = () => {
   const [url, setUrl] = useState('');
@@ -33,9 +34,6 @@ const SimilarWebInsights = () => {
   const [error, setError] = useState(null);
   const [insightsData, setInsightsData] = useState(null);
   const [websiteDetails, setWebsiteDetails] = useState(null);
-
-  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
-  const API_BASE_URL = `/api/${API_MODE}/similarweb`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,14 +55,8 @@ const SimilarWebInsights = () => {
       }
       // 1. Obtener detalles del sitio
       const token = localStorage.getItem('token');
-      const detailsRes = await fetch(`${API_BASE_URL}/website-details?domain=${encodeURIComponent(domain)}`, {
-        method: 'GET',
-        headers: { 
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        }
-      });
-      const detailsData = await detailsRes.json();
+      const detailsRes = await axiosInstance.get(`/api/beta_v2/similarweb/website-details?domain=${encodeURIComponent(domain)}`);
+      const detailsData = detailsRes.data;
       setWebsiteDetails(detailsData);
       try {
         const { default: store } = await import('../../redux/store');
@@ -74,16 +66,9 @@ const SimilarWebInsights = () => {
         }
       } catch {}
       // 2. Obtener insights
-      const response = await fetch(`${API_BASE_URL}/insights`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify({ domain })
-      });
-      const data = await response.json();
-      if (!response.ok || data.error) {
+      const response = await axiosInstance.post('/api/beta_v2/similarweb/insights', { domain });
+      const data = response.data;
+      if (data.error) {
         setError(data.error || 'Error al analizar el sitio web');
         setLoading(false);
         return;

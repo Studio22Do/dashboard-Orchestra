@@ -88,7 +88,7 @@ const staticMenuItems = [
 const getAppIcon = (appId) => {
   const iconMap = {
     'instagram-stats': <Instagram />,
-    'instagram-realtime': <Instagram />,
+
     'google-news': <Article />,
     'google-keyword': <TrendingUp />,
     'google-review-link': <Link />,

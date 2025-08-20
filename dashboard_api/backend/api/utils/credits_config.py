@@ -12,7 +12,7 @@ CREDITS_COST = {
     'instagram_stories': 1,
     'instagram_highlights': 1,
     'instagram_full_profile': 2,
-    'instagram_realtime': 1,
+
     'instagram_stats': 1,
     
     # AI Humanizer
@@ -115,7 +115,7 @@ def get_api_cost_by_endpoint(endpoint_path):
         '/instagram/stories': 'instagram_stories',
         '/instagram/highlights': 'instagram_highlights',
         '/instagram/full-profile': 'instagram_full_profile',
-        '/instagram-realtime/profile': 'instagram_realtime',
+    
         '/instagram-stats/check': 'instagram_stats',
         
         # AI Humanizer

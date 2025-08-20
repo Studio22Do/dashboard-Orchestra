@@ -41,7 +41,7 @@ def create_app(config_object):
     from api.routes.notifications import notifications_bp
     from api.routes.instagram import instagram_bp
     from api.routes.google_paid_search import google_paid_search_bp
-    from api.routes.instagram_realtime import instagram_realtime_bp
+
     from api.routes.ai_humanizer import ai_humanizer_bp
     from api.routes.seo_mastermind import seo_mastermind_bp
     from api.routes.seo_analyzer import seo_analyzer_bp
@@ -79,7 +79,7 @@ def create_app(config_object):
     app.register_blueprint(notifications_bp, url_prefix=f'{version_prefix}')
     app.register_blueprint(instagram_bp, url_prefix=f'{version_prefix}/instagram')
     app.register_blueprint(google_paid_search_bp, url_prefix=f'{version_prefix}/paid-search')
-    app.register_blueprint(instagram_realtime_bp, url_prefix=f'{version_prefix}/instagram-realtime')
+
     app.register_blueprint(ai_humanizer_bp, url_prefix=f'{version_prefix}/ai-humanizer')
     app.register_blueprint(seo_mastermind_bp, url_prefix=f'{version_prefix}/seo-mastermind')
     app.register_blueprint(seo_analyzer_bp, url_prefix=f'{version_prefix}/seo-analyzer')

@@ -15,7 +15,7 @@ import picpulseicon from '../../assets/images/apps/icons/Picpulseicon.png';
 import mediafyLogo from '../../assets/images/apps/icons/mediafyicon.png';
 import perplexityLogo from '../../assets/images/apps/icons/perplexityicon.png';
 import googleNewsLogo from '../../assets/images/apps/icons/googlenewsicon.png';
-import instagramRealtimeLogo from '../../assets/images/apps/icons/mediafyicon.png';
+
 import wordCountLogo from '../../assets/images/apps/icons/wordcounticon.png';
 import pdfToTextLogo from '../../assets/images/apps/icons/pdftotexticon.png';
 import snapVideoLogo from '../../assets/images/apps/icons/snapvideoicon.png';
@@ -110,23 +110,7 @@ const Dashboard = () => {
             setDrawerOpen(true);
           }
         },
-        {
-          id: 'instagram-realtime',
-          title: 'Instagram Realtime API',
-          imageUrl: instagramRealtimeLogo,
-          onClick: () => {
-            setSelectedApp({
-              id: 'instagram-realtime',
-              title: 'Instagram Realtime',
-              description: 'Monitorea en tiempo real la actividad de Instagram, hashtags y menciones',
-              imageUrl: instagramRealtimeLogo,
-              category: 'Social Listening',
-              route: '/instagram-realtime',
-              apiName: 'Instagram Realtime API',
-            });
-            setDrawerOpen(true);
-          }
-        }
+
       ]
     },
     {
