@@ -102,9 +102,10 @@ const PRLabsChat = () => {
     setLoading(true);
 
     try {
-      const API_VERSION = 'beta_v2'; // O usa la variable dinámica que manejes en tu app
-      const API_BASE_URL = `/api/${API_VERSION}/prlabs`;
-      const response = await fetch(`${API_BASE_URL}/chat`, {
+      const API_VERSION = 'beta_v2';
+      // Usar la variable de entorno para la URL base de la API
+      const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${API_BASE_URL}/${API_VERSION}/prlabs/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

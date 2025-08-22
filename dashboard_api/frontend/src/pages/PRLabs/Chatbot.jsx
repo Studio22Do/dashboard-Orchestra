@@ -105,7 +105,8 @@ const Chatbot = () => {
               mb: 2, 
               p: 2, 
               overflow: 'auto',
-              backgroundColor: '#f5f5f5'
+              backgroundColor: '#2d2d2d',
+              border: '1px solid #444'
             }}
           >
             <List>
@@ -121,16 +122,26 @@ const Chatbot = () => {
                       sx={{ 
                         p: 2, 
                         maxWidth: '70%',
-                        backgroundColor: message.sender === 'user' ? '#e3f2fd' : '#fff'
+                        backgroundColor: message.sender === 'user' ? '#6a4c93' : '#444',
+                        color: 'white',
+                        border: '1px solid #555'
                       }}
                     >
                       <ListItemText 
                         primary={message.text}
                         secondary={new Date(message.timestamp).toLocaleTimeString()}
+                        sx={{
+                          '& .MuiListItemText-primary': {
+                            color: 'white'
+                          },
+                          '& .MuiListItemText-secondary': {
+                            color: '#ccc'
+                          }
+                        }}
                       />
                     </Paper>
                   </ListItem>
-                  {index < messages.length - 1 && <Divider />}
+                  {index < messages.length - 1 && <Divider sx={{ borderColor: '#555' }} />}
                 </Box>
               ))}
               <div ref={messagesEndRef} />
