@@ -178,10 +178,10 @@ def get_location_info():
             return jsonify({'error': 'Se requiere el parámetro location_query'}), 400
         
         # Llamar a la API de Mediafy
-        url = "https://mediafy-api.p.rapidapi.com/v1/location"
+        url = "https://mediafy-api.p.rapidapi.com/v1/search_location"
         headers = get_headers()
         params = {
-            'location_query': location_query
+            'search_query': location_query
         }
         
         response = requests.get(url, headers=headers, params=params)
@@ -193,6 +193,36 @@ def get_location_info():
     except requests.RequestException as e:
         logger.error(f"Error en API Mediafy location: {str(e)}")
         return jsonify({'error': 'Error al obtener información de la ubicación'}), 500
+    except Exception as e:
+        logger.error(f"Error inesperado: {str(e)}")
+        return jsonify({'error': 'Error interno del servidor'}), 500
+
+@mediafy_bp.route('/location_info', methods=['GET'])
+@jwt_required()
+@credits_required(amount=3)
+def get_location_detail_info():
+    """Obtiene información detallada de una ubicación específica usando Mediafy API"""
+    try:
+        location_id = request.args.get('location_id')
+        if not location_id:
+            return jsonify({'error': 'Se requiere el parámetro location_id'}), 400
+        
+        # Llamar a la API de Mediafy
+        url = "https://mediafy-api.p.rapidapi.com/v1/location_info"
+        headers = get_headers()
+        params = {
+            'location_id': location_id
+        }
+        
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        
+        result = response.json()
+        return jsonify(result), 200
+        
+    except requests.RequestException as e:
+        logger.error(f"Error en API Mediafy location_info: {str(e)}")
+        return jsonify({'error': 'Error al obtener información detallada de la ubicación'}), 500
     except Exception as e:
         logger.error(f"Error inesperado: {str(e)}")
         return jsonify({'error': 'Error interno del servidor'}), 500
