@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, redirect, url_for
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -8,6 +8,9 @@ from flask_jwt_extended import (
 from marshmallow import ValidationError
 import secrets
 import datetime
+import os
+import requests
+from urllib.parse import urlencode
 
 from api import db
 from api.models.user import User
@@ -18,6 +21,11 @@ from utils.version_control import require_version
 # Crear blueprint
 auth_bp = Blueprint('auth', __name__)
 
+# Variables de Google OAuth
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
+GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI', 'http://localhost:5000/api/beta_v2/auth/google/callback')
+
 # Esquemas
 user_schema = UserSchema()
 login_schema = LoginSchema()
@@ -26,6 +34,98 @@ change_password_schema = ChangePasswordSchema()
 # Diccionarios para almacenar tokens temporalmente (solo para desarrollo)
 verification_tokens = {}  # {token: user_id}
 reset_password_tokens = {}  # {token: {user_id: id, expires: datetime}}
+
+@auth_bp.route('/google/url', methods=['GET'])
+@require_version('beta_v2')
+def google_auth_url():
+    """Generar URL de autorización de Google"""
+    if not GOOGLE_CLIENT_ID:
+        raise ApiValidationError("Google OAuth no está configurado")
+    
+    # Parámetros para la URL de autorización
+    params = {
+        'client_id': GOOGLE_CLIENT_ID,
+        'redirect_uri': GOOGLE_REDIRECT_URI,
+        'scope': 'email profile',
+        'response_type': 'code',
+        'access_type': 'offline'
+    }
+    
+    auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}"
+    
+    return jsonify({
+        'auth_url': auth_url
+    }), 200
+
+@auth_bp.route('/google/callback', methods=['GET'])
+@require_version('beta_v2')
+def google_auth_callback():
+    """Callback de Google OAuth"""
+    try:
+        # Obtener el código de autorización
+        code = request.args.get('code')
+        if not code:
+            raise ApiValidationError("Código de autorización no recibido")
+        
+        # Intercambiar código por tokens
+        token_url = "https://oauth2.googleapis.com/token"
+        token_data = {
+            'client_id': GOOGLE_CLIENT_ID,
+            'client_secret': GOOGLE_CLIENT_SECRET,
+            'code': code,
+            'grant_type': 'authorization_code',
+            'redirect_uri': GOOGLE_REDIRECT_URI
+        }
+        
+        response = requests.post(token_url, data=token_data)
+        if response.status_code != 200:
+            raise ApiValidationError("Error al obtener tokens de Google")
+        
+        tokens = response.json()
+        access_token = tokens.get('access_token')
+        
+        # Obtener información del usuario
+        user_info_url = "https://www.googleapis.com/oauth2/v2/userinfo"
+        headers = {'Authorization': f'Bearer {access_token}'}
+        user_response = requests.get(user_info_url, headers=headers)
+        
+        if user_response.status_code != 200:
+            raise ApiValidationError("Error al obtener información del usuario")
+        
+        google_user = user_response.json()
+        
+        # Buscar o crear usuario
+        user = User.query.filter_by(email=google_user['email']).first()
+        
+        if not user:
+            # Crear nuevo usuario
+            user = User(
+                email=google_user['email'],
+                name=google_user.get('name', 'Usuario Google'),
+                role='user',
+                is_active=True,
+                is_verified=True
+            )
+            # Generar contraseña aleatoria (no se usará)
+            user.password = secrets.token_urlsafe(32)
+            db.session.add(user)
+            db.session.commit()
+        
+        # Generar tokens JWT
+        access_token_jwt = create_access_token(identity=str(user.id))
+        refresh_token_jwt = create_refresh_token(identity=str(user.id))
+        
+        # Redirigir al frontend con tokens
+        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+        redirect_url = f"{frontend_url}/auth/callback?access_token={access_token_jwt}&refresh_token={refresh_token_jwt}"
+        
+        return redirect(redirect_url)
+        
+    except Exception as e:
+        print(f'[GOOGLE AUTH ERROR] {str(e)}')
+        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+        error_url = f"{frontend_url}/auth/error?message={str(e)}"
+        return redirect(error_url)
 
 @auth_bp.route('/register', methods=['POST'])
 @require_version('beta_v2')
