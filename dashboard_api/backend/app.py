@@ -23,7 +23,9 @@ CORS(app, resources={
         "origins": [
             "http://localhost:3000",
             "http://192.168.13.109:3000",
-            "http://0.0.0.0:3000"
+            "http://0.0.0.0:3000",
+            "https://m-aestro-i-qfrontendcompleto-esk1.vercel.app",
+            "https://m-aestro-i-qfrontendcompleto.vercel.app"
         ],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
