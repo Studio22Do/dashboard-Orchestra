@@ -2,7 +2,7 @@
 import logging
 from flask import Blueprint
 from api.routes.instagram import instagram_bp
-from .instagram_realtime import instagram_blueprint as instagram_realtime_bp
+
 import sys
 import os
 from api.routes.auth_google import auth_google_bp
@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 # Mapeo de blueprints a sus prefijos de URL
 BLUEPRINT_MAPPING = {
     instagram_bp: '/api/instagram',
-    instagram_realtime_bp: '/api/instagram-realtime',
+
     auth_bp: '/api/auth',
     google_paid_search_bp: '/api/paid-search',
     apps_bp: '/api/apps',

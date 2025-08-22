@@ -49,7 +49,7 @@ const QRCodeGenerator = () => {
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom>QR Code Generator</Typography>
+      <Typography variant="h4" gutterBottom>QR Generator</Typography>
       <Card>
         <CardContent>
           <Grid container spacing={2}>

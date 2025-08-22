@@ -54,9 +54,7 @@ gunicorn -w 4 -b 0.0.0.0:5000 backend.app:app
 ### Salud de la API
 `GET /health`
 
-### Instagram Real-time
-- `GET /api/instagram-realtime/followers?username=[username]` - Obtiene el conteo de seguidores
-- `GET /api/instagram-realtime/engagement?username=[username]` - Obtiene métricas de engagement
+
 
 ### Sistema de Apps
 - `GET /api/apps` - Lista todas las apps disponibles
@@ -78,7 +76,7 @@ El dashboard incluye tres categorías principales de apps:
    - Instagram Statistics API
    - Google Trends
    - Google Paid Search API
-   - Instagram Realtime API
+
    - TikTok Analytics
 
 2. **Creative & Content**

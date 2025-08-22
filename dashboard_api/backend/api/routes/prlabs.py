@@ -43,6 +43,13 @@ def chat():
 
         response = requests.post(url, json=payload, headers=headers)
         response.raise_for_status()
+        
+        print("DEBUG PRLABS/CHAT - Respuesta de RapidAPI:")
+        print(f"Status: {response.status_code}")
+        print(f"Headers: {dict(response.headers)}")
+        print(f"Content: {response.text}")
+        print(f"JSON: {response.json()}")
+        
         return jsonify(response.json()), 200
 
     except requests.exceptions.HTTPError as errh:

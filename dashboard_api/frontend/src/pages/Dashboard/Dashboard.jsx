@@ -15,7 +15,7 @@ import picpulseicon from '../../assets/images/apps/icons/Picpulseicon.png';
 import mediafyLogo from '../../assets/images/apps/icons/mediafyicon.png';
 import perplexityLogo from '../../assets/images/apps/icons/perplexityicon.png';
 import googleNewsLogo from '../../assets/images/apps/icons/googlenewsicon.png';
-import instagramRealtimeLogo from '../../assets/images/apps/icons/mediafyicon.png';
+
 import wordCountLogo from '../../assets/images/apps/icons/wordcounticon.png';
 import pdfToTextLogo from '../../assets/images/apps/icons/pdftotexticon.png';
 import snapVideoLogo from '../../assets/images/apps/icons/snapvideoicon.png';
@@ -110,23 +110,7 @@ const Dashboard = () => {
             setDrawerOpen(true);
           }
         },
-        {
-          id: 'instagram-realtime',
-          title: 'Instagram Realtime API',
-          imageUrl: instagramRealtimeLogo,
-          onClick: () => {
-            setSelectedApp({
-              id: 'instagram-realtime',
-              title: 'Instagram Realtime',
-              description: 'Monitorea en tiempo real la actividad de Instagram, hashtags y menciones',
-              imageUrl: instagramRealtimeLogo,
-              category: 'Social Listening',
-              route: '/instagram-realtime',
-              apiName: 'Instagram Realtime API',
-            });
-            setDrawerOpen(true);
-          }
-        }
+
       ]
     },
     {
@@ -153,7 +137,7 @@ const Dashboard = () => {
         },
         {
           id: 'pdf-to-text',
-          title: 'PDF to Text Converter',
+          title: 'PDF to Text',
           imageUrl: pdfToTextLogo,
           onClick: () => {
             setSelectedApp({
@@ -187,13 +171,13 @@ const Dashboard = () => {
         },
         {
           id: 'genie-ai',
-          title: 'GenieAI - ChatGPT-3 Model',
+          title: 'ChatGPT-4',
           imageUrl: genieAILogo,
           onClick: () => {
             setSelectedApp({
               id: 'genie-ai',
               title: 'GenieAI',
-              description: 'Asistente de IA basado en ChatGPT-3 para diversas tareas',
+              description: 'Asistente de IA basado en ChatGPT-4',
               imageUrl: genieAILogo,
               category: 'Creative & Content',
               route: '/apps/genie-ai',
@@ -204,7 +188,7 @@ const Dashboard = () => {
         },
         {
           id: 'ai-social-media',
-          title: 'AI Social Media Content Generator',
+          title: 'Content Generator',
           imageUrl: aiSocialMediaLogo,
           onClick: () => {
             setSelectedApp({
@@ -221,7 +205,7 @@ const Dashboard = () => {
         },
         {
           id: 'image-manipulation',
-          title: 'Advanced Image Manipulation API',
+          title: 'Image Transform',
           imageUrl: imageManipulationLogo,
           onClick: () => {
             setSelectedApp({
@@ -255,12 +239,12 @@ const Dashboard = () => {
         },
         {
           id: 'runwayml',
-          title: 'RunwayML',
+          title: 'Runway',
           imageUrl: runwayMLLogo,
           onClick: () => {
             setSelectedApp({
               id: 'runwayml',
-              title: 'RunwayML',
+              title: 'Runway',
               description: 'Plataforma de IA para generación y edición de contenido multimedia',
               imageUrl: runwayMLLogo,
               category: 'Creative & Content',
@@ -289,17 +273,17 @@ const Dashboard = () => {
         },
         {
           id: 'speech-to-text',
-          title: 'Speech to Text AI',
+          title: 'Speech to Text ',
           imageUrl: speechToTextLogo,
           onClick: () => {
             setSelectedApp({
               id: 'speech-to-text',
-              title: 'Speech to Text AI',
+              title: 'Speech to Text',
               description: 'Transcribe audio y video desde múltiples fuentes usando IA avanzada',
               imageUrl: speechToTextLogo,
               category: 'Creative & Content',
               route: '/apps/speech-to-text',
-              apiName: 'Speech to Text AI',
+              apiName: 'Speech to Text',
             });
             setDrawerOpen(true);
           }
@@ -331,12 +315,12 @@ const Dashboard = () => {
       tools: [
         {
           id: 'qr-generator',
-          title: 'QR Code Generator',
+          title: 'QR Generator',
           imageUrl: qrGeneratorLogo,
           onClick: () => {
             setSelectedApp({
               id: 'qr-generator',
-              title: 'QR Code Generator',
+              title: 'QR Generator',
               description: 'Genera códigos QR personalizables (PNG/JPEG/SVG) para texto, URL, WiFi, email, SMS y más',
               imageUrl: qrGeneratorLogo,
               category: 'Web & SEO',
@@ -365,7 +349,7 @@ const Dashboard = () => {
         },
         {
           id: 'similar-web',
-          title: 'Similar Web Insights',
+          title: 'Similar Web',
           imageUrl: similarWebLogo,
           onClick: () => {
             setSelectedApp({
@@ -382,7 +366,7 @@ const Dashboard = () => {
         },
         {
           id: 'google-keyword',
-          title: 'Google Keyword Insights',
+          title: 'Keyword Insights',
           imageUrl: googleKeywordLogo,
           onClick: () => {
             setSelectedApp({
@@ -399,7 +383,7 @@ const Dashboard = () => {
         },
         {
           id: 'domain-metrics',
-          title: 'Domain Metrics Check',
+          title: 'Domain Checker',
           imageUrl: domainMetricsLogo,
           onClick: () => {
             setSelectedApp({
@@ -433,12 +417,12 @@ const Dashboard = () => {
         },
         {
           id: 'ecommerce-description',
-          title: 'AI eCommerce Product Description Generator',
+          title: 'Product Description',
           imageUrl: productDescriptionLogo,
           onClick: () => {
             setSelectedApp({
               id: 'ecommerce-description',
-              title: 'Product Description Generator',
+              title: 'Product Description',
               description: 'Genera descripciones optimizadas para productos de eCommerce',
               imageUrl: productDescriptionLogo,
               category: 'Web & SEO',
@@ -467,7 +451,7 @@ const Dashboard = () => {
         },
         {
           id: 'website-status',
-          title: 'Check if WEBSITE is UP or DOWN',
+          title: ' Web Status',
           imageUrl: websiteStatusLogo,
           onClick: () => {
             setSelectedApp({
@@ -484,24 +468,24 @@ const Dashboard = () => {
         },
         {
           id: 'seo-mastermind',
-          title: 'SEO Mastermind – AI Keyword, Meta & Title Generator',
+          title: 'Keyword Search',
           imageUrl: seoMastermindLogo,
           onClick: () => {
             setSelectedApp({
               id: 'seo-mastermind',
-              title: 'SEO Mastermind',
+              title: 'Keyword Search',
               description: 'Genera keywords, meta tags y títulos optimizados con IA',
               imageUrl: seoMastermindLogo,
               category: 'Web & SEO',
               route: '/apps/seo-mastermind',
-              apiName: 'SEO Mastermind API',
+              apiName: 'SEO Mastermind',
             });
             setDrawerOpen(true);
           }
         },
         {
           id: 'whois-lookup',
-          title: 'WHOIS Lookup Service',
+          title: 'WHOIS',
           imageUrl: whoisLookupLogo,
           onClick: () => {
             setSelectedApp({

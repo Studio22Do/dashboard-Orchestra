@@ -14,7 +14,7 @@ Snap Video ✅
 AI Humanizer API ✅
 OpenAI Text to Speech ✅
 GenieAI - ChatGPT-3 Model ✅
-AI Social Media Content Generator ✅
+Content Generator ✅
 Advanced Image Manipulation API ✅
 Whisper: From URL ✅
 RunwayML ✅

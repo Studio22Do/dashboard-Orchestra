@@ -7,7 +7,7 @@ import Login from './pages/Login/Login';
 import Register from './pages/Login/Register';
 import EmailVerification from './pages/Login/EmailVerification';
 import AppCatalog from './pages/AppCatalog/AppCatalog';
-import InstagramRealtime from './pages/InstagramRealtime';
+
 import MediafyAPI from './pages/MediafyAPI/MediafyAPI';
 import PerplexityAPI from './pages/PerplexityAPI/PerplexityAPI';
 import GoogleNews from './pages/GoogleNews/GoogleNews';
@@ -297,11 +297,7 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/instagram-realtime" element={
-            <ProtectedRoute>
-              <InstagramRealtime />
-            </ProtectedRoute>
-          } />
+
           
 
           

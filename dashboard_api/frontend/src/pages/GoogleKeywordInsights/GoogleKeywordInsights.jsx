@@ -34,6 +34,7 @@ import {
   TrendingFlat,
   BarChart
 } from '@mui/icons-material';
+import axiosInstance from '../../config/axios';
 
 // Definición de países por región
 const COUNTRIES = {
@@ -88,8 +89,6 @@ const GoogleKeywordInsights = () => {
   const [page, setPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [countrySearch, setCountrySearch] = useState('');
-  const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
-  const API_BASE_URL = `/api/${API_MODE}/keyword-insight`;
 
   // Filtrar países basado en la búsqueda
   const getFilteredCountries = () => {
@@ -143,21 +142,8 @@ const GoogleKeywordInsights = () => {
         keyword
       };
       
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al analizar la palabra clave');
-      }
+      const response = await axiosInstance.post('/api/beta_v2/keyword-insight/', payload);
+      const data = response.data;
 
       if (!data || !Array.isArray(data)) {
         throw new Error('Formato de respuesta inválido');
@@ -235,7 +221,7 @@ const GoogleKeywordInsights = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Google Keyword Insights
+        Keyword Insights
       </Typography>
       <Typography variant="subtitle1" gutterBottom color="text.secondary">
         Analiza palabras clave y obtén insights de búsqueda de Google

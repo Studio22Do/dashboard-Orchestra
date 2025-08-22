@@ -33,7 +33,7 @@ import {
   CheckCircle,
   Error
 } from '@mui/icons-material';
-import axios from 'axios';
+import axiosInstance from '../../config/axios';
 
 const PdfToText = () => {
   const dispatch = useDispatch();
@@ -89,10 +89,9 @@ const PdfToText = () => {
       formData.append('pdfFile', file);
       
       // Llamar a la API real de PDF to Text con la ruta correcta
-      const response = await axios.post('/api/beta_v2/pdf-converter/to-text', formData, {
+      const response = await axiosInstance.post('/api/beta_v2/pdf-converter/to-text', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'multipart/form-data'
         }
       });
       
@@ -152,11 +151,8 @@ const PdfToText = () => {
     setExtractedPages(null);
     try {
       // Usar el endpoint correcto para URLs de PDF
-      const response = await axios.get('/api/beta_v2/pdf-converter/to-text-url', {
-        params: { pdfUrl },
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await axiosInstance.get('/api/beta_v2/pdf-converter/to-text-url', {
+        params: { pdfUrl }
       });
       
       // Actualizar créditos si la respuesta los incluye
@@ -178,14 +174,24 @@ const PdfToText = () => {
 
   const handleImgFileChange = (e) => {
     const selectedFile = e.target.files[0];
+    
     if (selectedFile) {
       if (selectedFile.type !== 'application/pdf') {
         setImgError('Por favor selecciona un archivo PDF');
         setImgFile(null);
         return;
       }
+      
+      if (selectedFile.size === 0) {
+        setImgError('El archivo está vacío');
+        setImgFile(null);
+        return;
+      }
+      
       setImgFile(selectedFile);
       setImgError(null);
+    } else {
+      setImgFile(null);
     }
   };
 
@@ -195,29 +201,42 @@ const PdfToText = () => {
       setImgError('Por favor selecciona un archivo PDF');
       return;
     }
+    
     setImgLoading(true);
     setImgError(null);
     setImgResultUrl(null);
     setImgResultType(null);
     try {
       const formData = new FormData();
-      formData.append('pdfFile', imgFile); // Corregir nombre del campo
+      formData.append('pdfFile', imgFile);
       formData.append('imgFormat', imgFormat);
-      // Puedes agregar startPage/endPage si lo deseas
-      const response = await axios.post('/api/beta_v2/pdf-converter/to-image', formData, {
+      
+      const response = await axiosInstance.post('/api/beta_v2/pdf-converter/to-image', formData, {
         responseType: 'blob',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'multipart/form-data'
         }
       });
       
-      const contentType = response.headers['content-type'];
-      const blob = new Blob([response.data], { type: contentType });
+      console.log('Respuesta recibida:', response);
+      console.log('Headers:', response.headers);
+      console.log('Data type:', typeof response.data);
+      console.log('Data size:', response.data.size);
+      
+      // Crear URL del blob
+      const blob = new Blob([response.data], { 
+        type: response.headers['content-type'] || 'image/jpeg' 
+      });
       const url = URL.createObjectURL(blob);
+      
       setImgResultUrl(url);
-      setImgResultType(contentType);
+      setImgResultType(response.headers['content-type'] || 'image/jpeg');
+      
+      console.log('Imagen creada exitosamente:', url);
+      
     } catch (err) {
-      setImgError('Error al convertir el PDF a imagen');
+      console.error('Error converting PDF to image:', err);
+      setImgError(err.response?.data?.error || 'Error al convertir el PDF a imagen');
     } finally {
       setImgLoading(false);
     }
@@ -226,7 +245,7 @@ const PdfToText = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        PDF to Text Converter
+        PDF to Text
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
         Convierte archivos PDF a texto editable
