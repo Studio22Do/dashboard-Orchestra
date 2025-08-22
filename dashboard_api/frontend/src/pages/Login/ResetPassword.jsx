@@ -39,7 +39,9 @@ const ResetPassword = () => {
     setLoading(true);
     setMsg('');
     try {
-      const res = await fetch(`/api/auth/reset-password/${token}`, {
+      // Usar la variable de entorno para la URL base de la API
+      const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      const res = await fetch(`${API_BASE_URL}/auth/reset-password/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),

@@ -123,7 +123,7 @@ def generate_image():
 @jwt_required()
 @credits_required(amount=2)
 def text_to_speech():
-    """Endpoint para convertir texto a voz usando OpenAI TTS"""
+    """Endpoint para convertir texto a voz usando OpenAI Text-to-Speech API"""
     try:
         # Debug headers de la solicitud entrante (para 401)
         print("[PRLABS/VOICE] Request headers:", dict(request.headers))
@@ -131,29 +131,35 @@ def text_to_speech():
 
         data = request.json
         print("[PRLABS/VOICE] Payload recibido:", data)
+        
+        # Campos que envía el frontend: { text, voice }
         text = data.get('text')
         voice = data.get('voice', 'alloy')
-        model = data.get('model', 'tts-1')
-        instructions = data.get('instructions', 'Speak in a natural tone.')
 
         if not text:
             print("[PRLABS/VOICE] FALTA EL TEXTO")
             return jsonify({'error': 'El texto es requerido'}), 400
 
-        url = "https://open-ai-text-to-speech1.p.rapidapi.com/"
+        # Usar las variables de entorno del archivo .env
+        url = current_app.config.get('RAPIDAPI_OPENAI_TEXT_TO_SPEECH_URL', 'https://open-ai-text-to-speech1.p.rapidapi.com')
+        host = current_app.config.get('RAPIDAPI_OPENAI_TEXT_TO_SPEECH_HOST', 'open-ai-text-to-speech1.p.rapidapi.com')
         api_key = current_app.config['RAPIDAPI_KEY']
+        
         headers = {
             "content-type": "application/json",
             "X-RapidAPI-Key": api_key,
-            "X-RapidAPI-Host": "open-ai-text-to-speech1.p.rapidapi.com"
+            "X-RapidAPI-Host": host
         }
+        
+        # Payload que espera la API de OpenAI TTS
         payload = {
-            "model": model,
-            "input": text,
-            "voice": voice,
-            "instructions": instructions
+            "model": "tts-1",
+            "input": text,  # El frontend envía 'text', lo mapeamos a 'input'
+            "voice": voice  # El frontend envía 'voice', se mantiene igual
         }
+        
         print(f"[PRLABS/VOICE] URL: {url}")
+        print(f"[PRLABS/VOICE] Host: {host}")
         print(f"[PRLABS/VOICE] Headers: {headers}")
         print(f"[PRLABS/VOICE] Payload enviado a RapidAPI: {payload}")
 
