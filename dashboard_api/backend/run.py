@@ -6,8 +6,26 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from app import app
 import logging
+from flask_cors import CORS
 
 logger = logging.getLogger(__name__)
+
+# Configurar CORS directamente aquí para asegurar que funcione en producción
+CORS(app, resources={
+    r"/api/*": {
+        "origins": [
+            "http://localhost:3000",
+            "http://192.168.13.109:3000",
+            "http://0.0.0.0:3000",
+            "https://m-aestro-i-qfrontendcompleto-esk1.vercel.app",
+            "https://m-aestro-i-qfrontendcompleto.vercel.app"
+        ],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True,
+        "expose_headers": ["Content-Type", "Authorization"]
+    }
+})
 
 def print_startup_info():
     """Imprime información de inicio de la aplicación"""
