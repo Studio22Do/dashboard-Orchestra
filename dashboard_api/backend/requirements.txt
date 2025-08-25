@@ -18,7 +18,7 @@ python-dotenv==0.19.2
 
 # Peticiones HTTP
 requests==2.27.1
-aiohttp==3.8.5
+aiohttp>=3.9.0
 
 # Servidor de producción
 gunicorn==20.1.0
