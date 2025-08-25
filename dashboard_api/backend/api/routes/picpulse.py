@@ -186,11 +186,15 @@ def analyze_image_detailed():
         # Usar un nombre de archivo seguro
         safe_filename = sanitize_filename(image_file.filename)
         
-        # Crear FormData con imagen y parámetros
+        # Separar imagen y parámetros
         files = {
-            'image': (safe_filename, image_content, 'image/png'),
-            'gender': (None, gender),
-            'age_group': (None, age_group)
+            'image': (safe_filename, image_content, 'image/png')
+        }
+
+        # Parámetros como query params
+        params = {
+            'gender': gender,
+            'age_group': age_group
         }
         
         headers = {
@@ -200,13 +204,14 @@ def analyze_image_detailed():
 
         logger.info("[PICPULSE] Configuración de la petición:")
         logger.info("  - URL: %s", url)
-        logger.info("  - Parámetros: gender=%s, age_group=%s", gender, age_group)
+        logger.info("  - Query params: %s", params)
         logger.info("  - Nombre archivo seguro: %s", safe_filename)
         
         logger.info("[PICPULSE] Enviando solicitud a RapidAPI...")
         response = requests.post(
             url,
             files=files,
+            params=params,
             headers=headers
         )
         
