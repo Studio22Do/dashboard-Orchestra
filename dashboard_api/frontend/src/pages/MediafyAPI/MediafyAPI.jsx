@@ -103,19 +103,15 @@ const MediafyAPI = () => {
           endpoint = '/api/beta_v2/mediafy/profile';
           params = { username: searchInputs.username };
           break;
-        case 1: // Search Posts
-          endpoint = '/api/beta_v2/mediafy/search_posts';
-          params = { search_query: searchInputs.search_query };
-          break;
-        case 2: // Hashtag
+        case 1: // Hashtag
           endpoint = '/api/beta_v2/mediafy/hashtag';
           params = { hashtag: searchInputs.hashtag };
           break;
-        case 3: // Search Users
+        case 2: // Search Users
           endpoint = '/api/beta_v2/mediafy/search_users';
           params = { search_query: searchInputs.search_query };
           break;
-        case 4: // Location
+        case 3: // Location
           endpoint = '/api/beta_v2/mediafy/location';
           params = { location_query: searchInputs.location_query };
           
@@ -136,19 +132,19 @@ const MediafyAPI = () => {
             return;
           }
           break;
-        case 5: // Reels
+        case 4: // Reels
           endpoint = '/api/beta_v2/mediafy/reels';
           params = { username: searchInputs.username };
           break;
-        case 6: // Stories
+        case 5: // Stories
           endpoint = '/api/beta_v2/mediafy/stories';
           params = { username: searchInputs.username };
           break;
-        case 7: // Highlights
+        case 6: // Highlights
           endpoint = '/api/beta_v2/mediafy/highlights';
           params = { username: searchInputs.username };
           break;
-        case 8: // Tagged
+        case 7: // Tagged
           endpoint = '/api/beta_v2/mediafy/tagged';
           params = { username: searchInputs.username };
           break;
@@ -168,10 +164,10 @@ const MediafyAPI = () => {
   const renderSearchForm = () => {
     switch (activeTab) {
       case 0: // Profile
-      case 5: // Reels
-      case 6: // Stories
-      case 7: // Highlights
-      case 8: // Tagged
+      case 4: // Reels
+      case 5: // Stories
+      case 6: // Highlights
+      case 7: // Tagged
         return (
           <TextField
             fullWidth
@@ -183,19 +179,7 @@ const MediafyAPI = () => {
             sx={{ mb: 2 }}
           />
         );
-      case 1: // Search Posts
-        return (
-          <TextField
-            fullWidth
-            label="Buscar posts y reels"
-            value={searchInputs.search_query}
-            onChange={(e) => handleInputChange('search_query', e.target.value)}
-            placeholder="ej: summer, food, travel"
-            variant="outlined"
-            sx={{ mb: 2 }}
-          />
-        );
-      case 2: // Hashtag
+      case 1: // Hashtag
         return (
           <TextField
             fullWidth
@@ -244,21 +228,19 @@ const MediafyAPI = () => {
     switch (activeTab) {
       case 0: // Profile
         return renderProfileResults();
-      case 1: // Search Posts
-        return renderSearchPostsResults();
-      case 2: // Hashtag
+      case 1: // Hashtag
         return renderHashtagResults();
-      case 3: // Search Users
+      case 2: // Search Users
         return renderSearchUsersResults();
-      case 4: // Location
+      case 3: // Location
         return renderLocationResults();
-      case 5: // Reels
+      case 4: // Reels
         return renderReelsResults();
-      case 6: // Stories
+      case 5: // Stories
         return renderStoriesResults();
-      case 7: // Highlights
+      case 6: // Highlights
         return renderHighlightsResults();
-      case 8: // Tagged
+      case 7: // Tagged
         return renderTaggedResults();
       default:
         return null;
@@ -347,51 +329,7 @@ const MediafyAPI = () => {
     );
   };
 
-  const renderSearchPostsResults = () => {
-    if (!data || !data.data || !data.data.items) return null;
-    
-    return (
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Typography variant="h6" gutterBottom>
-            Posts encontrados: {data.data.count} resultados
-          </Typography>
-        </Grid>
-        {data.data.items.map((post, index) => (
-          <Grid item xs={12} md={6} lg={4} key={index}>
-            <Card elevation={3}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Avatar src={post.user?.profile_pic_url} sx={{ mr: 2 }} />
-                  <Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                      {post.user?.full_name || 'Usuario'}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      @{post.user?.username}
-                    </Typography>
-                  </Box>
-                </Box>
-                {post.caption && (
-                  <Typography variant="body2" sx={{ mb: 2 }}>
-                    {post.caption.text}
-                  </Typography>
-                )}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="primary">
-                    ❤️ {post.like_count || 0}
-                  </Typography>
-                  <Typography variant="body2" color="secondary">
-                    💬 {post.comment_count || 0}
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    );
-  };
+
 
   const renderHashtagResults = () => {
     if (!data || !data.data) return null;
@@ -795,7 +733,6 @@ const MediafyAPI = () => {
           sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
           <Tab icon={<Person />} label="Perfil de Usuario" />
-          <Tab icon={<Search />} label="Buscar Posts" />
           <Tab icon={<Tag />} label="Análisis de Hashtag" />
           <Tab icon={<Group />} label="Buscar Usuarios" />
           <Tab icon={<LocationOn />} label="Ubicaciones" />

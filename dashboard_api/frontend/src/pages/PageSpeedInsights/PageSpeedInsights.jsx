@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axiosInstance from '../../config/axios';
 import {
   Container,
   Typography,
@@ -61,24 +62,13 @@ const PageSpeedInsights = () => {
     setResult(null);
 
     try {
-      const params = new URLSearchParams({ url: url });
-      
-      // Obtener el token JWT del localStorage
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError('No hay token de autenticación. Por favor inicia sesión nuevamente.');
-        setLoading(false);
-        return;
-      }
-      
-      const response = await fetch(`${API_BASE_URL}/full-analysis?${params.toString()}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await axiosInstance.get(`${API_BASE_URL}/full-analysis`, {
+        params: { url: url },
+        timeout: 90000  // 90 segundos de timeout (más que el backend de 60s)
       });
-      const data = await response.json();
-
-      if (!response.ok || data.error) {
+      
+      const data = response.data;
+      if (data.error) {
         throw new Error(data.error || data.details || 'Error al analizar la velocidad del sitio web');
       }
 
@@ -360,7 +350,7 @@ const PageSpeedInsights = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Website Speed Test   AQUIU ESTOY
+        Website Speed Test 
       </Typography>
       <Typography variant="subtitle1" gutterBottom color="text.secondary">
         Analiza la velocidad de carga y rendimiento de cualquier sitio web. 
