@@ -18,6 +18,7 @@ import {
   ListItemText,
   Divider
 } from '@mui/material';
+import axiosInstance from '../../config/axios';
 import { 
   Search,
   Domain,
@@ -50,22 +51,17 @@ const DomainMetrics = () => {
     setError(null);
     setMetricsData(null);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify({ domain })
+      const response = await axiosInstance.post(`${API_BASE_URL}`, {
+        domain
       });
-      const data = await response.json();
+      
+      const data = response.data;
       setMetricsData(data);
       console.log('Domain Metrics API response (frontend):', data);
       if (data && data.credits_info && typeof data.credits_info.remaining === 'number') {
         dispatch(setBalance(data.credits_info.remaining));
       }
-      if (!response.ok || data.error) {
+      if (data.error) {
         setError(data.error || 'Error al analizar el dominio');
         setLoading(false);
         return;
