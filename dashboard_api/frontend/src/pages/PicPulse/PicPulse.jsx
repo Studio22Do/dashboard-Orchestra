@@ -14,7 +14,7 @@ import {
   CircularProgress,
   Tooltip
 } from '@mui/material';
-import axios from 'axios';
+import axiosInstance from '../../config/axios';
 
 const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
 
@@ -157,9 +157,17 @@ const PicPulse = () => {
     formData.append('gender', gender);
     formData.append('age_group', ageGroup);
 
+    // Logs para debugging
+    console.log('Archivo seleccionado:', selectedFile);
+    console.log('Parámetros:', { gender, ageGroup });
+    console.log('FormData contenido:');
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+
     try {
       console.log('Enviando solicitud a:', `/api/${API_MODE}/picpulse/analyze-detailed`);
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `/api/${API_MODE}/picpulse/analyze-detailed`,
         formData,
         {
