@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Drawer, Box, Typography, Button, Divider, Snackbar, Alert } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectCanUseApp, selectUserRequests, selectPurchasedApps, fetchAllApps, fetchPurchasedApps } from '../../redux/slices/appsSlice';
@@ -17,6 +17,7 @@ const AppDetailDrawer = ({
   const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
+  const buttonRef = useRef(null);
   
   // Nueva lógica basada en requests
   const canUseApp = useSelector(state => selectCanUseApp(state, app?.id));
@@ -99,6 +100,19 @@ const AppDetailDrawer = ({
     setNotification({ ...notification, open: false });
   };
 
+  // Manejar el foco correctamente para evitar warnings de accesibilidad
+  useEffect(() => {
+    if (open && buttonRef.current) {
+      // Enfocar el botón cuando se abre el drawer
+      setTimeout(() => buttonRef.current?.focus(), 100);
+    } else if (!open) {
+      // Remover el foco cuando se cierra el drawer
+      if (document.activeElement === buttonRef.current) {
+        buttonRef.current?.blur();
+      }
+    }
+  }, [open]);
+
   return (
     <>
       <Drawer 
@@ -122,7 +136,8 @@ const AppDetailDrawer = ({
         ModalProps={{
           keepMounted: true,
           disableAutoFocus: true,
-          disableEnforceFocus: true
+          disableEnforceFocus: true,
+          disableRestoreFocus: true
         }}
       >
         <Box
@@ -184,6 +199,7 @@ const AppDetailDrawer = ({
               </Typography>
             )}
             <Button
+              ref={buttonRef}
               variant={getButtonVariant()}
               color={getButtonColor()}
               fullWidth
