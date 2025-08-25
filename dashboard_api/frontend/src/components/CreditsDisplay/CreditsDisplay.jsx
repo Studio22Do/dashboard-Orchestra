@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Box, Typography, Chip, CircularProgress } from '@mui/material';
-import { AccountBalanceWallet } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCreditsBalance, selectCreditsBalance, selectCreditsLoading } from '../../redux/slices/creditsSlice';
 import { selectIsAuthenticated } from '../../redux/slices/authSlice';
@@ -41,18 +40,18 @@ const CreditsDisplay = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <AccountBalanceWallet sx={{ fontSize: 20, color: 'primary.main' }} />
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Chip
         label={`${credits} puntos`}
-        size="small"
+        size="medium"
         color={credits > 10 ? 'success' : credits > 5 ? 'warning' : 'error'}
         variant="outlined"
         onClick={() => {}} // Agregar onClick vacío para evitar error
         sx={{
           '& .MuiChip-label': {
-            fontSize: '0.75rem',
-            fontWeight: 500,
+            fontSize: '0.9rem',
+            fontWeight: 600,
+            padding: '4px 12px',
           },
         }}
       />
