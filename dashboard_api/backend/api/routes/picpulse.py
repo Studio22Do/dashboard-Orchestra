@@ -178,11 +178,6 @@ def analyze_image_detailed():
         
         url = "https://picpulse-automated-image-quality-scoring-with-psychology-ai1.p.rapidapi.com/analyze_image_detailed/"
         
-        querystring = {
-            "gender": gender,
-            "age_group": age_group
-        }
-
         # Leer el contenido del archivo
         image_file.seek(0)
         image_content = image_file.read()
@@ -190,8 +185,12 @@ def analyze_image_detailed():
 
         # Usar un nombre de archivo seguro
         safe_filename = sanitize_filename(image_file.filename)
+        
+        # Crear FormData con imagen y parámetros
         files = {
-            'image': (safe_filename, image_content, 'image/png')
+            'image': (safe_filename, image_content, 'image/png'),
+            'gender': (None, gender),
+            'age_group': (None, age_group)
         }
         
         headers = {
@@ -201,15 +200,14 @@ def analyze_image_detailed():
 
         logger.info("[PICPULSE] Configuración de la petición:")
         logger.info("  - URL: %s", url)
-        logger.info("  - QueryString: %s", querystring)
+        logger.info("  - Parámetros: gender=%s, age_group=%s", gender, age_group)
         logger.info("  - Nombre archivo seguro: %s", safe_filename)
         
         logger.info("[PICPULSE] Enviando solicitud a RapidAPI...")
         response = requests.post(
             url,
             files=files,
-            headers=headers,
-            params=querystring
+            headers=headers
         )
         
         if response.status_code != 200:

@@ -159,6 +159,7 @@ const PicPulse = () => {
 
     // Logs para debugging
     console.log('Archivo seleccionado:', selectedFile);
+    console.log('Parámetros:', { gender, ageGroup });
     console.log('FormData contenido:');
     for (let [key, value] of formData.entries()) {
       console.log(`${key}:`, value);
