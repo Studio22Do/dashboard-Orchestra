@@ -58,7 +58,7 @@ const PicPulse = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [gender, setGender] = useState('Female');
-  const [ageGroup, setAgeGroup] = useState('45-54');
+  const [ageGroup, setAgeGroup] = useState('25-34');
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -231,11 +231,7 @@ const PicPulse = () => {
             onChange={(e) => setAgeGroup(e.target.value)}
             label="Grupo de Edad"
           >
-            <MenuItem value="18-24">18-24 años</MenuItem>
-            <MenuItem value="25-34">25-34 años</MenuItem>
-            <MenuItem value="35-44">35-44 años</MenuItem>
-            <MenuItem value="45-54">45-54 años</MenuItem>
-            <MenuItem value="55+">55+ años</MenuItem>
+            <MenuItem value="25-34">25-34 años (Recomendado)</MenuItem>
           </Select>
         </FormControl>
 
