@@ -68,8 +68,8 @@ const Text = () => {
                     label="Modelo"
                   >
                     <MenuItem value="gpt-4">GPT-4</MenuItem>
-                    <MenuItem value="deepseek">DeepSeek</MenuItem>
-                    <MenuItem value="mixtral">Mixtral</MenuItem>
+                                  <MenuItem value="deepseek">DeepSeek</MenuItem>
+              <MenuItem value="gpt-4o-mini">GPT-4 Omni Mini</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>

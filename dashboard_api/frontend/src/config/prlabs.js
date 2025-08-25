@@ -12,11 +12,11 @@ export const PR_LABS_CONFIG = {
     {
       id: 'chat-models',
       title: 'Modelos de Chat IA',
-      description: 'GPT-4, DeepSeek, Mixtral, y más',
+      description: 'GPT-4, DeepSeek, GPT-4 Omni Mini, y más',
       category: 'Chat Models',
       route: '/prlabs/chat',
       apiName: 'sinfonIA Chat API',
-      models: ['gpt-4o-mini', 'deepseek', 'mixtral', 'gpt-3.5']
+      models: ['gpt-4o-mini', 'deepseek', 'gpt-4o-mini', 'gpt-3.5']
     },
     {
       id: 'image-generation',
