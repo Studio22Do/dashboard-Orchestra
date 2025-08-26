@@ -42,9 +42,12 @@ import {
   OpenInNew,
   Share,
   BookmarkBorder,
-  Refresh
+  Refresh,
+  Download
 } from '@mui/icons-material';
 import axios from 'axios';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 // Configuración de la API
 const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
@@ -94,8 +97,18 @@ const GoogleNews = () => {
 
   // Cargar regiones de idioma disponibles
   useEffect(() => {
+    console.log(`🚀 Componente montado, cargando regiones de idioma...`);
     loadLanguageRegions();
   }, []);
+
+  // Efecto para recargar noticias cuando cambie el idioma
+  useEffect(() => {
+    // Solo recargar si hay una categoría activa
+    if (activeTab < categories.length) {
+      console.log(`🌍 Idioma cambiado a: ${languageRegion}, recargando categoría: ${categories[activeTab].id}`);
+      fetchNewsByCategory(categories[activeTab].id);
+    }
+  }, [languageRegion]); // Se ejecuta cada vez que cambie languageRegion
 
   const loadLanguageRegions = async () => {
     try {
@@ -109,6 +122,9 @@ const GoogleNews = () => {
   };
 
   const handleTabChange = (event, newValue) => {
+    const newCategory = categories[newValue]?.id || 'unknown';
+    console.log(`📑 Cambiando de categoría ${categories[activeTab]?.id || 'none'} a ${newCategory}`);
+    
     setActiveTab(newValue);
     setData(null);
     setError('');
@@ -127,11 +143,17 @@ const GoogleNews = () => {
     setCurrentPage(1);
 
     try {
+      // Usar el idioma actual del estado
+      const currentLanguageRegion = languageRegion;
+      console.log(`🔄 Cargando noticias de ${category} en idioma: ${currentLanguageRegion}`);
+      
       const response = await axios.get(`${API_BASE_URL}/google-news/${category}`, {
-        params: { lr: languageRegion }
+        params: { lr: currentLanguageRegion }
       });
       setData(response.data);
+      console.log(`✅ Noticias cargadas exitosamente para ${category} en ${currentLanguageRegion}`);
     } catch (err) {
+      console.error(`❌ Error al cargar noticias de ${category} en ${currentLanguageRegion}:`, err);
       setError(err.response?.data?.error || 'Error al obtener noticias');
     } finally {
       setLoading(false);
@@ -150,14 +172,20 @@ const GoogleNews = () => {
     setCurrentPage(1);
 
     try {
+      // Usar el idioma actual del estado
+      const currentLanguageRegion = languageRegion;
+      console.log(`🔍 Buscando "${searchKeyword.trim()}" en idioma: ${currentLanguageRegion}`);
+      
       const response = await axios.get(`${API_BASE_URL}/google-news/search`, {
         params: { 
           keyword: searchKeyword.trim(),
-          lr: languageRegion 
+          lr: currentLanguageRegion 
         }
       });
       setData(response.data);
+      console.log(`✅ Búsqueda exitosa para "${searchKeyword.trim()}" en ${currentLanguageRegion}`);
     } catch (err) {
+      console.error(`❌ Error en búsqueda para "${searchKeyword.trim()}" en ${currentLanguageRegion}:`, err);
       setError(err.response?.data?.error || 'Error al buscar noticias');
     } finally {
       setLoading(false);
@@ -165,22 +193,97 @@ const GoogleNews = () => {
   };
 
   const handleLanguageChange = (event) => {
-    setLanguageRegion(event.target.value);
-    if (activeTab < categories.length) {
-      fetchNewsByCategory(categories[activeTab].id);
-    }
+    const newLanguageRegion = event.target.value;
+    console.log(`🔄 Cambiando idioma de ${languageRegion} a ${newLanguageRegion}`);
+    
+    setLanguageRegion(newLanguageRegion);
+    
+    // Limpiar datos anteriores
+    setData(null);
+    setError('');
+    setImageErrors({});
+    setImageLoadingStates({});
+    setCurrentPage(1);
+    
+    // El useEffect detectará el cambio y recargará automáticamente
+    console.log(`🧹 Estado limpiado, esperando recarga automática...`);
   };
 
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return 'Fecha no disponible';
-    const date = new Date(parseInt(timestamp));
-    return date.toLocaleString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    
+    try {
+      const date = new Date(parseInt(timestamp));
+      if (isNaN(date.getTime())) {
+        return 'Fecha inválida';
+      }
+      
+      return date.toLocaleString('es-ES', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.error('Error al formatear timestamp:', error, timestamp);
+      return 'Error en fecha';
+    }
+  };
+
+  const generateExcelReport = () => {
+    if (!data || !data.items || data.items.length === 0) {
+      alert('No hay noticias para generar el reporte');
+      return;
+    }
+
+    try {
+      // Preparar datos para Excel
+      const excelData = data.items.map((item, index) => ({
+        'Número': index + 1,
+        'Título': item.title || 'Sin título',
+        'Descripción': item.snippet || 'Sin descripción',
+        'URL de la imagen': item.images?.thumbnail || 'Sin imagen',
+        'Fecha': formatTimestamp(item.timestamp),
+        'URL de la noticia': item.newsUrl || 'Sin URL',
+        'Fuente': item.publisher || 'Sin fuente'
+      }));
+
+      // Crear workbook y worksheet
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+      // Ajustar ancho de columnas
+      const columnWidths = [
+        { wch: 8 },   // Número
+        { wch: 50 },  // Título
+        { wch: 60 },  // Descripción
+        { wch: 40 },  // URL de la imagen
+        { wch: 20 },  // Fecha
+        { wch: 40 },  // URL de la noticia
+        { wch: 20 }   // Fuente
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      // Agregar worksheet al workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte de Noticias');
+
+      // Generar nombre del archivo con fecha y hora
+      const now = new Date();
+      const dateStr = now.toISOString().split('T')[0];
+      const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+      const fileName = `Reporte_Noticias_${dateStr}_${timeStr}.xlsx`;
+
+      // Generar y descargar archivo
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const dataBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(dataBlob, fileName);
+
+      console.log(`✅ Reporte Excel generado: ${fileName}`);
+    } catch (error) {
+      console.error('❌ Error al generar reporte Excel:', error);
+      alert('Error al generar el reporte Excel');
+    }
   };
 
   const renderNewsItem = (item, index) => {
@@ -314,12 +417,12 @@ const GoogleNews = () => {
             variant="h6" 
             component="h3" 
             sx={{ 
-              fontSize: '1rem', 
+            fontSize: '1rem', 
               fontWeight: 700,
-              lineHeight: 1.3,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
+            lineHeight: 1.3,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
               mb: 1,
               color: 'text.primary',
@@ -335,9 +438,9 @@ const GoogleNews = () => {
             variant="body2" 
             color="text.secondary" 
             sx={{ 
-              display: '-webkit-box',
+            display: '-webkit-box',
               WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
+            WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
               lineHeight: 1.4,
               height: '2.8rem', // Altura fija para la descripción
@@ -365,33 +468,47 @@ const GoogleNews = () => {
             gap: 1,
             mb: 1
           }}>
-            <Chip
-              icon={<AccessTime />}
-              label={formatTimestamp(item.timestamp)}
-              size="small"
-              variant="outlined"
+            <Box
               sx={{ 
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 1,
+                border: '1px solid',
+                borderColor: 'divider',
+                backgroundColor: 'background.paper',
                 fontSize: '0.7rem',
                 height: 24,
-                '& .MuiChip-label': {
-                  px: 1
-                }
+                color: 'text.secondary'
               }}
-            />
+            >
+              <AccessTime sx={{ fontSize: '0.8rem' }} />
+              <Typography variant="caption">
+                {formatTimestamp(item.timestamp)}
+              </Typography>
+            </Box>
             {item.publisher && (
-              <Chip
-                label={item.publisher}
-                size="small"
-                color="primary"
-                variant="outlined"
+              <Box
                 sx={{ 
+                  display: 'flex',
+                  alignItems: 'center',
+                  px: 1.5,
+                  py: 0.5,
+                  borderRadius: 1,
+                  border: '1px solid',
+                  borderColor: 'primary.main',
+                  backgroundColor: 'primary.50',
                   fontSize: '0.7rem',
                   height: 24,
-                  '& .MuiChip-label': {
-                    px: 1
-                  }
+                  color: 'primary.main'
                 }}
-              />
+              >
+                <Typography variant="caption">
+                  {item.publisher}
+                </Typography>
+              </Box>
             )}
           </Box>
           
@@ -404,41 +521,47 @@ const GoogleNews = () => {
             borderColor: 'divider',
             pt: 1
           }}>
-            <Box>
-              {item.newsUrl && (
-                <Tooltip title="Ver noticia completa">
-                  <IconButton
-                    size="small"
-                    onClick={() => window.open(item.newsUrl, '_blank')}
-                    color="primary"
+          <Box>
+            {item.newsUrl && (
+              <Tooltip title="Ver noticia completa">
+                <IconButton
+                  size="small"
+                  onClick={() => window.open(item.newsUrl, '_blank')}
+                  color="primary"
                     sx={{
                       '&:hover': {
                         backgroundColor: 'primary.main',
                         color: 'white'
                       }
                     }}
-                  >
-                    <OpenInNew />
-                  </IconButton>
-                </Tooltip>
-              )}
-            </Box>
-            
-            {item.hasSubnews && (
-              <Chip
-                label={`${item.subnews?.length || 0} subnoticias`}
-                size="small"
-                color="success"
-                variant="outlined"
-                sx={{ 
-                  fontSize: '0.7rem',
-                  height: 24,
-                  '& .MuiChip-label': {
-                    px: 1
-                  }
-                }}
-              />
+                >
+                  <OpenInNew />
+                </IconButton>
+              </Tooltip>
             )}
+          </Box>
+          
+          {item.hasSubnews && (
+            <Box
+              sx={{ 
+                display: 'flex',
+                alignItems: 'center',
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 1,
+                border: '1px solid',
+                borderColor: 'success.main',
+                backgroundColor: 'success.50',
+                fontSize: '0.7rem',
+                height: 24,
+                color: 'success.main'
+              }}
+            >
+              <Typography variant="caption">
+                {item.subnews?.length || 0} subnoticias
+              </Typography>
+            </Box>
+          )}
           </Box>
         </Box>
       </Card>
@@ -466,11 +589,25 @@ const GoogleNews = () => {
       );
     }
 
+    // Ordenar noticias por fecha (más recientes primero)
+    const sortedNewsItems = [...newsItems].sort((a, b) => {
+      const timestampA = parseInt(a.timestamp) || 0;
+      const timestampB = parseInt(b.timestamp) || 0;
+      return timestampB - timestampA; // Orden descendente (más reciente primero)
+    });
+    
+    // Log para debugging del ordenamiento
+    console.log('📅 Noticias ordenadas por fecha:', sortedNewsItems.slice(0, 3).map(item => ({
+      title: item.title?.substring(0, 50) + '...',
+      timestamp: item.timestamp,
+      formattedDate: formatTimestamp(item.timestamp)
+    })));
+
     // Calcular paginación
-    const totalPages = Math.ceil(newsItems.length / itemsPerPage);
+    const totalPages = Math.ceil(sortedNewsItems.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    const currentItems = newsItems.slice(startIndex, endIndex);
+    const currentItems = sortedNewsItems.slice(startIndex, endIndex);
 
     const handlePageChange = (event, value) => {
       setCurrentPage(value);
@@ -481,17 +618,39 @@ const GoogleNews = () => {
     return (
       <Box>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+          <Box>
           <Typography variant="h6" color="primary">
-            {newsItems.length} noticias encontradas
+            {sortedNewsItems.length} noticias encontradas
           </Typography>
-          <Button
-            startIcon={<Refresh />}
-            onClick={() => activeTab < categories.length ? fetchNewsByCategory(categories[activeTab].id) : handleSearch()}
-            variant="outlined"
-            size="small"
-          >
-            Actualizar
-          </Button>
+            <Typography variant="caption" color="text.secondary">
+              Idioma: {languageRegion}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              startIcon={<Download />}
+              onClick={generateExcelReport}
+              variant="contained"
+              size="small"
+              color="success"
+              disabled={!data || !data.items || data.items.length === 0}
+              sx={{
+                '&:hover': {
+                  backgroundColor: 'success.dark',
+                }
+              }}
+            >
+              Descargar Reporte
+            </Button>
+            <Button
+              startIcon={<Refresh />}
+              onClick={() => activeTab < categories.length ? fetchNewsByCategory(categories[activeTab].id) : handleSearch()}
+              variant="outlined"
+              size="small"
+            >
+              Actualizar
+            </Button>
+          </Box>
         </Box>
         
         {/* Grid de noticias con paginación - 3 tarjetas por fila, 4 filas por página */}
@@ -624,14 +783,53 @@ const GoogleNews = () => {
                     },
                   }}
                 >
-                  <MenuItem value="es-ES">Español (España)</MenuItem>
-                  <MenuItem value="es-MX">Español (México)</MenuItem>
-                  <MenuItem value="en-US">English (US)</MenuItem>
-                  <MenuItem value="en-GB">English (UK)</MenuItem>
-                  <MenuItem value="fr-FR">Français (France)</MenuItem>
-                  <MenuItem value="de-DE">Deutsch (Deutschland)</MenuItem>
-                  <MenuItem value="it-IT">Italiano (Italia)</MenuItem>
-                  <MenuItem value="pt-BR">Português (Brasil)</MenuItem>
+                  {/* Español */}
+                  <MenuItem value="es-ES">🇪🇸 Español (España)</MenuItem>
+                  <MenuItem value="es-MX">🇲🇽 Español (México)</MenuItem>
+                  <MenuItem value="es-DO">🇩🇴 Español (República Dominicana)</MenuItem>
+                  <MenuItem value="es-AR">🇦🇷 Español (Argentina)</MenuItem>
+                  <MenuItem value="es-CO">🇨🇴 Español (Colombia)</MenuItem>
+                  <MenuItem value="es-PE">🇵🇪 Español (Perú)</MenuItem>
+                  <MenuItem value="es-VE">🇻🇪 Español (Venezuela)</MenuItem>
+                  <MenuItem value="es-CL">🇨🇱 Español (Chile)</MenuItem>
+                  
+                  {/* Inglés */}
+                  <MenuItem value="en-US">🇺🇸 English (US)</MenuItem>
+                  <MenuItem value="en-GB">🇬🇧 English (UK)</MenuItem>
+                  <MenuItem value="en-CA">🇨🇦 English (Canada)</MenuItem>
+                  <MenuItem value="en-AU">🇦🇺 English (Australia)</MenuItem>
+                  
+                  {/* Francés */}
+                  <MenuItem value="fr-FR">🇫🇷 Français (France)</MenuItem>
+                  <MenuItem value="fr-CA">🇨🇦 Français (Canada)</MenuItem>
+                  <MenuItem value="fr-BE">🇧🇪 Français (Belgique)</MenuItem>
+                  
+                  {/* Alemán */}
+                  <MenuItem value="de-DE">🇩🇪 Deutsch (Deutschland)</MenuItem>
+                  <MenuItem value="de-AT">🇦🇹 Deutsch (Österreich)</MenuItem>
+                  <MenuItem value="de-CH">🇨🇭 Deutsch (Schweiz)</MenuItem>
+                  
+                  {/* Italiano */}
+                  <MenuItem value="it-IT">🇮🇹 Italiano (Italia)</MenuItem>
+                  <MenuItem value="it-CH">🇨🇭 Italiano (Svizzera)</MenuItem>
+                  
+                  {/* Portugués */}
+                  <MenuItem value="pt-BR">🇧🇷 Português (Brasil)</MenuItem>
+                  <MenuItem value="pt-PT">🇵🇹 Português (Portugal)</MenuItem>
+                  
+                  {/* Otros idiomas */}
+                  <MenuItem value="nl-NL">🇳🇱 Nederlands (Nederland)</MenuItem>
+                  <MenuItem value="sv-SE">🇸🇪 Svenska (Sverige)</MenuItem>
+                  <MenuItem value="da-DK">🇩🇰 Dansk (Danmark)</MenuItem>
+                  <MenuItem value="no-NO">🇳🇴 Norsk (Norge)</MenuItem>
+                  <MenuItem value="fi-FI">🇫🇮 Suomi (Suomi)</MenuItem>
+                  <MenuItem value="pl-PL">🇵🇱 Polski (Polska)</MenuItem>
+                  <MenuItem value="ru-RU">🇷🇺 Русский (Россия)</MenuItem>
+                  <MenuItem value="ja-JP">🇯🇵 日本語 (日本)</MenuItem>
+                  <MenuItem value="ko-KR">🇰🇷 한국어 (대한민국)</MenuItem>
+                  <MenuItem value="zh-CN">🇨🇳 中文 (中国)</MenuItem>
+                  <MenuItem value="ar-SA">🇸🇦 العربية (السعودية)</MenuItem>
+                  <MenuItem value="hi-IN">🇮🇳 हिन्दी (भारत)</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
