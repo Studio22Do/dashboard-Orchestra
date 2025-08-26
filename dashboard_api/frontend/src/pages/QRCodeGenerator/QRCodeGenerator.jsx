@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axiosInstance from '../../config/axios';
 import { Container, Card, CardContent, Grid, TextField, MenuItem, Button, Typography, Box, CircularProgress, Alert } from '@mui/material';
 import { useAppDispatch } from '../../redux/hooks/reduxHooks';
 import { setBalance } from '../../redux/slices/creditsSlice';
@@ -23,22 +24,12 @@ const QRCodeGenerator = () => {
     setError(null);
     setResult(null);
     try {
-      const token = localStorage.getItem('token');
       // Payload mínimo y seguro: si el tipo requiere estructura específica y sólo tenemos 'data', el backend hará fallback a 'auto'
       const payload = type === 'batch' ? { items: [{ data, output_format: 'png' }] } : { data, output_format: 'png' };
-      const resp = await fetch(`${API_BASE_URL}/generate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify({ type, payload })
-      });
-      const json = await resp.json();
-      if (!resp.ok) throw new Error(json.error || 'Error generando QR');
-      setResult(json);
-      if (json && json.credits_info && typeof json.credits_info.remaining === 'number') {
-        dispatch(setBalance(json.credits_info.remaining));
+      const resp = await axiosInstance.post(`${API_BASE_URL}/generate`, { type, payload });
+      setResult(resp.data);
+      if (resp.data && resp.data.credits_info && typeof resp.data.credits_info.remaining === 'number') {
+        dispatch(setBalance(resp.data.credits_info.remaining));
       }
     } catch (e) {
       setError(e.message);
