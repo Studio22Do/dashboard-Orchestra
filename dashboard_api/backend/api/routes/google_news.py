@@ -1,6 +1,6 @@
 import logging
 import requests
-from flask import Blueprint, jsonify, current_app, request
+from flask import Blueprint, jsonify, current_app, request, Response
 from flask_jwt_extended import jwt_required
 from api.utils.decorators import credits_required
 
@@ -316,3 +316,57 @@ def get_language_regions():
     except Exception as e:
         logger.error(f"Error inesperado: {str(e)}")
         return jsonify({'error': 'Error interno del servidor'}), 500 
+
+@google_news_bp.route('/proxy-image')
+def proxy_image():
+    """Proxy optimizado para imágenes de Google News"""
+    image_url = request.args.get('url')
+    if not image_url:
+        return jsonify({'error': 'URL de imagen requerida'}), 400
+    
+    try:
+        # Configurar headers para simular un navegador real
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
+            'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1'
+        }
+        
+        # Timeout más corto para mejor rendimiento
+        response = requests.get(
+            image_url, 
+            headers=headers, 
+            stream=True, 
+            timeout=5,
+            allow_redirects=True
+        )
+        response.raise_for_status()
+        
+        # Configurar headers de respuesta optimizados
+        response_headers = {
+            'Content-Type': response.headers.get('Content-Type', 'image/jpeg'),
+            'Cache-Control': 'public, max-age=86400',  # Cache por 24 horas
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type'
+        }
+        
+        # Stream de la imagen en chunks más pequeños para mejor rendimiento
+        return Response(
+            response.iter_content(chunk_size=4096), 
+            content_type=response.headers.get('Content-Type'),
+            headers=response_headers
+        )
+        
+    except requests.exceptions.Timeout:
+        logger.warning(f"Timeout al obtener imagen: {image_url}")
+        return jsonify({'error': 'Timeout al obtener imagen'}), 408
+    except requests.exceptions.ConnectionError as e:
+        logger.warning(f"Error de conexión al obtener imagen: {image_url} - {str(e)}")
+        return jsonify({'error': 'Error de conexión'}), 503
+    except Exception as e:
+        logger.error(f"Error al obtener imagen: {str(e)}")
+        return jsonify({'error': 'Error al obtener imagen'}), 500 
