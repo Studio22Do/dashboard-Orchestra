@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axiosInstance from '../../config/axios';
 import {
   Container,
   Typography,
@@ -182,16 +183,9 @@ const RunwayML = () => {
         return;
       }
       
-      const res = await fetch(`${API_BASE_URL}/runwayml/process`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (!res.ok || data.error) {
+      const res = await axiosInstance.post(`/api/${API_VERSION}/runwayml/process`, payload);
+      const data = res.data;
+      if (data.error) {
         setError(data.error || 'Error al procesar el video');
         setLoading(false);
         return;
@@ -313,18 +307,9 @@ const RunwayML = () => {
       const API_VERSION = "beta_v2";
       const API_BASE_URL = `/api/${API_VERSION}`;
       
-      const response = await fetch(`${API_BASE_URL}/runwayml/status/${uuid}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await axiosInstance.get(`/api/${API_VERSION}/runwayml/status/${uuid}`);
 
-      if (!response.ok) {
-        throw new Error(`Error al consultar estado: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
       return data;
     } catch (error) {
       console.error('Error consultando estado:', error);
@@ -344,18 +329,9 @@ const RunwayML = () => {
       const API_VERSION = "beta_v2";
       const API_BASE_URL = `/api/${API_VERSION}`;
       
-      const response = await fetch(`${API_BASE_URL}/runwayml/result/${uuid}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await axiosInstance.get(`/api/${API_VERSION}/runwayml/result/${uuid}`);
 
-      if (!response.ok) {
-        throw new Error(`Error al obtener resultado: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
       return data;
     } catch (error) {
       console.error('Error obteniendo resultado:', error);
