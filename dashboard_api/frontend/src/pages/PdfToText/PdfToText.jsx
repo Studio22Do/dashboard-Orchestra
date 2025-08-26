@@ -21,7 +21,8 @@ import {
   IconButton,
   Tooltip,
   TextField,
-  MenuItem
+  MenuItem,
+  Chip
 } from '@mui/material';
 import { 
   ContentCopy,
@@ -31,7 +32,8 @@ import {
   Upload,
   TextFields,
   CheckCircle,
-  Error
+  Error,
+  Star
 } from '@mui/icons-material';
 import axiosInstance from '../../config/axios';
 
@@ -244,12 +246,34 @@ const PdfToText = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        PDF to Text
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Convierte archivos PDF a texto editable
-      </Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{ 
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          PDF to Text
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Convierte archivos PDF a texto editable
+        </Typography>
+        <Chip 
+          icon={<Description />} 
+          label="Extrae texto de PDFs y conviértelos a formatos editables" 
+          color="primary" 
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip 
+          icon={<Star />} 
+          label="Costo: 2 puntos por conversión" 
+          color="primary" 
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
+      </Box>
 
       <Card sx={{ mb: 4 }}>
         <CardContent>

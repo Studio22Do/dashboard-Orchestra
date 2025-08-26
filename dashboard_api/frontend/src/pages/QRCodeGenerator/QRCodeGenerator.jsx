@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axiosInstance from '../../config/axios';
-import { Container, Card, CardContent, Grid, TextField, MenuItem, Button, Typography, Box, CircularProgress, Alert } from '@mui/material';
+import { Container, Card, CardContent, Grid, TextField, MenuItem, Button, Typography, Box, CircularProgress, Alert, Chip } from '@mui/material';
+import { QrCode, Star } from '@mui/icons-material';
 import { useAppDispatch } from '../../redux/hooks/reduxHooks';
 import { setBalance } from '../../redux/slices/creditsSlice';
 
@@ -40,7 +41,35 @@ const QRCodeGenerator = () => {
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom>QR Generator</Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{ 
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          QR Generator
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Genera códigos QR personalizados para cualquier tipo de contenido
+        </Typography>
+        <Chip 
+          icon={<QrCode />} 
+          label="Crea QRs para texto, URLs, WiFi, contactos y más" 
+          color="primary" 
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip 
+          icon={<Star />} 
+          label="Costo: 1 punto por generación" 
+          color="primary" 
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
+      </Box>
+
       <Card>
         <CardContent>
           <Grid container spacing={2}>
