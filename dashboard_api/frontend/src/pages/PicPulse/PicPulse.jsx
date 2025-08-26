@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useState } from 'react';
 import {
   Container,
   Paper,
@@ -206,7 +207,7 @@ const PicPulse = () => {
           <ul>
             <li>Usa imágenes de logos o diseños de marca</li>
             <li>Evita fotos de personas o capturas de pantalla</li>
-            <li>Formato PNG o JPG/JPEG (max 5MB)</li>
+            <li>Formato PNG o JPG/JPEG (max 2MB)</li>
             <li>Dimensiones entre 100x100 y 4000x4000 píxeles</li>
             <li>Nombres sin espacios ni caracteres especiales</li>
           </ul>

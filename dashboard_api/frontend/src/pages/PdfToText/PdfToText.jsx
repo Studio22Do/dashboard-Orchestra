@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBalance } from '../../redux/slices/creditsSlice';
 import { 
@@ -21,7 +21,8 @@ import {
   IconButton,
   Tooltip,
   TextField,
-  MenuItem
+  MenuItem,
+  Chip
 } from '@mui/material';
 import { 
   ContentCopy,
@@ -31,7 +32,8 @@ import {
   Upload,
   TextFields,
   CheckCircle,
-  Error
+  Error,
+  Star
 } from '@mui/icons-material';
 import axiosInstance from '../../config/axios';
 
@@ -52,6 +54,20 @@ const PdfToText = () => {
   const [imgError, setImgError] = useState(null);
   const [imgResultUrl, setImgResultUrl] = useState(null);
   const [imgResultType, setImgResultType] = useState(null);
+  const [startPage, setStartPage] = useState(0);
+  const [endPage, setEndPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
+  const [isMultiPage, setIsMultiPage] = useState(false);
+
+  // Resetear valores cuando cambie el archivo
+  useEffect(() => {
+    if (!imgFile) {
+      setStartPage(0);
+      setEndPage(0);
+      setPageCount(0);
+      setIsMultiPage(false);
+    }
+  }, [imgFile]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -190,8 +206,38 @@ const PdfToText = () => {
       
       setImgFile(selectedFile);
       setImgError(null);
+      setImgResultUrl(null);
+      setImgResultType(null);
+      
+      // Detectar si es un PDF de múltiples páginas
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const arr = new Uint8Array(e.target.result);
+        let count = 0;
+        for (let i = 0; i < arr.length; i++) {
+          if (arr[i] === 0x25 && arr[i + 1] === 0x50 && arr[i + 2] === 0x44 && arr[i + 3] === 0x46) {
+            // Buscar el patrón /Count en el PDF
+            const str = new TextDecoder().decode(arr);
+            const match = str.match(/\/Count\s+(\d+)/);
+            if (match) {
+              count = parseInt(match[1]);
+              break;
+            }
+          }
+        }
+        setPageCount(count);
+        setIsMultiPage(count > 1);
+        
+        // Si es múltiples páginas, cambiar automáticamente a TIF
+        if (count > 1 && imgFormat === 'jpeg') {
+          setImgFormat('tifflzw');
+        }
+      };
+      reader.readAsArrayBuffer(selectedFile);
     } else {
       setImgFile(null);
+      setPageCount(0);
+      setIsMultiPage(false);
     }
   };
 
@@ -211,6 +257,12 @@ const PdfToText = () => {
       formData.append('pdfFile', imgFile);
       formData.append('imgFormat', imgFormat);
       
+      // Agregar parámetros de páginas si están configurados
+      if (startPage > 0 || endPage > 0) {
+        formData.append('startPage', startPage);
+        formData.append('endPage', endPage);
+      }
+      
       const response = await axiosInstance.post('/api/beta_v2/pdf-converter/to-image', formData, {
         responseType: 'blob',
         headers: {
@@ -223,16 +275,37 @@ const PdfToText = () => {
       console.log('Data type:', typeof response.data);
       console.log('Data size:', response.data.size);
       
-      // Crear URL del blob
-      const blob = new Blob([response.data], { 
-        type: response.headers['content-type'] || 'image/jpeg' 
-      });
-      const url = URL.createObjectURL(blob);
+      // Verificar el tipo de contenido y manejar diferentes formatos
+      const contentType = response.headers['content-type'];
+      console.log('Content-Type detectado:', contentType);
       
-      setImgResultUrl(url);
-      setImgResultType(response.headers['content-type'] || 'image/jpeg');
+      if (contentType && contentType.includes('zip')) {
+        // Es un ZIP con múltiples imágenes
+        const blob = new Blob([response.data], { type: 'application/zip' });
+        const url = URL.createObjectURL(blob);
+        setImgResultUrl(url);
+        setImgResultType('application/zip');
+      } else if (contentType && (contentType.includes('tiff') || contentType.includes('tif'))) {
+        // Es un archivo TIFF
+        const blob = new Blob([response.data], { type: contentType });
+        const url = URL.createObjectURL(blob);
+        setImgResultUrl(url);
+        setImgResultType(contentType);
+      } else if (contentType && contentType.startsWith('image/')) {
+        // Es una imagen individual (JPEG, PNG, etc.)
+        const blob = new Blob([response.data], { type: contentType });
+        const url = URL.createObjectURL(blob);
+        setImgResultUrl(url);
+        setImgResultType(contentType);
+      } else {
+        // Tipo no reconocido, asumir que es una imagen
+        const blob = new Blob([response.data], { type: 'image/jpeg' });
+        const url = URL.createObjectURL(blob);
+        setImgResultUrl(url);
+        setImgResultType('image/jpeg');
+      }
       
-      console.log('Imagen creada exitosamente:', url);
+      console.log('Archivo creado exitosamente:', url);
       
     } catch (err) {
       console.error('Error converting PDF to image:', err);
@@ -244,12 +317,34 @@ const PdfToText = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        PDF to Text
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Convierte archivos PDF a texto editable
-      </Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{ 
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          PDF to Text
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Convierte archivos PDF a texto editable
+        </Typography>
+        <Chip 
+          icon={<Description />} 
+          label="Extrae texto de PDFs y conviértelos a formatos editables" 
+          color="primary" 
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip 
+          icon={<Star />} 
+          label="Costo: 2 puntos por conversión" 
+          color="primary" 
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
+      </Box>
 
       <Card sx={{ mb: 4 }}>
         <CardContent>
@@ -507,7 +602,7 @@ const PdfToText = () => {
                   />
                 </Button>
               </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={3}>
                 <TextField
                   select
                   fullWidth
@@ -524,6 +619,30 @@ const PdfToText = () => {
                 </TextField>
               </Grid>
               <Grid item xs={12} md={3}>
+                <TextField
+                  fullWidth
+                  label="Página inicial"
+                  type="number"
+                  value={startPage}
+                  onChange={e => setStartPage(parseInt(e.target.value) || 0)}
+                  inputProps={{ min: 0, max: pageCount - 1 }}
+                  disabled={pageCount === 0}
+                  helperText={pageCount > 0 ? `0 a ${pageCount - 1}` : 'Selecciona un PDF'}
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <TextField
+                  fullWidth
+                  label="Página final"
+                  type="number"
+                  value={endPage}
+                  onChange={e => setEndPage(parseInt(e.target.value) || 0)}
+                  inputProps={{ min: 0, max: pageCount - 1 }}
+                  disabled={pageCount === 0}
+                  helperText={pageCount > 0 ? `0 = hasta el final` : 'Selecciona un PDF'}
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
                 <Button
                   type="submit"
                   variant="contained"
@@ -537,34 +656,99 @@ const PdfToText = () => {
               </Grid>
             </Grid>
           </Box>
-          {imgError && (
-            <Alert severity="error" sx={{ mt: 2 }}>{imgError}</Alert>
-          )}
-          {imgResultUrl && imgResultType && imgResultType.startsWith('image') && (
-            <Box sx={{ mt: 3, textAlign: 'center' }}>
-              <Typography variant="subtitle1" gutterBottom>Imagen generada:</Typography>
-              <img src={imgResultUrl} alt="PDF convertido" style={{ maxWidth: '100%', maxHeight: 400 }} />
-              <Button
-                variant="outlined"
-                sx={{ mt: 2 }}
-                href={imgResultUrl}
-                download={`pdf-convertido.${imgFormat}`}
-              >
-                Descargar Imagen
-              </Button>
+          {/* Información del PDF */}
+          {imgFile && pageCount > 0 && (
+            <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                📄 PDF seleccionado: <strong>{imgFile.name}</strong> ({pageCount} página{pageCount > 1 ? 's' : ''})
+              </Typography>
+              {isMultiPage && (
+                <Typography variant="body2" color="warning.main" sx={{ mt: 1 }}>
+                  ⚠️ PDF de múltiples páginas detectado. Para mejor compatibilidad, se recomienda usar formato TIFF.
+                </Typography>
+              )}
             </Box>
           )}
-          {imgResultUrl && imgResultType && !imgResultType.startsWith('image') && (
+          
+          {/* Solo mostrar error si realmente hay un error */}
+          {imgError && !imgResultUrl && (
+            <Alert severity="error" sx={{ mt: 2 }}>{imgError}</Alert>
+          )}
+          
+          {imgResultUrl && imgResultType && (
             <Box sx={{ mt: 3, textAlign: 'center' }}>
-              <Typography variant="subtitle1" gutterBottom>Archivo generado (no visualizable):</Typography>
-              <Button
-                variant="outlined"
-                sx={{ mt: 2 }}
-                href={imgResultUrl}
-                download={`pdf-convertido.${imgFormat}`}
-              >
-                Descargar Archivo
-              </Button>
+              {imgResultType === 'image/tiff' || imgResultType === 'image/tif' ? (
+                <>
+                  <Typography variant="subtitle1" gutterBottom>Archivo TIFF generado:</Typography>
+                  <Box sx={{ 
+                    width: 200, 
+                    height: 200, 
+                    mx: 'auto', 
+                    mb: 2, 
+                    bgcolor: 'grey.100', 
+                    borderRadius: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '2px dashed grey'
+                  }}>
+                    <Typography variant="h4" color="text.secondary">
+                      📄 TIFF
+                    </Typography>
+                  </Box>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    Formato TIFF generado exitosamente. Los navegadores no pueden mostrar este formato, pero puedes descargarlo.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    sx={{ mt: 2 }}
+                    href={imgResultUrl}
+                    download={`pdf-convertido.tiff`}
+                  >
+                    Descargar Archivo TIFF
+                  </Button>
+                </>
+              ) : imgResultType.startsWith('image/') && !imgResultType.includes('tiff') ? (
+                <>
+                  <Typography variant="subtitle1" gutterBottom>Imagen generada:</Typography>
+                  <img src={imgResultUrl} alt="PDF convertido" style={{ maxWidth: '100%', maxHeight: 400 }} />
+                  <Button
+                    variant="outlined"
+                    sx={{ mt: 2 }}
+                    href={imgResultUrl}
+                    download={`pdf-convertido.${imgFormat}`}
+                  >
+                    Descargar Imagen
+                  </Button>
+                </>
+              ) : imgResultType === 'application/zip' ? (
+                <>
+                  <Typography variant="subtitle1" gutterBottom>Archivo ZIP generado:</Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    El PDF contiene múltiples páginas. Se ha generado un archivo ZIP con todas las imágenes.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    sx={{ mt: 2 }}
+                    href={imgResultUrl}
+                    download={`pdf-convertido-multipagina.zip`}
+                  >
+                    Descargar ZIP con Imágenes
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Typography variant="subtitle1" gutterBottom>Archivo generado:</Typography>
+                  <Button
+                    variant="outlined"
+                    sx={{ mt: 2 }}
+                    href={imgResultUrl}
+                    download={`pdf-convertido.${imgFormat}`}
+                  >
+                    Descargar Archivo
+                  </Button>
+                </>
+              )}
             </Box>
           )}
         </CardContent>

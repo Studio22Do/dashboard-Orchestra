@@ -39,7 +39,8 @@ import {
   Download,
   Language,
   Translate,
-  Speed
+  Speed,
+  Star
 } from '@mui/icons-material';
 
 const WhisperFromURL = () => {
@@ -159,20 +160,32 @@ const WhisperFromURL = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Whisper: Transcripción desde URL
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Transcribe audio desde URLs directas de archivos de audio usando el modelo Whisper de OpenAI
-      </Typography>
-      
-      {/* Chip de costo */}
-      <Box sx={{ mb: 3 }}>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{ 
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          Whisper: Transcripción desde URL
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Transcribe audio desde URLs directas de archivos de audio usando el modelo Whisper de OpenAI
+        </Typography>
         <Chip 
-          label="Costo: 1 punto" 
+          icon={<AudioFile />} 
+          label="Transcribe audio desde múltiples formatos" 
           color="primary" 
           variant="outlined"
-          icon={<Speed />}
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip 
+          icon={<Star />} 
+          label="Costo: 2 puntos por transcripción" 
+          color="primary" 
+          variant="outlined"
+          sx={{ mt: 1 }}
         />
       </Box>
       

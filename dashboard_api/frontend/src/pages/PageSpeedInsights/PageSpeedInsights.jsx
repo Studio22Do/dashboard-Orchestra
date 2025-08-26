@@ -38,7 +38,8 @@ import {
   Search as SearchIcon,
   Tag as TagIcon,
   Title as TitleIcon,
-  Description as DescriptionIcon
+  Description as DescriptionIcon,
+  Star
 } from '@mui/icons-material';
 
 const PageSpeedInsights = () => {
@@ -349,13 +350,27 @@ const PageSpeedInsights = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Website Speed Test 
-      </Typography>
-      <Typography variant="subtitle1" gutterBottom color="text.secondary">
-        Analiza la velocidad de carga y rendimiento de cualquier sitio web. 
-        Obtén métricas precisas y sugerencias de optimización.
-      </Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{ 
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          Website Speed Test
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Analiza la velocidad de carga y rendimiento de cualquier sitio web
+        </Typography>
+        <Chip 
+          icon={<Star />} 
+          label="Costo: 1 punto por análisis" 
+          color="primary" 
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
+      </Box>
 
       <Paper 
         elevation={2} 

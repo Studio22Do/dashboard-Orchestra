@@ -191,7 +191,7 @@ const MediafyAPI = () => {
             sx={{ mb: 2 }}
           />
         );
-      case 3: // Search Users
+      case 2: // Search Users
         return (
           <TextField
             fullWidth
@@ -203,7 +203,7 @@ const MediafyAPI = () => {
             sx={{ mb: 2 }}
           />
         );
-      case 4: // Location
+      case 3: // Location
         return (
           <TextField
             fullWidth
@@ -223,7 +223,7 @@ const MediafyAPI = () => {
   const renderResults = () => {
     console.log('🔍 [DEBUG] renderResults - data:', !!data, 'activeTab:', activeTab, 'locations:', locations.length);
     
-    if (!data && activeTab !== 4) return null;
+    if (!data && activeTab !== 3) return null;
 
     switch (activeTab) {
       case 0: // Profile

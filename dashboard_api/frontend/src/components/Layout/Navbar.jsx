@@ -195,7 +195,7 @@ const Navbar = () => {
         subtitle: null
       },
       '/apps': {
-        title: 'ToolBox',
+        title: 'Catálogo de Apps',
         icon: null,
         subtitle: null
       },
@@ -243,6 +243,16 @@ const Navbar = () => {
         title: 'Instagram Statistics',
         icon: Instagram,
         subtitle: 'API de estadísticas de Instagram'
+      },
+      '/apps/mediafy': {
+        title: 'Mediafy',
+        icon: Instagram,
+        subtitle: 'Análisis completo de Instagram'
+      },
+      '/apps/perplexity': {
+        title: 'Perplexity',
+        icon: ChatBubble,
+        subtitle: 'API de búsqueda inteligente'
       },
 
       '/apps/google-trends': {

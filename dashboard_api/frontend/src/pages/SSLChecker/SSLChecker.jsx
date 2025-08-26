@@ -10,9 +10,10 @@ import {
   Box,
   CircularProgress,
   Alert,
-  Paper
+  Paper,
+  Chip
 } from '@mui/material';
-import { Security } from '@mui/icons-material';
+import { Security, Star } from '@mui/icons-material';
 import { APP_CONFIG } from '../../config/constants';
 
 const SSLChecker = () => {
@@ -74,12 +75,34 @@ const SSLChecker = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        SSL Checker
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Verifica el estado y los detalles del certificado SSL de cualquier sitio web
-      </Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{ 
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          SSL Checker
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Verifica el estado y los detalles del certificado SSL de cualquier sitio web
+        </Typography>
+        <Chip 
+          icon={<Security />} 
+          label="Verifica la seguridad de tus sitios web" 
+          color="primary" 
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip 
+          icon={<Star />} 
+          label="Costo: 1 punto por verificación" 
+          color="primary" 
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
+      </Box>
 
       <Card sx={{ mb: 4 }}>
         <CardContent>
