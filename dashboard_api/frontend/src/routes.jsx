@@ -11,6 +11,7 @@ import PRLabsVoice from './pages/PRLabs/Voice';
 import PRLabsChatbot from './pages/PRLabs/Chatbot';
 import PRLabsTools from './pages/PRLabs/Tools';
 import Dashboard from './pages/Dashboard/Dashboard';
+import CategoryView from './pages/CategoryView/CategoryView';
 import SpeechToTextAI from './pages/SpeechToTextAI/SpeechToTextAI';
 import GoogleNews from './pages/GoogleNews/GoogleNews';
 import SeoAnalyzer from './pages/SeoAnalyzer/SeoAnalyzer';
@@ -21,6 +22,7 @@ const AppRoutes = () => {
         <Routes>
             <Route path="/" element={<Layout />}>
                 <Route index element={<Dashboard />} />
+                <Route path="/category/:category" element={<CategoryView />} />
                 <Route path="/apps/speech-to-text" element={<SpeechToTextAI />} />
                 <Route path="/apps/seo-analyzer" element={<SeoAnalyzer />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />

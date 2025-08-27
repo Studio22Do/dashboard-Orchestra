@@ -285,6 +285,12 @@ function App() {
             </ProtectedRoute>
           } />
           
+          <Route path="/category/:category" element={
+            <ProtectedRoute>
+              <CategoryView />
+            </ProtectedRoute>
+          } />
+          
           <Route path="/apps/mediafy" element={
             <ProtectedRoute>
               <MediafyAPI />
