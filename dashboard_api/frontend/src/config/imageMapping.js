@@ -24,6 +24,7 @@ import keywordsearchBanner from '../assets/images/apps/banners/keywordsearch.png
 import marketinghubBanner from '../assets/images/apps/banners/marketinghub.png';
 import qrgeneratorBanner from '../assets/images/apps/banners/QRGenerator.png';
 import speechtotextBanner from '../assets/images/apps/banners/SPEECHTOTEXT.png';
+import sinfoniaBanner from '../assets/images/apps/banners/SINFONIA.png';  // ← AGREGADO: Banner de SinfonIA
 
 // Mapeo de apps a sus imágenes de banner
 export const getAppBanner = (appId) => {
@@ -39,10 +40,11 @@ export const getAppBanner = (appId) => {
     'genie-ai': chatgptBanner,
     'ai-humanizer': chatgptBanner,
     'ai-social-media': contentcreatorBanner,
-    'prlabs': webauditBanner,
+    'prlabs': sinfoniaBanner,  // ← CORREGIDO: Ahora usa su propio banner
     
     // Web & SEO
     'google-news': googleNewsBanner,
+    'google-keyword': keywordinsightsBanner,  // ← AGREGADO: Google Keyword Insights
     'seo-analyzer': seoanalyzerBanner,
     'seo-mastermind': keywordsearchBanner,
     'similar-web': similarwebBanner,
@@ -59,7 +61,8 @@ export const getAppBanner = (appId) => {
     'pdf-to-text': pdftotextBanner,
     'snap-video': snapvideoBanner,
     'whisper-url': whisperBanner,
-    'runway-ml': runwayBanner,
+    'runwayml': runwayBanner,  // ← AGREGADO: ID sin guión
+    'runway-ml': runwayBanner, // ← YA EXISTÍA: ID con guión
     'advanced-image': imagetransformBanner,
     'image-manipulation': imagetransformBanner,
     'qr-generator': qrgeneratorBanner,
