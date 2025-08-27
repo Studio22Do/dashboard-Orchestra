@@ -24,6 +24,37 @@ import {
     Skeleton,
     Tooltip,
 } from "@mui/material";
+
+// Importar iconos (empezando con Google News)
+import googleNewsIcon from "../../assets/images/apps/icons/googlenewsicon.png";
+import mediafyIcon from "../../assets/images/apps/icons/mediafyicon.png";
+import perplexityIcon from "../../assets/images/apps/icons/perplexityicon.png";
+
+// Importar iconos de Creative & Content
+import wordCountIcon from "../../assets/images/apps/icons/wordcounticon.png";
+import pdfToTextIcon from "../../assets/images/apps/icons/pdftotexticon.png";
+import snapVideoIcon from "../../assets/images/apps/icons/snapvideoicon.png";
+import genieAIIcon from "../../assets/images/apps/icons/chatgpt4icon.png";
+import aiSocialMediaIcon from "../../assets/images/apps/icons/contentcreatoricon.png";
+import advancedImageIcon from "../../assets/images/apps/icons/imagetransform-1.png";
+import whisperIcon from "../../assets/images/apps/icons/whispericon.png";
+import runwayMLIcon from "../../assets/images/apps/icons/runawayicon.png";
+import prlabsIcon from "../../assets/images/apps/icons/marketinghubicon.png";
+import speechToTextIcon from "../../assets/images/apps/icons/speechtotexticon.png";
+import picPulseIcon from "../../assets/images/apps/icons/Picpulseicon.png";
+
+// Importar iconos de Web & SEO
+import qrGeneratorIcon from "../../assets/images/apps/icons/qrgeneratorcode.png";
+import seoAnalyzerIcon from "../../assets/images/apps/icons/seoanalyzericon.png";
+import similarWebIcon from "../../assets/images/apps/icons/similarwebicon.png";
+import googleKeywordIcon from "../../assets/images/apps/icons/keywordinsightsicon.png";
+import domainMetricsIcon from "../../assets/images/apps/icons/domaincheckericon.png";
+import pageSpeedIcon from "../../assets/images/apps/icons/webstatusicon.png";
+import productDescriptionIcon from "../../assets/images/apps/icons/productdescriptionicon.png";
+import sslCheckerIcon from "../../assets/images/apps/icons/SSLcheckericon.png";
+import websiteStatusIcon from "../../assets/images/apps/icons/webstatusicon.png";
+import seoMastermindIcon from "../../assets/images/apps/icons/keywordsearchicon.png";
+import whoisLookupIcon from "../../assets/images/apps/icons/Whoisicon.png";
 import {
     Search as SearchIcon,
     ArrowBack as ArrowBackIcon,
@@ -101,8 +132,15 @@ const StyledCard = styled(Card)(({ theme }) => ({
 
 const StyledCardMedia = styled(CardMedia)(({ theme }) => ({
     height: 140,
-    backgroundSize: "cover",
-    objectFit: "cover",
+    backgroundSize: "contain",
+    objectFit: "contain",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    backgroundColor: "#272038",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "16px",
 }));
 
 const CategoryView = () => {
@@ -127,11 +165,62 @@ const CategoryView = () => {
 
     // Cargar apps al montar el componente
     useEffect(() => {
+        console.log('🚀 CategoryView mounted, fetching apps...');
         dispatch(fetchApps());
     }, [dispatch]);
 
     // Obtener la categoría desde el estado o parámetros
-    const categoryFromState = category || "Creative & Content";
+    const getCategoryFromParam = (param) => {
+        switch (param) {
+            case 'social-listening':
+                return 'Social Listening';
+            case 'ux-ui':
+                return 'Creative & Content';
+            case 'web-seo':
+                return 'Web & SEO';
+            default:
+                return 'Creative & Content';
+        }
+    };
+    
+    const categoryFromState = getCategoryFromParam(category);
+
+    // Mapeo de iconos para las apps
+    const getAppIcon = (appId) => {
+        const iconMap = {
+            // Social Listening
+            'google-news': googleNewsIcon,
+            'mediafy': mediafyIcon,
+            'perplexity': perplexityIcon,
+            
+            // Creative & Content
+            'word-count': wordCountIcon,
+            'pdf-to-text': pdfToTextIcon,
+            'snap-video': snapVideoIcon,
+            'genie-ai': genieAIIcon,
+            'ai-social-media': aiSocialMediaIcon,
+            'advanced-image': advancedImageIcon,
+            'whisper-url': whisperIcon,
+            'runwayml': runwayMLIcon,
+            'prlabs': prlabsIcon,
+            'speech-to-text': speechToTextIcon,
+            'picpulse': picPulseIcon,
+            
+            // Web & SEO
+            'qr-generator': qrGeneratorIcon,
+            'seo-analyzer': seoAnalyzerIcon,
+            'similar-web': similarWebIcon,
+            'google-keyword': googleKeywordIcon,
+            'domain-metrics': domainMetricsIcon,
+            'page-speed': pageSpeedIcon,
+            'product-description': productDescriptionIcon,
+            'ssl-checker': sslCheckerIcon,
+            'website-status': websiteStatusIcon,
+            'seo-mastermind': seoMastermindIcon,
+            'whois-lookup': whoisLookupIcon
+        };
+        return iconMap[appId] || '/app-placeholder.svg';
+    };
 
     // Filtrar apps por categoría
     const categoryApps = useMemo(() => {
@@ -192,6 +281,14 @@ const CategoryView = () => {
         return result;
     }, [categoryApps, searchQuery, selectedSubcategory, sortBy]);
 
+    // DEBUG: Agregar logs para ver qué está pasando (después de declarar todas las variables)
+    console.log('🔍 CategoryView DEBUG:');
+    console.log('- URL param category:', category);
+    console.log('- Mapped category:', categoryFromState);
+    console.log('- Apps from Redux:', apps);
+    console.log('- Category apps:', categoryApps);
+    console.log('- Filtered apps:', filteredApps);
+    
     // Función para obtener el ancho de las cards según el layout
     const getCardWidth = () => {
         switch (gridLayout) {
@@ -254,6 +351,8 @@ const CategoryView = () => {
         }
     };
 
+    console.log('🎨 CategoryView rendering...');
+    
     return (
         <Box sx={{ minHeight: "100vh", bgcolor: "#1a1625", color: "white" }}>
             {/* Header */}
@@ -727,9 +826,7 @@ const CategoryView = () => {
 
                                     <StyledCardMedia
                                         component="img"
-                                        image={
-                                            app.imageUrl || app.image_url || "/app-placeholder.svg"
-                                        }
+                                        image={getAppIcon(app.id)}
                                         title={app.title}
                                         onError={(e) => {
                                             // Si la imagen falla, usar el placeholder SVG
@@ -754,7 +851,7 @@ const CategoryView = () => {
                                             {app.description}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary">
-                                            API: {app.apiName}
+                                           
                                         </Typography>
                                     </CardContent>
                                     

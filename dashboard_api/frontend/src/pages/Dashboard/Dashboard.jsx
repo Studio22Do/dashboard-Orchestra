@@ -59,16 +59,16 @@ const Dashboard = () => {
       icon: Search,
       tools: [
         {
-          id: 'instagram',
+          id: 'mediafy',
           title: 'Mediafy',
           imageUrl: mediafyLogo,
           onClick: () => {
             setSelectedApp({
-              id: 'instagram',
+              id: 'mediafy',
               title: 'Mediafy',
               description: 'Análisis completo de Instagram: perfiles, posts, hashtags, usuarios y ubicaciones',
               imageUrl: mediafyLogo,
-              category: 'Social Media',
+              category: 'Social Listening',
               route: '/apps/mediafy',
               apiName: 'Mediafy',
             });
@@ -204,12 +204,12 @@ const Dashboard = () => {
           }
         },
         {
-          id: 'image-manipulation',
+          id: 'advanced-image',
           title: 'Image Transform',
           imageUrl: imageManipulationLogo,
           onClick: () => {
             setSelectedApp({
-              id: 'image-manipulation',
+              id: 'advanced-image',
               title: 'Image Manipulation',
               description: 'Herramientas avanzadas para edición y manipulación de imágenes',
               imageUrl: imageManipulationLogo,
@@ -416,12 +416,12 @@ const Dashboard = () => {
           }
         },
         {
-          id: 'ecommerce-description',
+          id: 'product-description',
           title: 'Product Description',
           imageUrl: productDescriptionLogo,
           onClick: () => {
             setSelectedApp({
-              id: 'ecommerce-description',
+              id: 'product-description',
               title: 'Product Description',
               description: 'Genera descripciones optimizadas para productos de eCommerce',
               imageUrl: productDescriptionLogo,
@@ -545,10 +545,10 @@ const Dashboard = () => {
               icon={category.icon}
               tools={category.tools}
               onViewAll={() => {
-                const categoryPath = category.id === 'social-listening' ? 'Social Media' :
+                const categoryPath = category.id === 'social-listening' ? 'Social Listening' :
                   category.id === 'ux-ui' ? 'Creative & Content' :
                   category.id === 'web-seo' ? 'Web & SEO' : '';
-                navigate('/category', { state: { preselectedCategory: categoryPath } });
+                navigate(`/category/${category.id}`, { state: { preselectedCategory: categoryPath } });
               }}
             />
           ))
