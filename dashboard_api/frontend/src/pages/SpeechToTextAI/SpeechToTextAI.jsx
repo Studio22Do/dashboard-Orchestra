@@ -18,15 +18,18 @@ import {
   MenuItem,
   IconButton,
   Paper,
-  Tooltip
+  Tooltip,
+  Chip
 } from '@mui/material';
 import {
   CloudUpload as UploadIcon,
   YouTube as YouTubeIcon,
   Language as LanguageIcon,
   ContentCopy as CopyIcon,
-  Download as DownloadIcon
+  Download as DownloadIcon,
+  Star
 } from '@mui/icons-material';
+import speechToTextIcon from '../../assets/images/apps/icons/speechtotexticon.png';
 
 // Base URL de la API
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -165,21 +168,34 @@ const SpeechToTextAI = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 3 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
           Speech to Text
         </Typography>
-        <Typography variant="body1" color="text.secondary" paragraph>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
           Transcribe audio y video desde múltiples fuentes usando IA avanzada
         </Typography>
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            <AlertTitle>Error</AlertTitle>
-            {error}
-          </Alert>
-        )}
+        <Chip
+          icon={<img src={speechToTextIcon} alt="Speech to Text" style={{ width: '20px', height: '20px' }} />}
+          label="Conversión de voz a texto con IA avanzada"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip
+          icon={<Star />}
+          label="Costo: 2 puntos por transcripción"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
       </Box>
 
       <Paper sx={{ mb: 4, p: 3 }}>

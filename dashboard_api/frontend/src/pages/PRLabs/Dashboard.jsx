@@ -11,9 +11,11 @@ import {
   RecordVoiceOver as VoiceIcon,
   Speed as PerformanceIcon,
   Insights as InsightsIcon,
-  Build
+  Build,
+  Star
 } from '@mui/icons-material';
 import { PR_LABS_CONFIG, getChatCost } from '../../config/prlabs';
+import prlabsIcon from '../../assets/images/apps/icons/marketinghubicon.png';
 
 const DashboardContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(4),
@@ -121,15 +123,34 @@ const PRLabsDashboard = () => {
   };
 
   return (
-    <DashboardContainer sx={{ mt: 3 }}>
-      {/* Header without Back Button */}
-      <Box mb={4}>
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
+    <DashboardContainer>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
           sinfonIA AI Suite
         </Typography>
-        <Typography variant="subtitle1" color="text.secondary">
+        <Typography variant="h6" color="text.secondary" gutterBottom>
           Suite completa de herramientas de IA para potenciar tu productividad
         </Typography>
+        <Chip
+          icon={<img src={prlabsIcon} alt="sinfonIA AI Suite" style={{ width: '20px', height: '20px' }} />}
+          label="Suite completa de herramientas de IA"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip
+          icon={<Star />}
+          label="Costo: Varía según herramienta"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
       </Box>
 
       {/* Quick Stats */}

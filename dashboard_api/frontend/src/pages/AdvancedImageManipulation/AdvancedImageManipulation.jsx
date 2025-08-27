@@ -37,9 +37,11 @@ import {
   Filter,
   Crop,
   Adjust,
-  Palette
+  Palette,
+  Star
 } from '@mui/icons-material';
 import { APP_CONFIG } from '../../config/constants';
+import imageManipulationIcon from '../../assets/images/apps/icons/imagetransform-1.png';
 
 const AdvancedImageManipulation = () => {
   const API_MODE = process.env.REACT_APP_MODE || 'beta_v2';
@@ -170,12 +172,34 @@ const AdvancedImageManipulation = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Manipulación Avanzada de Imágenes
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Procesa y mejora tus imágenes usando IA
-      </Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          Manipulación Avanzada de Imágenes
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Procesa y mejora tus imágenes usando IA
+        </Typography>
+        <Chip
+          icon={<img src={imageManipulationIcon} alt="Image Manipulation" style={{ width: '20px', height: '20px' }} />}
+          label="Manipulación avanzada de imágenes con IA"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip
+          icon={<Star />}
+          label="Costo: 2 puntos por operación"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
+      </Box>
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
