@@ -17,7 +17,8 @@ import {
   ListItemText,
   Divider,
   IconButton,
-  Tooltip
+  Tooltip,
+  Chip
 } from '@mui/material';
 import { 
   ContentCopy,
@@ -26,10 +27,12 @@ import {
   Link,
   VideoLibrary,
   Info,
-  Warning
+  Warning,
+  Star
 } from '@mui/icons-material';
 import axios from 'axios';
 import { APP_CONFIG } from '../../config/constants';
+import snapVideoIcon from '../../assets/images/apps/icons/snapvideoicon.png';
 
 const SnapVideo = () => {
   const [url, setUrl] = useState('');
@@ -177,12 +180,34 @@ const SnapVideo = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Media Downloader
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Descarga videos y audio de YouTube, Instagram, TikTok, Facebook y más plataformas
-      </Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          SnapVideo
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Descarga videos y audio de YouTube, Instagram, TikTok, Facebook y más plataformas
+        </Typography>
+        <Chip
+          icon={<img src={snapVideoIcon} alt="SnapVideo" style={{ width: '20px', height: '20px' }} />}
+          label="Descarga de medios de múltiples plataformas"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip
+          icon={<Star />}
+          label="Costo: 2 puntos por descarga"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
+      </Box>
 
       <Card sx={{ mb: 4 }}>
         <CardContent>

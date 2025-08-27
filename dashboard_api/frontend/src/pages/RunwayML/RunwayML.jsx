@@ -37,8 +37,10 @@ import {
   Movie,
   Edit,
   AutoAwesome,
-  Speed
+  Speed,
+  Star
 } from '@mui/icons-material';
+import runwayIcon from '../../assets/images/apps/icons/runawayicon.png';
 
 const RunwayML = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -436,12 +438,34 @@ const RunwayML = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        RunwayML
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Genera y edita videos usando IA con RunwayML
-      </Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          RunwayML
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Genera y edita videos usando IA con RunwayML
+        </Typography>
+        <Chip
+          icon={<img src={runwayIcon} alt="RunwayML" style={{ width: '20px', height: '20px' }} />}
+          label="Plataforma de IA multimedia avanzada"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip
+          icon={<Star />}
+          label="Costo: 3 puntos por operación"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
+      </Box>
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>

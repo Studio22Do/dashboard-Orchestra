@@ -10,11 +10,13 @@ import {
   Box, 
   CircularProgress,
   Alert,
-  Paper
+  Paper,
+  Chip
 } from '@mui/material';
-import { Public, CheckCircle, Cancel } from '@mui/icons-material';
+import { Public, CheckCircle, Cancel, Star } from '@mui/icons-material';
 import { useAppDispatch } from '../../redux/hooks/reduxHooks';
 import { setBalance } from '../../redux/slices/creditsSlice';
+import webStatusIcon from '../../assets/images/apps/icons/webstatusicon.png';
 
 const WebsiteStatus = () => {
   const [url, setUrl] = useState('');
@@ -64,12 +66,35 @@ const WebsiteStatus = () => {
 
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Website Status
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Verifica si un sitio web está <b>UP</b> o <b>DOWN</b> en tiempo real.
-      </Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          Website Status
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Verifica si un sitio web está UP o DOWN en tiempo real.
+        </Typography>
+        <Chip
+          icon={<img src={webStatusIcon} alt="Website Status" style={{ width: '20px', height: '20px' }} />}
+          label="Verificación en tiempo real del estado de sitios web"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip
+          icon={<Star />}
+          label="Costo: 1 punto por verificación"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
+      </Box>
+
       <Card sx={{ mb: 4 }}>
         <CardContent>
           <Box component="form" onSubmit={handleSubmit}>

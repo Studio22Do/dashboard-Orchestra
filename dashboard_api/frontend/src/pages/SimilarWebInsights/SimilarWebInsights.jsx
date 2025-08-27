@@ -15,7 +15,8 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Divider
+  Divider,
+  Chip
 } from '@mui/material';
 import { 
   Search,
@@ -24,9 +25,11 @@ import {
   Timer,
   Language,
   Devices,
-  LocationOn
+  LocationOn,
+  Star
 } from '@mui/icons-material';
 import axiosInstance from '../../config/axios';
+import similarWebIcon from '../../assets/images/apps/icons/similarwebicon.png';
 
 const SimilarWebInsights = () => {
   const [url, setUrl] = useState('');
@@ -146,17 +149,37 @@ const SimilarWebInsights = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 3 }}>
-      <Box mb={4}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Similar Web Insights
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          SimilarWeb Insights
         </Typography>
-        <Typography variant="body1" color="text.secondary" paragraph>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
           Analiza el tráfico y las métricas de cualquier sitio web
         </Typography>
+        <Chip
+          icon={<img src={similarWebIcon} alt="SimilarWeb" style={{ width: '20px', height: '20px' }} />}
+          label="Análisis completo de tráfico y competencia"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip
+          icon={<Star />}
+          label="Costo: 3 puntos por análisis"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
       </Box>
 
-      <Card sx={{ mb: 3 }}>
+      <Card sx={{ mb: 4 }}>
         <CardContent>
           <Box component="form" onSubmit={handleSubmit}>
             <Grid container spacing={2} alignItems="center">

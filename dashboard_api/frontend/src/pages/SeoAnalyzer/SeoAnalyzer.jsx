@@ -17,15 +17,18 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Divider
+  Divider,
+  Chip
 } from '@mui/material';
 import { 
   Search,
   CheckCircle,
   Error,
   Warning,
-  Info
+  Info,
+  Star
 } from '@mui/icons-material';
+import seoIcon from '../../assets/images/apps/icons/seoanalyzericon.png';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
@@ -92,12 +95,34 @@ const SeoAnalyzer = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        SEO Analyzer
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Analiza el SEO de cualquier sitio web y obtén recomendaciones para mejorar
-      </Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          SEO Analyzer
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Analiza el SEO de cualquier sitio web y obtén recomendaciones para mejorar
+        </Typography>
+        <Chip
+          icon={<img src={seoIcon} alt="SEO Analyzer" style={{ width: '20px', height: '20px' }} />}
+          label="Análisis completo de SEO con métricas detalladas"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip
+          icon={<Star />}
+          label="Costo: 2 puntos por análisis"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
+      </Box>
 
       <Card sx={{ mb: 4 }}>
         <CardContent>

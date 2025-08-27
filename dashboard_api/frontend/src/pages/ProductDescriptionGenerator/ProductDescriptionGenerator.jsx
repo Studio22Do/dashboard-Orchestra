@@ -23,7 +23,8 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel
+  InputLabel,
+  Chip
 } from '@mui/material';
 import { 
   ContentCopy,
@@ -32,8 +33,10 @@ import {
   ShoppingBag,
   Category,
   PriceChange,
-  Description
+  Description,
+  Star
 } from '@mui/icons-material';
+import productIcon from '../../assets/images/apps/icons/productdescriptionicon.png';
 
 const ProductDescriptionGenerator = () => {
 
@@ -118,12 +121,34 @@ const ProductDescriptionGenerator = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        AI eCommerce Product Description Generator
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Genera descripciones de productos optimizadas para eCommerce usando IA
-      </Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          AI eCommerce Product Description Generator
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Genera descripciones de productos optimizadas para eCommerce usando IA
+        </Typography>
+        <Chip
+          icon={<img src={productIcon} alt="Product Description" style={{ width: '20px', height: '20px' }} />}
+          label="Generador inteligente de descripciones para eCommerce"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip
+          icon={<Star />}
+          label="Costo: 2 puntos por generación"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
+      </Box>
 
       <Card sx={{ mb: 4 }}>
         <CardContent>

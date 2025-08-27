@@ -13,9 +13,12 @@ import {
   Alert,
   Box,
   CircularProgress,
-  Tooltip
+  Tooltip,
+  Chip
 } from '@mui/material';
 import axiosInstance from '../../config/axios';
+import { Star } from '@mui/icons-material';
+import picPulseIcon from '../../assets/images/apps/icons/Picpulseicon.png';
 
 const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
 
@@ -189,14 +192,34 @@ const PicPulse = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 3 }}>
-      <Box mb={4}>
-        <Typography variant="h4" component="h1" gutterBottom>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
           PicPulse - Análisis de Imágenes
         </Typography>
-        <Typography variant="subtitle1" color="text.secondary" paragraph>
-          Analiza el impacto psicológico y la calidad de tus imágenes usando IA avanzada
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Analiza imágenes y obtén insights detallados usando IA avanzada
         </Typography>
+        <Chip
+          icon={<img src={picPulseIcon} alt="PicPulse" style={{ width: '20px', height: '20px' }} />}
+          label="Análisis inteligente de imágenes con IA"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip
+          icon={<Star />}
+          label="Costo: 2 puntos por análisis"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
       </Box>
 
       <StyledPaper>

@@ -37,9 +37,11 @@ import {
   Facebook,
   Twitter,
   Instagram,
-  LinkedIn
+  LinkedIn,
+  Star
 } from '@mui/icons-material';
 import { generateSocialMediaContent } from '../../services/socialMediaContent';
+import socialMediaIcon from '../../assets/images/apps/icons/contentcreatoricon.png';
 
 const AISocialMediaContent = () => {
   const [prompt, setPrompt] = useState('');
@@ -131,12 +133,34 @@ const AISocialMediaContent = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Generador de Contenido para Redes Sociales
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Genera contenido optimizado para diferentes redes sociales usando IA
-      </Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          Generador de Contenido para Redes Sociales
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Genera contenido optimizado para diferentes redes sociales usando IA
+        </Typography>
+        <Chip
+          icon={<img src={socialMediaIcon} alt="Social Media Content" style={{ width: '20px', height: '20px' }} />}
+          label="Generador inteligente de contenido para redes sociales"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip
+          icon={<Star />}
+          label="Costo: 2 puntos por generación"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
+      </Box>
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>

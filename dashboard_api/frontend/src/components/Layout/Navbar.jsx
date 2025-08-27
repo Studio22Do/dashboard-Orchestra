@@ -346,7 +346,7 @@ const Navbar = () => {
         subtitle: 'Conversor de PDF a texto'
       },
       '/apps/snap-video': {
-        title: 'Media Downloader',
+        title: 'SnapVideo',
         icon: VideoLibrary,
         subtitle: 'Descarga de medios'
       },

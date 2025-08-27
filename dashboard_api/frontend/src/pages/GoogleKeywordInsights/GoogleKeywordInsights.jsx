@@ -32,9 +32,11 @@ import {
   TrendingUp,
   TrendingDown,
   TrendingFlat,
-  BarChart
+  BarChart,
+  Star
 } from '@mui/icons-material';
 import axiosInstance from '../../config/axios';
+import keywordIcon from '../../assets/images/apps/icons/keywordinsightsicon.png';
 
 // Definición de países por región
 const COUNTRIES = {
@@ -220,134 +222,158 @@ const GoogleKeywordInsights = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Keyword Insights
-      </Typography>
-      <Typography variant="subtitle1" gutterBottom color="text.secondary">
-        Analiza palabras clave y obtén insights de búsqueda de Google
-      </Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          Keyword Insights
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Analiza palabras clave y obtén insights de búsqueda de Google
+        </Typography>
+        <Chip
+          icon={<img src={keywordIcon} alt="Keyword Insights" style={{ width: '20px', height: '20px' }} />}
+          label="Análisis completo de palabras clave y tendencias"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip
+          icon={<Star />}
+          label="Costo: 2 puntos por análisis"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
+      </Box>
 
-      <Paper elevation={2} sx={{ p: 3, mt: 3 }}>
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-          <TextField
-            fullWidth
-            label="Palabra clave"
-            variant="outlined"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            error={!!error}
-            helperText={error}
-            sx={{ flex: '1 1 300px' }}
-            InputProps={{
-              startAdornment: (
-                <Search color="action" sx={{ mr: 1 }} />
-              ),
-            }}
-          />
-          <FormControl sx={{ minWidth: 200 }}>
-            <InputLabel>Ubicación</InputLabel>
-            <Select
-              value={location}
-              label="Ubicación"
-              onChange={(e) => setLocation(e.target.value)}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 400
+      <Card sx={{ mb: 4 }}>
+        <Paper elevation={2} sx={{ p: 3, mt: 3 }}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+            <TextField
+              fullWidth
+              label="Palabra clave"
+              variant="outlined"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              error={!!error}
+              helperText={error}
+              sx={{ flex: '1 1 300px' }}
+              InputProps={{
+                startAdornment: (
+                  <Search color="action" sx={{ mr: 1 }} />
+                ),
+              }}
+            />
+            <FormControl sx={{ minWidth: 200 }}>
+              <InputLabel>Ubicación</InputLabel>
+              <Select
+                value={location}
+                label="Ubicación"
+                onChange={(e) => setLocation(e.target.value)}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 400
+                    }
                   }
-                }
+                }}
+              >
+                <ListSubheader 
+                  sx={{ 
+                    bgcolor: 'primary.dark',
+                    color: 'primary.contrastText',
+                    fontWeight: 'bold',
+                    lineHeight: '40px',
+                    borderLeft: '4px solid',
+                    borderColor: 'primary.main'
+                  }}
+                >
+                  EUROPA
+                </ListSubheader>
+                {COUNTRIES.EUROPA.map(country => (
+                  <MenuItem key={country.code} value={country.code}>
+                    {country.name}
+                  </MenuItem>
+                ))}
+
+                <ListSubheader 
+                  sx={{ 
+                    bgcolor: 'primary.dark',
+                    color: 'primary.contrastText',
+                    fontWeight: 'bold',
+                    lineHeight: '40px',
+                    mt: 1,
+                    borderLeft: '4px solid',
+                    borderColor: 'primary.main'
+                  }}
+                >
+                  LATINOAMÉRICA - SUDAMÉRICA
+                </ListSubheader>
+                {COUNTRIES.LATINOAMERICA.SUDAMERICA.map(country => (
+                  <MenuItem key={country.code} value={country.code}>
+                    {country.name}
+                  </MenuItem>
+                ))}
+
+                <ListSubheader 
+                  sx={{ 
+                    bgcolor: 'primary.dark',
+                    color: 'primary.contrastText',
+                    fontWeight: 'bold',
+                    lineHeight: '40px',
+                    mt: 1,
+                    borderLeft: '4px solid',
+                    borderColor: 'primary.main'
+                  }}
+                >
+                  LATINOAMÉRICA - CENTROAMÉRICA Y CARIBE
+                </ListSubheader>
+                {COUNTRIES.LATINOAMERICA.CENTROAMERICA.map(country => (
+                  <MenuItem key={country.code} value={country.code}>
+                    {country.name}
+                  </MenuItem>
+                ))}
+
+                <ListSubheader 
+                  sx={{ 
+                    bgcolor: 'primary.dark',
+                    color: 'primary.contrastText',
+                    fontWeight: 'bold',
+                    lineHeight: '40px',
+                    mt: 1,
+                    borderLeft: '4px solid',
+                    borderColor: 'primary.main'
+                  }}
+                >
+                  NORTEAMÉRICA
+                </ListSubheader>
+                {COUNTRIES.NORTEAMERICA.map(country => (
+                  <MenuItem key={country.code} value={country.code}>
+                    {country.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={loading}
+              sx={{ 
+                height: '56px',
+                flex: '0 0 auto',
+                minWidth: '120px'
               }}
             >
-              <ListSubheader 
-                sx={{ 
-                  bgcolor: 'primary.dark',
-                  color: 'primary.contrastText',
-                  fontWeight: 'bold',
-                  lineHeight: '40px',
-                  borderLeft: '4px solid',
-                  borderColor: 'primary.main'
-                }}
-              >
-                EUROPA
-              </ListSubheader>
-              {COUNTRIES.EUROPA.map(country => (
-                <MenuItem key={country.code} value={country.code}>
-                  {country.name}
-                </MenuItem>
-              ))}
-
-              <ListSubheader 
-                sx={{ 
-                  bgcolor: 'primary.dark',
-                  color: 'primary.contrastText',
-                  fontWeight: 'bold',
-                  lineHeight: '40px',
-                  mt: 1,
-                  borderLeft: '4px solid',
-                  borderColor: 'primary.main'
-                }}
-              >
-                LATINOAMÉRICA - SUDAMÉRICA
-              </ListSubheader>
-              {COUNTRIES.LATINOAMERICA.SUDAMERICA.map(country => (
-                <MenuItem key={country.code} value={country.code}>
-                  {country.name}
-                </MenuItem>
-              ))}
-
-              <ListSubheader 
-                sx={{ 
-                  bgcolor: 'primary.dark',
-                  color: 'primary.contrastText',
-                  fontWeight: 'bold',
-                  lineHeight: '40px',
-                  mt: 1,
-                  borderLeft: '4px solid',
-                  borderColor: 'primary.main'
-                }}
-              >
-                LATINOAMÉRICA - CENTROAMÉRICA Y CARIBE
-              </ListSubheader>
-              {COUNTRIES.LATINOAMERICA.CENTROAMERICA.map(country => (
-                <MenuItem key={country.code} value={country.code}>
-                  {country.name}
-                </MenuItem>
-              ))}
-
-              <ListSubheader 
-                sx={{ 
-                  bgcolor: 'primary.dark',
-                  color: 'primary.contrastText',
-                  fontWeight: 'bold',
-                  lineHeight: '40px',
-                  mt: 1,
-                  borderLeft: '4px solid',
-                  borderColor: 'primary.main'
-                }}
-              >
-                NORTEAMÉRICA
-              </ListSubheader>
-              {COUNTRIES.NORTEAMERICA.map(country => (
-                <MenuItem key={country.code} value={country.code}>
-                  {country.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={loading}
-            sx={{ 
-              height: '56px',
-              flex: '0 0 auto',
-              minWidth: '120px'
-            }}
-          >
-            {loading ? <CircularProgress size={24} /> : 'Analizar'}
-          </Button>
-        </Box>
-      </Paper>
+              {loading ? <CircularProgress size={24} /> : 'Analizar'}
+            </Button>
+          </Box>
+        </Paper>
+      </Card>
 
       {loading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>

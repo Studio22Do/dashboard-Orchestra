@@ -16,7 +16,8 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Divider
+  Divider,
+  Chip
 } from '@mui/material';
 import axiosInstance from '../../config/axios';
 import { 
@@ -26,10 +27,12 @@ import {
   Speed,
   Security,
   Storage,
-  Language
+  Language,
+  Star
 } from '@mui/icons-material';
 import { useAppDispatch } from '../../redux/hooks/reduxHooks';
 import { setBalance } from '../../redux/slices/creditsSlice';
+import domainIcon from '../../assets/images/apps/icons/domaincheckericon.png';
 
 const DomainMetrics = () => {
   const [domain, setDomain] = useState('');
@@ -75,12 +78,34 @@ const DomainMetrics = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Domain Metrics Check
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Analiza métricas y estadísticas de cualquier dominio
-      </Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 'bold'
+        }}>
+          Domain Metrics Check
+        </Typography>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Analiza métricas y estadísticas de cualquier dominio
+        </Typography>
+        <Chip
+          icon={<img src={domainIcon} alt="Domain Metrics" style={{ width: '20px', height: '20px' }} />}
+          label="Análisis completo de métricas de dominio"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1, mr: 1 }}
+        />
+        <Chip
+          icon={<Star />}
+          label="Costo: 2 puntos por análisis"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 1 }}
+        />
+      </Box>
 
       <Card sx={{ mb: 4 }}>
         <CardContent>
