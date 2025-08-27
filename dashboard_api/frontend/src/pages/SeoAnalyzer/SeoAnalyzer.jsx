@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../config/axios';
 import { 
   Container, 
   Typography, 
@@ -49,12 +49,18 @@ const SeoAnalyzer = () => {
       return;
     }
     
+    // Formatear la URL para asegurar que tenga el esquema
+    let formattedUrl = url.trim();
+    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+      formattedUrl = `https://${formattedUrl}`;
+    }
+    
     setLoading(true);
     setError(null);
     setSeoData(null); // Limpia resultado anterior al iniciar análisis
     
     try {
-      const response = await axios.post(`${API_BASE_URL}/seo-analyzer/analyze`, { url });
+      const response = await axiosInstance.post(`${API_BASE_URL}/seo-analyzer/analyze`, { url: formattedUrl });
       setSeoData(response.data);
     } catch (err) {
       console.error('Error analyzing SEO:', err);
