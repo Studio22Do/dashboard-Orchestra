@@ -26,6 +26,11 @@ def analyze_seo():
     if not url:
         return jsonify({'error': 'Se requiere una URL para analizar'}), 400
 
+    # Formatear la URL para asegurar que tenga el esquema
+    url = url.strip()
+    if not url.startswith('http://') and not url.startswith('https://'):
+        url = f'https://{url}'
+
     api_url = "https://seo-analyzer3.p.rapidapi.com/seo-audit-basic"
     headers = {
         "x-rapidapi-key": current_app.config['RAPIDAPI_KEY'],
