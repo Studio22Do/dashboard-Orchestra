@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-import { APP_CONFIG } from '../../config/constants';
+import axiosInstance from '../../config/axios';
 
 // Estado inicial
 const initialState = {
@@ -20,24 +19,9 @@ const initialState = {
 // Acciones asíncronas
 export const fetchDashboardStats = createAsyncThunk(
   'stats/fetchDashboardStats',
-  async (_, { rejectWithValue, getState }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const state = getState();
-      const token = state.auth.token;
-      
-      if (!token) {
-        throw new Error('No hay token de autenticación');
-      }
-
-      const response = await axios.get(
-        `${APP_CONFIG.API_URL}/api/beta_v2/stats/dashboard`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await axiosInstance.get('/api/beta_v2/stats/dashboard');
 
       return response.data;
     } catch (error) {
