@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axiosInstance from '../../config/axios';
 import { 
   Container, 
   Typography, 
@@ -25,8 +26,9 @@ const WebsiteStatus = () => {
   const [statusData, setStatusData] = useState(null);
   const dispatch = useAppDispatch();
 
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
   const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
-  const API_BASE_URL = `/api/${API_MODE}/website-status`;
+  const API_BASE_URL = `${API_URL}/${API_MODE}/website-status`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,26 +41,22 @@ const WebsiteStatus = () => {
     setStatusData(null);
     try {
       let domain = url.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
-      const response = await fetch(`${API_BASE_URL}/check`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(localStorage.getItem('token') ? { 'Authorization': `Bearer ${localStorage.getItem('token')}` } : {})
-        },
-        body: JSON.stringify({ domain })
-      });
-      const data = await response.json();
-      if (!response.ok || data.error) {
+      const response = await axiosInstance.post(`${API_BASE_URL}/check`, { domain });
+      const data = response.data;
+      
+      if (data.error) {
         setError(data.message || data.error || 'Error al verificar el estado del sitio');
         setLoading(false);
         return;
       }
+      
       setStatusData(data);
       if (data && data.credits_info && typeof data.credits_info.remaining === 'number') {
         dispatch(setBalance(data.credits_info.remaining));
       }
     } catch (err) {
-      setError(err.message || 'Error al verificar el estado del sitio');
+      console.error('Error checking website status:', err);
+      setError(err.response?.data?.error || err.message || 'Error al verificar el estado del sitio');
     } finally {
       setLoading(false);
     }
