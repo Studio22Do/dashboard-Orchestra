@@ -2,7 +2,6 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
-from flask_cors import CORS
 from config import get_config
 from api.routes.seo_analyzer import seo_analyzer_bp
 from api.routes.picpulse import picpulse_bp
@@ -16,11 +15,10 @@ def create_app(config_object):
     """Fábrica de aplicación Flask"""
     app = Flask(__name__)
     app.config.from_object(config_object)
-    CORS(app)
     
     # Inicializar extensiones con la aplicación
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app)
     jwt.init_app(app)
     
     # Configurar JWT específicamente para evitar problemas de OpenSSL
@@ -116,14 +114,12 @@ def create_app(config_object):
     @app.route(f'{version_prefix}/version-info')
     def version_info():
         """Endpoint para obtener información de la versión actual"""
-        version_config = app.config.get_version_config()
         return {
             'version': app.config.get('MODE', 'beta_v1'),
-            'config': version_config,
             'features': {
-                'authentication_required': version_config['require_auth'],
-                'favorites_enabled': version_config['enable_favorites'],
-                'purchases_enabled': version_config['enable_purchases']
+                'authentication_required': True,
+                'favorites_enabled': True,
+                'purchases_enabled': False
             }
         }
     

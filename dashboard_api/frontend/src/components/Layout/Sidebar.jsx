@@ -69,12 +69,6 @@ const NavButton = styled(ListItemButton)(({ theme }) => ({
   },
 }));
 
-const staticMenuItems = [
-  { text: 'Apps', icon: <Dashboard />, path: '/' },
-  { text: 'ToolBox', icon: <Apps />, path: '/apps' },
-  { text: 'Analytics', icon: <Analytics />, path: '/analytics' },
-];
-
 // Mapeo de apps a logos del dashboard para mantener consistencia
 const getAppIcon = (appId) => {
   const logoMap = {
@@ -133,7 +127,7 @@ const getAppIcon = (appId) => {
     'file-converter-pdf': pdfToTextLogo,
     
     // Default fallback
-    'default': Apps
+    'default': <Apps />
   };
   
   return logoMap[appId] || logoMap['default'];
@@ -143,8 +137,23 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const favoriteApps = useAppSelector(selectFavoriteApps) || [];
-  // const user = useAppSelector(selectUser); // Ya no se usa aquí
+  const favoriteApps = useAppSelector(selectFavoriteApps);
+  const user = useAppSelector(selectUser);
+
+  // Obtener menú dinámico basado en el rol del usuario
+  const getMenuItems = () => {
+    const baseMenuItems = [
+      { text: 'Apps', icon: <Dashboard />, path: '/' },
+      { text: 'ToolBox', icon: <Apps />, path: '/apps' },
+    ];
+
+    // Solo mostrar Analytics para usuarios admin (con validación adicional)
+    if (user && user.role && user.role === 'admin') {
+      baseMenuItems.push({ text: 'Analytics', icon: <Analytics />, path: '/analytics' });
+    }
+
+    return baseMenuItems;
+  };
 
   // Cargar apps favoritas cuando se monta el sidebar
   useEffect(() => {
@@ -159,21 +168,29 @@ const Sidebar = () => {
 
   return (
     <StyledDrawer variant="permanent">
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 3 }}>
+      <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
+          Dashboard
+        </Typography>
         <button
-          onClick={() => navigate('/')}
-          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', outline: 'none' }}
-          tabIndex={0}
-          aria-label="Ir a inicio"
-          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') navigate('/'); }}
+          onClick={() => navigate('/profile')}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'rgba(255,255,255,0.7)',
+            fontSize: '0.9rem',
+            cursor: 'pointer',
+            padding: '4px 0',
+            marginTop: '4px'
+          }}
         >
-          <img src="/maestro.png" alt="Logo Sympho" style={{ width: 120, marginBottom: 16, display: 'block' }} />
+          {user?.name || 'Usuario'}
         </button>
       </Box>
       <Box sx={{ overflow: 'auto' }}>
         <List>
-          {/* Menú estático siempre visible */}
-          {staticMenuItems.map((item) => (
+          {/* Menú dinámico basado en rol */}
+          {getMenuItems().map((item) => (
             <NavButton
               key={item.text}
               onClick={() => navigate(item.path)}

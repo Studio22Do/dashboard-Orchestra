@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import ValidationError
 import os
@@ -11,6 +11,7 @@ from api.models.app import App, ApiUsage, UserApp
 from api.models.user import User
 from api.utils.schemas import AppSchema, ApiUsageSchema
 from api.utils.error_handlers import ResourceNotFoundError, ValidationError as ApiValidationError
+from api.utils.decorators import credits_required
 
 # Crear blueprint
 apps_bp = Blueprint('apps', __name__)
@@ -490,15 +491,14 @@ def toggle_favorite_app(app_id):
     if not app:
         return jsonify({'error': f'App {app_id} no encontrada'}), 404
     
-    # Verificar si el usuario tiene la app
+    # Verificar si ya existe la relación usuario-app
     user_app = UserApp.query.filter_by(user_id=current_user_id, app_id=app_id).first()
+    
+    # Si no existe, crear la relación (sin restricciones de compra)
     if not user_app:
-        # Si estamos en beta_v1, permitir marcar como favorito sin comprar
-        if user.version == 'beta_v1':
-            user_app = UserApp(user_id=current_user_id, app_id=app_id)
-            db.session.add(user_app)
-        else:
-            return jsonify({'error': 'Debes comprar la app antes de marcarla como favorita'}), 403
+        user_app = UserApp(user_id=current_user_id, app_id=app_id)
+        db.session.add(user_app)
+    
     # Alternar favorito
     user_app.is_favorite = not user_app.is_favorite
     db.session.commit()
@@ -507,7 +507,7 @@ def toggle_favorite_app(app_id):
         'message': 'Estado de favorito actualizado',
         'is_favorite': user_app.is_favorite,
         'app': app.to_dict() | {'is_favorite': user_app.is_favorite}
-    }), 200 
+    }), 200
 
 @apps_bp.route('/generate-qr', methods=['POST'])
 def generate_qr():
