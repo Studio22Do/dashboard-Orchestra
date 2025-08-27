@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import axiosInstance from '../../config/axios';
 import {
   Container,
   Typography,
@@ -76,8 +77,9 @@ const WhoisLookup = () => {
     setData(null);
   };
 
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
   const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
-  const API_BASE_URL = `/api/${API_MODE}/whois-lookup`;
+  const API_BASE_URL = `${API_URL}/${API_MODE}/whois-lookup`;
 
   const handleSearch = async (type, input) => {
     if (!input.trim()) {
@@ -102,20 +104,8 @@ const WhoisLookup = () => {
     };
 
     try {
-      const response = await fetch(endpoints[type], {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payloads[type])
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || `Error ${response.status}`);
-      }
+      const response = await axiosInstance.post(endpoints[type], payloads[type]);
+      const result = response.data;
 
       if (result.status === 'error') {
         throw new Error(result.error || 'Error en la consulta WHOIS');
@@ -125,29 +115,43 @@ const WhoisLookup = () => {
       if (type === 'domain' && result.data && typeof result.data === 'object') {
         const whoisKeys = Object.keys(result.data);
         if (whoisKeys.length > 0) {
-          const whoisData = result.data[whoisKeys[0]];
-          // Mapeo plano para el frontend
-          setData({
-            domainName: whoisData['Domain Name'] || whoisData['domainName'] || '',
-            registrar: whoisData['Registrar'] || whoisData['registrar'] || '',
-            creationDate: whoisData['Created Date'] || whoisData['creationDate'] || '',
-            expirationDate: whoisData['Expiry Date'] || whoisData['expirationDate'] || '',
-            updatedDate: whoisData['Updated Date'] || whoisData['updatedDate'] || '',
-            status: whoisData['Domain Status'] || whoisData['status'] || '',
-            nameServers: whoisData['Name Server'] || whoisData['nameServers'] || '',
-            registrantName: whoisData['Registrant Name'] || '',
-            registrantOrganization: whoisData['Registrant Organization'] || '',
-            registrantEmail: whoisData['Registrant Email'] || '',
-            registrantPhone: whoisData['Registrant Phone'] || '',
-            registrantCountry: whoisData['Registrant Country'] || '',
-            adminName: whoisData['Admin Name'] || '',
-            adminEmail: whoisData['Admin Email'] || '',
-            techName: whoisData['Tech Name'] || '',
-            techEmail: whoisData['Tech Email'] || '',
-            // Puedes agregar más campos si el frontend los usa
-          });
+          // Usar el primer servidor WHOIS que tenga datos válidos
+          let whoisData = null;
+          for (const key of whoisKeys) {
+            const serverData = result.data[key];
+            if (serverData && serverData['Domain Name']) {
+              whoisData = serverData;
+              break;
+            }
+          }
+          
+          if (whoisData) {
+            // Mapeo plano para el frontend
+            setData({
+              domainName: whoisData['Domain Name'] || '',
+              registrar: whoisData['Registrar'] || '',
+              creationDate: whoisData['Created Date'] || '',
+              expirationDate: whoisData['Expiry Date'] || '',
+              updatedDate: whoisData['Updated Date'] || '',
+              status: whoisData['Domain Status'] || '',
+              nameServers: whoisData['Name Server'] || '',
+              registrantName: whoisData['Registrant Name'] || '',
+              registrantOrganization: whoisData['Registrant Organization'] || '',
+              registrantEmail: whoisData['Registrant Email'] || '',
+              registrantPhone: whoisData['Registrant Phone'] || '',
+              registrantCountry: whoisData['Registrant Country'] || '',
+              adminName: whoisData['Admin Name'] || '',
+              adminEmail: whoisData['Admin Email'] || '',
+              techName: whoisData['Tech Name'] || '',
+              techEmail: whoisData['Tech Email'] || '',
+            });
+          } else {
+            setData(null);
+            setError('No se encontraron datos válidos del dominio');
+          }
         } else {
           setData(null);
+          setError('No se encontraron datos del dominio');
         }
       } else {
         setData(result.data);
