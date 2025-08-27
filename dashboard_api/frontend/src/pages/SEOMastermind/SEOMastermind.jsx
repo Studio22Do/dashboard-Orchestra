@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axiosInstance from '../../config/axios';
 import {
   Box,
   Container,
@@ -139,8 +140,9 @@ const SEOMastermind = () => {
   const [orderBy, setOrderBy] = useState('difficulty');
   const [order, setOrder] = useState('asc');
 
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
   const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
-  const API_BASE_URL = `/api/${API_MODE}/seo-mastermind`;
+  const API_BASE_URL = `${API_URL}/${API_MODE}/seo-mastermind`;
 
   const handleAnalyze = async () => {
     if (!keyword) {
@@ -158,22 +160,9 @@ const SEOMastermind = () => {
       const apiUrl = `${API_BASE_URL}`;
       console.log('Llamando a la API:', apiUrl);
 
-      const token = localStorage.getItem('token');
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify({ keyword })
-      });
+      const response = await axiosInstance.post(apiUrl, { keyword });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Error ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
       setKeywordData(data);
 
       // Actualizar créditos si viene información del decorador
@@ -187,9 +176,9 @@ const SEOMastermind = () => {
       }));
     } catch (err) {
       console.error('Error en la llamada a la API:', err);
-      setError(err.message);
+      setError(err.response?.data?.error || err.message);
       dispatch(addNotification({
-        message: `Error al realizar el análisis de keywords: ${err.message}`,
+        message: `Error al realizar el análisis de keywords: ${err.response?.data?.error || err.message}`,
         type: 'error'
       }));
     } finally {
