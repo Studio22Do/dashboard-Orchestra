@@ -69,12 +69,6 @@ const NavButton = styled(ListItemButton)(({ theme }) => ({
   },
 }));
 
-const staticMenuItems = [
-  { text: 'Apps', icon: <Dashboard />, path: '/' },
-  { text: 'ToolBox', icon: <Apps />, path: '/apps' },
-  { text: 'Analytics', icon: <Analytics />, path: '/analytics' },
-];
-
 // Mapeo de apps a logos del dashboard para mantener consistencia
 const getAppIcon = (appId) => {
   const logoMap = {
@@ -133,7 +127,7 @@ const getAppIcon = (appId) => {
     'file-converter-pdf': pdfToTextLogo,
     
     // Default fallback
-    'default': Apps
+    'default': <Apps />
   };
   
   return logoMap[appId] || logoMap['default'];
@@ -153,8 +147,8 @@ const Sidebar = () => {
       { text: 'ToolBox', icon: <Apps />, path: '/apps' },
     ];
 
-    // Solo mostrar Analytics para usuarios admin
-    if (user && user.role === 'admin') {
+    // Solo mostrar Analytics para usuarios admin (con validación adicional)
+    if (user && user.role && user.role === 'admin') {
       baseMenuItems.push({ text: 'Analytics', icon: <Analytics />, path: '/analytics' });
     }
 
