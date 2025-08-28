@@ -218,10 +218,6 @@ function App() {
   
   // Verificar token al inicializar la aplicación
   useEffect(() => {
-
-    // Establecer autenticación a true aunque no haya token
-      dispatch(setAuth(true));
-
     const token = localStorage.getItem('token');
     
     if (token && !isTokenExpired(token)) {
@@ -232,6 +228,9 @@ function App() {
     } else if (token && isTokenExpired(token)) {
       // Token expirado, limpiarlo
       localStorage.removeItem('token');
+      dispatch(setAuth(false));
+    } else {
+      // No hay token, mantener autenticación como false
       dispatch(setAuth(false));
     }
   }, [dispatch]);
