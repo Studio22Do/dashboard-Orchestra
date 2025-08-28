@@ -106,6 +106,10 @@ def create_app(config_object):
     app.register_blueprint(mediafy_bp, url_prefix=f'{version_prefix}/mediafy')
     app.register_blueprint(perplexity_bp, url_prefix=f'{version_prefix}/perplexity')
     
+    # Inicializar tracking global automático para todas las APIs
+    from api.utils.global_tracking import init_global_tracking
+    init_global_tracking(app)
+    
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers
     register_error_handlers(app)

@@ -7,9 +7,7 @@ import {
   Paper, 
   CircularProgress, 
   Alert,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+
   Chip,
   Table,
   TableBody,
@@ -18,7 +16,16 @@ import {
   TableHead,
   TableRow,
   IconButton,
-  Collapse
+  Collapse,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Card,
+  CardContent,
+  Tooltip,
+  Badge
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import {
@@ -28,10 +35,10 @@ import {
   Apps as AppsIcon,
   Assessment,
   Timeline,
-  ShowChart,
+
   Dashboard as DashboardIcon,
   Analytics as AnalyticsIcon,
-  ExpandMore,
+
   CheckCircle,
   Warning,
   Error,
@@ -39,6 +46,7 @@ import {
 } from '@mui/icons-material';
 import MetricCard from './components/MetricCard';
 import UsageChart from './components/UsageChart';
+import UsageChartModal from './components/UsageChartModal';
 import ApiPerformance from './components/ApiPerformance';
 import UserMetrics from './components/UserMetrics';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks/reduxHooks';
@@ -113,28 +121,7 @@ const MetricsGrid = styled(Grid)(({ theme }) => ({
   },
 }));
 
-const StyledAccordion = styled(Accordion)(({ theme }) => ({
-  backgroundColor: '#272038',
-  color: 'white',
-  borderRadius: 12,
-  border: '1px solid rgba(255, 255, 255, 0.1)',
-  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-  '&:before': {
-    display: 'none',
-  },
-  '&.Mui-expanded': {
-    margin: 0,
-  },
-}));
 
-const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
-  '& .MuiAccordionSummary-content': {
-    margin: 0,
-  },
-  '& .MuiAccordionSummary-expandIconWrapper': {
-    color: '#837cf2',
-  },
-}));
 
 const StatusChip = styled(Chip)(({ status }) => ({
   backgroundColor: status === 'Operativo' ? '#4caf50' : 
@@ -156,7 +143,10 @@ const Analytics = () => {
   const apiPerformance = useAppSelector(selectApiPerformance);
   const loading = useAppSelector(selectStatsLoading);
   const error = useAppSelector(selectStatsError);
-  const [expanded, setExpanded] = useState(false);
+
+  const [openApiModal, setOpenApiModal] = useState(false);
+  const [openMetricsModal, setOpenMetricsModal] = useState(false);
+  const [openUsageModal, setOpenUsageModal] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -214,14 +204,7 @@ const Analytics = () => {
   // Determinar si es admin/superadmin
   const isAdmin = user && (user.role === 'admin' || user.role === 'superadmin');
 
-  // Datos simulados para las APIs (reemplazar con datos reales)
-  const apiData = [
-    { name: 'Instagram API', status: 'Operativo', responseTime: '120ms', uptime: '99.9%', lastCheck: '2 min ago' },
-    { name: 'Google API', status: 'Operativo', responseTime: '85ms', uptime: '99.8%', lastCheck: '1 min ago' },
-    { name: 'YouTube API', status: 'Operativo', responseTime: '200ms', uptime: '99.7%', lastCheck: '3 min ago' },
-    { name: 'Twitter API', status: 'Advertencia', responseTime: '500ms', uptime: '98.5%', lastCheck: '5 min ago' },
-    { name: 'Facebook API', status: 'Operativo', responseTime: '150ms', uptime: '99.9%', lastCheck: '1 min ago' },
-  ];
+
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -274,108 +257,136 @@ const Analytics = () => {
         </Box>
       )}
 
-      {/* Estado del Sistema - Ahora arriba para admin/superadmin */}
-      {isAdmin && (
+      {/* Estado del Sistema - Versión compacta para admin/superadmin */}
+      {isAdmin && apiPerformance && apiPerformance.length > 0 && (
         <Box mb={4}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <StyledPaper>
-                <Box display="flex" alignItems="center" mb={3}>
+                <Box display="flex" alignItems="center" justifyContent="space-between" mb={3}>
+                  <Box display="flex" alignItems="center">
                   <Speed sx={{ color: '#837cf2', mr: 2, fontSize: 28 }} />
                   <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
-                    Estado del Sistema
+                      Estado de las APIs
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center',
-                    p: 2,
-                    borderRadius: 2,
-                    background: 'rgba(131, 124, 242, 0.05)',
-                    border: '1px solid rgba(131, 124, 242, 0.1)',
-                    minHeight: 60
-                  }}>
-                    <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
-                      APIs Operativas
-                    </Typography>
-                    <Box sx={{ 
-                      width: 12, 
-                      height: 12, 
-                      borderRadius: '50%', 
-                      backgroundColor: '#4caf50'
-                    }} />
-                  </Box>
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center',
-                    p: 2,
-                    borderRadius: 2,
-                    background: 'rgba(131, 124, 242, 0.05)',
-                    border: '1px solid rgba(131, 124, 242, 0.1)',
-                    minHeight: 60
-                  }}>
-                    <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
-                      Base de Datos
-                    </Typography>
-                    <Box sx={{ 
-                      width: 12, 
-                      height: 12, 
-                      borderRadius: '50%', 
-                      backgroundColor: '#4caf50'
-                    }} />
-                  </Box>
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center',
-                    p: 2,
-                    borderRadius: 2,
-                    background: 'rgba(131, 124, 242, 0.05)',
-                    border: '1px solid rgba(131, 124, 242, 0.1)',
-                    minHeight: 60
-                  }}>
-                    <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
-                      Servidor Web
-                    </Typography>
-                    <Box sx={{ 
-                      width: 12, 
-                      height: 12, 
-                      borderRadius: '50%', 
-                      backgroundColor: '#4caf50'
-                    }} />
-                  </Box>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setOpenApiModal(true)}
+                    sx={{ 
+                      color: '#837cf2', 
+                      borderColor: '#837cf2',
+                      '&:hover': { borderColor: '#AC9DFB' }
+                    }}
+                  >
+                    Ver Todas ({apiPerformance.length})
+                  </Button>
                 </Box>
-              </StyledPaper>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <StyledPaper>
-                <Box display="flex" alignItems="center" mb={3}>
-                  <TrendingUp sx={{ color: '#837cf2', mr: 2, fontSize: 28 }} />
-                  <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
-                    Tendencias del Sistema
-                  </Typography>
-                </Box>
-                <Typography variant="body1" color="text.secondary" paragraph>
-                  Monitoreo de tendencias y patrones de uso del sistema.
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Box>
+                
+                {/* Resumen compacto */}
+                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
+                  <Box sx={{ textAlign: 'center', p: 2 }}>
+                    <Badge 
+                      badgeContent={apiPerformance.filter(api => api.status === 'Operativo').length} 
+                      color="success"
+                      sx={{ '& .MuiBadge-badge': { fontSize: '0.8rem' } }}
+                    >
+                  <Box sx={{ 
+                        width: 40, 
+                        height: 40, 
+                        borderRadius: '50%', 
+                        backgroundColor: '#4caf50',
+                    display: 'flex', 
+                    alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto',
+                        mb: 1
+                      }}>
+                        <CheckCircle sx={{ color: 'white', fontSize: 20 }} />
+                      </Box>
+                    </Badge>
+                    <Typography variant="body2" color="text.secondary">
+                      Operativas
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ textAlign: 'center', p: 2 }}>
+                    <Badge 
+                      badgeContent={apiPerformance.filter(api => api.status === 'Sin datos').length} 
+                      color="warning"
+                      sx={{ '& .MuiBadge-badge': { fontSize: '0.8rem' } }}
+                    >
+                    <Box sx={{ 
+                        width: 40, 
+                        height: 40, 
+                      borderRadius: '50%', 
+                        backgroundColor: '#ff9800',
+                    display: 'flex', 
+                    alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto',
+                        mb: 1
+                      }}>
+                        <Warning sx={{ color: 'white', fontSize: 20 }} />
+                      </Box>
+                    </Badge>
+                    <Typography variant="body2" color="text.secondary">
+                      Sin Datos
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ textAlign: 'center', p: 2 }}>
                     <Typography variant="h4" sx={{ color: '#837cf2', fontWeight: 700 }}>
-                      99.8%
+                      {metrics.successRate?.value || '0%'}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Tasa de Éxito
                     </Typography>
                   </Box>
-                  <Box>
-                    <Typography variant="h4" sx={{ color: '#6a4c93', fontWeight: 700 }}>
-                      24/7
+                </Box>
+              </StyledPaper>
+            </Grid>
+            
+            <Grid item xs={12} md={6}>
+              <StyledPaper>
+                <Box display="flex" alignItems="center" justifyContent="space-between" mb={3}>
+                  <Box display="flex" alignItems="center">
+                  <TrendingUp sx={{ color: '#837cf2', mr: 2, fontSize: 28 }} />
+                  <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
+                      Resumen del Sistema
+                  </Typography>
+                </Box>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setOpenMetricsModal(true)}
+                    sx={{ 
+                      color: '#837cf2', 
+                      borderColor: '#837cf2',
+                      '&:hover': { borderColor: '#AC9DFB' },
+                      ml: 2
+                    }}
+                  >
+                    Ver Métricas
+                  </Button>
+                </Box>
+                
+                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 3, px: 1 }}>
+                  <Box sx={{ textAlign: 'center', p: 2 }}>
+                    <Typography variant="h4" sx={{ color: '#837cf2', fontWeight: 700 }}>
+                      {metrics.apiCalls?.value || '0'}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Disponibilidad
+                      Total Llamadas
+                    </Typography>
+                  </Box>
+                  <Box sx={{ textAlign: 'center', p: 2 }}>
+                    <Typography variant="h4" sx={{ color: '#6a4c93', fontWeight: 700 }}>
+                      {metrics.totalApps?.value || '0'}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Aplicaciones
                     </Typography>
                   </Box>
                 </Box>
@@ -385,13 +396,15 @@ const Analytics = () => {
         </Box>
       )}
 
-      {/* Vista General - Métricas principales mejoradas */}
-      <SectionTitle variant="h5" component="h2" sx={{ color: 'white', mb: 3, fontWeight: 600 }}>
+      {/* Vista General - Métricas principales compactas */}
+      <Box sx={{ mb: 4 }}>
+        <Box display="flex" alignItems="center" mb={3}>
+          <SectionTitle variant="h5" component="h2" sx={{ color: 'white', mb: 0, fontWeight: 600 }}>
         {isAdmin ? 'Vista General del Sistema' : 'Mi Actividad'}
       </SectionTitle>
+        </Box>
       
-      <Box sx={{ mb: 4 }}>
-        <Grid container spacing={3}>
+        <Grid container spacing={4}>
           {Object.entries(metrics).map(([key, metric]) => {
             // Para usuarios normales, mostrar solo métricas personales
             if (!isAdmin && (key === 'activeUsers' || key === 'totalApps')) {
@@ -399,35 +412,26 @@ const Analytics = () => {
             }
             
             return (
-              <Grid item xs={12} sm={6} md={6} lg={3} key={key}>
-                <StyledPaper 
+              <Grid item xs={12} sm={6} md={6} lg={6} key={key}>
+                <Card 
                   sx={{ 
                     textAlign: 'center',
                     background: 'linear-gradient(135deg, #2a1f3d 0%, #3a2a4d 100%)',
                     border: '1px solid rgba(131, 124, 242, 0.2)',
                     position: 'relative',
                     overflow: 'hidden',
-                    minHeight: 140,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: '3px',
-                      background: 'linear-gradient(90deg, #837cf2, #6a4c93)',
-                    },
+                    width: 200,
+                    height: 200,
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
                     '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 12px 40px rgba(131, 124, 242, 0.2)',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 25px rgba(131, 124, 242, 0.2)',
                       border: '1px solid rgba(131, 124, 242, 0.4)',
                     }
                   }}
                 >
-                  <Box sx={{ mb: 2 }}>
+                  <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <Box 
                       sx={{ 
                         width: 50, 
@@ -439,7 +443,7 @@ const Analytics = () => {
                         justifyContent: 'center',
                         margin: '0 auto',
                         mb: 2,
-                        boxShadow: '0 4px 20px rgba(131, 124, 242, 0.3)',
+                        boxShadow: '0 4px 15px rgba(131, 124, 242, 0.3)',
                       }}
                     >
                       {React.createElement(getIconComponent(metric.icon), {
@@ -447,7 +451,7 @@ const Analytics = () => {
                       })}
                     </Box>
                     <Typography 
-                      variant="h4" 
+                      variant="h5" 
                       sx={{ 
                         color: 'white', 
                         fontWeight: 700,
@@ -460,38 +464,32 @@ const Analytics = () => {
                     <Typography 
                       variant="body2" 
                       sx={{ 
-                        color: metric.change?.startsWith('+') ? '#4caf50' : '#ff9800',
-                        fontWeight: 600,
-                        fontSize: '0.9rem'
-                      }}
-                    >
-                      {metric.change || '+0%'}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ 
-                    background: 'rgba(131, 124, 242, 0.1)', 
-                    borderRadius: 1, 
-                    p: 1.5,
-                    border: '1px solid rgba(131, 124, 242, 0.2)',
-                    mt: 'auto'
-                  }}>
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
                         color: 'text.secondary',
                         fontWeight: 500,
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px',
-                        fontSize: '0.8rem'
+                        display: 'block',
+                        mb: 1
                       }}
                     >
-                      {key === 'activeUsers' ? 'Usuarios Activos' :
-                       key === 'apiCalls' ? 'Llamadas API' :
-                       key === 'successRate' ? 'Tasa de Éxito' :
-                       key === 'totalApps' ? 'Aplicaciones' : key}
+                      {key === 'activeUsers' ? 'Usuarios' :
+                       key === 'apiCalls' ? 'Llamadas' :
+                       key === 'successRate' ? 'Éxito' :
+                       key === 'totalApps' ? 'Apps' : key}
                     </Typography>
-                  </Box>
-                </StyledPaper>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: metric.change?.startsWith('+') ? '#4caf50' : '#ff9800',
+                        fontWeight: 600,
+                        display: 'block',
+                        mt: 'auto'
+                      }}
+                    >
+                      {metric.change || '+0%'}
+                    </Typography>
+                  </CardContent>
+                </Card>
               </Grid>
             );
           })}
@@ -500,78 +498,54 @@ const Analytics = () => {
 
       {/* Layout principal mejorado */}
       <Grid container spacing={3}>
-        {/* Columna 1: Uso de Herramientas */}
-        <Grid item xs={12} md={isAdmin ? 6 : 12}>
+        {/* Uso de Herramientas - Ocupa todo el ancho */}
+        <Grid item xs={12}>
           <StyledPaper>
-            <Box display="flex" alignItems="center" mb={3}>
+            <Box display="flex" alignItems="center" justifyContent="space-between" mb={3}>
+              <Box display="flex" alignItems="center">
               <Timeline sx={{ color: '#837cf2', mr: 2, fontSize: 28 }} />
               <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
                 {isAdmin ? 'Uso de Herramientas' : 'Mis Herramientas'}
               </Typography>
             </Box>
+              {usage && usage.length > 0 && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => setOpenUsageModal(true)}
+                  sx={{ 
+                    color: '#837cf2', 
+                    borderColor: '#837cf2',
+                    '&:hover': { borderColor: '#AC9DFB' }
+                  }}
+                >
+                  Ver Gráfico
+                </Button>
+              )}
+            </Box>
+            
+            {usage && usage.length > 0 ? (
             <UsageChart usageData={usage} />
+            ) : (
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <Timeline sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 48, mb: 2 }} />
+                <Typography variant="body1" color="text.secondary">
+                  No hay datos de uso disponibles
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  Usa las herramientas para generar estadísticas
+                </Typography>
+              </Box>
+            )}
           </StyledPaper>
         </Grid>
 
-        {/* Columna 2: Rendimiento de APIs con menú desplegable (solo admin/superadmin) */}
-        {isAdmin && (
-          <Grid item xs={12} md={6}>
-            <StyledAccordion 
-              expanded={expanded} 
-              onChange={() => setExpanded(!expanded)}
-            >
-              <StyledAccordionSummary expandIcon={<ExpandMore />}>
-                <Box display="flex" alignItems="center">
-                  <ShowChart sx={{ color: '#837cf2', mr: 2, fontSize: 28 }} />
-                  <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
-                    Rendimiento de APIs
-                  </Typography>
-                  <Box sx={{ ml: 2 }}>
-                    <Chip 
-                      label={`${apiData.filter(api => api.status === 'Operativo').length}/${apiData.length} Operativas`}
-                      size="small"
-                      sx={{ backgroundColor: '#4caf50', color: 'white' }}
-                    />
-                  </Box>
-                </Box>
-              </StyledAccordionSummary>
-              <AccordionDetails sx={{ p: 0 }}>
-                <Box sx={{ p: 2 }}>
-                  <TableContainer>
-                    <Table size="small">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell sx={{ color: 'white', fontWeight: 600 }}>API</TableCell>
-                          <TableCell sx={{ color: 'white', fontWeight: 600 }}>Estado</TableCell>
-                          <TableCell sx={{ color: 'white', fontWeight: 600 }}>Tiempo</TableCell>
-                          <TableCell sx={{ color: 'white', fontWeight: 600 }}>Uptime</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {apiData.map((api, index) => (
-                          <TableRow key={index} sx={{ '&:hover': { backgroundColor: 'rgba(255,255,255,0.05)' } }}>
-                            <TableCell sx={{ color: 'white' }}>{api.name}</TableCell>
-                            <TableCell>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                {getStatusIcon(api.status)}
-                                <StatusChip label={api.status} status={api.status} size="small" />
-                              </Box>
-                            </TableCell>
-                            <TableCell sx={{ color: 'white' }}>{api.responseTime}</TableCell>
-                            <TableCell sx={{ color: 'white' }}>{api.uptime}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Box>
-              </AccordionDetails>
-            </StyledAccordion>
-          </Grid>
-        )}
+
+
       </Grid>
 
-      {/* Métricas de Usuario - Ahora en sección separada */}
+      {/* Métricas de Usuario - Solo si hay datos disponibles */}
+      {userMetrics && userMetrics.length > 0 && (
       <Box mt={4}>
         <SectionTitle variant="h5" component="h2" sx={{ color: 'white', mb: 3, fontWeight: 600 }}>
           {isAdmin ? 'Métricas de Usuario' : 'Mi Rendimiento'}
@@ -584,6 +558,7 @@ const Analytics = () => {
           </Grid>
         </Grid>
       </Box>
+      )}
 
       {/* Sección adicional para usuarios normales */}
       {!isAdmin && (
@@ -610,6 +585,166 @@ const Analytics = () => {
           </StyledPaper>
         </Box>
       )}
+
+        {/* Modal para Estado de APIs */}
+        <Dialog 
+          open={openApiModal} 
+          onClose={() => setOpenApiModal(false)}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{
+            sx: {
+              backgroundColor: '#272038',
+              color: 'white',
+              borderRadius: 2
+            }
+          }}
+        >
+          <DialogTitle sx={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Typography variant="h6">Estado de todas las APIs</Typography>
+              <Chip 
+                label={`${apiPerformance?.filter(api => api.status === 'Operativo').length || 0}/${apiPerformance?.length || 0} Operativas`}
+                color="success"
+                size="small"
+              />
+            </Box>
+          </DialogTitle>
+          <DialogContent sx={{ pt: 2 }}>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ color: 'white', fontWeight: 600 }}>API</TableCell>
+                    <TableCell sx={{ color: 'white', fontWeight: 600 }}>Estado</TableCell>
+                    <TableCell sx={{ color: 'white', fontWeight: 600 }}>Tiempo Respuesta</TableCell>
+                    <TableCell sx={{ color: 'white', fontWeight: 600 }}>Uptime</TableCell>
+                    <TableCell sx={{ color: 'white', fontWeight: 600 }}>Última Verificación</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {apiPerformance?.map((api, index) => (
+                    <TableRow key={index} sx={{ '&:hover': { backgroundColor: 'rgba(255,255,255,0.05)' } }}>
+                      <TableCell sx={{ color: 'white' }}>{api.api}</TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          {getStatusIcon(api.status)}
+                          <StatusChip label={api.status} status={api.status} size="small" />
+                        </Box>
+                      </TableCell>
+                      <TableCell sx={{ color: 'white' }}>
+                        {api.responseTime > 0 ? `${api.responseTime}ms` : '-'}
+                      </TableCell>
+                      <TableCell sx={{ color: 'white' }}>{api.uptime}%</TableCell>
+                      <TableCell sx={{ color: 'white' }}>{api.lastCheck}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+          <DialogActions sx={{ borderTop: '1px solid rgba(255,255,255,0.1)', p: 2 }}>
+            <Button onClick={() => setOpenApiModal(false)} sx={{ color: '#837cf2' }}>
+              Cerrar
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Modal para Métricas Detalladas */}
+        <Dialog 
+          open={openMetricsModal} 
+          onClose={() => setOpenMetricsModal(false)}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{
+            sx: {
+              backgroundColor: '#272038',
+              color: 'white',
+              borderRadius: 2
+            }
+          }}
+        >
+          <DialogTitle sx={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+            <Typography variant="h5">Métricas Detalladas del Sistema</Typography>
+          </DialogTitle>
+          <DialogContent sx={{ pt: 2 }}>
+            <Grid container spacing={3}>
+              {Object.entries(metrics).map(([key, metric]) => (
+                <Grid item xs={12} sm={6} key={key}>
+                  <Card sx={{ backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <CardContent>
+                      <Box display="flex" alignItems="center" mb={2}>
+                        <Box sx={{ 
+                          width: 40, 
+                          height: 40, 
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #837cf2, #6a4c93)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          mr: 2
+                        }}>
+                          {React.createElement(getIconComponent(metric.icon), {
+                            sx: { fontSize: 20, color: 'white' }
+                          })}
+                        </Box>
+                        <Box>
+                          <Typography variant="body1" sx={{ color: 'white', fontWeight: 600, fontSize: '1.1rem' }}>
+                            {key === 'activeUsers' ? 'Usuarios Activos' :
+                             key === 'apiCalls' ? 'Llamadas API' :
+                             key === 'successRate' ? 'Tasa de Éxito' :
+                             key === 'totalApps' ? 'Aplicaciones' : key}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {metric.change || '+0%'} vs período anterior
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Typography variant="h4" sx={{ color: '#837cf2', fontWeight: 700, textAlign: 'center' }}>
+                        {metric.value}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </DialogContent>
+          <DialogActions sx={{ borderTop: '1px solid rgba(255,255,255,0.1)', p: 2 }}>
+            <Button onClick={() => setOpenMetricsModal(false)} sx={{ color: '#837cf2' }}>
+              Cerrar
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Modal para Uso de Herramientas */}
+        <Dialog 
+          open={openUsageModal} 
+          onClose={() => setOpenUsageModal(false)}
+          maxWidth="xl"
+          fullWidth
+          PaperProps={{
+            sx: {
+              backgroundColor: '#272038',
+              color: 'white',
+              borderRadius: 2,
+              maxHeight: '90vh'
+            }
+          }}
+        >
+          <DialogTitle sx={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+            <Typography variant="h5" sx={{ color: 'white', fontWeight: 600 }}>
+              📊 Gráficos de Uso de Herramientas
+            </Typography>
+          </DialogTitle>
+          <DialogContent sx={{ pt: 2, pb: 2 }}>
+            <UsageChartModal usageData={usage} />
+          </DialogContent>
+          <DialogActions sx={{ borderTop: '1px solid rgba(255,255,255,0.1)', p: 2 }}>
+            <Button onClick={() => setOpenUsageModal(false)} sx={{ color: '#837cf2' }}>
+              Cerrar
+            </Button>
+          </DialogActions>
+        </Dialog>
     </AnalyticsContainer>
   );
 };
