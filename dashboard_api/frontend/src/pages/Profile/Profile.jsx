@@ -100,7 +100,7 @@ const Profile = () => {
                 {personalData.name || 'Usuario'}
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                {personalData.email || 'usuario@ejemplo.com'}
+                {personalData.email || 'Sin email'}
               </Typography>
               <Typography variant="body2" sx={{ mt: 1 }}>
                 Rol: {user?.role === 'admin' ? 'Administrador' : 'Usuario'}
