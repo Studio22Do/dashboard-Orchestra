@@ -7,5 +7,6 @@ db = SQLAlchemy()
 from .user import User
 from .seo_history import SEOHistory
 from .notification import Notification
+from .app import App, ApiUsage, UserApp
 
-__all__ = ['db', 'User', 'SEOHistory', 'Notification'] 
+__all__ = ['db', 'User', 'SEOHistory', 'Notification', 'App', 'ApiUsage', 'UserApp'] 
