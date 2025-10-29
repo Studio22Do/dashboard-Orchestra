@@ -50,6 +50,7 @@ import PRLabsTools from './pages/PRLabs/Tools';
 import WhoisLookup from './pages/WhoisLookup/WhoisLookup';
 import SpeechToTextAI from './pages/SpeechToTextAI/SpeechToTextAI';
 import QRCodeGenerator from './pages/QRCodeGenerator/QRCodeGenerator';
+import CryptoTracker from './pages/CryptoTracker/CryptoTracker';
 
 // Theme configuration function
 const createAppTheme = (mode) => createTheme({
@@ -353,6 +354,12 @@ function App() {
           <Route path="/apps/whois-lookup" element={
             <ProtectedRoute>
               <WhoisLookup />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/apps/crypto-tracker" element={
+            <ProtectedRoute>
+              <CryptoTracker />
             </ProtectedRoute>
           } />
           

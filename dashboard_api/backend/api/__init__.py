@@ -67,6 +67,7 @@ def create_app(config_object):
     from api.routes.qrcode_generator import qrcode_generator_bp
     from api.routes.mediafy import mediafy_bp
     from api.routes.perplexity import perplexity_bp
+    from api.routes.crypto_tracker import crypto_tracker_bp
 
     # Registrar blueprints con prefijos de versión
     version_prefix = f"/api/{app.config.get('MODE', 'beta_v1')}"
@@ -105,6 +106,7 @@ def create_app(config_object):
     app.register_blueprint(qrcode_generator_bp, url_prefix=f'{version_prefix}/qrcode-generator')
     app.register_blueprint(mediafy_bp, url_prefix=f'{version_prefix}/mediafy')
     app.register_blueprint(perplexity_bp, url_prefix=f'{version_prefix}/perplexity')
+    app.register_blueprint(crypto_tracker_bp, url_prefix=f'{version_prefix}/crypto-tracker')
     
     # Configurar manejadores de errores
     from api.utils.error_handlers import register_error_handlers
