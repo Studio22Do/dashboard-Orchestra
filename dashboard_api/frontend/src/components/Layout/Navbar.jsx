@@ -650,7 +650,7 @@ const Navbar = () => {
                 Interfaz
               </Typography>
             </Box>
-            <MenuItem>
+            <MenuItem onClick={handleSettingsClose}>
               <ListItemIcon>
                 <ViewCompact fontSize="small" />
               </ListItemIcon>
