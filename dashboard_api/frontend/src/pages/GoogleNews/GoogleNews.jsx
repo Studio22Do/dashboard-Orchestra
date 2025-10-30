@@ -717,8 +717,8 @@ const GoogleNews = () => {
     return (
       <Paper elevation={3} sx={{ p: 3, mb: 4, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
         <form onSubmit={handleSearch}>
-          <Grid container spacing={2} alignItems="flex-end">
-            <Grid item xs={12} md={6}>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end', flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+            <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 0' }, minWidth: 0 }}>
               <TextField
                 fullWidth
                 label="Buscar noticias"
@@ -726,9 +726,13 @@ const GoogleNews = () => {
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 placeholder="ej: inteligencia artificial, cambio climático, fútbol..."
                 variant="outlined"
-                sx={{ 
+                sx={{
+                  width: '100%',
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: 'transparent',
+                    
+                    
+                    
                     '& fieldset': {
                       borderColor: 'rgba(255, 255, 255, 0.3)',
                     },
@@ -748,16 +752,16 @@ const GoogleNews = () => {
                   '& .MuiInputBase-input': {
                     color: 'white',
                     '&::placeholder': {
-                      color: 'rgba(255, 255, 255, 0.6)',
+                      color: 'rgba(255, 255, 255, 0.65)',
                       opacity: 1,
                     },
                   },
                 }}
               />
-            </Grid>
-            <Grid item xs={12} md={3}>
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minWidth: { xs: '100%', md: '150px' } }}>
               <FormControl fullWidth>
-                <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>Idioma/Región</InputLabel>
+                <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.85rem' }}>Idioma</InputLabel>
                 <Select
                   value={languageRegion}
                   onChange={handleLanguageChange}
@@ -832,8 +836,8 @@ const GoogleNews = () => {
                   <MenuItem value="hi-IN">🇮🇳 हिन्दी (भारत)</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid item xs={12} md={3}>
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minWidth: { xs: '100%', md: '120px' } }}>
               <Button
                 type="submit"
                 variant="contained"
@@ -844,15 +848,17 @@ const GoogleNews = () => {
                   height: '56px',
                   background: 'rgba(255, 255, 255, 0.2)',
                   backdropFilter: 'blur(10px)',
+                  fontSize: '0.85rem',
+                  px: 1,
                   '&:hover': {
                     background: 'rgba(255, 255, 255, 0.3)',
                   }
                 }}
               >
-                {loading ? 'Buscando...' : 'Buscar Noticias'}
+                {loading ? 'Buscando...' : 'Buscar'}
               </Button>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </form>
       </Paper>
     );
