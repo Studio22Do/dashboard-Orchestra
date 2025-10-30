@@ -236,24 +236,16 @@ const SnapVideo = () => {
                   }}
                 />
               </Box>
-              <Box sx={{ display: 'flex', gap: 2, flex: { xs: '1 1 100%', md: '0 0 auto' } }}>
+              <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minWidth: { xs: '100%', md: '160px' } }}>
                 <Button
                   type="submit"
                   variant="contained"
                   disabled={loading}
                   startIcon={loading ? <CircularProgress size={20} /> : <AutoAwesome />}
-                  sx={{ height: 56, minWidth: 160, textTransform: 'none', fontWeight: 600 }}
+                  fullWidth
+                  sx={{ height: 56, textTransform: 'none', fontWeight: 600 }}
                 >
                   {loading ? 'Obteniendo...' : 'Obtener Video'}
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={handleTest}
-                  disabled={loading}
-                  startIcon={loading ? <CircularProgress size={20} /> : <Info />}
-                  sx={{ height: 56, minWidth: 160, textTransform: 'none' }}
-                >
-                  {loading ? 'Probando...' : 'Probar Frontend'}
                 </Button>
               </Box>
             </Box>
