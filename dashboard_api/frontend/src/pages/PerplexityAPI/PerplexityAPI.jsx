@@ -117,8 +117,6 @@ const PerplexityAPI = () => {
             onChange={(e) => handleInputChange('general', e.target.value)}
             placeholder="ej: ¿Cuáles son las tendencias de IA en 2025?"
             variant="outlined"
-            multiline
-            rows={3}
             sx={{ mb: 2 }}
           />
         );
@@ -131,8 +129,6 @@ const PerplexityAPI = () => {
             onChange={(e) => handleInputChange('trends', e.target.value)}
             placeholder="ej: Analiza las tendencias de criptomonedas este año"
             variant="outlined"
-            multiline
-            rows={3}
             sx={{ mb: 2 }}
           />
         );
@@ -145,8 +141,6 @@ const PerplexityAPI = () => {
             onChange={(e) => handleInputChange('market', e.target.value)}
             placeholder="ej: Investigación del mercado de smartphones en Latinoamérica"
             variant="outlined"
-            multiline
-            rows={3}
             sx={{ mb: 2 }}
           />
         );
@@ -159,8 +153,6 @@ const PerplexityAPI = () => {
             onChange={(e) => handleInputChange('news', e.target.value)}
             placeholder="ej: Noticias sobre tecnología y innovación hoy"
             variant="outlined"
-            multiline
-            rows={3}
             sx={{ mb: 2 }}
           />
         );
@@ -173,8 +165,6 @@ const PerplexityAPI = () => {
             onChange={(e) => handleInputChange('comparison', e.target.value)}
             placeholder="ej: Compara iPhone vs Android en términos de seguridad"
             variant="outlined"
-            multiline
-            rows={3}
             sx={{ mb: 2 }}
           />
         );
@@ -383,11 +373,11 @@ const PerplexityAPI = () => {
       {/* Formulario de búsqueda */}
       <Paper elevation={3} sx={{ mb: 4, p: 3, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
         <form onSubmit={handleSearch}>
-          <Grid container spacing={2} alignItems="flex-start">
-            <Grid item xs={12} md={8}>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+            <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 0' }, minWidth: 0 }}>
               {renderSearchForm()}
-            </Grid>
-            <Grid item xs={12} md={4}>
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minWidth: { xs: '100%', md: '150px' } }}>
               <Button
                 type="submit"
                 variant="contained"
@@ -405,8 +395,8 @@ const PerplexityAPI = () => {
               >
                 {loading ? 'Analizando...' : 'Buscar con IA'}
               </Button>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </form>
       </Paper>
 
