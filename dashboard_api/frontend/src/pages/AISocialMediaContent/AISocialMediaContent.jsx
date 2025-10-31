@@ -53,6 +53,38 @@ const AISocialMediaContent = () => {
   const [generatedContent, setGeneratedContent] = useState(null);
   const [history, setHistory] = useState([]);
 
+  // Estilos consistentes
+  const actionButtonSx = {
+    height: 56,
+    borderRadius: 2,
+    textTransform: 'none',
+    fontWeight: 600
+  };
+
+  const inputSx = {
+    width: '100%',
+    '& .MuiOutlinedInput-root': {
+      backgroundColor: 'transparent',
+      borderRadius: 2,
+      height: 56,
+      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
+      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
+      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' }
+    },
+    '& .MuiInputBase-input': { padding: '0 14px', height: 56, boxSizing: 'border-box' }
+  };
+
+  const selectSx = {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: 2,
+      height: 56,
+      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
+      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
+      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' }
+    },
+    '& .MuiSelect-select': { height: 56, padding: '0 14px', display: 'flex', alignItems: 'center', boxSizing: 'border-box' }
+  };
+
   const platforms = [
     { value: 'instagram', label: 'Instagram', icon: <Instagram /> },
     { value: 'facebook', label: 'Facebook', icon: <Facebook /> },
@@ -162,90 +194,94 @@ const AISocialMediaContent = () => {
         />
       </Box>
 
-      <Grid container spacing={3}>
+      <Grid  spacing={3}>
         <Grid item xs={12} md={8}>
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <Box component="form" onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
+                  {/* Barra única: Prompt + Selects + Botón */}
                   <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Prompt"
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      multiline
-                      rows={4}
-                      required
-                      placeholder="Describe el contenido que deseas generar..."
-                    />
-                  </Grid>
-                  
-                  <Grid item xs={12} md={4}>
-                    <FormControl fullWidth>
-                      <InputLabel>Plataforma</InputLabel>
-                      <Select
-                        value={platform}
-                        onChange={(e) => setPlatform(e.target.value)}
-                        label="Plataforma"
-                      >
-                        {platforms.map((platform) => (
-                          <MenuItem key={platform.value} value={platform.value}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              {platform.icon}
-                              {platform.label}
-                            </Box>
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  
-                  <Grid item xs={12} md={4}>
-                    <FormControl fullWidth>
-                      <InputLabel>Tipo de Contenido</InputLabel>
-                      <Select
-                        value={contentType}
-                        onChange={(e) => setContentType(e.target.value)}
-                        label="Tipo de Contenido"
-                      >
-                        {contentTypes.map((type) => (
-                          <MenuItem key={type.value} value={type.value}>
-                            {type.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  
-                  <Grid item xs={12} md={4}>
-                    <FormControl fullWidth>
-                      <InputLabel>Tono</InputLabel>
-                      <Select
-                        value={tone}
-                        onChange={(e) => setTone(e.target.value)}
-                        label="Tono"
-                      >
-                        {tones.map((tone) => (
-                          <MenuItem key={tone.value} value={tone.value}>
-                            {tone.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  
-                  <Grid item xs={12}>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      fullWidth
-                      disabled={loading}
-                      startIcon={<Send />}
-                      sx={{ height: '56px' }}
-                    >
-                      {loading ? <CircularProgress size={24} /> : 'Generar Contenido'}
-                    </Button>
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end', flexWrap: { xs: 'wrap', md: 'nowrap' }, width: '100%' }}>
+                      {/* Prompt ocupa todo el espacio disponible */}
+                      <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 0' }, minWidth: 0 }}>
+                        <TextField
+                          fullWidth
+                          label="Prompt"
+                          value={prompt}
+                          onChange={(e) => setPrompt(e.target.value)}
+                          required
+                          placeholder="Describe el contenido que deseas generar..."
+                          sx={inputSx}
+                        />
+                      </Box>
+                      <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minWidth: { xs: '100%', md: 200 } }}>
+                        <FormControl fullWidth>
+                          <InputLabel>Plataforma</InputLabel>
+                          <Select
+                            value={platform}
+                            onChange={(e) => setPlatform(e.target.value)}
+                            label="Plataforma"
+                            sx={selectSx}
+                          >
+                            {platforms.map((platform) => (
+                              <MenuItem key={platform.value} value={platform.value}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  {platform.icon}
+                                  {platform.label}
+                                </Box>
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Box>
+                      <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minWidth: { xs: '100%', md: 200 } }}>
+                        <FormControl fullWidth>
+                          <InputLabel>Tipo de Contenido</InputLabel>
+                          <Select
+                            value={contentType}
+                            onChange={(e) => setContentType(e.target.value)}
+                            label="Tipo de Contenido"
+                            sx={selectSx}
+                          >
+                            {contentTypes.map((type) => (
+                              <MenuItem key={type.value} value={type.value}>
+                                {type.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Box>
+                      <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minWidth: { xs: '100%', md: 200 } }}>
+                        <FormControl fullWidth>
+                          <InputLabel>Tono</InputLabel>
+                          <Select
+                            value={tone}
+                            onChange={(e) => setTone(e.target.value)}
+                            label="Tono"
+                            sx={selectSx}
+                          >
+                            {tones.map((tone) => (
+                              <MenuItem key={tone.value} value={tone.value}>
+                                {tone.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Box>
+                      <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minWidth: { xs: '100%', md: 160 } }}>
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          fullWidth
+                          disabled={loading}
+                          startIcon={<Send />}
+                          sx={actionButtonSx}
+                        >
+                          {loading ? <CircularProgress size={24} /> : 'Generar'}
+                        </Button>
+                      </Box>
+                    </Box>
                   </Grid>
                 </Grid>
               </Box>
@@ -344,69 +380,69 @@ const AISocialMediaContent = () => {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                <Settings sx={{ mr: 1, verticalAlign: 'middle' }} />
-                Configuración
-              </Typography>
-              
-              <List>
-                <ListItem>
-                  <ListItemText
-                    primary="Plataforma Seleccionada"
-                    secondary={platforms.find(p => p.value === platform)?.label}
-                  />
-                </ListItem>
-                <Divider />
-                <ListItem>
-                  <ListItemText
-                    primary="Tipo de Contenido"
-                    secondary={contentTypes.find(t => t.value === contentType)?.label}
-                  />
-                </ListItem>
-                <Divider />
-                <ListItem>
-                  <ListItemText
-                    primary="Tono"
-                    secondary={tones.find(t => t.value === tone)?.label}
-                  />
-                </ListItem>
-              </List>
-            </CardContent>
-          </Card>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  <Settings sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Configuración
+                </Typography>
+                <List>
+                  <ListItem>
+                    <ListItemText
+                      primary="Plataforma Seleccionada"
+                      secondary={platforms.find(p => p.value === platform)?.label}
+                    />
+                  </ListItem>
+                  <Divider />
+                  <ListItem>
+                    <ListItemText
+                      primary="Tipo de Contenido"
+                      secondary={contentTypes.find(t => t.value === contentType)?.label}
+                    />
+                  </ListItem>
+                  <Divider />
+                  <ListItem>
+                    <ListItemText
+                      primary="Tono"
+                      secondary={tones.find(t => t.value === tone)?.label}
+                    />
+                  </ListItem>
+                </List>
+              </CardContent>
+            </Card>
 
-          <Card sx={{ mt: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                <Lightbulb sx={{ mr: 1, verticalAlign: 'middle' }} />
-                Sugerencias
-              </Typography>
-              
-              <List>
-                <ListItem>
-                  <ListItemText
-                    primary="Sé específico en tu prompt"
-                    secondary="Menciona detalles clave como el tema, público objetivo y objetivos del contenido"
-                  />
-                </ListItem>
-                <Divider />
-                <ListItem>
-                  <ListItemText
-                    primary="Adapta el tono"
-                    secondary="Cada plataforma tiene su propio estilo de comunicación"
-                  />
-                </ListItem>
-                <Divider />
-                <ListItem>
-                  <ListItemText
-                    primary="Optimiza el formato"
-                    secondary="Considera las limitaciones de caracteres y formato de cada plataforma"
-                  />
-                </ListItem>
-              </List>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  <Lightbulb sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Sugerencias
+                </Typography>
+                <List>
+                  <ListItem>
+                    <ListItemText
+                      primary="Sé específico en tu prompt"
+                      secondary="Menciona detalles clave como el tema, público objetivo y objetivos del contenido"
+                    />
+                  </ListItem>
+                  <Divider />
+                  <ListItem>
+                    <ListItemText
+                      primary="Adapta el tono"
+                      secondary="Cada plataforma tiene su propio estilo de comunicación"
+                    />
+                  </ListItem>
+                  <Divider />
+                  <ListItem>
+                    <ListItemText
+                      primary="Optimiza el formato"
+                      secondary="Considera las limitaciones de caracteres y formato de cada plataforma"
+                    />
+                  </ListItem>
+                </List>
+              </CardContent>
+            </Card>
+          </Box>
         </Grid>
       </Grid>
     </Container>
