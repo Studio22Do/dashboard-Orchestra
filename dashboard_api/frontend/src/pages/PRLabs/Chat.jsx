@@ -74,6 +74,45 @@ const PRLabsChat = () => {
   const [loading, setLoading] = useState(false);
   const messageEndRef = useRef(null);
 
+  const inputSx = {
+    width: '100%',
+    '& .MuiOutlinedInput-root': {
+      height: 56,
+      borderRadius: 2,
+      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
+      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
+      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' }
+    },
+    '& .MuiInputBase-input': {
+      height: 56,
+      padding: '0 16px',
+      boxSizing: 'border-box'
+    }
+  };
+
+  const selectContainerSx = {
+    '& .MuiInputBase-root': {
+      height: 56,
+      borderRadius: 2,
+      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
+      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
+      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' }
+    },
+    '& .MuiSelect-select': {
+      display: 'flex',
+      alignItems: 'center',
+      paddingTop: 0,
+      paddingBottom: 0
+    }
+  };
+
+  const actionButtonSx = {
+    height: 56,
+    borderRadius: 2,
+    fontWeight: 600,
+    textTransform: 'none'
+  };
+
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -156,11 +195,18 @@ const PRLabsChat = () => {
             Chat con IA
           </Typography>
           <Typography variant="subtitle2" color="text.secondary">
-            Interactúa con diferentes modelos de IA
+            Interactúa con diferentes modelos de IA##
           </Typography>
         </Box>
-        <Box display="flex" alignItems="center" gap={2}>
-          <FormControl variant="outlined" size="small" sx={{ minWidth: 200 }}>
+        <Box display="flex" alignItems="center" gap={2} flexWrap={{ xs: 'wrap', md: 'nowrap' }}>
+          <FormControl
+            variant="outlined"
+            sx={{
+              minWidth: { xs: '100%', md: 220 },
+              flex: { xs: '1 1 100%', md: '0 0 auto' },
+              ...selectContainerSx
+            }}
+          >
             <InputLabel>Modelo</InputLabel>
             <Select
               value={selectedModel}
@@ -175,7 +221,7 @@ const PRLabsChat = () => {
             </Select>
           </FormControl>
           <Tooltip title="Puntos por mensaje (éxito). Algunos modelos premium cuestan 2 puntos.">
-            <Chip color="secondary" label={`Puntos: ${currentCost}`} />
+            <Chip color="secondary" label={`Puntos: ${currentCost}`} sx={{ height: 40, borderRadius: 2, fontWeight: 600 }} />
           </Tooltip>
         </Box>
       </Box>
@@ -197,30 +243,44 @@ const PRLabsChat = () => {
 
       {/* Input */}
       <InputContainer>
-        <Grid container spacing={2}>
-          <Grid item xs>
+        <Box
+          component="form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSend();
+          }}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            flexWrap: { xs: 'wrap', md: 'nowrap' }
+          }}
+        >
+          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 0' }, minWidth: 0 }}>
             <TextField
               fullWidth
               variant="outlined"
               placeholder="Escribe tu mensaje..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSend()}
               disabled={loading}
+              sx={inputSx}
             />
-          </Grid>
-          <Grid item>
+          </Box>
+          <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minWidth: { xs: '100%', md: 160 } }}>
             <Button
+              type="submit"
               variant="contained"
               color="primary"
-              onClick={handleSend}
               disabled={!message.trim() || loading}
               startIcon={<SendIcon />}
+              fullWidth
+              sx={actionButtonSx}
             >
-              Enviar
+              {loading ? 'Enviando...' : 'Enviar'}
             </Button>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </InputContainer>
     </ChatContainer>
   );
