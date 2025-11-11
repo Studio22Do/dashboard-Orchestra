@@ -71,6 +71,8 @@ import { logoutUser, selectUser } from '../../redux/slices/authSlice';
 import { addNotification } from '../../redux/slices/uiSlice';
 import NotificationBell from '../NotificationBell/NotificationBell';
 import CreditsDisplay from '../CreditsDisplay/CreditsDisplay';
+import wordCountLogo from '../../assets/images/apps/icons/wordcounticon.png';
+import googleNewsLogo from '../../assets/images/apps/icons/googlenewsicon.png';
 
 // AppBar estilizado con colores del diseño
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -267,7 +269,8 @@ const Navbar = () => {
       },
       '/apps/google-news': {
         title: 'Google News',
-        icon: Article,
+        icon: null,
+        image: googleNewsLogo,
         subtitle: 'Noticias en tiempo real'
       },
       '/apps/tiktok': {
@@ -337,7 +340,8 @@ const Navbar = () => {
       },
       '/apps/word-count': {
         title: 'Word Count',
-        icon: Functions,
+        icon: null,
+        image: wordCountLogo,
         subtitle: 'Contador de palabras'
       },
       '/apps/pdf-to-text': {
@@ -531,9 +535,29 @@ const Navbar = () => {
     <StyledAppBar position="static">
       <NavbarContent>
         <DynamicHeader>
-          {currentApp.icon && (
-            <AppIcon>
-              <currentApp.icon />
+          {(currentApp.icon || currentApp.image) && (
+            <AppIcon
+              sx={
+                currentApp.image
+                  ? { backgroundColor: 'transparent', p: 0 }
+                  : undefined
+              }
+            >
+              {currentApp.image ? (
+                <Box
+                  component="img"
+                  src={currentApp.image}
+                  alt={`${currentApp.title} logo`}
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: 'inherit',
+                    objectFit: 'cover'
+                  }}
+                />
+              ) : (
+                <currentApp.icon />
+              )}
             </AppIcon>
           )}
           <Box>
