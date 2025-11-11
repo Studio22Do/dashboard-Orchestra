@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   CardContent,
-  Grid,
   Box,
   CircularProgress,
   Alert,
@@ -33,6 +32,50 @@ const Voice = () => {
   const [audioUrl, setAudioUrl] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const selectContainerSx = {
+    '& .MuiOutlinedInput-root': {
+      height: 56,
+      borderRadius: 2,
+      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
+      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
+      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' }
+    },
+    '& .MuiSelect-select': {
+      display: 'flex',
+      alignItems: 'center',
+      paddingTop: 0,
+      paddingBottom: 0
+    }
+  };
+
+  const textareaSx = {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: 2,
+      alignItems: 'flex-start',
+      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
+      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
+      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' }
+    },
+    '& .MuiInputBase-input': {
+      padding: '16px',
+      lineHeight: 1.5
+    }
+  };
+
+  const actionButtonSx = {
+    height: 56,
+    borderRadius: 2,
+    textTransform: 'none',
+    fontWeight: 600
+  };
+
+  const secondaryButtonSx = {
+    height: 48,
+    borderRadius: 2,
+    textTransform: 'none',
+    fontWeight: 600
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -93,9 +136,15 @@ const Voice = () => {
       <Card>
         <CardContent>
           <form onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                <FormControl
+                  fullWidth
+                  sx={{
+                    flex: { xs: '1 1 100%', md: '0 0 220px' },
+                    ...selectContainerSx
+                  }}
+                >
                   <InputLabel>Voz</InputLabel>
                   <Select
                     value={voice}
@@ -110,9 +159,7 @@ const Voice = () => {
                     <MenuItem value="shimmer">Shimmer</MenuItem>
                   </Select>
                 </FormControl>
-              </Grid>
 
-              <Grid item xs={12}>
                 <TextField
                   fullWidth
                   multiline
@@ -121,42 +168,40 @@ const Voice = () => {
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   placeholder="Escribe el texto que quieres convertir a voz..."
+                  sx={{ flex: '1 1 0', minWidth: 260, ...textareaSx }}
                 />
-              </Grid>
+              </Box>
 
-              <Grid item xs={12}>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, flexWrap: 'wrap' }}>
                 <Button
                   type="submit"
                   variant="contained"
-                  fullWidth
-                  disabled={loading || !text}
+                  disabled={loading || !text.trim()}
                   startIcon={loading ? <CircularProgress size={24} /> : <Send />}
+                  sx={{ ...actionButtonSx, minWidth: { xs: '100%', md: 200 } }}
+                  fullWidth
                 >
-                  Generar Audio
+                  {loading ? 'Generando...' : 'Generar audio'}
                 </Button>
-              </Grid>
+              </Box>
 
-              {error && (
-                <Grid item xs={12}>
-                  <Alert severity="error">{error}</Alert>
-                </Grid>
-              )}
+              {error && <Alert severity="error">{error}</Alert>}
 
               {audioUrl && (
-                <Grid item xs={12}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <audio controls style={{ width: '100%' }} src={audioUrl} />
                   <Button
                     variant="contained"
                     color="secondary"
                     href={audioUrl}
                     download="voz-generada.mp3"
-                    sx={{ mt: 2 }}
+                    sx={secondaryButtonSx}
                   >
-                    Descargar Audio
+                    Descargar audio
                   </Button>
-                </Grid>
+                </Box>
               )}
-            </Grid>
+            </Box>
           </form>
         </CardContent>
       </Card>
