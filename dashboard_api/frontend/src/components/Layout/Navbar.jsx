@@ -73,6 +73,13 @@ import NotificationBell from '../NotificationBell/NotificationBell';
 import CreditsDisplay from '../CreditsDisplay/CreditsDisplay';
 import wordCountLogo from '../../assets/images/apps/icons/wordcounticon.png';
 import googleNewsLogo from '../../assets/images/apps/icons/googlenewsicon.png';
+import perplexityLogo from '../../assets/images/apps/icons/perplexityicon.png';
+import mediafyLogo from '../../assets/images/apps/icons/mediafyicon.png';
+import picpulseLogo from '../../assets/images/apps/icons/Picpulseicon.png';
+import snapVideoLogo from '../../assets/images/apps/icons/snapvideoicon.png';
+import contentGeneratorLogo from '../../assets/images/apps/icons/contentcreatoricon.png';
+import similarWebLogo from '../../assets/images/apps/icons/similarwebicon.png';
+import speechToTextLogo from '../../assets/images/apps/icons/speechtotexticon.png';
 
 // AppBar estilizado con colores del diseño
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -248,12 +255,14 @@ const Navbar = () => {
       },
       '/apps/mediafy': {
         title: 'Mediafy',
-        icon: Instagram,
+        icon: null,
+        image: mediafyLogo,
         subtitle: 'Análisis completo de Instagram'
       },
       '/apps/perplexity': {
         title: 'Perplexity',
-        icon: ChatBubble,
+        icon: null,
+        image: perplexityLogo,
         subtitle: 'API de búsqueda inteligente'
       },
 
@@ -310,7 +319,8 @@ const Navbar = () => {
       },
       '/apps/similar-web': {
         title: 'SimilarWeb',
-        icon: Visibility,
+        icon: null,
+        image: similarWebLogo,
         subtitle: 'Análisis de competencia'
       },
       '/apps/keyword-insights': {
@@ -351,7 +361,8 @@ const Navbar = () => {
       },
       '/apps/snap-video': {
         title: 'SnapVideo',
-        icon: VideoLibrary,
+        icon: null,
+        image: snapVideoLogo,
         subtitle: 'Descarga de medios'
       },
       '/apps/genie-ai': {
@@ -361,7 +372,8 @@ const Navbar = () => {
       },
       '/apps/ai-social-media': {
         title: 'Content Generator',
-        icon: ContentCopy,
+        icon: null,
+        image: contentGeneratorLogo,
         subtitle: 'Generador de contenido'
       },
       '/apps/advanced-image': {
@@ -371,7 +383,8 @@ const Navbar = () => {
       },
       '/apps/picpulse': {
         title: 'PicPulse',
-        icon: Image,
+        icon: null,
+        image: picpulseLogo,
         subtitle: 'Análisis de imágenes'
       },
       '/apps/whisper-url': {
@@ -386,7 +399,8 @@ const Navbar = () => {
       },
       '/apps/speech-to-text': {
         title: 'Speech to Text',
-        icon: RecordVoiceOver,
+        icon: null,
+        image: speechToTextLogo,
         subtitle: 'Conversión de voz a texto'
       },
       '/apps/ai-humanizer': {
