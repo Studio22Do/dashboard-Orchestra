@@ -80,6 +80,9 @@ import snapVideoLogo from '../../assets/images/apps/icons/snapvideoicon.png';
 import contentGeneratorLogo from '../../assets/images/apps/icons/contentcreatoricon.png';
 import similarWebLogo from '../../assets/images/apps/icons/similarwebicon.png';
 import speechToTextLogo from '../../assets/images/apps/icons/speechtotexticon.png';
+import imageTransformLogo from '../../assets/images/apps/icons/imagetransform-1.png';
+import sslCheckerLogo from '../../assets/images/apps/icons/SSLcheckericon.png';
+import keywordSearchLogo from '../../assets/images/apps/icons/keywordsearchicon.png';
 
 // AppBar estilizado con colores del diseño
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -299,7 +302,8 @@ const Navbar = () => {
       },
       '/apps/ssl-checker': {
         title: 'SSL Checker',
-        icon: Security,
+        icon: null,
+        image: sslCheckerLogo,
         subtitle: 'Verificación de certificados SSL'
       },
       '/apps/website-status': {
@@ -345,7 +349,8 @@ const Navbar = () => {
       },
       '/apps/seo-mastermind': {
         title: 'Keyword Search',
-        icon: SettingsIcon,
+        icon: null,
+        image: keywordSearchLogo,
         subtitle: 'Generador de keywords y meta tags'
       },
       '/apps/word-count': {
@@ -378,7 +383,8 @@ const Navbar = () => {
       },
       '/apps/advanced-image': {
         title: 'Image Transform',
-        icon: Transform,
+        icon: null,
+        image: imageTransformLogo,
         subtitle: 'Manipulación avanzada de imágenes'
       },
       '/apps/picpulse': {
