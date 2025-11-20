@@ -17,15 +17,15 @@ from api.routes.pdf_converter import pdf_converter_bp
 from api.routes.snap_video import snap_video_bp
 from api.routes.ai_humanizer import ai_humanizer_bp
 from api.routes.advanced_image_manipulation import advanced_image_bp
-from api.routes.whisper_url import whisper_url_bp
+
 from api.routes.runwayml import runwayml_bp
 from api.routes.similarweb import similarweb_bp
 from api.routes.google_keyword_insight import keyword_insight_bp
-from api.routes.domain_metrics import domain_metrics_bp
+
 from api.routes.ahrefs_dr import ahrefs_dr_bp
 from api.routes.pagespeed_insights import pagespeed_bp
 from api.routes.ssl_checker import ssl_checker_bp
-from api.routes.website_status import website_status_bp
+
 from api.routes.seo_mastermind import seo_mastermind_bp
 from api.routes.image_optimizer import image_optimizer_bp
 from api.routes.prlabs import prlabs_bp
@@ -44,15 +44,15 @@ BLUEPRINT_MAPPING = {
     snap_video_bp: '/api/snap-video',
     ai_humanizer_bp: '/api/ai-humanizer',
     advanced_image_bp: '/api',
-    whisper_url_bp: '/api/whisper-url',
+
     runwayml_bp: '/api/runwayml',
     similarweb_bp: '/api/similarweb',
     keyword_insight_bp: '/api/keyword-insight',
-    domain_metrics_bp: '/api/domain-metrics',
+
     ahrefs_dr_bp: '/api/beta_v2/ahrefs-dr',
     pagespeed_bp: '/api/pagespeed-insights',
     ssl_checker_bp: '/api/ssl-checker',
-    website_status_bp: '/api/website-status',
+
     seo_mastermind_bp: '/api/seo-mastermind',
     auth_google_bp: '/api/auth/google',
     prlabs_bp: '/api/prlabs'

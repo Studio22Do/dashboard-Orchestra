@@ -24,7 +24,7 @@ CREDITS_COST = {
     'seo_mastermind': 2,
     'similarweb': 1,
     'google_keyword_insight': 3,
-    'domain_metrics': 1,
+
     'ahrefs_dr': 2,
     'pagespeed_insights': 1,
     'website_analyzer': 2,  # Análisis completo de velocidad, SEO y dominio
@@ -35,7 +35,7 @@ CREDITS_COST = {
     'social_media_content': 2,
     'runwayml': 3,
     'speech_to_text': 1,
-    'whisper_url': 2,
+
     
     # File/Media APIs
     'pdf_converter': 1,
@@ -47,7 +47,7 @@ CREDITS_COST = {
     'google_news': 1,
     'google_paid_search': 1,
     'whois_lookup': 1,
-    'website_status': 1,
+
     'ssl_checker': 1,
     'text_extract': 1,
     'prlabs_chat': 1,
@@ -127,7 +127,7 @@ def get_api_cost_by_endpoint(endpoint_path):
         '/seo-mastermind/generate': 'seo_mastermind',
         '/similarweb/insights': 'similarweb',
         '/keyword-insight/search': 'google_keyword_insight',
-        '/domain-metrics/check': 'domain_metrics',
+
         '/ahrefs-dr/check': 'ahrefs_dr',
         '/pagespeed-insights/analyze': 'pagespeed_insights',
         '/seo-keyword-research/generate': 'seo_keyword_research',
@@ -137,7 +137,7 @@ def get_api_cost_by_endpoint(endpoint_path):
         '/social-media-content/generate': 'social_media_content',
         '/runwayml/generate': 'runwayml',
         '/speech-to-text/transcribe': 'speech_to_text',
-        '/whisper-url/transcribe': 'whisper_url',
+
         
         # File/Media
         '/pdf-converter/convert': 'pdf_converter',
@@ -149,7 +149,7 @@ def get_api_cost_by_endpoint(endpoint_path):
         '/google-news/search': 'google_news',
         '/paid-search/analyze': 'google_paid_search',
         '/whois-lookup/lookup': 'whois_lookup',
-        '/website-status/check': 'website_status',
+
         '/ssl-checker/check': 'ssl_checker',
         '/text-extract/extract': 'text_extract',
         '/prlabs/chat': 'prlabs_chat',

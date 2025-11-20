@@ -161,7 +161,7 @@ def debug_smart_update_icons():
         image_categories = {
             'social': ['mediafyicon.png', 'googlenewsicon.png', 'snapvideoicon.png'],
             'ai': ['chatgpt4icon.png', 'contentcreatoricon.png', 'imagetransform-1.png'],
-            'tools': ['wordcounticon.png', 'pdftotexticon.png', 'whispericon.png'],
+            'tools': ['wordcounticon.png', 'pdftotexticon.png', 'speechtotexticon.png'],
             'seo': ['seoanalyzericon.png', 'similarwebicon.png', 'keywordinsightsicon.png'],
             'web': ['domaincheckericon.png', 'webauditicon.png', 'webstatusicon.png'],
             'qr': ['qrgeneratorcode.png'],
@@ -180,7 +180,7 @@ def debug_smart_update_icons():
             # Palabras clave para categorizar
             social_keywords = ['instagram', 'tiktok', 'youtube', 'social', 'media', 'news', 'trends']
             ai_keywords = ['ai', 'genie', 'chatgpt', 'content', 'creator', 'humanizer', 'image', 'manipulation', 'midjourney', 'runway']
-            tools_keywords = ['word', 'count', 'pdf', 'text', 'speech', 'whisper', 'converter']
+            tools_keywords = ['word', 'count', 'pdf', 'text', 'speech', 'converter']
             seo_keywords = ['seo', 'similar', 'web', 'keyword', 'google', 'domain', 'metrics']
             web_keywords = ['speed', 'website', 'status', 'ssl', 'checker', 'audit']
             qr_keywords = ['qr', 'url', 'shortener']
@@ -203,7 +203,7 @@ def debug_smart_update_icons():
                 if 'pdf' in app_id_lower or 'pdf' in title_lower:
                     return image_categories['tools'][1]  # pdftotexticon.png
                 elif 'speech' in app_id_lower or 'speech' in title_lower:
-                    return image_categories['tools'][2]  # whispericon.png
+                    return image_categories['tools'][2]  # speechtotexticon.png
                 else:
                     return image_categories['tools'][0]  # wordcounticon.png
             elif any(keyword in app_id_lower or keyword in title_lower for keyword in seo_keywords):

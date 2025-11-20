@@ -1,24 +1,24 @@
 import { useState } from 'react';
-import { 
-  AppBar, 
-  Toolbar, 
-  Typography, 
-  IconButton, 
-  Avatar, 
-  Box, 
-  Menu, 
-  MenuItem, 
-  ListItemIcon, 
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Avatar,
+  Box,
+  Menu,
+  MenuItem,
+  ListItemIcon,
   ListItemText,
   Divider,
   TextField,
   InputAdornment,
   Switch
 } from '@mui/material';
-import { 
-  Settings, 
-  AccountCircle, 
-  Lock, 
+import {
+  Settings,
+  AccountCircle,
+  Lock,
   Logout,
   Search,
   Person,
@@ -175,13 +175,13 @@ const Navbar = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
-  
+
   // Estados para los menús
   const [anchorEl, setAnchorEl] = useState(null);
   const [settingsAnchor, setSettingsAnchor] = useState(null);
   const open = Boolean(anchorEl);
   const settingsOpen = Boolean(settingsAnchor);
-  
+
   // Estados para las configuraciones
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -370,11 +370,7 @@ const Navbar = () => {
         icon: Image,
         subtitle: 'Análisis de imágenes'
       },
-      '/apps/whisper-url': {
-        title: 'Whisper from URL',
-        icon: Cloud,
-        subtitle: 'Transcripción de audio'
-      },
+
       '/apps/runway-ml': {
         title: 'Runway',
         icon: Psychology,
@@ -454,12 +450,12 @@ const Navbar = () => {
 
   // Obtener los datos de la aplicación actual
   const currentApp = getAppData(location.pathname);
-  
+
   // Controladores para el menú de usuario
   const handleOpenMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  
+
   const handleCloseMenu = () => {
     setAnchorEl(null);
   };
@@ -494,7 +490,7 @@ const Navbar = () => {
   // Manejador de opciones del menú
   const handleMenuOption = (option) => {
     handleCloseMenu();
-    
+
     switch (option) {
       case 'profile':
         navigate('/profile');
@@ -520,10 +516,10 @@ const Navbar = () => {
   // Obtener iniciales del usuario para mostrar en el Avatar
   const getUserInitials = () => {
     if (!user || !user.name) return 'U';
-    
+
     const nameParts = user.name.split(' ');
     if (nameParts.length === 1) return nameParts[0].charAt(0).toUpperCase();
-    
+
     return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
   };
 
@@ -550,8 +546,8 @@ const Navbar = () => {
         <IconGroup>
           <CreditsDisplay />
           <NotificationBell />
-          <IconButton 
-            size="medium" 
+          <IconButton
+            size="medium"
             sx={{ color: 'white' }}
             onClick={handleSettingsOpen}
           >
@@ -626,18 +622,18 @@ const Navbar = () => {
               <ListItemIcon>
                 <Palette fontSize="small" />
               </ListItemIcon>
-              <ListItemText 
+              <ListItemText
                 primary="Tema"
                 secondary={isDarkMode ? "Modo Oscuro" : "Modo Claro"}
               />
               <Switch checked={isDarkMode} />
             </MenuItem>
-            
+
             <MenuItem onClick={handleLanguageChange}>
               <ListItemIcon>
                 <Language fontSize="small" />
               </ListItemIcon>
-              <ListItemText 
+              <ListItemText
                 primary="Idioma"
                 secondary="Español"
               />
@@ -654,7 +650,7 @@ const Navbar = () => {
               <ListItemIcon>
                 <ViewCompact fontSize="small" />
               </ListItemIcon>
-              <ListItemText 
+              <ListItemText
                 primary="Densidad"
                 secondary="Normal"
               />
