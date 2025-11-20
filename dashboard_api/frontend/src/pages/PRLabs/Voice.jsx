@@ -191,7 +191,7 @@ const Voice = () => {
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <audio controls style={{ width: '100%' }} src={audioUrl} />
                   <Button
-                    variant="contained"
+                    variant="contained" 
                     color="secondary"
                     href={audioUrl}
                     download="voz-generada.mp3"

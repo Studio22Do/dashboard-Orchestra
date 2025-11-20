@@ -83,6 +83,7 @@ import speechToTextLogo from '../../assets/images/apps/icons/speechtotexticon.pn
 import imageTransformLogo from '../../assets/images/apps/icons/imagetransform-1.png';
 import sslCheckerLogo from '../../assets/images/apps/icons/SSLcheckericon.png';
 import keywordSearchLogo from '../../assets/images/apps/icons/keywordsearchicon.png';
+import whoisLookupLogo from '../../assets/images/apps/icons/Whoisicon.png';
 
 // AppBar estilizado con colores del diseño
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -313,7 +314,8 @@ const Navbar = () => {
       },
       '/apps/whois-lookup': {
         title: 'WHOIS',
-        icon: Dns,
+        icon: null,
+        image: whoisLookupLogo,
         subtitle: 'Consulta de información de dominio'
       },
       '/apps/seo-analyzer': {

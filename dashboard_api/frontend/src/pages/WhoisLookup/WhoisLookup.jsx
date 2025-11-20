@@ -28,7 +28,8 @@ import {
   ListItemText,
   ListItemIcon,
   useTheme,
-  alpha
+  alpha,
+  InputAdornment
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -75,6 +76,27 @@ const WhoisLookup = () => {
     setActiveTab(newValue);
     setError(null);
     setData(null);
+  };
+
+  const inputSx = {
+    '& .MuiOutlinedInput-root': {
+      height: 56,
+      borderRadius: 2,
+      '& fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
+      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.2)' },
+      '&.Mui-focused fieldset': { borderColor: '#764ba2' }
+    },
+    '& .MuiInputBase-input': {
+      padding: '0 16px',
+      fontSize: 16
+    }
+  };
+
+  const actionButtonSx = {
+    height: 56,
+    borderRadius: 2,
+    textTransform: 'none',
+    fontWeight: 600
   };
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -571,94 +593,148 @@ const WhoisLookup = () => {
 
         {/* Panel de Dominio */}
         <TabPanel value={activeTab} index={0}>
-          <Box component="form" onSubmit={(e) => { e.preventDefault(); handleSearch('domain', domainInput); }}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={9}>
-                <TextField
-                  fullWidth
-                  label="Dominio"
-                  placeholder="ejemplo.com"
-                  value={domainInput}
-                  onChange={(e) => setDomainInput(e.target.value)}
-                  InputProps={{
-                    startAdornment: <SearchIcon sx={{ mr: 1, color: 'action.active' }} />
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  disabled={loading}
-                  sx={{ height: '56px' }}
-                >
-                  {loading ? <CircularProgress size={24} /> : 'Consultar'}
-                </Button>
-              </Grid>
-            </Grid>
+          <Box
+            component="form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSearch('domain', domainInput);
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 2,
+                flexWrap: { xs: 'wrap', md: 'nowrap' },
+                alignItems: 'center'
+              }}
+            >
+              <TextField
+                fullWidth
+                label="Dominio"
+                placeholder="ejemplo.com"
+                value={domainInput}
+                onChange={(e) => setDomainInput(e.target.value)}
+                sx={{ flex: '1 1 320px', ...inputSx }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: 'action.active' }} />
+                    </InputAdornment>
+                  )
+                }}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading || !domainInput.trim()}
+                sx={{
+                  ...actionButtonSx,
+                  minWidth: 200,
+                  flexShrink: 0,
+                  width: { xs: '100%', md: 'auto' }
+                }}
+              >
+                {loading ? <CircularProgress size={24} /> : 'Consultar'}
+              </Button>
+            </Box>
           </Box>
         </TabPanel>
 
         {/* Panel de ASN */}
         <TabPanel value={activeTab} index={1}>
-          <Box component="form" onSubmit={(e) => { e.preventDefault(); handleSearch('asn', asnInput); }}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={9}>
-                <TextField
-                  fullWidth
-                  label="ASN"
-                  placeholder="AS15193 o 15193"
-                  value={asnInput}
-                  onChange={(e) => setAsnInput(e.target.value)}
-                  InputProps={{
-                    startAdornment: <SearchIcon sx={{ mr: 1, color: 'action.active' }} />
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  disabled={loading}
-                  sx={{ height: '56px' }}
-                >
-                  {loading ? <CircularProgress size={24} /> : 'Consultar'}
-                </Button>
-              </Grid>
-            </Grid>
+          <Box
+            component="form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSearch('asn', asnInput);
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 2,
+                flexWrap: { xs: 'wrap', md: 'nowrap' },
+                alignItems: 'center'
+              }}
+            >
+              <TextField
+                fullWidth
+                label="ASN"
+                placeholder="AS15193 o 15193"
+                value={asnInput}
+                onChange={(e) => setAsnInput(e.target.value)}
+                sx={{ flex: '1 1 320px', ...inputSx }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: 'action.active' }} />
+                    </InputAdornment>
+                  )
+                }}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading || !asnInput.trim()}
+                sx={{
+                  ...actionButtonSx,
+                  minWidth: 200,
+                  flexShrink: 0,
+                  width: { xs: '100%', md: 'auto' }
+                }}
+              >
+                {loading ? <CircularProgress size={24} /> : 'Consultar'}
+              </Button>
+            </Box>
           </Box>
         </TabPanel>
 
         {/* Panel de IP */}
         <TabPanel value={activeTab} index={2}>
-          <Box component="form" onSubmit={(e) => { e.preventDefault(); handleSearch('ip', ipInput); }}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={9}>
-                <TextField
-                  fullWidth
-                  label="Dirección IP"
-                  placeholder="98.137.27.103"
-                  value={ipInput}
-                  onChange={(e) => setIpInput(e.target.value)}
-                  InputProps={{
-                    startAdornment: <SearchIcon sx={{ mr: 1, color: 'action.active' }} />
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  disabled={loading}
-                  sx={{ height: '56px' }}
-                >
-                  {loading ? <CircularProgress size={24} /> : 'Consultar'}
-                </Button>
-              </Grid>
-            </Grid>
+          <Box
+            component="form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSearch('ip', ipInput);
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 2,
+                flexWrap: { xs: 'wrap', md: 'nowrap' },
+                alignItems: 'center'
+              }}
+            >
+              <TextField
+                fullWidth
+                label="Dirección IP"
+                placeholder="98.137.27.103"
+                value={ipInput}
+                onChange={(e) => setIpInput(e.target.value)}
+                sx={{ flex: '1 1 320px', ...inputSx }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: 'action.active' }} />
+                    </InputAdornment>
+                  )
+                }}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading || !ipInput.trim()}
+                sx={{
+                  ...actionButtonSx,
+                  minWidth: 200,
+                  flexShrink: 0,
+                  width: { xs: '100%', md: 'auto' }
+                }}
+              >
+                {loading ? <CircularProgress size={24} /> : 'Consultar'}
+              </Button>
+            </Box>
           </Box>
         </TabPanel>
       </Paper>
