@@ -16,6 +16,7 @@ import {
   Chip,
   IconButton,
   Tooltip,
+  InputAdornment,
   useTheme,
   styled,
   alpha,
@@ -91,7 +92,8 @@ const StyledButton = styled(Button)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius * 2,
   textTransform: 'none',
   fontWeight: 600,
-  padding: theme.spacing(1.5, 3),
+  height: 56,
+  padding: theme.spacing(0, 3),
   transition: 'all 0.3s ease',
   '&:hover': {
     transform: 'translateY(-1px)',
@@ -106,6 +108,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
     borderRadius: theme.shape.borderRadius * 2,
     transition: 'all 0.3s ease',
+    height: 56,
     '&:hover': {
       '& .MuiOutlinedInput-notchedOutline': {
         borderColor: theme.palette.primary.main,
@@ -116,6 +119,12 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
         borderWidth: 2,
       },
     },
+  },
+  '& .MuiInputBase-input': {
+    height: '56px',
+    padding: '0 16px',
+    display: 'flex',
+    alignItems: 'center',
   },
 }));
 
@@ -279,35 +288,45 @@ const SEOMastermind = () => {
           </Typography>
         </Box>
 
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12} md={8}>
-            <StyledTextField
-              fullWidth
-              label="Ingresa una keyword"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="Ej: marketing digital"
-              InputProps={{
-                endAdornment: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 2,
+            alignItems: 'center',
+            mb: 4,
+          }}
+        >
+          <StyledTextField
+            fullWidth
+            label="Ingresa una keyword"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="Ej: marketing digital"
+            sx={{ flex: '1 1 320px' }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
                   <IconButton onClick={handleAnalyze} disabled={loading}>
                     {loading ? <CircularProgress size={24} /> : <SearchIcon />}
                   </IconButton>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <StyledButton
-              fullWidth
-              variant="contained"
-              onClick={handleAnalyze}
-              disabled={loading}
-              startIcon={loading ? <CircularProgress size={20} /> : <SearchIcon />}
-            >
-              {loading ? 'Analizando...' : 'Analizar Keyword'}
-            </StyledButton>
-          </Grid>
-        </Grid>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <StyledButton
+            variant="contained"
+            onClick={handleAnalyze}
+            disabled={loading || !keyword.trim()}
+            startIcon={loading ? <CircularProgress size={20} /> : <SearchIcon />}
+            sx={{
+              minWidth: { xs: '100%', md: 220 },
+              flex: { xs: '1 1 100%', md: '0 0 auto' },
+            }}
+          >
+            {loading ? 'Analizando...' : 'Analizar Keyword'}
+          </StyledButton>
+        </Box>
 
         {error && (
           <Alert severity="error" sx={{ mb: 3 }}>
