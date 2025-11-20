@@ -219,7 +219,7 @@ const AdvancedImageManipulation = () => {
           Procesa y mejora tus imágenes usando IA
         </Typography>
         <Chip
-          icon={<img src={imageManipulationIcon} alt="Image Manipulation" style={{ width: '20px', height: '20px' }} />}
+          icon={<img src={imageManipulationIcon} alt="Image Transform" style={{ width: '20px', height: '20px' }} />}
           label="Manipulación avanzada de imágenes con IA"
           color="primary"
           variant="outlined"
