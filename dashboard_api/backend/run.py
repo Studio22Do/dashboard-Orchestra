@@ -16,6 +16,8 @@ CORS(app, resources={
         "origins": [
             "http://localhost:3000",
             "http://192.168.13.109:3000",
+            "http://172.18.102.11:3000",
+            "http://172.18.102.80:3000",
             "http://0.0.0.0:3000",
             "https://m-aestro-i-qfrontendcompleto-esk1.vercel.app",
             "https://m-aestro-i-qfrontendcompleto.vercel.app"
