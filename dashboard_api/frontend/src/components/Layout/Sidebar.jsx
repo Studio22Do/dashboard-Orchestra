@@ -23,7 +23,7 @@ import snapVideoLogo from '../../assets/images/apps/icons/snapvideoicon.png';
 import genieAILogo from '../../assets/images/apps/icons/chatgpt4icon.png';
 import aiSocialMediaLogo from '../../assets/images/apps/icons/contentcreatoricon.png';
 import imageManipulationLogo from '../../assets/images/apps/icons/imagetransform-1.png';
-import whisperLogo from '../../assets/images/apps/icons/whispericon.png';
+
 import runwayMLLogo from '../../assets/images/apps/icons/runawayicon.png';
 import prlabsLogo from '../../assets/images/apps/icons/chatgpt4icon.png';
 import speechToTextLogo from '../../assets/images/apps/icons/speechtotexticon.png';
@@ -31,11 +31,11 @@ import qrGeneratorLogo from '../../assets/images/apps/icons/qrgeneratorcode.png'
 import seoAnalyzerLogo from '../../assets/images/apps/icons/seoanalyzericon.png';
 import similarWebLogo from '../../assets/images/apps/icons/similarwebicon.png';
 import googleKeywordLogo from '../../assets/images/apps/icons/keywordinsightsicon.png';
-import domainMetricsLogo from '../../assets/images/apps/icons/domaincheckericon.png';
+
 import pageSpeedLogo from '../../assets/images/apps/icons/webauditicon.png';
 import productDescriptionLogo from '../../assets/images/apps/icons/productdescriptionicon.png';
 import sslCheckerLogo from '../../assets/images/apps/icons/SSLcheckericon.png';
-import websiteStatusLogo from '../../assets/images/apps/icons/webstatusicon.png';
+
 import seoMastermindLogo from '../../assets/images/apps/icons/keywordsearchicon.png';
 import whoisLookupLogo from '../../assets/images/apps/icons/Whoisicon.png';
 
@@ -76,60 +76,60 @@ const getAppIcon = (appId) => {
     'instagram-stats': mediafyLogo,
     'ai-social-media': aiSocialMediaLogo,
     'social-media-content': aiSocialMediaLogo,
-    
+
     // AI & Chat
     'genie-ai': genieAILogo,
     'perplexity': perplexityLogo,
     'prlabs': prlabsLogo,
-    
+
     // Image & Video
     'picpulse': picpulseicon,
     'runwayml': runwayMLLogo,
     'snap-video': snapVideoLogo,
     'image-manipulation': imageManipulationLogo,
     'advanced-image': imageManipulationLogo,
-    
+
     // Text & Documents
     'pdf-to-text': pdfToTextLogo,
     'word-count': wordCountLogo,
     'text-extract': wordCountLogo,
     'product-description': productDescriptionLogo,
     'ecommerce-description': productDescriptionLogo,
-    
+
     // SEO & Analytics
     'seo-analyzer': seoAnalyzerLogo,
     'seo-mastermind': seoMastermindLogo,
     'similar-web': similarWebLogo,
     'google-keyword': googleKeywordLogo,
-    'domain-metrics': domainMetricsLogo,
+
     'page-speed': pageSpeedLogo,
-    'website-status': websiteStatusLogo,
-    'website-analyzer': websiteStatusLogo,
-    
+
+
+
     // Google Services
     'google-news': googleNewsLogo,
     'google-keyword-insights': googleKeywordLogo,
-    
+
     // Audio & Speech
     'speech-to-text': speechToTextLogo,
-    'whisper-url': whisperLogo,
+
     'openai-tts': speechToTextLogo,
-    
+
     // Security & Tools
     'ssl-checker': sslCheckerLogo,
     'whois-lookup': whoisLookupLogo,
     'qr-generator': qrGeneratorLogo,
-    
+
     // File Conversion
     'file-converter': imageManipulationLogo,
     'file-converter-audio': speechToTextLogo,
     'file-converter-image': imageManipulationLogo,
     'file-converter-pdf': pdfToTextLogo,
-    
+
     // Default fallback
     'default': <Apps />
   };
-  
+
   return logoMap[appId] || logoMap['default'];
 };
 
@@ -199,8 +199,8 @@ const Sidebar = () => {
               <ListItemIcon sx={{ minWidth: 40, color: 'rgba(255, 255, 255, 0.7)' }}>
                 {item.icon}
               </ListItemIcon>
-              <ListItemText 
-                primary={item.text} 
+              <ListItemText
+                primary={item.text}
                 primaryTypographyProps={{
                   fontSize: '0.95rem',
                   fontWeight: location.pathname === item.path ? 600 : 400
@@ -214,10 +214,10 @@ const Sidebar = () => {
             <Box sx={{ mt: 3, mb: 2, px: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                 <StarIcon sx={{ color: '#FFD700', fontSize: '1.2rem' }} />
-                <Typography 
-                  variant="subtitle2" 
-                  sx={{ 
-                    color: 'rgba(255,255,255,0.8)', 
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    color: 'rgba(255,255,255,0.8)',
                     fontWeight: 600,
                     fontSize: '0.9rem',
                     textTransform: 'uppercase',
@@ -227,23 +227,23 @@ const Sidebar = () => {
                   Favoritos
                 </Typography>
               </Box>
-              <Box sx={{ 
-                height: '1px', 
-                backgroundColor: 'rgba(255,255,255,0.1)', 
-                mb: 2 
+              <Box sx={{
+                height: '1px',
+                backgroundColor: 'rgba(255,255,255,0.1)',
+                mb: 2
               }} />
             </Box>
           )}
           {uniqueFavoriteApps.map((app) => {
             const appIcon = getAppIcon(app.app_id || app.id);
             const isImageIcon = typeof appIcon === 'string' || appIcon?.src;
-            
+
             return (
               <NavButton
                 key={app.app_id || app.id}
                 onClick={() => navigate(app.route)}
                 selected={location.pathname === app.route}
-                sx={{ 
+                sx={{
                   margin: '2px 16px',
                   '& .MuiListItemIcon-root': {
                     color: 'rgba(255, 255, 255, 0.8)',
@@ -253,21 +253,21 @@ const Sidebar = () => {
               >
                 <ListItemIcon>
                   {isImageIcon ? (
-                    <img 
-                      src={appIcon} 
+                    <img
+                      src={appIcon}
                       alt={app.title}
-                      style={{ 
-                        width: 24, 
-                        height: 24, 
+                      style={{
+                        width: 24,
+                        height: 24,
                         objectFit: 'contain',
                         borderRadius: '4px'
-                      }} 
+                      }}
                     />
                   ) : (
                     appIcon
                   )}
                 </ListItemIcon>
-                <ListItemText 
+                <ListItemText
                   primary={app.title}
                   primaryTypographyProps={{
                     fontSize: '0.85rem',

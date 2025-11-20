@@ -37,7 +37,7 @@ import snapVideoIcon from "../../assets/images/apps/icons/snapvideoicon.png";
 import genieAIIcon from "../../assets/images/apps/icons/chatgpt4icon.png";
 import aiSocialMediaIcon from "../../assets/images/apps/icons/contentcreatoricon.png";
 import advancedImageIcon from "../../assets/images/apps/icons/imagetransform-1.png";
-import whisperIcon from "../../assets/images/apps/icons/whispericon.png";
+
 import runwayMLIcon from "../../assets/images/apps/icons/runawayicon.png";
 import prlabsIcon from "../../assets/images/apps/icons/marketinghubicon.png";
 import speechToTextIcon from "../../assets/images/apps/icons/speechtotexticon.png";
@@ -48,11 +48,11 @@ import qrGeneratorIcon from "../../assets/images/apps/icons/qrgeneratorcode.png"
 import seoAnalyzerIcon from "../../assets/images/apps/icons/seoanalyzericon.png";
 import similarWebIcon from "../../assets/images/apps/icons/similarwebicon.png";
 import googleKeywordIcon from "../../assets/images/apps/icons/keywordinsightsicon.png";
-import domainMetricsIcon from "../../assets/images/apps/icons/domaincheckericon.png";
+
 import pageSpeedIcon from "../../assets/images/apps/icons/webstatusicon.png";
 import productDescriptionIcon from "../../assets/images/apps/icons/productdescriptionicon.png";
 import sslCheckerIcon from "../../assets/images/apps/icons/SSLcheckericon.png";
-import websiteStatusIcon from "../../assets/images/apps/icons/webstatusicon.png";
+
 import seoMastermindIcon from "../../assets/images/apps/icons/keywordsearchicon.png";
 import whoisLookupIcon from "../../assets/images/apps/icons/Whoisicon.png";
 import {
@@ -147,7 +147,7 @@ const CategoryView = () => {
     const navigate = useNavigate();
     const { category } = useParams();
     const dispatch = useDispatch();
-    
+
     // Estados locales
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedSubcategory, setSelectedSubcategory] = useState("all");
@@ -182,7 +182,7 @@ const CategoryView = () => {
                 return 'Creative & Content';
         }
     };
-    
+
     const categoryFromState = getCategoryFromParam(category);
 
     // Mapeo de iconos para las apps
@@ -192,7 +192,7 @@ const CategoryView = () => {
             'google-news': googleNewsIcon,
             'mediafy': mediafyIcon,
             'perplexity': perplexityIcon,
-            
+
             // Creative & Content
             'word-count': wordCountIcon,
             'pdf-to-text': pdfToTextIcon,
@@ -200,22 +200,22 @@ const CategoryView = () => {
             'genie-ai': genieAIIcon,
             'ai-social-media': aiSocialMediaIcon,
             'advanced-image': advancedImageIcon,
-            'whisper-url': whisperIcon,
+
             'runwayml': runwayMLIcon,
             'prlabs': prlabsIcon,
             'speech-to-text': speechToTextIcon,
             'picpulse': picPulseIcon,
-            
+
             // Web & SEO
             'qr-generator': qrGeneratorIcon,
             'seo-analyzer': seoAnalyzerIcon,
             'similar-web': similarWebIcon,
             'google-keyword': googleKeywordIcon,
-            'domain-metrics': domainMetricsIcon,
+
             'page-speed': pageSpeedIcon,
             'product-description': productDescriptionIcon,
             'ssl-checker': sslCheckerIcon,
-            'website-status': websiteStatusIcon,
+
             'seo-mastermind': seoMastermindIcon,
             'whois-lookup': whoisLookupIcon
         };
@@ -244,7 +244,7 @@ const CategoryView = () => {
         if (!categoryApps || !Array.isArray(categoryApps)) {
             return [];
         }
-        
+
         let result = [...categoryApps];
 
         // Filtrar por búsqueda
@@ -288,7 +288,7 @@ const CategoryView = () => {
     console.log('- Apps from Redux:', apps);
     console.log('- Category apps:', categoryApps);
     console.log('- Filtered apps:', filteredApps);
-    
+
     // Función para obtener el ancho de las cards según el layout
     const getCardWidth = () => {
         switch (gridLayout) {
@@ -324,7 +324,7 @@ const CategoryView = () => {
     // Obtener el nombre de la categoría para mostrar
     const getCategoryDisplayName = () => {
         switch (categoryFromState) {
-            
+
             case "Social Listening":
                 return "Social Listening";
             case "Creative & Content":
@@ -339,7 +339,7 @@ const CategoryView = () => {
     // Obtener ícono para la categoría
     const getCategoryIcon = () => {
         switch (categoryFromState) {
-            
+
             case "Social Listening":
                 return <ChatIcon />;
             case "Creative & Content":
@@ -352,7 +352,7 @@ const CategoryView = () => {
     };
 
     console.log('🎨 CategoryView rendering...');
-    
+
     return (
         <Box sx={{ minHeight: "100vh", bgcolor: "#1a1625", color: "white" }}>
             {/* Header */}
@@ -503,7 +503,7 @@ const CategoryView = () => {
                                         <ViewListIcon />
                                     </IconButton>
                                 </Tooltip>
-                                
+
                                 <Tooltip title="3 columnas">
                                     <IconButton
                                         onClick={() => setGridLayout('6')}
@@ -518,7 +518,7 @@ const CategoryView = () => {
                                         <ViewComfy />
                                     </IconButton>
                                 </Tooltip>
-                                
+
                                 <Tooltip title="4 columnas">
                                     <IconButton
                                         onClick={() => setGridLayout('8')}
@@ -559,13 +559,13 @@ const CategoryView = () => {
                                             borderColor: "#3a3045",
                                         },
                                         "&:hover .MuiOutlinedInput-notchedOutline":
-                                            {
-                                                borderColor: "#837cf2",
-                                            },
+                                        {
+                                            borderColor: "#837cf2",
+                                        },
                                         "&.Mui-focused .MuiOutlinedInput-notchedOutline":
-                                            {
-                                                borderColor: "#837cf2",
-                                            },
+                                        {
+                                            borderColor: "#837cf2",
+                                        },
                                         ".MuiSvgIcon-root": {
                                             color: "white",
                                         },
@@ -607,13 +607,13 @@ const CategoryView = () => {
                                             borderColor: "#3a3045",
                                         },
                                         "&:hover .MuiOutlinedInput-notchedOutline":
-                                            {
-                                                borderColor: "#837cf2",
-                                            },
+                                        {
+                                            borderColor: "#837cf2",
+                                        },
                                         "&.Mui-focused .MuiOutlinedInput-notchedOutline":
-                                            {
-                                                borderColor: "#837cf2",
-                                            },
+                                        {
+                                            borderColor: "#837cf2",
+                                        },
                                         ".MuiSvgIcon-root": {
                                             color: "white",
                                         },
@@ -717,11 +717,11 @@ const CategoryView = () => {
                     // Skeleton loader
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', width: '100%', gap: '24px' }}>
                         {[1, 2, 3, 4, 5, 6].map((item) => (
-                            <Box 
-                                key={item} 
-                                sx={{ 
-                                    width: getCardWidth(), 
-                                    boxSizing: 'border-box' 
+                            <Box
+                                key={item}
+                                sx={{
+                                    width: getCardWidth(),
+                                    boxSizing: 'border-box'
                                 }}
                             >
                                 <StyledCard>
@@ -796,9 +796,9 @@ const CategoryView = () => {
                         {filteredApps.map((app) => (
                             <Box
                                 key={app.id}
-                                sx={{ 
-                                    width: getCardWidth(), 
-                                    boxSizing: 'border-box' 
+                                sx={{
+                                    width: getCardWidth(),
+                                    boxSizing: 'border-box'
                                 }}
                             >
                                 <StyledCard
@@ -833,16 +833,16 @@ const CategoryView = () => {
                                             e.target.src = "/app-placeholder.svg";
                                         }}
                                     />
-                                    
+
                                     <CardContent sx={{ flexGrow: 1 }}>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                                             <Typography gutterBottom variant="h6" component="div" noWrap>
                                                 {app.title}
                                             </Typography>
-                                            <Chip 
-                                                label={app.category} 
-                                                size="small" 
-                                                color="primary" 
+                                            <Chip
+                                                label={app.category}
+                                                size="small"
+                                                color="primary"
                                                 variant="outlined"
                                                 sx={{ ml: 1, fontSize: '0.7rem' }}
                                             />
@@ -851,14 +851,14 @@ const CategoryView = () => {
                                             {app.description}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary">
-                                           
+
                                         </Typography>
                                     </CardContent>
-                                    
+
                                     <CardActions sx={{ p: 2, pt: 0 }}>
-                                        <Button 
-                                            size="small" 
-                                            fullWidth 
+                                        <Button
+                                            size="small"
+                                            fullWidth
                                             variant="contained"
                                             color="primary"
                                             onClick={(e) => {
