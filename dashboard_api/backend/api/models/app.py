@@ -135,6 +135,16 @@ def create_sample_apps():
             'api_name': 'Google Trends API'
         },
         {
+            'id': 'product-description',
+            'title': 'AI eCommerce Product Description',
+            'description': 'Genera descripciones optimizadas para productos de eCommerce usando IA',
+            'image_url': '/assets/images/apps/banners/productdescription.png',
+            'icon_url': '/assets/images/apps/icons/productdescriptionicon.png',
+            'category': 'Creative & Content',
+            'route': '/apps/product-description',
+            'api_name': 'AI Product Description Generator'
+        },
+        {
             'id': 'weather-forecast',
             'title': 'Weather Forecast',
             'description': 'Consulta el pronóstico del tiempo en cualquier ubicación del mundo',
@@ -188,7 +198,8 @@ def create_sample_apps():
                 id=app_data['id'],
                 title=app_data['title'],
                 description=app_data['description'],
-                image_url=app_data['image_url'],
+                image_url=app_data.get('image_url'),
+                icon_url=app_data.get('icon_url'),
                 category=app_data['category'],
                 route=app_data['route'],
                 api_name=app_data['api_name']
