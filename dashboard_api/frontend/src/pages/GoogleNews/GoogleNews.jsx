@@ -94,21 +94,12 @@ const GoogleNews = () => {
     { id: 'sport', label: 'Deportes', icon: SportsSoccer, color: 'success' },
     { id: 'technology', label: 'Tecnología', icon: Computer, color: 'primary' }
   ];
-
+ 
   // Cargar regiones de idioma disponibles
   useEffect(() => {
     console.log(`🚀 Componente montado, cargando regiones de idioma...`);
     loadLanguageRegions();
   }, []);
-
-  // Efecto para recargar noticias cuando cambie el idioma
-  useEffect(() => {
-    // Solo recargar si hay una categoría activa
-    if (activeTab < categories.length) {
-      console.log(`🌍 Idioma cambiado a: ${languageRegion}, recargando categoría: ${categories[activeTab].id}`);
-      fetchNewsByCategory(categories[activeTab].id);
-    }
-  }, [languageRegion]); // Se ejecuta cada vez que cambie languageRegion
 
   const loadLanguageRegions = async () => {
     try {
@@ -120,49 +111,19 @@ const GoogleNews = () => {
       console.log('No se pudieron cargar las regiones de idioma');
     }
   };
-
+ 
   const handleTabChange = (event, newValue) => {
     const newCategory = categories[newValue]?.id || 'unknown';
-    console.log(`📑 Cambiando de categoría ${categories[activeTab]?.id || 'none'} a ${newCategory}`);
-    
+    console.log(`📑 Cambiando de categoría a ${newCategory} (sin recarga automática)`);
     setActiveTab(newValue);
-    setData(null);
-    setError('');
-    setCurrentPage(1);
-    if (newValue < categories.length) {
-      fetchNewsByCategory(categories[newValue].id);
-    }
-  };
-
-  const fetchNewsByCategory = async (category) => {
-    setLoading(true);
-    setError('');
-    setData(null);
-    setImageErrors({});
-    setImageLoadingStates({});
-    setCurrentPage(1);
-
-    try {
-      // Usar el idioma actual del estado
-      const currentLanguageRegion = languageRegion;
-      console.log(`🔄 Cargando noticias de ${category} en idioma: ${currentLanguageRegion}`);
-      
-      const response = await axios.get(`${API_BASE_URL}/google-news/${category}`, {
-        params: { lr: currentLanguageRegion }
-      });
-      setData(response.data);
-      console.log(`✅ Noticias cargadas exitosamente para ${category} en ${currentLanguageRegion}`);
-    } catch (err) {
-      console.error(`❌ Error al cargar noticias de ${category} en ${currentLanguageRegion}:`, err);
-      setError(err.response?.data?.error || 'Error al obtener noticias');
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!searchKeyword.trim()) return;
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
+
+    const keyword = searchKeyword.trim();
 
     setLoading(true);
     setError('');
@@ -172,20 +133,31 @@ const GoogleNews = () => {
     setCurrentPage(1);
 
     try {
-      // Usar el idioma actual del estado
       const currentLanguageRegion = languageRegion;
-      console.log(`🔍 Buscando "${searchKeyword.trim()}" en idioma: ${currentLanguageRegion}`);
-      
-      const response = await axios.get(`${API_BASE_URL}/google-news/search`, {
-        params: { 
-          keyword: searchKeyword.trim(),
-          lr: currentLanguageRegion 
-        }
-      });
-      setData(response.data);
-      console.log(`✅ Búsqueda exitosa para "${searchKeyword.trim()}" en ${currentLanguageRegion}`);
+
+      if (keyword) {
+        console.log(`🔍 Buscando "${keyword}" en idioma: ${currentLanguageRegion}`);
+        
+        const response = await axios.get(`${API_BASE_URL}/google-news/search`, {
+          params: { 
+            keyword,
+            lr: currentLanguageRegion 
+          }
+        });
+        setData(response.data);
+        console.log(`✅ Búsqueda exitosa para "${keyword}" en ${currentLanguageRegion}`);
+      } else {
+        const categoryId = categories[activeTab]?.id || 'latest';
+        console.log(`🔍 Cargando categoría "${categoryId}" en idioma: ${currentLanguageRegion}`);
+        
+        const response = await axios.get(`${API_BASE_URL}/google-news/${categoryId}`, {
+          params: { lr: currentLanguageRegion }
+        });
+        setData(response.data);
+        console.log(`✅ Categoría cargada exitosamente: "${categoryId}" en ${currentLanguageRegion}`);
+      }
     } catch (err) {
-      console.error(`❌ Error en búsqueda para "${searchKeyword.trim()}" en ${currentLanguageRegion}:`, err);
+      console.error('❌ Error en búsqueda/carga de noticias:', err);
       setError(err.response?.data?.error || 'Error al buscar noticias');
     } finally {
       setLoading(false);
@@ -194,19 +166,8 @@ const GoogleNews = () => {
 
   const handleLanguageChange = (event) => {
     const newLanguageRegion = event.target.value;
-    console.log(`🔄 Cambiando idioma de ${languageRegion} a ${newLanguageRegion}`);
-    
+    console.log(`🔄 Cambiando idioma de ${languageRegion} a ${newLanguageRegion} (sin recarga automática)`);
     setLanguageRegion(newLanguageRegion);
-    
-    // Limpiar datos anteriores
-    setData(null);
-    setError('');
-    setImageErrors({});
-    setImageLoadingStates({});
-    setCurrentPage(1);
-    
-    // El useEffect detectará el cambio y recargará automáticamente
-    console.log(`🧹 Estado limpiado, esperando recarga automática...`);
   };
 
   const formatTimestamp = (timestamp) => {
@@ -644,7 +605,7 @@ const GoogleNews = () => {
             </Button>
             <Button
               startIcon={<Refresh />}
-              onClick={() => activeTab < categories.length ? fetchNewsByCategory(categories[activeTab].id) : handleSearch()}
+              onClick={handleSearch}
               variant="outlined"
               size="small"
             >
@@ -838,7 +799,7 @@ const GoogleNews = () => {
                 type="submit"
                 variant="contained"
                 fullWidth
-                disabled={loading || !searchKeyword.trim()}
+                disabled={loading}
                 startIcon={loading ? <CircularProgress size={20} /> : <Search />}
                 sx={{
                   height: '56px',
