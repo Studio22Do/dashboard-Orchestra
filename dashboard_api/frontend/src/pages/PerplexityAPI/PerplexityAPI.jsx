@@ -45,6 +45,7 @@ const PerplexityAPI = () => {
     news: '',
     comparison: ''
   });
+  const [copyStatus, setCopyStatus] = useState('');
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -64,6 +65,7 @@ const PerplexityAPI = () => {
     setLoading(true);
     setError('');
     setData(null);
+    setCopyStatus('');
 
     try {
       let content = '';
@@ -103,6 +105,63 @@ const PerplexityAPI = () => {
       setError(err.response?.data?.error || 'Error al realizar la búsqueda');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getMainAnswerText = (responseData) => {
+    if (!responseData) return '';
+    if (responseData.choices && responseData.choices.content && responseData.choices.content.parts && responseData.choices.content.parts.length > 0) {
+      return responseData.choices.content.parts[0].text;
+    } else if (responseData.text) {
+      return responseData.text;
+    } else if (responseData.response) {
+      return responseData.response;
+    } else if (responseData.answer) {
+      return responseData.answer;
+    } else if (responseData.content) {
+      return responseData.content;
+    } else if (responseData.message) {
+      return responseData.message;
+    }
+    return '';
+  };
+
+  const handleCopyText = async (text) => {
+    if (!text) return;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setCopyStatus('Texto copiado al portapapeles');
+    } catch (err) {
+      setCopyStatus('No se pudo copiar el texto');
+    }
+  };
+
+  const handleDownloadText = (text) => {
+    if (!text) return;
+    try {
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'perplexity_respuesta.txt';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      // En caso de error, solo actualizamos el estado para informar al usuario
+      setCopyStatus('No se pudo descargar el texto');
     }
   };
 
@@ -198,6 +257,8 @@ const PerplexityAPI = () => {
       );
     }
 
+    const mainText = getMainAnswerText(data) || 'Respuesta no disponible';
+
     return (
       <Grid container spacing={3}>
         <Grid item xs={12}>
@@ -211,28 +272,32 @@ const PerplexityAPI = () => {
               </Box>
               
               <Divider sx={{ mb: 2 }} />
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mb: 2 }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => handleCopyText(mainText)}
+                >
+                  Copiar texto
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => handleDownloadText(mainText)}
+                >
+                  Descargar .txt
+                </Button>
+              </Box>
+              {copyStatus && (
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2, textAlign: 'right' }}>
+                  {copyStatus}
+                </Typography>
+              )}
               
               {/* Contenido principal */}
               <Box sx={{ mb: 3 }}>
                 <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
-                  {(() => {
-                    // Extraer el contenido principal de la respuesta de Perplexity
-                    if (data.choices && data.choices.content && data.choices.content.parts && data.choices.content.parts.length > 0) {
-                      return data.choices.content.parts[0].text;
-                    } else if (data.text) {
-                      return data.text;
-                    } else if (data.response) {
-                      return data.response;
-                    } else if (data.answer) {
-                      return data.answer;
-                    } else if (data.content) {
-                      return data.content;
-                    } else if (data.message) {
-                      return data.message;
-                    } else {
-                      return 'Respuesta no disponible';
-                    }
-                  })()}
+                  {mainText}
                 </Typography>
               </Box>
 
