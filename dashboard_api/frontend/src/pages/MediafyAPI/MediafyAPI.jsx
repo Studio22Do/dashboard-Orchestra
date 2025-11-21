@@ -22,7 +22,12 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemAvatar
+  ListItemAvatar,
+  Pagination,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
 import {
   Search,
@@ -52,6 +57,12 @@ const MediafyAPI = () => {
   });
   const [locations, setLocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const ITEMS_PER_PAGE = 10;
+  const [page, setPage] = useState(1);
+  const [audioDialogOpen, setAudioDialogOpen] = useState(false);
+  const [audioInfo, setAudioInfo] = useState(null);
+  const [audioLoading, setAudioLoading] = useState(false);
+  const [audioError, setAudioError] = useState('');
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -59,6 +70,7 @@ const MediafyAPI = () => {
     setError('');
     setLocations([]);
     setSelectedLocation(null);
+    setPage(1);
   };
 
   const handleInputChange = (field, value) => {
@@ -70,6 +82,7 @@ const MediafyAPI = () => {
 
   const handleLocationSelect = async (location) => {
     setSelectedLocation(location);
+    setPage(1);
     setLoading(true);
     setError('');
     
@@ -88,11 +101,37 @@ const MediafyAPI = () => {
     }
   };
 
+  const handleOpenAudioInfo = async (audioCanonicalId) => {
+    if (!audioCanonicalId) return;
+
+    setAudioDialogOpen(true);
+    setAudioLoading(true);
+    setAudioError('');
+    setAudioInfo(null);
+
+    try {
+      const response = await axiosInstance.get('/api/beta_v2/mediafy/audio_info', {
+        params: { audio_canonical_id: audioCanonicalId }
+      });
+      const payload = response.data;
+      setAudioInfo(payload.data || payload);
+    } catch (err) {
+      setAudioError(err.response?.data?.error || 'Error al obtener información de audio');
+    } finally {
+      setAudioLoading(false);
+    }
+  };
+
+  const handleCloseAudioDialog = () => {
+    setAudioDialogOpen(false);
+  };
+
   const handleSearch = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setData(null);
+    setPage(1);
 
     try {
       let endpoint = '';
@@ -148,6 +187,10 @@ const MediafyAPI = () => {
           endpoint = '/api/beta_v2/mediafy/tagged';
           params = { username: searchInputs.username };
           break;
+        case 8: // Posts
+          endpoint = '/api/beta_v2/mediafy/posts';
+          params = { username: searchInputs.username };
+          break;
         default:
           break;
       }
@@ -168,6 +211,7 @@ const MediafyAPI = () => {
       case 5: // Stories
       case 6: // Highlights
       case 7: // Tagged
+      case 8: // Posts
         return (
           <TextField
             fullWidth
@@ -242,6 +286,8 @@ const MediafyAPI = () => {
         return renderHighlightsResults();
       case 7: // Tagged
         return renderTaggedResults();
+      case 8: // Posts
+        return renderPostsResults();
       default:
         return null;
     }
@@ -251,6 +297,17 @@ const MediafyAPI = () => {
     if (!data || !data.data) return null;
     
     const profileData = data.data;
+    const profileImageUrl = profileData.profile_pic_url_hd
+      || profileData.profile_pic_url
+      || profileData.hd_profile_pic_url_info?.url
+      || '';
+    const isPrivate = profileData.is_private;
+    const accountPrivacyLabel = isPrivate ? 'Cuenta privada' : 'Cuenta pública';
+    const accountCategory = profileData.category || profileData.account_category || '';
+    const externalUrl = profileData.external_url;
+    const latestReelDate = profileData.latest_reel_media
+      ? new Date(profileData.latest_reel_media * 1000)
+      : null;
     
     return (
       <Grid container spacing={3}>
@@ -258,7 +315,7 @@ const MediafyAPI = () => {
           <Card elevation={3}>
             <CardContent sx={{ textAlign: 'center' }}>
               <Avatar 
-                src={profileData.profile_pic_url} 
+                src={profileImageUrl} 
                 sx={{ width: 120, height: 120, mx: 'auto', mb: 2 }}
               />
               <Typography variant="h5" gutterBottom>
@@ -272,12 +329,47 @@ const MediafyAPI = () => {
                   icon={<Star />} 
                   label="Verificado" 
                   color="primary" 
-                  sx={{ mb: 2 }}
+                  sx={{ mb: 1 }}
                 />
               )}
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {profileData.biography}
               </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+                <Chip 
+                  label={accountPrivacyLabel} 
+                  color={isPrivate ? 'default' : 'success'} 
+                  variant="outlined"
+                  size="small"
+                />
+                {accountCategory && (
+                  <Chip 
+                    label={accountCategory}
+                    color="secondary"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+              </Box>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                {externalUrl && (
+                  <Button
+                    component="a"
+                    href={externalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="outlined"
+                    size="small"
+                  >
+                    Ver enlace en bio
+                  </Button>
+                )}
+                {latestReelDate && (
+                  <Typography variant="caption" color="text.secondary">
+                    Último reel: {latestReelDate.toLocaleDateString()}
+                  </Typography>
+                )}
+              </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -307,24 +399,90 @@ const MediafyAPI = () => {
               <Card elevation={2}>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" color="success.main">
-                    {profileData.total?.toLocaleString() || 'N/A'}
+                    {profileData.media_count?.toLocaleString() || 'N/A'}
                   </Typography>
                   <Typography variant="body2">Posts</Typography>
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={6} md={3}>
-              <Card elevation={2}>
-                <CardContent sx={{ textAlign: 'center' }}>
-                  <Typography variant="h4" color="info.main">
-                    {profileData.igtv_video_count?.toLocaleString() || 'N/A'}
-                  </Typography>
-                  <Typography variant="body2">Videos IGTV</Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+            {profileData.igtv_video_count != null && (
+              <Grid item xs={6} md={3}>
+                <Card elevation={2}>
+                  <CardContent sx={{ textAlign: 'center' }}>
+                    <Typography variant="h4" color="info.main">
+                      {profileData.igtv_video_count?.toLocaleString() || '0'}
+                    </Typography>
+                    <Typography variant="body2">Videos IGTV</Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            )}
           </Grid>
         </Grid>
+      </Grid>
+    );
+  };
+
+  const renderPostsResults = () => {
+    if (!data || !data.data || !data.data.items) return null;
+    
+    const items = data.data.items;
+    const totalItems = items.length;
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const paginatedItems = items.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+    return (
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Typography variant="h6" gutterBottom>
+            Posts encontrados: {data.data.count || totalItems} resultados
+          </Typography>
+        </Grid>
+        {paginatedItems.map((post, index) => (
+          <Grid item xs={12} md={6} lg={4} key={index}>
+            <Card elevation={3}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Avatar src={post.user?.profile_pic_url} sx={{ mr: 2 }} />
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                      {post.user?.full_name || 'Usuario'}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      @{post.user?.username}
+                    </Typography>
+                  </Box>
+                </Box>
+                {post.caption && (
+                  <Typography variant="body2" sx={{ mb: 2 }}>
+                    {post.caption.text}
+                  </Typography>
+                )}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" color="primary">
+                    ❤️ {post.like_count || 0}
+                  </Typography>
+                  <Typography variant="body2" color="secondary">
+                    💬 {post.comment_count || 0}
+                  </Typography>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+        {totalPages > 1 && (
+          <Grid item xs={12}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={(_, value) => setPage(value)}
+                color="primary"
+              />
+            </Box>
+          </Grid>
+        )}
       </Grid>
     );
   };
@@ -335,6 +493,11 @@ const MediafyAPI = () => {
     if (!data || !data.data) return null;
     
     const hashtagData = data.data;
+    const items = hashtagData.items || [];
+    const totalItems = items.length;
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const paginatedItems = items.slice(startIndex, startIndex + ITEMS_PER_PAGE);
     
     return (
       <Grid container spacing={3}>
@@ -358,7 +521,7 @@ const MediafyAPI = () => {
             Posts recientes del hashtag
           </Typography>
           <Grid container spacing={2}>
-            {hashtagData.items?.map((post, index) => (
+            {paginatedItems.map((post, index) => (
               <Grid item xs={12} sm={6} key={index}>
                 <Card elevation={2}>
                   <CardContent>
@@ -378,6 +541,16 @@ const MediafyAPI = () => {
               </Grid>
             ))}
           </Grid>
+          {totalPages > 1 && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={(_, value) => setPage(value)}
+                color="primary"
+              />
+            </Box>
+          )}
         </Grid>
       </Grid>
     );
@@ -386,6 +559,12 @@ const MediafyAPI = () => {
   const renderSearchUsersResults = () => {
     if (!data || !data.data || !data.data.items) return null;
     
+    const items = data.data.items;
+    const totalItems = items.length;
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const paginatedItems = items.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
     return (
       <Grid container spacing={3}>
         <Grid item xs={12}>
@@ -393,7 +572,7 @@ const MediafyAPI = () => {
             Usuarios encontrados: {data.data.count} resultados
           </Typography>
         </Grid>
-        {data.data.items.map((user, index) => (
+        {paginatedItems.map((user, index) => (
           <Grid item xs={12} md={6} lg={4} key={index}>
             <Card elevation={3}>
               <CardContent>
@@ -433,6 +612,18 @@ const MediafyAPI = () => {
             </Card>
           </Grid>
         ))}
+        {totalPages > 1 && (
+          <Grid item xs={12}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={(_, value) => setPage(value)}
+                color="primary"
+              />
+            </Box>
+          </Grid>
+        )}
       </Grid>
     );
   };
@@ -443,6 +634,11 @@ const MediafyAPI = () => {
     // Si no hay ubicaciones seleccionadas, mostrar la lista de ubicaciones encontradas
     if (locations.length > 0 && !selectedLocation) {
       console.log('🔍 [DEBUG] Mostrando lista de ubicaciones');
+
+      const totalItems = locations.length;
+      const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+      const startIndex = (page - 1) * ITEMS_PER_PAGE;
+      const paginatedLocations = locations.slice(startIndex, startIndex + ITEMS_PER_PAGE);
       return (
         <Grid container spacing={3}>
           <Grid item xs={12}>
@@ -453,7 +649,7 @@ const MediafyAPI = () => {
               Selecciona una ubicación para ver más detalles
             </Typography>
           </Grid>
-          {locations.map((location, index) => (
+          {paginatedLocations.map((location, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <Card 
                 elevation={2} 
@@ -479,6 +675,18 @@ const MediafyAPI = () => {
               </Card>
             </Grid>
           ))}
+          {totalPages > 1 && (
+            <Grid item xs={12}>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+                <Pagination
+                  count={totalPages}
+                  page={page}
+                  onChange={(_, value) => setPage(value)}
+                  color="primary"
+                />
+              </Box>
+            </Grid>
+          )}
         </Grid>
       );
     }
@@ -486,6 +694,11 @@ const MediafyAPI = () => {
     // Si hay una ubicación seleccionada y datos, mostrar la información detallada
     if (selectedLocation && data && data.data) {
       const locationData = data.data;
+      const items = locationData.items || [];
+      const totalItems = items.length;
+      const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+      const startIndex = (page - 1) * ITEMS_PER_PAGE;
+      const paginatedItems = items.slice(startIndex, startIndex + ITEMS_PER_PAGE);
       
       return (
         <Grid container spacing={3}>
@@ -512,7 +725,7 @@ const MediafyAPI = () => {
               Posts recientes de la ubicación
             </Typography>
             <Grid container spacing={2}>
-              {locationData.items?.map((post, index) => (
+              {paginatedItems.map((post, index) => (
                 <Grid item xs={12} sm={6} key={index}>
                   <Card elevation={2}>
                     <CardContent>
@@ -532,6 +745,16 @@ const MediafyAPI = () => {
                 </Grid>
               ))}
             </Grid>
+            {totalPages > 1 && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                <Pagination
+                  count={totalPages}
+                  page={page}
+                  onChange={(_, value) => setPage(value)}
+                  color="primary"
+                />
+              </Box>
+            )}
           </Grid>
         </Grid>
       );
@@ -543,6 +766,12 @@ const MediafyAPI = () => {
   const renderReelsResults = () => {
     if (!data || !data.data || !data.data.items) return null;
     
+    const items = data.data.items;
+    const totalItems = items.length;
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const paginatedItems = items.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
     return (
       <Grid container spacing={3}>
         <Grid item xs={12}>
@@ -550,38 +779,84 @@ const MediafyAPI = () => {
             Reels encontrados: {data.data.count || data.data.items.length} resultados
           </Typography>
         </Grid>
-        {data.data.items.map((reel, index) => (
-          <Grid item xs={12} md={6} lg={4} key={index}>
-            <Card elevation={3}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Avatar src={reel.user?.profile_pic_url} sx={{ mr: 2 }} />
-                  <Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                      {reel.user?.full_name || 'Usuario'}
+        {paginatedItems.map((reel, index) => {
+          const clipsMetadata = reel.clips_metadata || {};
+          const originalSound = clipsMetadata.original_sound_info;
+          const musicInfo = clipsMetadata.music_info?.music_asset_info;
+          const audioCanonicalId = clipsMetadata.audio_canonical_id;
+
+          let audioTitle = '';
+          let audioArtist = '';
+
+          if (musicInfo) {
+            audioTitle = musicInfo.title || 'Audio';
+            audioArtist = musicInfo.display_artist || '';
+          } else if (originalSound) {
+            audioTitle = originalSound.original_audio_title || 'Audio original';
+            audioArtist = originalSound.ig_artist?.username || '';
+          }
+
+          return (
+            <Grid item xs={12} md={6} lg={4} key={index}>
+              <Card elevation={3}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Avatar src={reel.user?.profile_pic_url} sx={{ mr: 2 }} />
+                    <Box>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                        {reel.user?.full_name || 'Usuario'}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        @{reel.user?.username}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  {reel.caption && (
+                    <Typography variant="body2" sx={{ mb: 1 }}>
+                      {reel.caption.text}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      @{reel.user?.username}
+                  )}
+                  {audioTitle && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      {'🎵 '}{audioTitle}{audioArtist && ` · ${audioArtist}`}
+                    </Typography>
+                  )}
+                  {audioCanonicalId && (
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleOpenAudioInfo(audioCanonicalId)}
+                      >
+                        Ver info de audio
+                      </Button>
+                    </Box>
+                  )}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2" color="primary">
+                      ❤️ {reel.like_count || 0}
+                    </Typography>
+                    <Typography variant="body2" color="secondary">
+                      💬 {reel.comment_count || 0}
                     </Typography>
                   </Box>
-                </Box>
-                {reel.caption && (
-                  <Typography variant="body2" sx={{ mb: 2 }}>
-                    {reel.caption.text}
-                  </Typography>
-                )}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="primary">
-                    ❤️ {reel.like_count || 0}
-                  </Typography>
-                  <Typography variant="body2" color="secondary">
-                    💬 {reel.comment_count || 0}
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Grid>
+          );
+        })}
+        {totalPages > 1 && (
+          <Grid item xs={12}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={(_, value) => setPage(value)}
+                color="primary"
+              />
+            </Box>
           </Grid>
-        ))}
+        )}
       </Grid>
     );
   };
@@ -589,6 +864,12 @@ const MediafyAPI = () => {
   const renderStoriesResults = () => {
     if (!data || !data.data || !data.data.items) return null;
     
+    const items = data.data.items;
+    const totalItems = items.length;
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const paginatedItems = items.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
     return (
       <Grid container spacing={3}>
         <Grid item xs={12}>
@@ -596,7 +877,7 @@ const MediafyAPI = () => {
             Stories encontradas: {data.data.count || data.data.items.length} resultados
           </Typography>
         </Grid>
-        {data.data.items.map((story, index) => (
+        {paginatedItems.map((story, index) => (
           <Grid item xs={12} md={6} lg={4} key={index}>
             <Card elevation={3}>
               <CardContent>
@@ -618,6 +899,18 @@ const MediafyAPI = () => {
             </Card>
           </Grid>
         ))}
+        {totalPages > 1 && (
+          <Grid item xs={12}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={(_, value) => setPage(value)}
+                color="primary"
+              />
+            </Box>
+          </Grid>
+        )}
       </Grid>
     );
   };
@@ -625,6 +918,12 @@ const MediafyAPI = () => {
   const renderHighlightsResults = () => {
     if (!data || !data.data || !data.data.items) return null;
     
+    const items = data.data.items;
+    const totalItems = items.length;
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const paginatedItems = items.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
     return (
       <Grid container spacing={3}>
         <Grid item xs={12}>
@@ -632,7 +931,7 @@ const MediafyAPI = () => {
             Highlights encontrados: {data.data.count || data.data.items.length} resultados
           </Typography>
         </Grid>
-        {data.data.items.map((highlight, index) => (
+        {paginatedItems.map((highlight, index) => (
           <Grid item xs={12} md={6} lg={4} key={index}>
             <Card elevation={3}>
               <CardContent>
@@ -649,6 +948,18 @@ const MediafyAPI = () => {
             </Card>
           </Grid>
         ))}
+        {totalPages > 1 && (
+          <Grid item xs={12}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={(_, value) => setPage(value)}
+                color="primary"
+              />
+            </Box>
+          </Grid>
+        )}
       </Grid>
     );
   };
@@ -656,6 +967,12 @@ const MediafyAPI = () => {
   const renderTaggedResults = () => {
     if (!data || !data.data || !data.data.items) return null;
     
+    const items = data.data.items;
+    const totalItems = items.length;
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const paginatedItems = items.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
     return (
       <Grid container spacing={3}>
         <Grid item xs={12}>
@@ -663,7 +980,7 @@ const MediafyAPI = () => {
             Posts etiquetados encontrados: {data.data.count || data.data.items.length} resultados
           </Typography>
         </Grid>
-        {data.data.items.map((post, index) => (
+        {paginatedItems.map((post, index) => (
           <Grid item xs={12} md={6} lg={4} key={index}>
             <Card elevation={3}>
               <CardContent>
@@ -695,6 +1012,18 @@ const MediafyAPI = () => {
             </Card>
           </Grid>
         ))}
+        {totalPages > 1 && (
+          <Grid item xs={12}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={(_, value) => setPage(value)}
+                color="primary"
+              />
+            </Box>
+          </Grid>
+        )}
       </Grid>
     );
   };
@@ -740,6 +1069,7 @@ const MediafyAPI = () => {
           <Tab icon={<PhotoCamera />} label="Stories" />
           <Tab icon={<Collections />} label="Highlights" />
           <Tab icon={<Label />} label="Posts Etiquetados" />
+          <Tab icon={<Instagram />} label="Posts" />
         </Tabs>
       </Paper>
 
@@ -782,6 +1112,52 @@ const MediafyAPI = () => {
 
       {/* Resultados */}
       {renderResults()}
+
+      <Dialog
+        open={audioDialogOpen}
+        onClose={handleCloseAudioDialog}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Información del audio</DialogTitle>
+        <DialogContent dividers>
+          {audioLoading && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+              <CircularProgress size={24} />
+            </Box>
+          )}
+          {!audioLoading && audioError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {audioError}
+            </Alert>
+          )}
+          {!audioLoading && audioInfo && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                {audioInfo.title || 'Audio'}
+              </Typography>
+              {audioInfo.artist && (
+                <Typography variant="body2" color="text.secondary">
+                  Artista: @{audioInfo.artist.username}
+                </Typography>
+              )}
+              {typeof audioInfo.duration_in_ms === 'number' && (
+                <Typography variant="body2" color="text.secondary">
+                  Duración: {(audioInfo.duration_in_ms / 1000).toFixed(1)} s
+                </Typography>
+              )}
+              {typeof audioInfo.total_reels === 'number' && (
+                <Typography variant="body2" color="text.secondary">
+                  Reels que usan este audio: {audioInfo.total_reels}
+                </Typography>
+              )}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAudioDialog}>Cerrar</Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
