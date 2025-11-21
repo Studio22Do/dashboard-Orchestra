@@ -24,7 +24,8 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Chip
+  Chip,
+  InputAdornment
 } from '@mui/material';
 import { 
   ContentCopy,
@@ -39,6 +40,94 @@ import {
 import productIcon from '../../assets/images/apps/icons/productdescriptionicon.png';
 
 const ProductDescriptionGenerator = () => {
+  // Estilos para inputs consistentes
+  const inputSx = {
+    '& .MuiOutlinedInput-root': {
+      height: 56,
+      borderRadius: 2,
+      backgroundColor: 'transparent',
+      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
+      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
+      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' },
+      // Evitar color azul del autofill manteniendo el color del tema
+      '& input:-webkit-autofill': {
+        WebkitBoxShadow: '0 0 0 100px transparent inset !important',
+        WebkitTextFillColor: '#fff !important',
+        transition: 'background-color 5000s ease-in-out 0s',
+        caretColor: '#fff',
+      },
+      '& input:-webkit-autofill:hover': {
+        WebkitBoxShadow: '0 0 0 100px transparent inset !important',
+        WebkitTextFillColor: '#fff !important',
+      },
+      '& input:-webkit-autofill:focus': {
+        WebkitBoxShadow: '0 0 0 100px transparent inset !important',
+        WebkitTextFillColor: '#fff !important',
+      },
+      '& input:-webkit-autofill:active': {
+        WebkitBoxShadow: '0 0 0 100px transparent inset !important',
+        WebkitTextFillColor: '#fff !important',
+      },
+    },
+    '& .MuiInputBase-input': {
+      padding: '16px 14px',
+      backgroundColor: 'transparent',
+    }
+  };
+
+  const textareaSx = {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: 2,
+      alignItems: 'flex-start',
+      backgroundColor: 'transparent',
+      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
+      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
+      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' },
+      // Evitar color azul del autofill manteniendo el color del tema
+      '& textarea:-webkit-autofill': {
+        WebkitBoxShadow: '0 0 0 100px transparent inset !important',
+        WebkitTextFillColor: '#fff !important',
+        transition: 'background-color 5000s ease-in-out 0s',
+        caretColor: '#fff',
+      },
+      '& textarea:-webkit-autofill:hover': {
+        WebkitBoxShadow: '0 0 0 100px transparent inset !important',
+        WebkitTextFillColor: '#fff !important',
+      },
+      '& textarea:-webkit-autofill:focus': {
+        WebkitBoxShadow: '0 0 0 100px transparent inset !important',
+        WebkitTextFillColor: '#fff !important',
+      },
+    },
+    '& .MuiInputBase-input': {
+      padding: '16px',
+      lineHeight: 1.5,
+      backgroundColor: 'transparent',
+    }
+  };
+
+  const selectSx = {
+    '& .MuiOutlinedInput-root': {
+      height: 56,
+      borderRadius: 2,
+      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
+      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
+      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' }
+    },
+    '& .MuiSelect-select': {
+      display: 'flex',
+      alignItems: 'center',
+      paddingTop: 0,
+      paddingBottom: 0
+    }
+  };
+
+  const actionButtonSx = {
+    height: 56,
+    borderRadius: 2,
+    textTransform: 'none',
+    fontWeight: 600
+  };
 
   const [productData, setProductData] = useState({
     name: '',
@@ -162,9 +251,12 @@ const ProductDescriptionGenerator = () => {
                   value={productData.name}
                   onChange={handleInputChange}
                   required
+                  sx={inputSx}
                   InputProps={{
                     startAdornment: (
-                      <ShoppingBag color="action" sx={{ mr: 1 }} />
+                      <InputAdornment position="start">
+                        <ShoppingBag color="action" />
+                      </InputAdornment>
                     ),
                   }}
                 />
@@ -177,9 +269,12 @@ const ProductDescriptionGenerator = () => {
                   value={productData.category}
                   onChange={handleInputChange}
                   required
+                  sx={inputSx}
                   InputProps={{
                     startAdornment: (
-                      <Category color="action" sx={{ mr: 1 }} />
+                      <InputAdornment position="start">
+                        <Category color="action" />
+                      </InputAdornment>
                     ),
                   }}
                 />
@@ -192,15 +287,18 @@ const ProductDescriptionGenerator = () => {
                   value={productData.price}
                   onChange={handleInputChange}
                   required
+                  sx={inputSx}
                   InputProps={{
                     startAdornment: (
-                      <PriceChange color="action" sx={{ mr: 1 }} />
+                      <InputAdornment position="start">
+                        <PriceChange color="action" />
+                      </InputAdornment>
                     ),
                   }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <FormControl fullWidth>
+                <FormControl fullWidth sx={selectSx}>
                   <InputLabel>Tono de la Descripción</InputLabel>
                   <Select
                     name="tone"
@@ -224,9 +322,12 @@ const ProductDescriptionGenerator = () => {
                   onChange={handleInputChange}
                   multiline
                   rows={4}
+                  sx={textareaSx}
                   InputProps={{
                     startAdornment: (
-                      <Description color="action" sx={{ mr: 1 }} />
+                      <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}>
+                        <Description color="action" />
+                      </InputAdornment>
                     ),
                   }}
                 />
@@ -237,10 +338,10 @@ const ProductDescriptionGenerator = () => {
                   variant="contained"
                   fullWidth
                   disabled={loading}
-                  startIcon={<AutoAwesome />}
-                  sx={{ height: '56px' }}
+                  startIcon={loading ? <CircularProgress size={24} /> : <AutoAwesome />}
+                  sx={actionButtonSx}
                 >
-                  {loading ? <CircularProgress size={24} /> : 'Generar Descripción'}
+                  {loading ? 'Generando...' : 'Generar Descripción'}
                 </Button>
               </Grid>
             </Grid>
@@ -269,19 +370,33 @@ const ProductDescriptionGenerator = () => {
             <Grid item xs={12}>
               <Card>
                 <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6">
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+                    <Typography variant="h6" sx={{ flex: 1, minWidth: 'fit-content' }}>
                       Título del Producto
                     </Typography>
-                    <Box>
+                    <Box sx={{ display: 'flex', gap: 0.5 }}>
                       <Tooltip title="Copiar">
-                        <IconButton onClick={() => handleCopy(generatedContent.title)}>
-                          <ContentCopy />
+                        <IconButton 
+                          onClick={() => handleCopy(generatedContent.title)}
+                          size="small"
+                          sx={{ 
+                            border: '1px solid rgba(0,0,0,0.12)',
+                            '&:hover': { backgroundColor: 'rgba(0,0,0,0.04)' }
+                          }}
+                        >
+                          <ContentCopy fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Descargar">
-                        <IconButton onClick={() => handleDownload(generatedContent.title, 'titulo.txt')}>
-                          <Download />
+                        <IconButton 
+                          onClick={() => handleDownload(generatedContent.title, 'titulo.txt')}
+                          size="small"
+                          sx={{ 
+                            border: '1px solid rgba(0,0,0,0.12)',
+                            '&:hover': { backgroundColor: 'rgba(0,0,0,0.04)' }
+                          }}
+                        >
+                          <Download fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     </Box>
@@ -296,19 +411,33 @@ const ProductDescriptionGenerator = () => {
             <Grid item xs={12}>
               <Card>
                 <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6">
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+                    <Typography variant="h6" sx={{ flex: 1, minWidth: 'fit-content' }}>
                       Descripción Corta
                     </Typography>
-                    <Box>
+                    <Box sx={{ display: 'flex', gap: 0.5 }}>
                       <Tooltip title="Copiar">
-                        <IconButton onClick={() => handleCopy(generatedContent.shortDescription)}>
-                          <ContentCopy />
+                        <IconButton 
+                          onClick={() => handleCopy(generatedContent.shortDescription)}
+                          size="small"
+                          sx={{ 
+                            border: '1px solid rgba(0,0,0,0.12)',
+                            '&:hover': { backgroundColor: 'rgba(0,0,0,0.04)' }
+                          }}
+                        >
+                          <ContentCopy fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Descargar">
-                        <IconButton onClick={() => handleDownload(generatedContent.shortDescription, 'descripcion-corta.txt')}>
-                          <Download />
+                        <IconButton 
+                          onClick={() => handleDownload(generatedContent.shortDescription, 'descripcion-corta.txt')}
+                          size="small"
+                          sx={{ 
+                            border: '1px solid rgba(0,0,0,0.12)',
+                            '&:hover': { backgroundColor: 'rgba(0,0,0,0.04)' }
+                          }}
+                        >
+                          <Download fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     </Box>
@@ -323,19 +452,33 @@ const ProductDescriptionGenerator = () => {
             <Grid item xs={12}>
               <Card>
                 <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6">
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+                    <Typography variant="h6" sx={{ flex: 1, minWidth: 'fit-content' }}>
                       Descripción Larga
                     </Typography>
-                    <Box>
+                    <Box sx={{ display: 'flex', gap: 0.5 }}>
                       <Tooltip title="Copiar">
-                        <IconButton onClick={() => handleCopy(generatedContent.longDescription)}>
-                          <ContentCopy />
+                        <IconButton 
+                          onClick={() => handleCopy(generatedContent.longDescription)}
+                          size="small"
+                          sx={{ 
+                            border: '1px solid rgba(0,0,0,0.12)',
+                            '&:hover': { backgroundColor: 'rgba(0,0,0,0.04)' }
+                          }}
+                        >
+                          <ContentCopy fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Descargar">
-                        <IconButton onClick={() => handleDownload(generatedContent.longDescription, 'descripcion-larga.txt')}>
-                          <Download />
+                        <IconButton 
+                          onClick={() => handleDownload(generatedContent.longDescription, 'descripcion-larga.txt')}
+                          size="small"
+                          sx={{ 
+                            border: '1px solid rgba(0,0,0,0.12)',
+                            '&:hover': { backgroundColor: 'rgba(0,0,0,0.04)' }
+                          }}
+                        >
+                          <Download fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     </Box>
@@ -367,19 +510,33 @@ const ProductDescriptionGenerator = () => {
             <Grid item xs={12} md={6}>
               <Card>
                 <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6">
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+                    <Typography variant="h6" sx={{ flex: 1, minWidth: 'fit-content' }}>
                       Meta Descripción
                     </Typography>
-                    <Box>
+                    <Box sx={{ display: 'flex', gap: 0.5 }}>
                       <Tooltip title="Copiar">
-                        <IconButton onClick={() => handleCopy(generatedContent.metaDescription)}>
-                          <ContentCopy />
+                        <IconButton 
+                          onClick={() => handleCopy(generatedContent.metaDescription)}
+                          size="small"
+                          sx={{ 
+                            border: '1px solid rgba(0,0,0,0.12)',
+                            '&:hover': { backgroundColor: 'rgba(0,0,0,0.04)' }
+                          }}
+                        >
+                          <ContentCopy fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Descargar">
-                        <IconButton onClick={() => handleDownload(generatedContent.metaDescription, 'meta-descripcion.txt')}>
-                          <Download />
+                        <IconButton 
+                          onClick={() => handleDownload(generatedContent.metaDescription, 'meta-descripcion.txt')}
+                          size="small"
+                          sx={{ 
+                            border: '1px solid rgba(0,0,0,0.12)',
+                            '&:hover': { backgroundColor: 'rgba(0,0,0,0.04)' }
+                          }}
+                        >
+                          <Download fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     </Box>
