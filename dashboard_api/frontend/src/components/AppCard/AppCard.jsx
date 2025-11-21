@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleFavoriteApp, selectCanUseApp } from '../../redux/slices/appsSlice';
+import { toggleFavoriteApp, selectCanUseApp, selectPurchasedApps } from '../../redux/slices/appsSlice';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 
@@ -21,6 +21,14 @@ const AppCard = ({ id, title, description, imageUrl, iconUrl, category, route, a
   
   // Nueva lógica basada en requests
   const canUseApp = useSelector(state => selectCanUseApp(state, id));
+  
+  // Obtener el estado de favorito desde Redux para asegurar sincronización
+  const purchasedApps = useSelector(selectPurchasedApps);
+  const appInRedux = purchasedApps.find(app => (app.app_id || app.id) === id);
+  const isFavoriteFromRedux = appInRedux?.is_favorite ?? false;
+  
+  // Usar el estado de Redux si está disponible, de lo contrario usar la prop
+  const currentIsFavorite = appInRedux ? isFavoriteFromRedux : (is_favorite ?? false);
 
   const handleAction = () => {
     // En beta_v2 abrimos siempre; el cobro va por puntos en endpoints
@@ -68,13 +76,13 @@ const AppCard = ({ id, title, description, imageUrl, iconUrl, category, route, a
             top: 8,
             right: 8,
             zIndex: 2,
-            color: is_favorite ? '#FFD600' : 'rgba(255,255,255,0.5)',
+            color: currentIsFavorite ? '#FFD600' : 'rgba(255,255,255,0.5)',
             background: 'rgba(30,30,40,0.7)',
             '&:hover': { color: '#FFD600', background: 'rgba(30,30,40,0.9)' }
           }}
           size="small"
         >
-          {is_favorite ? <StarIcon /> : <StarBorderIcon />}
+          {currentIsFavorite ? <StarIcon /> : <StarBorderIcon />}
         </IconButton>
       )}
       <CardMedia

@@ -124,8 +124,11 @@ export const toggleFavoriteApp = createAsyncThunk(
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      // Después de cambiar el favorito, recargar las apps favoritas
-      await dispatch(fetchFavoriteApps());
+      // Después de cambiar el favorito, recargar tanto las apps favoritas como las apps compradas
+      await Promise.all([
+        dispatch(fetchFavoriteApps()),
+        dispatch(fetchPurchasedApps())
+      ]);
       
       return response.data.app;
     } catch (error) {
@@ -301,24 +304,35 @@ const appsSlice = createSlice({
       })
       // Toggle favorite
       .addCase(toggleFavoriteApp.fulfilled, (state, action) => {
+        const payloadAppId = action.payload.app_id || action.payload.id;
+        const payloadIsFavorite = action.payload.is_favorite;
+        
         // Actualiza el estado de favorito en purchasedApps
-        const idx = state.purchasedApps.findIndex(app => app.app_id === action.payload.app_id || app.id === action.payload.app_id);
+        // Buscar por diferentes variaciones de ID
+        const idx = state.purchasedApps.findIndex(app => {
+          const appId = app.app_id || app.id;
+          return appId === payloadAppId;
+        });
+        
         if (idx !== -1) {
-          state.purchasedApps[idx].is_favorite = action.payload.is_favorite;
+          state.purchasedApps[idx].is_favorite = payloadIsFavorite;
         }
+        
         // Actualiza la lista de favoritas
-        if (action.payload.is_favorite) {
+        if (payloadIsFavorite) {
           // Verificar si ya existe antes de agregar
-          const exists = state.favoriteApps.some(app => 
-            (app.app_id || app.id) === (action.payload.app_id || action.payload.id)
-          );
+          const exists = state.favoriteApps.some(app => {
+            const appId = app.app_id || app.id;
+            return appId === payloadAppId;
+          });
           if (!exists) {
             state.favoriteApps.push(action.payload);
           }
         } else {
-          state.favoriteApps = state.favoriteApps.filter(app => 
-            (app.app_id || app.id) !== (action.payload.app_id || action.payload.id)
-          );
+          state.favoriteApps = state.favoriteApps.filter(app => {
+            const appId = app.app_id || app.id;
+            return appId !== payloadAppId;
+          });
         }
       })
       .addCase(fetchAllApps.pending, (state) => {

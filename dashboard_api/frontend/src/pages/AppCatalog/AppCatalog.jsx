@@ -199,7 +199,12 @@ const AppCatalog = () => {
               
               return (
                 <Box key={app.app_id || app.id} sx={{ width: getCardWidth(), boxSizing: 'border-box'}}>
-                  <AppCard {...mappedApp} showFavorite={true} is_favorite={app.is_favorite} />
+                  <AppCard 
+                    {...mappedApp} 
+                    id={app.app_id || app.id}
+                    showFavorite={true} 
+                    is_favorite={app.is_favorite} 
+                  />
                 </Box>
               );
             })
