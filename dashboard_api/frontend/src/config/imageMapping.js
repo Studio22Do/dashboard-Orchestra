@@ -69,6 +69,8 @@ export const getAppBanner = (appId) => {
 
     // Utilities
     'word-count': wordcountBanner,
+    'word_count': wordcountBanner,
+    'wordcount': wordcountBanner,
     'speech-to-text': speechtotextBanner,
     'ecommerce-description': productdescriptionBanner,
     'product-description': productdescriptionBanner,

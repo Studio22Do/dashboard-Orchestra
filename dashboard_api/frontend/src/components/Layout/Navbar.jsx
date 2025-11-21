@@ -71,6 +71,20 @@ import { logoutUser, selectUser } from '../../redux/slices/authSlice';
 import { addNotification } from '../../redux/slices/uiSlice';
 import NotificationBell from '../NotificationBell/NotificationBell';
 import CreditsDisplay from '../CreditsDisplay/CreditsDisplay';
+import wordCountLogo from '../../assets/images/apps/icons/wordcounticon.png';
+import googleNewsLogo from '../../assets/images/apps/icons/googlenewsicon.png';
+import perplexityLogo from '../../assets/images/apps/icons/perplexityicon.png';
+import mediafyLogo from '../../assets/images/apps/icons/mediafyicon.png';
+import picpulseLogo from '../../assets/images/apps/icons/Picpulseicon.png';
+import snapVideoLogo from '../../assets/images/apps/icons/snapvideoicon.png';
+import contentGeneratorLogo from '../../assets/images/apps/icons/contentcreatoricon.png';
+import similarWebLogo from '../../assets/images/apps/icons/similarwebicon.png';
+import speechToTextLogo from '../../assets/images/apps/icons/speechtotexticon.png';
+import imageTransformLogo from '../../assets/images/apps/icons/imagetransform-1.png';
+import sslCheckerLogo from '../../assets/images/apps/icons/SSLcheckericon.png';
+import keywordSearchLogo from '../../assets/images/apps/icons/keywordsearchicon.png';
+import whoisLookupLogo from '../../assets/images/apps/icons/Whoisicon.png';
+import productDescriptionLogo from '../../assets/images/apps/icons/productdescriptionicon.png';
 
 // AppBar estilizado con colores del diseño
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -246,12 +260,14 @@ const Navbar = () => {
       },
       '/apps/mediafy': {
         title: 'Mediafy',
-        icon: Instagram,
+        icon: null,
+        image: mediafyLogo,
         subtitle: 'Análisis completo de Instagram'
       },
       '/apps/perplexity': {
         title: 'Perplexity',
-        icon: ChatBubble,
+        icon: null,
+        image: perplexityLogo,
         subtitle: 'API de búsqueda inteligente'
       },
 
@@ -267,7 +283,8 @@ const Navbar = () => {
       },
       '/apps/google-news': {
         title: 'Google News',
-        icon: Article,
+        icon: null,
+        image: googleNewsLogo,
         subtitle: 'Noticias en tiempo real'
       },
       '/apps/tiktok': {
@@ -287,7 +304,8 @@ const Navbar = () => {
       },
       '/apps/ssl-checker': {
         title: 'SSL Checker',
-        icon: Security,
+        icon: null,
+        image: sslCheckerLogo,
         subtitle: 'Verificación de certificados SSL'
       },
       '/apps/website-status': {
@@ -297,7 +315,8 @@ const Navbar = () => {
       },
       '/apps/whois-lookup': {
         title: 'WHOIS',
-        icon: Dns,
+        icon: null,
+        image: whoisLookupLogo,
         subtitle: 'Consulta de información de dominio'
       },
       '/apps/seo-analyzer': {
@@ -307,7 +326,8 @@ const Navbar = () => {
       },
       '/apps/similar-web': {
         title: 'SimilarWeb',
-        icon: Visibility,
+        icon: null,
+        image: similarWebLogo,
         subtitle: 'Análisis de competencia'
       },
       '/apps/keyword-insights': {
@@ -326,18 +346,21 @@ const Navbar = () => {
         subtitle: 'Análisis de velocidad'
       },
       '/apps/product-description': {
-        title: 'Product Description',
-        icon: ShoppingCart,
+        title: 'AI eCommerce Product Description Generator',
+        icon: null,
+        image: productDescriptionLogo,
         subtitle: 'Generador de descripciones'
       },
       '/apps/seo-mastermind': {
         title: 'Keyword Search',
-        icon: SettingsIcon,
+        icon: null,
+        image: keywordSearchLogo,
         subtitle: 'Generador de keywords y meta tags'
       },
       '/apps/word-count': {
         title: 'Word Count',
-        icon: Functions,
+        icon: null,
+        image: wordCountLogo,
         subtitle: 'Contador de palabras'
       },
       '/apps/pdf-to-text': {
@@ -347,7 +370,8 @@ const Navbar = () => {
       },
       '/apps/snap-video': {
         title: 'SnapVideo',
-        icon: VideoLibrary,
+        icon: null,
+        image: snapVideoLogo,
         subtitle: 'Descarga de medios'
       },
       '/apps/genie-ai': {
@@ -357,17 +381,20 @@ const Navbar = () => {
       },
       '/apps/ai-social-media': {
         title: 'Content Generator',
-        icon: ContentCopy,
+        icon: null,
+        image: contentGeneratorLogo,
         subtitle: 'Generador de contenido'
       },
       '/apps/advanced-image': {
         title: 'Image Transform',
-        icon: Transform,
+        icon: null,
+        image: imageTransformLogo,
         subtitle: 'Manipulación avanzada de imágenes'
       },
       '/apps/picpulse': {
         title: 'PicPulse',
-        icon: Image,
+        icon: null,
+        image: picpulseLogo,
         subtitle: 'Análisis de imágenes'
       },
 
@@ -378,7 +405,8 @@ const Navbar = () => {
       },
       '/apps/speech-to-text': {
         title: 'Speech to Text',
-        icon: RecordVoiceOver,
+        icon: null,
+        image: speechToTextLogo,
         subtitle: 'Conversión de voz a texto'
       },
       '/apps/ai-humanizer': {
@@ -527,9 +555,29 @@ const Navbar = () => {
     <StyledAppBar position="static">
       <NavbarContent>
         <DynamicHeader>
-          {currentApp.icon && (
-            <AppIcon>
-              <currentApp.icon />
+          {(currentApp.icon || currentApp.image) && (
+            <AppIcon
+              sx={
+                currentApp.image
+                  ? { backgroundColor: 'transparent', p: 0 }
+                  : undefined
+              }
+            >
+              {currentApp.image ? (
+                <Box
+                  component="img"
+                  src={currentApp.image}
+                  alt={`${currentApp.title} logo`}
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: 'inherit',
+                    objectFit: 'cover'
+                  }}
+                />
+              ) : (
+                <currentApp.icon />
+              )}
             </AppIcon>
           )}
           <Box>
@@ -646,7 +694,7 @@ const Navbar = () => {
                 Interfaz
               </Typography>
             </Box>
-            <MenuItem>
+            <MenuItem onClick={handleSettingsClose}>
               <ListItemIcon>
                 <ViewCompact fontSize="small" />
               </ListItemIcon>

@@ -154,41 +154,42 @@ const PRLabsDashboard = () => {
       </Box>
 
       {/* Quick Stats */}
-      <Grid container spacing={3} mb={6}>
-        <Grid item xs={12} md={4}>
-          <StatsCard elevation={2}>
-            <PerformanceIcon color="primary" />
-            <Box>
-              <Typography variant="h6">Rendimiento</Typography>
-              <Typography variant="body2" color="text.secondary">
-                99.9% Uptime
-              </Typography>
-            </Box>
-          </StatsCard>
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <StatsCard elevation={2}>
-            <InsightsIcon color="primary" />
-            <Box>
-              <Typography variant="h6">Precisión</Typography>
-              <Typography variant="body2" color="text.secondary">
-                95% Promedio
-              </Typography>
-            </Box>
-          </StatsCard>
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <StatsCard elevation={2}>
-            <PerformanceIcon color="primary" />
-            <Box>
-              <Typography variant="h6">Velocidad</Typography>
-              <Typography variant="body2" color="text.secondary">
-                &lt; 500ms Respuesta
-              </Typography>
-            </Box>
-          </StatsCard>
-        </Grid>
-      </Grid>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(auto-fit, minmax(280px, 1fr))' },
+          gap: 3,
+          mb: 6
+        }}
+      >
+        <StatsCard elevation={2} sx={{ width: '100%' }}>
+          <PerformanceIcon color="primary" />
+          <Box>
+            <Typography variant="h6">Rendimiento</Typography>
+            <Typography variant="body2" color="text.secondary">
+              99.9% Uptime
+            </Typography>
+          </Box>
+        </StatsCard>
+        <StatsCard elevation={2} sx={{ width: '100%' }}>
+          <InsightsIcon color="primary" />
+          <Box>
+            <Typography variant="h6">Precisión</Typography>
+            <Typography variant="body2" color="text.secondary">
+              95% Promedio
+            </Typography>
+          </Box>
+        </StatsCard>
+        <StatsCard elevation={2} sx={{ width: '100%' }}>
+          <PerformanceIcon color="primary" />
+          <Box>
+            <Typography variant="h6">Velocidad</Typography>
+            <Typography variant="body2" color="text.secondary">
+              &lt; 500ms Respuesta
+            </Typography>
+          </Box>
+        </StatsCard>
+      </Box>
 
       {/* Features Grid */}
       <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }} gap={3}>

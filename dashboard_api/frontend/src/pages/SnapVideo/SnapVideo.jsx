@@ -212,8 +212,8 @@ const SnapVideo = () => {
       <Card sx={{ mb: 4 }}>
         <CardContent>
           <Box component="form" onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end', flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+              <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 0' }, minWidth: 0 }}>
                 <TextField
                   fullWidth
                   label="URL del Video"
@@ -226,33 +226,29 @@ const SnapVideo = () => {
                       <Link color="action" sx={{ mr: 1 }} />
                     ),
                   }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'transparent',
+                      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
+                      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
+                      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' }
+                    }
+                  }}
                 />
-              </Grid>
-              <Grid item xs={12}>
+              </Box>
+              <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minWidth: { xs: '100%', md: '160px' } }}>
                 <Button
                   type="submit"
                   variant="contained"
-                  fullWidth
                   disabled={loading}
-                  startIcon={<AutoAwesome />}
-                  sx={{ height: '56px' }}
-                >
-                  {loading ? <CircularProgress size={24} /> : 'Obtener Video'}
-                </Button>
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  variant="outlined"
+                  startIcon={loading ? <CircularProgress size={20} /> : <AutoAwesome />}
                   fullWidth
-                  onClick={handleTest}
-                  disabled={loading}
-                  startIcon={<Info />}
-                  sx={{ height: '56px' }}
+                  sx={{ height: 56, textTransform: 'none', fontWeight: 600 }}
                 >
-                  {loading ? <CircularProgress size={24} /> : '🧪 Probar Frontend'}
+                  {loading ? 'Obteniendo...' : 'Obtener Video'}
                 </Button>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
           </Box>
         </CardContent>
       </Card>
@@ -276,9 +272,9 @@ const SnapVideo = () => {
         <Paper elevation={2} sx={{ p: 3 }}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
-              <Card>
+              <Card sx={{ boxShadow: 3 }}>
                 <CardContent>
-                  <Box sx={{ position: 'relative', paddingTop: '56.25%' }}>
+                  <Box sx={{ position: 'relative', paddingTop: '56.25%', borderRadius: 2, overflow: 'hidden', boxShadow: 1 }}>
                     <img
                       src={videoInfo.thumbnail}
                       alt={videoInfo.title}
@@ -292,62 +288,41 @@ const SnapVideo = () => {
                       }}
                     />
                   </Box>
-                  <Typography variant="h6" sx={{ mt: 2 }}>
+                  <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
                     {videoInfo.title}
                   </Typography>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <VideoLibrary />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Duración" 
-                        secondary={videoInfo.duration} 
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemIcon>
-                        <Info />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Fuente" 
-                        secondary={videoInfo.source} 
-                      />
-                    </ListItem>
-                  </List>
+                  <Box sx={{ display: 'flex', gap: 2, mb: 1 }}>
+                    <Chip icon={<VideoLibrary />} label={`Duración: ${videoInfo.duration}`} />
+                    <Chip icon={<Info />} label={`Fuente: ${videoInfo.source}`} />
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>
             <Grid item xs={12} md={6}>
-              <Card>
+              <Card sx={{ boxShadow: 3 }}>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     Enlaces de descarga
                   </Typography>
-                  <List>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {videoInfo.medias.map((media, idx) => (
-                      <ListItem key={idx} alignItems="flex-start">
-                        <ListItemIcon>
-                          <Download />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={`${media.quality ? media.quality.toUpperCase() : media.extension.toUpperCase()} (${media.extension})`}
-                          secondary={media.url}
-                        />
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          href={media.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          startIcon={<Download />}
-                        >
-                          Descargar
-                        </Button>
-                      </ListItem>
+                      <Box key={idx} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, p: 1, borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
+                        <Box sx={{ minWidth: 0 }}>
+                          <Typography variant="subtitle2" noWrap>
+                            {`${media.quality ? media.quality.toUpperCase() : media.extension.toUpperCase()} (${media.extension})`}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {media.url}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Button size="small" variant="outlined" color="primary" href={media.url} target="_blank" rel="noopener noreferrer" startIcon={<Download />}>
+                            Descargar
+                          </Button>
+                        </Box>
+                      </Box>
                     ))}
-                  </List>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>

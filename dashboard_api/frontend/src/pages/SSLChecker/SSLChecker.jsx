@@ -11,7 +11,8 @@ import {
   CircularProgress,
   Alert,
   Paper,
-  Chip
+  Chip,
+  InputAdornment
 } from '@mui/material';
 import { Security, Star } from '@mui/icons-material';
 import { APP_CONFIG } from '../../config/constants';
@@ -24,6 +25,27 @@ const SSLChecker = () => {
 
   const API_MODE = process.env.REACT_APP_MODE || 'beta_v1';
   const API_BASE_URL = `${APP_CONFIG.API_URL}/api/${API_MODE}`;
+
+  const inputSx = {
+    '& .MuiOutlinedInput-root': {
+      height: 56,
+      borderRadius: 2,
+      '& fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
+      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.2)' },
+      '&.Mui-focused fieldset': { borderColor: '#764ba2' }
+    },
+    '& .MuiInputBase-input': {
+      padding: '0 16px',
+      fontSize: 16
+    }
+  };
+
+  const actionButtonSx = {
+    height: 56,
+    borderRadius: 2,
+    textTransform: 'none',
+    fontWeight: 600
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -107,36 +129,47 @@ const SSLChecker = () => {
       <Card sx={{ mb: 4 }}>
         <CardContent>
           <Box component="form" onSubmit={handleSubmit}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={8}>
-                <TextField
-                  fullWidth
-                  label="URL del sitio web"
-                  placeholder="https://ejemplo.com"
-                  variant="outlined"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  error={!!error}
-                  helperText={error}
-                  InputProps={{
-                    startAdornment: (
-                      <Security color="action" sx={{ mr: 1 }} />
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  disabled={loading}
-                  sx={{ height: '56px' }}
-                >
-                  {loading ? <CircularProgress size={24} /> : 'Verificar SSL'}
-                </Button>
-              </Grid>
-            </Grid>
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 2,
+                flexWrap: 'wrap',
+                alignItems: 'center'
+              }}
+            >
+              <TextField
+                fullWidth
+                label="URL del sitio web"
+                placeholder="https://ejemplo.com"
+                variant="outlined"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                error={!!error}
+                helperText={error}
+                sx={{ flex: '1 1 300px', ...inputSx }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Security color="action" />
+                    </InputAdornment>
+                  )
+                }}
+              />
+
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading}
+                sx={{
+                  ...actionButtonSx,
+                  minWidth: { xs: '100%', md: 200 },
+                  flex: { xs: '1 1 100%', md: '0 0 auto' }
+                }}
+                fullWidth
+              >
+                {loading ? <CircularProgress size={24} /> : 'Verificar SSL'}
+              </Button>
+            </Box>
           </Box>
         </CardContent>
       </Card>

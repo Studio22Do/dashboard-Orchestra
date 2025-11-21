@@ -242,71 +242,86 @@ const WordCount = () => {
         />
       </Box>
 
-      <Card sx={{ mb: 4 }}>
-        <CardContent>
-          <Box sx={{ mb: 2 }}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={9}>
+      <Grid container spacing={3} direction="column" sx={{ mb: 4, maxWidth: 900, mx: 'auto' }}>
+        <Grid item xs={12}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, minHeight: 220 }}>
+              <Typography variant="h6" gutterBottom>
+                Extraer desde URL
+              </Typography>
+              <Box component="form" onSubmit={(e) => { e.preventDefault(); handleExtractFromUrl(); }} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <TextField
                   fullWidth
-                  label="Extraer texto desde URL"
+                  label="URL del artículo"
                   value={url}
                   onChange={e => setUrl(e.target.value)}
-                  placeholder="Pega aquí la URL de un artículo, blog, etc."
+                  placeholder="https://sitio.com/articulo"
                   InputProps={{
                     startAdornment: (
                       <TextFields color="action" sx={{ mr: 1 }} />
                     ),
                   }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': { height: 56 },
+                    '& .MuiOutlinedInput-input': { py: 0 }
+                  }}
                 />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <Button
-                  variant="outlined"
-                  fullWidth
-                  onClick={handleExtractFromUrl}
-                  disabled={extracting || loading}
-                  sx={{ height: '56px' }}
-                >
-                  {extracting ? <CircularProgress size={24} /> : 'Extraer Texto'}
-                </Button>
-              </Grid>
-            </Grid>
-          </Box>
-          <Box component="form" onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    type="submit"
+                    variant="outlined"
+                    disabled={extracting || loading}
+                    sx={{ height: '56px', px: 3 }}
+                  >
+                    {extracting ? <CircularProgress size={24} /> : 'Extraer Texto'}
+                  </Button>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, minHeight: 220 }}>
+              <Typography variant="h6" gutterBottom>
+                Analizar texto manual
+              </Typography>
+              <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <TextField
                   fullWidth
                   label="Texto a Analizar"
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   multiline
-                  rows={6}
+                  minRows={6}
+                  maxRows={6}
                   required
+                  placeholder="Pega o escribe aquí el contenido a analizar"
                   InputProps={{
                     startAdornment: (
                       <TextFields color="action" sx={{ mr: 1 }} />
                     ),
                   }}
+                  sx={{
+                    '& .MuiOutlinedInput-inputMultiline': { py: 1 }
+                  }}
                 />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  disabled={loading}
-                  startIcon={<AutoAwesome />}
-                  sx={{ height: '56px' }}
-                >
-                  {loading ? <CircularProgress size={24} /> : 'Analizar Texto'}
-                </Button>
-              </Grid>
-            </Grid>
-          </Box>
-        </CardContent>
-      </Card>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={loading}
+                    startIcon={<AutoAwesome />}
+                    sx={{ height: '56px', px: 3 }}
+                  >
+                    {loading ? <CircularProgress size={24} /> : 'Analizar Texto'}
+                  </Button>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
       {loading && (
         <Box sx={{ mb: 4 }}>

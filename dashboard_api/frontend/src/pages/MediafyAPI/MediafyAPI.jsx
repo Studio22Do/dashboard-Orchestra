@@ -205,63 +205,133 @@ const MediafyAPI = () => {
   };
 
   const renderSearchForm = () => {
-    switch (activeTab) {
-      case 0: // Profile
-      case 4: // Reels
-      case 5: // Stories
-      case 6: // Highlights
-      case 7: // Tagged
-      case 8: // Posts
-        return (
-          <TextField
-            fullWidth
-            label="Nombre de usuario de Instagram"
-            value={searchInputs.username}
-            onChange={(e) => handleInputChange('username', e.target.value)}
-            placeholder="ej: mrbeast, shakira, cristiano"
-            variant="outlined"
-            sx={{ mb: 2 }}
-          />
-        );
-      case 1: // Hashtag
-        return (
-          <TextField
-            fullWidth
-            label="Hashtag a analizar"
-            value={searchInputs.hashtag}
-            onChange={(e) => handleInputChange('hashtag', e.target.value)}
-            placeholder="ej: #summer, #love, #food"
-            variant="outlined"
-            sx={{ mb: 2 }}
-          />
-        );
-      case 2: // Search Users
-        return (
-          <TextField
-            fullWidth
-            label="Buscar usuarios"
-            value={searchInputs.search_query}
-            onChange={(e) => handleInputChange('search_query', e.target.value)}
-            placeholder="ej: artistas, fotógrafos, chefs"
-            variant="outlined"
-            sx={{ mb: 2 }}
-          />
-        );
-      case 3: // Location
-        return (
-          <TextField
-            fullWidth
-            label="Buscar ubicaciones"
-            value={searchInputs.location_query}
-            onChange={(e) => handleInputChange('location_query', e.target.value)}
-            placeholder="ej: New York, Paris, Tokyo"
-            variant="outlined"
-            sx={{ mb: 2 }}
-          />
-        );
-      default:
-        return null;
-    }
+    const innerInput = (() => {
+      switch (activeTab) {
+        case 0: // Profile
+        case 4: // Reels
+        case 5: // Stories
+        case 6: // Highlights
+        case 7: // Tagged
+          return (
+            <TextField
+              fullWidth
+              label="Nombre de usuario de Instagram"
+              value={searchInputs.username}
+              onChange={(e) => handleInputChange('username', e.target.value)}
+              placeholder="ej: mrbeast, shakira, cristiano"
+              variant="outlined"
+              sx={{
+                width: '100%',
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'transparent',
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: 'rgba(255, 255, 255, 0.8)' }
+                },
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.8)', '&.Mui-focused': { color: 'rgba(255, 255, 255, 1)' } },
+                '& .MuiInputBase-input': { color: 'white', '&::placeholder': { color: 'rgba(255, 255, 255, 0.65)', opacity: 1 } }
+              }}
+            />
+          );
+        case 1: // Hashtag
+          return (
+            <TextField
+              fullWidth
+              label="Hashtag a analizar"
+              value={searchInputs.hashtag}
+              onChange={(e) => handleInputChange('hashtag', e.target.value)}
+              placeholder="ej: #summer, #love, #food"
+              variant="outlined"
+              sx={{
+                width: '100%',
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'transparent',
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: 'rgba(255, 255, 255, 0.8)' }
+                },
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.8)', '&.Mui-focused': { color: 'rgba(255, 255, 255, 1)' } },
+                '& .MuiInputBase-input': { color: 'white', '&::placeholder': { color: 'rgba(255, 255, 255, 0.65)', opacity: 1 } }
+              }}
+            />
+          );
+        case 2: // Search Users
+          return (
+            <TextField
+              fullWidth
+              label="Buscar usuarios"
+              value={searchInputs.search_query}
+              onChange={(e) => handleInputChange('search_query', e.target.value)}
+              placeholder="ej: artistas, fotógrafos, chefs"
+              variant="outlined"
+              sx={{
+                width: '100%',
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'transparent',
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: 'rgba(255, 255, 255, 0.8)' }
+                },
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.8)', '&.Mui-focused': { color: 'rgba(255, 255, 255, 1)' } },
+                '& .MuiInputBase-input': { color: 'white', '&::placeholder': { color: 'rgba(255, 255, 255, 0.65)', opacity: 1 } }
+              }}
+            />
+          );
+        case 3: // Location
+          return (
+            <TextField
+              fullWidth
+              label="Buscar ubicaciones"
+              value={searchInputs.location_query}
+              onChange={(e) => handleInputChange('location_query', e.target.value)}
+              placeholder="ej: New York, Paris, Tokyo"
+              variant="outlined"
+              sx={{
+                width: '100%',
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'transparent',
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: 'rgba(255, 255, 255, 0.8)' }
+                },
+                '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.8)', '&.Mui-focused': { color: 'rgba(255, 255, 255, 1)' } },
+                '& .MuiInputBase-input': { color: 'white', '&::placeholder': { color: 'rgba(255, 255, 255, 0.65)', opacity: 1 } }
+              }}
+            />
+          );
+        default:
+          return null;
+      }
+    })();
+
+    return (
+      <Paper elevation={3} sx={{ p: 3, mb: 4, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+        <form onSubmit={handleSearch}>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end', flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+            <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 0' }, minWidth: 0 }}>
+              {innerInput}
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minWidth: { xs: '100%', md: '150px' } }}>
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                disabled={loading}
+                startIcon={loading ? <CircularProgress size={20} /> : <Search />}
+                sx={{
+                  height: '56px',
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  backdropFilter: 'blur(10px)',
+                  '&:hover': { background: 'rgba(255, 255, 255, 0.3)' }
+                }}
+              >
+                {loading ? 'Analizando...' : 'Analizar'}
+              </Button>
+            </Box>
+          </Box>
+        </form>
+      </Paper>
+    );
   };
 
   const renderResults = () => {
@@ -1074,34 +1144,7 @@ const MediafyAPI = () => {
       </Paper>
 
       {/* Formulario de búsqueda */}
-      <Paper elevation={3} sx={{ mb: 4, p: 3, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-        <form onSubmit={handleSearch}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={8}>
-              {renderSearchForm()}
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Button
-                type="submit"
-                variant="contained"
-                fullWidth
-                disabled={loading}
-                startIcon={loading ? <CircularProgress size={20} /> : <Search />}
-                sx={{
-                  height: '56px',
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  backdropFilter: 'blur(10px)',
-                  '&:hover': {
-                    background: 'rgba(255, 255, 255, 0.3)',
-                  }
-                }}
-              >
-                {loading ? 'Analizando...' : 'Analizar'}
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </Paper>
+      {renderSearchForm()}
 
       {/* Mensaje de error */}
       {error && (

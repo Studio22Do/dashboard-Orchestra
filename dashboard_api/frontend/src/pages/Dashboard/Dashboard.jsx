@@ -227,12 +227,12 @@ const Dashboard = () => {
           onClick: () => {
             setSelectedApp({
               id: 'advanced-image',
-              title: 'Image Manipulation',
-              description: 'Herramientas avanzadas para edición y manipulación de imágenes',
+              title: 'Image Transform',
+              description: 'Herramientas avanzadas para edición y transformación de imágenes',
               imageUrl: imageManipulationLogo,
               category: 'Creative & Content',
               route: '/apps/advanced-image',
-              apiName: 'Image Manipulation API',
+              apiName: 'Image Transform API',
             });
             setDrawerOpen(true);
           }

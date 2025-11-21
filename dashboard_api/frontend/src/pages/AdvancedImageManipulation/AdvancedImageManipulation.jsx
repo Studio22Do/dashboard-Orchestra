@@ -92,6 +92,39 @@ const AdvancedImageManipulation = () => {
     { value: 'GIF', label: 'GIF' }
   ];
 
+  // Estilos reutilizables para botones de acción
+  const actionButtonSx = {
+    height: 56,
+    borderRadius: 2,
+    textTransform: 'none',
+    fontWeight: 600
+  };
+
+  // Estilos reutilizables para inputs y selects
+  const inputSx = {
+    width: '100%',
+    '& .MuiOutlinedInput-root': {
+      backgroundColor: 'transparent',
+      borderRadius: 2,
+      height: 56,
+      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
+      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
+      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' }
+    },
+    '& .MuiInputBase-input': { padding: '0 14px', height: 56, boxSizing: 'border-box' }
+  };
+
+  const selectSx = {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: 2,
+      height: 56,
+      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
+      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
+      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' }
+    },
+    '& .MuiSelect-select': { height: 56, padding: '0 14px', display: 'flex', alignItems: 'center', boxSizing: 'border-box' }
+  };
+
   const handleParameterChange = (parameter) => (event) => {
     setParameters(prev => ({
       ...prev,
@@ -186,7 +219,7 @@ const AdvancedImageManipulation = () => {
           Procesa y mejora tus imágenes usando IA
         </Typography>
         <Chip
-          icon={<img src={imageManipulationIcon} alt="Image Manipulation" style={{ width: '20px', height: '20px' }} />}
+          icon={<img src={imageManipulationIcon} alt="Image Transform" style={{ width: '20px', height: '20px' }} />}
           label="Manipulación avanzada de imágenes con IA"
           color="primary"
           variant="outlined"
@@ -201,82 +234,70 @@ const AdvancedImageManipulation = () => {
         />
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
+      <Grid spacing={3}>
+        <Grid item xs={12} md={9}>
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <Box component="form" onSubmit={handleSubmit}>
-                <Grid container spacing={3}>
-                  {/* PDF a Imágenes: solo campo URL PDF */}
-                  {operation === 'pdf_to_images' && (
-                    <Grid item xs={12}>
-                      <TextField
-                        label="URL del PDF"
-                        value={imageUrl}
-                        onChange={e => setImageUrl(e.target.value)}
-                        fullWidth
-                        required
-                        placeholder="https://..."
-                      />
-                    </Grid>
-                  )}
-                  {/* Convertir Formato: campo URL y formato destino */}
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end', flexWrap: { xs: 'wrap', md: 'nowrap' }, mb: 3, width: '100%' }}>
+                  <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 0' }, minWidth: 0 }}>
+                    <TextField
+                      label={operation === 'pdf_to_images' ? 'URL del PDF' : 'URL de la Imagen'}
+                      value={imageUrl}
+                      onChange={e => setImageUrl(e.target.value)}
+                      fullWidth
+                      required
+                      placeholder="https://..."
+                      sx={inputSx}
+                    />
+                  </Box>
                   {operation === 'convert' && (
-                    <>
-                      <Grid item xs={12}>
-                        <TextField
-                          label="URL de la Imagen"
-                          value={imageUrl}
-                          onChange={e => setImageUrl(e.target.value)}
-                          fullWidth
+                    <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minWidth: { xs: '100%', md: 180 } }}>
+                      <FormControl fullWidth>
+                        <InputLabel>Formato destino</InputLabel>
+                        <Select
+                          value={parameters.convert_to}
+                          onChange={handleParameterChange('convert_to')}
+                          label="Formato destino"
                           required
-                          placeholder="https://..."
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <FormControl fullWidth>
-                          <InputLabel>Formato destino</InputLabel>
-                          <Select
-                            value={parameters.convert_to}
-                            onChange={handleParameterChange('convert_to')}
-                            label="Formato destino"
-                            required
-                          >
-                            {formatOptions.map(opt => (
-                              <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                    </>
+                          sx={selectSx}
+                        >
+                          {formatOptions.map(opt => (
+                            <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
                   )}
-                  {/* Operaciones normales: mantener comportamiento actual */}
-                  {operation !== 'pdf_to_images' && operation !== 'convert' && (
-                    <Grid item xs={12}>
-                      <TextField
-                        label="URL de la Imagen"
-                        value={imageUrl}
-                        onChange={e => setImageUrl(e.target.value)}
-                        fullWidth
-                        required
-                        placeholder="https://..."
-                      />
-                    </Grid>
-                  )}
-                  <Grid item xs={12} md={6}>
+                  <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minWidth: { xs: '100%', md: 180 } }}>
                     <FormControl fullWidth>
                       <InputLabel>Operación</InputLabel>
                       <Select
                         value={operation}
                         onChange={e => setOperation(e.target.value)}
                         label="Operación"
+                        sx={selectSx}
                       >
                         {operations.map((op) => (
                           <MenuItem key={op.value} value={op.value}>{op.label}</MenuItem>
                         ))}
                       </Select>
                     </FormControl>
-                  </Grid>
+                  </Box>
+                  <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minWidth: { xs: '100%', md: 140 } }}>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      fullWidth
+                      disabled={loading}
+                      startIcon={<Image />}
+                      sx={actionButtonSx}
+                    >
+                      {loading ? <CircularProgress size={20} /> : 'Procesar Imagen'}
+                    </Button>
+                  </Box>
+                </Box>
+                <Grid container spacing={3}>
                   {/* Parámetros dinámicos según operación */}
                   {operation === 'resize' && (
                     <>
@@ -288,6 +309,7 @@ const AdvancedImageManipulation = () => {
                           onChange={handleParameterChange('width')}
                           fullWidth
                           required
+                          sx={inputSx}
                         />
                       </Grid>
                       <Grid item xs={6} md={3}>
@@ -298,6 +320,7 @@ const AdvancedImageManipulation = () => {
                           onChange={handleParameterChange('height')}
                           fullWidth
                           required
+                          sx={inputSx}
                         />
                       </Grid>
                     </>
@@ -310,6 +333,7 @@ const AdvancedImageManipulation = () => {
                         value={parameters.blur}
                         onChange={handleParameterChange('blur')}
                         fullWidth
+                        sx={inputSx}
                       />
                     </Grid>
                   )}
@@ -323,6 +347,7 @@ const AdvancedImageManipulation = () => {
                           onChange={handleParameterChange('left')}
                           fullWidth
                           required
+                          sx={inputSx}
                         />
                       </Grid>
                       <Grid item xs={6} md={3}>
@@ -333,6 +358,7 @@ const AdvancedImageManipulation = () => {
                           onChange={handleParameterChange('upper')}
                           fullWidth
                           required
+                          sx={inputSx}
                         />
                       </Grid>
                       <Grid item xs={6} md={3}>
@@ -343,6 +369,7 @@ const AdvancedImageManipulation = () => {
                           onChange={handleParameterChange('right')}
                           fullWidth
                           required
+                          sx={inputSx}
                         />
                       </Grid>
                       <Grid item xs={6} md={3}>
@@ -353,6 +380,7 @@ const AdvancedImageManipulation = () => {
                           onChange={handleParameterChange('lower')}
                           fullWidth
                           required
+                          sx={inputSx}
                         />
                       </Grid>
                     </>
@@ -366,6 +394,7 @@ const AdvancedImageManipulation = () => {
                         onChange={handleParameterChange('angle')}
                         fullWidth
                         required
+                        sx={inputSx}
                       />
                     </Grid>
                   )}
@@ -379,6 +408,7 @@ const AdvancedImageManipulation = () => {
                           onChange={handleParameterChange('width')}
                           fullWidth
                           required
+                          sx={inputSx}
                         />
                       </Grid>
                       <Grid item xs={6} md={3}>
@@ -389,39 +419,30 @@ const AdvancedImageManipulation = () => {
                           onChange={handleParameterChange('height')}
                           fullWidth
                           required
+                          sx={inputSx}
                         />
                       </Grid>
                     </>
                   )}
                   {operation === 'transpose' && (
-                    <Grid item xs={12} md={6}>
+                      <Grid item xs={12} md={6}>
                       <FormControl fullWidth>
-                        <InputLabel>Método</InputLabel>
-                        <Select
-                          value={parameters.method}
-                          onChange={handleParameterChange('method')}
-                          label="Método"
-                          required
-                        >
-                          {transposeMethods.map((m) => (
-                            <MenuItem key={m} value={m}>{m}</MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
+                      <InputLabel>Método</InputLabel>
+                      <Select
+                        value={parameters.method}
+                        onChange={handleParameterChange('method')}
+                        label="Método"
+                        required
+                        sx={selectSx}
+                      >
+                        {transposeMethods.map((m) => (
+                          <MenuItem key={m} value={m}>{m}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                     </Grid>
                   )}
-                  <Grid item xs={12}>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      fullWidth
-                      disabled={loading}
-                      startIcon={<Image />}
-                      sx={{ height: '56px' }}
-                    >
-                      {loading ? <CircularProgress size={24} /> : 'Procesar Imagen'}
-                    </Button>
-                  </Grid>
+                  
                 </Grid>
               </Box>
             </CardContent>
@@ -443,14 +464,14 @@ const AdvancedImageManipulation = () => {
           )}
 
           {processedImageUrl && (
-            <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
+            <Paper elevation={2} sx={{ p: 3, mb: 4, borderRadius: 2 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h6">
                   Imagen Procesada
                 </Typography>
                 <Box>
-                  <Tooltip title="Descargar imagen">
-                    <IconButton onClick={handleDownload}>
+                <Tooltip title="Descargar imagen">
+                    <IconButton onClick={handleDownload} sx={{ p: 1 }}>
                       <Download />
                     </IconButton>
                   </Tooltip>
@@ -531,7 +552,7 @@ const AdvancedImageManipulation = () => {
                       target="_blank"
                       rel="noopener"
                       fullWidth
-                      sx={{ mt: 1 }}
+                      sx={{ mt: 1, ...actionButtonSx }}
                     >
                       Descargar Página {idx + 1}
                     </Button>
@@ -559,6 +580,7 @@ const AdvancedImageManipulation = () => {
                 target="_blank"
                 rel="noopener"
                 fullWidth
+                sx={actionButtonSx}
               >
                 Descargar Imagen Convertida
               </Button>
@@ -566,146 +588,103 @@ const AdvancedImageManipulation = () => {
           )}
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                <Settings sx={{ mr: 1, verticalAlign: 'middle' }} />
-                Configuración
-              </Typography>
-              
-              <List>
-                <ListItem>
-                  <ListItemText
-                    primary="Operación Seleccionada"
-                    secondary={operations.find(o => o.value === operation)?.label}
-                  />
-                </ListItem>
-                <Divider />
-                {operation === 'resize' && (
-                  <>
-                    <ListItem>
-                      <ListItemText
-                        primary="Ancho"
-                        secondary={parameters.width}
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemText
-                        primary="Alto"
-                        secondary={parameters.height}
-                      />
-                    </ListItem>
-                  </>
-                )}
-                {operation === 'blur' && (
+        <Grid item xs={12} md={3}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  <Settings sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Configuración
+                </Typography>
+                <List>
                   <ListItem>
                     <ListItemText
-                      primary="Nivel de Desenfoque"
-                      secondary={parameters.blur}
+                      primary="Operación Seleccionada"
+                      secondary={operations.find(o => o.value === operation)?.label}
                     />
                   </ListItem>
-                )}
-                {operation === 'crop' && (
-                  <>
+                  <Divider />
+                  {operation === 'resize' && (
+                    <>
+                      <ListItem>
+                        <ListItemText primary="Ancho" secondary={parameters.width} />
+                      </ListItem>
+                      <Divider />
+                      <ListItem>
+                        <ListItemText primary="Alto" secondary={parameters.height} />
+                      </ListItem>
+                    </>
+                  )}
+                  {operation === 'blur' && (
                     <ListItem>
-                      <ListItemText
-                        primary="Left"
-                        secondary={parameters.left}
-                      />
+                      <ListItemText primary="Nivel de Desenfoque" secondary={parameters.blur} />
                     </ListItem>
-                    <Divider />
+                  )}
+                  {operation === 'crop' && (
+                    <>
+                      <ListItem>
+                        <ListItemText primary="Left" secondary={parameters.left} />
+                      </ListItem>
+                      <Divider />
+                      <ListItem>
+                        <ListItemText primary="Upper" secondary={parameters.upper} />
+                      </ListItem>
+                      <Divider />
+                      <ListItem>
+                        <ListItemText primary="Right" secondary={parameters.right} />
+                      </ListItem>
+                      <Divider />
+                      <ListItem>
+                        <ListItemText primary="Lower" secondary={parameters.lower} />
+                      </ListItem>
+                    </>
+                  )}
+                  {operation === 'rotate' && (
                     <ListItem>
-                      <ListItemText
-                        primary="Upper"
-                        secondary={parameters.upper}
-                      />
+                      <ListItemText primary="Ángulo" secondary={parameters.angle} />
                     </ListItem>
-                    <Divider />
+                  )}
+                  {operation === 'thumbnail' && (
+                    <>
+                      <ListItem>
+                        <ListItemText primary="Ancho" secondary={parameters.width} />
+                      </ListItem>
+                      <Divider />
+                      <ListItem>
+                        <ListItemText primary="Alto" secondary={parameters.height} />
+                      </ListItem>
+                    </>
+                  )}
+                  {operation === 'transpose' && (
                     <ListItem>
-                      <ListItemText
-                        primary="Right"
-                        secondary={parameters.right}
-                      />
+                      <ListItemText primary="Método" secondary={parameters.method} />
                     </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemText
-                        primary="Lower"
-                        secondary={parameters.lower}
-                      />
-                    </ListItem>
-                  </>
-                )}
-                {operation === 'rotate' && (
+                  )}
+                </List>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  <Lightbulb sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Sugerencias
+                </Typography>
+                <List>
                   <ListItem>
-                    <ListItemText
-                      primary="Ángulo"
-                      secondary={parameters.angle}
-                    />
+                    <ListItemText primary="Formatos soportados" secondary="JPG, PNG, WEBP, GIF (primer frame)" />
                   </ListItem>
-                )}
-                {operation === 'thumbnail' && (
-                  <>
-                    <ListItem>
-                      <ListItemText
-                        primary="Ancho"
-                        secondary={parameters.width}
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem>
-                      <ListItemText
-                        primary="Alto"
-                        secondary={parameters.height}
-                      />
-                    </ListItem>
-                  </>
-                )}
-                {operation === 'transpose' && (
+                  <Divider />
                   <ListItem>
-                    <ListItemText
-                      primary="Método"
-                      secondary={parameters.method}
-                    />
+                    <ListItemText primary="Tamaño máximo" secondary="10MB por imagen" />
                   </ListItem>
-                )}
-              </List>
-            </CardContent>
-          </Card>
-
-          <Card sx={{ mt: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                <Lightbulb sx={{ mr: 1, verticalAlign: 'middle' }} />
-                Sugerencias
-              </Typography>
-              
-              <List>
-                <ListItem>
-                  <ListItemText
-                    primary="Formatos soportados"
-                    secondary="JPG, PNG, WEBP, GIF (primer frame)"
-                  />
-                </ListItem>
-                <Divider />
-                <ListItem>
-                  <ListItemText
-                    primary="Tamaño máximo"
-                    secondary="10MB por imagen"
-                  />
-                </ListItem>
-                <Divider />
-                <ListItem>
-                  <ListItemText
-                    primary="Resolución recomendada"
-                    secondary="Mínimo 800x600 píxeles"
-                  />
-                </ListItem>
-              </List>
-            </CardContent>
-          </Card>
+                  <Divider />
+                  <ListItem>
+                    <ListItemText primary="Resolución recomendada" secondary="Mínimo 800x600 píxeles" />
+                  </ListItem>
+                </List>
+              </CardContent>
+            </Card>
+          </Box>
         </Grid>
       </Grid>
     </Container>
