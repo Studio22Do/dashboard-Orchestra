@@ -401,13 +401,13 @@ const Dashboard = () => {
           }
         },
         {
-          id: 'product-description',
-          title: 'Product Description',
+          id: 'ecommerce-description',
+          title: 'AI eCommerce Product Description',
           imageUrl: productDescriptionLogo,
           onClick: () => {
             setSelectedApp({
-              id: 'product-description',
-              title: 'Product Description',
+              id: 'ecommerce-description',
+              title: 'AI eCommerce Product Description',
               description: 'Genera descripciones optimizadas para productos de eCommerce',
               imageUrl: productDescriptionLogo,
               category: 'Web & SEO',
