@@ -56,9 +56,9 @@ def create_app(config_object):
     from api.routes.runwayml import runwayml_bp
     from api.routes.similarweb import similarweb_bp
     from api.routes.google_keyword_insight import keyword_insight_bp
-    from api.routes.domain_metrics import domain_metrics_bp
+
     from api.routes.product_description import product_description_bp
-    from api.routes.website_status import website_status_bp
+
     from api.routes.website_analyzer import website_analyzer_pro_bp
     from api.routes.ahrefs_dr import ahrefs_dr_bp
     from api.routes.speech_to_text import speech_to_text_bp
@@ -95,9 +95,9 @@ def create_app(config_object):
     app.register_blueprint(runwayml_bp, url_prefix=f'{version_prefix}/runwayml')
     app.register_blueprint(similarweb_bp, url_prefix=f'{version_prefix}/similarweb')
     app.register_blueprint(keyword_insight_bp, url_prefix=f'{version_prefix}/keyword-insight')
-    app.register_blueprint(domain_metrics_bp, url_prefix=f'{version_prefix}/domain-metrics')
+
     app.register_blueprint(product_description_bp, url_prefix=f'{version_prefix}/product-description')
-    app.register_blueprint(website_status_bp, url_prefix=f'{version_prefix}/website-status')
+
     app.register_blueprint(website_analyzer_pro_bp, url_prefix=f'{version_prefix}/website-analyzer')
     app.register_blueprint(ahrefs_dr_bp, url_prefix=f'{version_prefix}/ahrefs-dr')
     app.register_blueprint(speech_to_text_bp, url_prefix=f'{version_prefix}/speech-to-text')

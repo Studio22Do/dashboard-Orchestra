@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import CategorySection from '../../components/CategorySection/CategorySection';
 // Solo iconos para categorías principales
-import { 
+import {
   Search, // Social Listening icon
   Palette, // Creative & Content icon
   Language, // Web & SEO icon
@@ -22,7 +22,7 @@ import snapVideoLogo from '../../assets/images/apps/icons/snapvideoicon.png';
 import genieAILogo from '../../assets/images/apps/icons/chatgpt4icon.png';
 import aiSocialMediaLogo from '../../assets/images/apps/icons/contentcreatoricon.png';
 import imageManipulationLogo from '../../assets/images/apps/icons/imagetransform-1.png';
-import whisperLogo from '../../assets/images/apps/icons/whispericon.png';
+
 import runwayMLLogo from '../../assets/images/apps/icons/runawayicon.png';
 import prlabsLogo from '../../assets/images/apps/icons/chatgpt4icon.png';
 import speechToTextLogo from '../../assets/images/apps/icons/speechtotexticon.png';
@@ -30,11 +30,11 @@ import qrGeneratorLogo from '../../assets/images/apps/icons/qrgeneratorcode.png'
 import seoAnalyzerLogo from '../../assets/images/apps/icons/seoanalyzericon.png';
 import similarWebLogo from '../../assets/images/apps/icons/similarwebicon.png';
 import googleKeywordLogo from '../../assets/images/apps/icons/keywordinsightsicon.png';
-import domainMetricsLogo from '../../assets/images/apps/icons/domaincheckericon.png';
+
 import pageSpeedLogo from '../../assets/images/apps/icons/webauditicon.png';
 import productDescriptionLogo from '../../assets/images/apps/icons/productdescriptionicon.png';
 import sslCheckerLogo from '../../assets/images/apps/icons/SSLcheckericon.png';
-import websiteStatusLogo from '../../assets/images/apps/icons/webstatusicon.png';
+
 import seoMastermindLogo from '../../assets/images/apps/icons/keywordsearchicon.png';
 import whoisLookupLogo from '../../assets/images/apps/icons/Whoisicon.png';
 const DashboardContainer = styled(Container)(({ theme }) => ({
@@ -42,7 +42,7 @@ const DashboardContainer = styled(Container)(({ theme }) => ({
   paddingBottom: theme.spacing(4),
   overflowX: 'visible', // Prevenir scroll horizontal
   maxWidth: '100%', // Asegurar que no exceda el ancho de la ventana
-  
+
 }));
 
 const Dashboard = () => {
@@ -76,9 +76,9 @@ const Dashboard = () => {
           }
         },
         {
-            id: 'perplexity',
-            title: 'Perplexity',
-            imageUrl: perplexityLogo,
+          id: 'perplexity',
+          title: 'Perplexity',
+          imageUrl: perplexityLogo,
           onClick: () => {
             setSelectedApp({
               id: 'perplexity',
@@ -237,23 +237,7 @@ const Dashboard = () => {
             setDrawerOpen(true);
           }
         },
-        {
-          id: 'whisper-url',
-          title: 'Whisper: From URL',
-          imageUrl: whisperLogo,
-          onClick: () => {
-            setSelectedApp({
-              id: 'whisper-url',
-              title: 'Whisper URL',
-              description: 'Transcribe audio desde URLs usando el modelo Whisper',
-              imageUrl: whisperLogo,
-              category: 'Creative & Content',
-              route: '/apps/whisper-url',
-              apiName: 'Whisper API',
-            });
-            setDrawerOpen(true);
-          }
-        },
+
         {
           id: 'runwayml',
           title: 'Runway',
@@ -398,23 +382,7 @@ const Dashboard = () => {
             setDrawerOpen(true);
           }
         },
-        {
-          id: 'domain-metrics',
-          title: 'Domain Checker',
-          imageUrl: domainMetricsLogo,
-          onClick: () => {
-            setSelectedApp({
-              id: 'domain-metrics',
-              title: 'Domain Metrics',
-              description: 'Verifica métricas y salud de dominios web',
-              imageUrl: domainMetricsLogo,
-              category: 'Web & SEO',
-              route: '/apps/domain-metrics',
-              apiName: 'Domain Metrics API',
-            });
-            setDrawerOpen(true);
-          }
-        },
+
         {
           id: 'page-speed',
           title: 'Website Speed Test',
@@ -433,13 +401,13 @@ const Dashboard = () => {
           }
         },
         {
-          id: 'product-description',
-          title: 'Product Description',
+          id: 'ecommerce-description',
+          title: 'AI eCommerce Product Description',
           imageUrl: productDescriptionLogo,
           onClick: () => {
             setSelectedApp({
-              id: 'product-description',
-              title: 'Product Description',
+              id: 'ecommerce-description',
+              title: 'AI eCommerce Product Description',
               description: 'Genera descripciones optimizadas para productos de eCommerce',
               imageUrl: productDescriptionLogo,
               category: 'Web & SEO',
@@ -466,23 +434,7 @@ const Dashboard = () => {
             setDrawerOpen(true);
           }
         },
-        {
-          id: 'website-status',
-          title: ' Web Status',
-          imageUrl: websiteStatusLogo,
-          onClick: () => {
-            setSelectedApp({
-              id: 'website-status',
-              title: 'Website Status',
-              description: 'Monitorea el estado y disponibilidad de sitios web',
-              imageUrl: websiteStatusLogo,
-              category: 'Web & SEO',
-              route: '/apps/website-status',
-              apiName: 'Website Status API',
-            });
-            setDrawerOpen(true);
-          }
-        },
+
         {
           id: 'seo-mastermind',
           title: 'Keyword Search',
@@ -532,16 +484,16 @@ const Dashboard = () => {
           (tool.description && tool.description.toLowerCase().includes(q))
         );
       })
-      // Asegurar que cada tool tenga las props necesarias para ToolCard
-      .map(tool => {
-        const mappedTool = {
-          ...tool,
-          title: tool.title || tool.name || 'Sin título',
-          imageUrl: tool.imageUrl || tool.img || 'https://placehold.co/400x200/1a1a1a/ffffff?text=No+Image',
-          onClick: tool.onClick || (() => {}),
-        };
-        return mappedTool;
-      });
+        // Asegurar que cada tool tenga las props necesarias para ToolCard
+        .map(tool => {
+          const mappedTool = {
+            ...tool,
+            title: tool.title || tool.name || 'Sin título',
+            imageUrl: tool.imageUrl || tool.img || 'https://placehold.co/400x200/1a1a1a/ffffff?text=No+Image',
+            onClick: tool.onClick || (() => { }),
+          };
+          return mappedTool;
+        });
       return { ...category, tools: filteredTools };
     })
     .filter(category => category.tools.length > 0);
@@ -564,7 +516,7 @@ const Dashboard = () => {
               onViewAll={() => {
                 const categoryPath = category.id === 'social-listening' ? 'Social Listening' :
                   category.id === 'ux-ui' ? 'Creative & Content' :
-                  category.id === 'web-seo' ? 'Web & SEO' : '';
+                    category.id === 'web-seo' ? 'Web & SEO' : '';
                 navigate(`/category/${category.id}`, { state: { preselectedCategory: categoryPath } });
               }}
             />

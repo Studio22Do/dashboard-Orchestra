@@ -8,17 +8,17 @@ import PropTypes from 'prop-types';
 import { Apps as DefaultAppIcon } from '@mui/icons-material';
 import backgroundDrawer from '../../assets/images/apps/background/background-drawer.png';
 
-const AppDetailDrawer = ({ 
-  open = false, 
-  onClose = () => {}, 
-  app = null 
+const AppDetailDrawer = ({
+  open = false,
+  onClose = () => { },
+  app = null
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
   const buttonRef = useRef(null);
-  
+
   // Nueva lógica basada en requests
   const canUseApp = useSelector(state => selectCanUseApp(state, app?.id));
   const userRequests = useSelector(selectUserRequests);
@@ -29,7 +29,7 @@ const AppDetailDrawer = ({
   const userCredits = useSelector(selectCreditsBalance);
 
   // Verificar si la app ya está en el toolbox (mover aquí arriba)
-  const isAlreadyInToolbox = purchasedApps.some(purchasedApp => 
+  const isAlreadyInToolbox = purchasedApps.some(purchasedApp =>
     purchasedApp.id === app?.id || purchasedApp.app_id === app?.id
   );
 
@@ -52,7 +52,7 @@ const AppDetailDrawer = ({
       'mediafy-api': 1,
       'perplexity': 1,
       'advanced-image-manipulation': 1,
-      'whisper-url': 2,
+
       'ai-social-media': 2,
       'ecommerce-description': 1,
       'seo-analyzer': 2,
@@ -115,14 +115,14 @@ const AppDetailDrawer = ({
 
   return (
     <>
-      <Drawer 
-        anchor="right" 
-        open={open} 
+      <Drawer
+        anchor="right"
+        open={open}
         onClose={onClose}
-        PaperProps={{ 
-          sx: { 
-            width: 400, 
-            p: 0, 
+        PaperProps={{
+          sx: {
+            width: 400,
+            p: 0,
             background: `url(${backgroundDrawer})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
@@ -131,7 +131,7 @@ const AppDetailDrawer = ({
             '&:focus': {
               outline: 'none'
             }
-          } 
+          }
         }}
         ModalProps={{
           keepMounted: true,
@@ -153,16 +153,16 @@ const AppDetailDrawer = ({
           <Box sx={{ width: '100%', maxWidth: 340 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               {imageUrl && !imageError && (
-                <img 
-                  src={imageUrl} 
-                  alt={title} 
-                  style={{ 
-                    width: 56, 
-                    height: 56, 
-                    borderRadius: 12, 
+                <img
+                  src={imageUrl}
+                  alt={title}
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 12,
                     marginRight: '16px',
                     objectFit: 'cover'
-                  }} 
+                  }}
                   onError={() => setImageError(true)}
                 />
               )}

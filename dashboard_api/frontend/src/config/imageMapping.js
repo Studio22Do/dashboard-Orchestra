@@ -8,7 +8,7 @@ import seoanalyzerBanner from '../assets/images/apps/banners/seoanalyzer.png';
 import similarwebBanner from '../assets/images/apps/banners/similarweb.png';
 import pdftotextBanner from '../assets/images/apps/banners/pdftotext.png';
 import snapvideoBanner from '../assets/images/apps/banners/snapvideo.png';
-import whisperBanner from '../assets/images/apps/banners/whisper.png';
+
 import webstatusBanner from '../assets/images/apps/banners/webstatus.png';
 import wordcountBanner from '../assets/images/apps/banners/wordcount.png';
 import sslcheckerBanner from '../assets/images/apps/banners/SSLchecker.png';
@@ -33,7 +33,7 @@ export const getAppBanner = (appId) => {
 
     'instagram-stats': mediafyBanner,
     'mediafy': mediafyBanner,
-    
+
     // AI Tools
     'picpulse': picpulseBanner,
     'perplexity': perplexityBanner,
@@ -41,7 +41,7 @@ export const getAppBanner = (appId) => {
     'ai-humanizer': chatgptBanner,
     'ai-social-media': contentcreatorBanner,
     'prlabs': sinfoniaBanner,  // ← CORREGIDO: Ahora usa su propio banner
-    
+
     // Web & SEO
     'google-news': googleNewsBanner,
     'google-keyword': keywordinsightsBanner,  // ← AGREGADO: Google Keyword Insights
@@ -56,17 +56,17 @@ export const getAppBanner = (appId) => {
     'website-status': webstatusBanner,
     'website-analyzer': webauditBanner,
     'ahrefs-dr': keywordinsightsBanner,
-    
+
     // Creative & Content
     'pdf-to-text': pdftotextBanner,
     'snap-video': snapvideoBanner,
-    'whisper-url': whisperBanner,
+
     'runwayml': runwayBanner,  // ← AGREGADO: ID sin guión
     'runway-ml': runwayBanner, // ← YA EXISTÍA: ID con guión
     'advanced-image': imagetransformBanner,
     'image-manipulation': imagetransformBanner,
     'qr-generator': qrgeneratorBanner,
-    
+
     // Utilities
     'word-count': wordcountBanner,
     'word_count': wordcountBanner,
@@ -74,11 +74,11 @@ export const getAppBanner = (appId) => {
     'speech-to-text': speechtotextBanner,
     'ecommerce-description': productdescriptionBanner,
     'product-description': productdescriptionBanner,
-    
+
     // Default para apps no mapeadas
     'default': chatgptBanner
   };
-  
+
   return bannerMap[appId] || bannerMap['default'];
 };
 

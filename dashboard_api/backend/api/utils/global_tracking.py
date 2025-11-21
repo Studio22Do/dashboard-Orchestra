@@ -142,7 +142,7 @@ class GlobalAPITracker:
             '/runwayml': 'runwayml',
             '/similarweb': 'similarweb',
             '/keyword-insight': 'google-keyword-insight',
-            '/domain-metrics': 'domain-metrics',
+
             '/product-description': 'product-description',
             '/website-status': 'website-status',
             '/website-analyzer': 'website-analyzer',
@@ -182,9 +182,9 @@ class GlobalAPITracker:
                 'runwayml': 'runwayml',
                 'similarweb': 'similarweb',
                 'google_keyword_insight': 'keyword-insight',
-                'domain_metrics': 'domain-metrics',
+
                 'product_description': 'product-description',
-                'website_status': 'website-status',
+
                 'website_analyzer': 'website-analyzer',
                 'ahrefs_dr': 'ahrefs-dr',
                 'speech_to_text': 'speech-to-text',
