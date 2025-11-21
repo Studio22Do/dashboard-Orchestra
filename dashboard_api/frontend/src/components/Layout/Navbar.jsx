@@ -84,6 +84,7 @@ import imageTransformLogo from '../../assets/images/apps/icons/imagetransform-1.
 import sslCheckerLogo from '../../assets/images/apps/icons/SSLcheckericon.png';
 import keywordSearchLogo from '../../assets/images/apps/icons/keywordsearchicon.png';
 import whoisLookupLogo from '../../assets/images/apps/icons/Whoisicon.png';
+import productDescriptionLogo from '../../assets/images/apps/icons/productdescriptionicon.png';
 
 // AppBar estilizado con colores del diseño
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -345,8 +346,9 @@ const Navbar = () => {
         subtitle: 'Análisis de velocidad'
       },
       '/apps/product-description': {
-        title: 'Product Description',
-        icon: ShoppingCart,
+        title: 'AI eCommerce Product Description Generator',
+        icon: null,
+        image: productDescriptionLogo,
         subtitle: 'Generador de descripciones'
       },
       '/apps/seo-mastermind': {
