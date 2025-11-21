@@ -46,9 +46,18 @@ const ProductDescriptionGenerator = () => {
       height: 56,
       borderRadius: 2,
       backgroundColor: 'transparent',
-      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
-      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
-      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' },
+      '& fieldset': { 
+        borderColor: 'rgba(0,0,0,0.23)',
+        borderWidth: '1.5px'
+      },
+      '&:hover fieldset': { 
+        borderColor: 'rgba(0,0,0,0.35)',
+        borderWidth: '1.5px'
+      },
+      '&.Mui-focused fieldset': { 
+        borderColor: 'rgba(0,0,0,0.5)',
+        borderWidth: '2px'
+      },
       // Evitar color azul del autofill manteniendo el color del tema
       '& input:-webkit-autofill': {
         WebkitBoxShadow: '0 0 0 100px transparent inset !important',
@@ -80,9 +89,18 @@ const ProductDescriptionGenerator = () => {
       borderRadius: 2,
       alignItems: 'flex-start',
       backgroundColor: 'transparent',
-      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
-      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
-      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' },
+      '& fieldset': { 
+        borderColor: 'rgba(0,0,0,0.23)',
+        borderWidth: '1.5px'
+      },
+      '&:hover fieldset': { 
+        borderColor: 'rgba(0,0,0,0.35)',
+        borderWidth: '1.5px'
+      },
+      '&.Mui-focused fieldset': { 
+        borderColor: 'rgba(0,0,0,0.5)',
+        borderWidth: '2px'
+      },
       // Evitar color azul del autofill manteniendo el color del tema
       '& textarea:-webkit-autofill': {
         WebkitBoxShadow: '0 0 0 100px transparent inset !important',
@@ -110,9 +128,18 @@ const ProductDescriptionGenerator = () => {
     '& .MuiOutlinedInput-root': {
       height: 56,
       borderRadius: 2,
-      '& fieldset': { borderColor: 'rgba(0,0,0,0.08)' },
-      '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.12)' },
-      '&.Mui-focused fieldset': { borderColor: 'rgba(0,0,0,0.2)' }
+      '& fieldset': { 
+        borderColor: 'rgba(0,0,0,0.23)',
+        borderWidth: '1.5px'
+      },
+      '&:hover fieldset': { 
+        borderColor: 'rgba(0,0,0,0.35)',
+        borderWidth: '1.5px'
+      },
+      '&.Mui-focused fieldset': { 
+        borderColor: 'rgba(0,0,0,0.5)',
+        borderWidth: '2px'
+      }
     },
     '& .MuiSelect-select': {
       display: 'flex',
@@ -241,110 +268,112 @@ const ProductDescriptionGenerator = () => {
 
       <Card sx={{ mb: 4 }}>
         <CardContent>
-          <Box component="form" onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Nombre del Producto"
-                  name="name"
-                  value={productData.name}
+          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            {/* Primera fila: Nombre del Producto (ocupa más espacio) */}
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+              <TextField
+                fullWidth
+                label="Nombre del Producto"
+                name="name"
+                value={productData.name}
+                onChange={handleInputChange}
+                required
+                sx={{ flex: '1 1 300px', ...inputSx }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <ShoppingBag color="action" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+
+            {/* Segunda fila: Categoría, Precio y Tono */}
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+              <TextField
+                fullWidth
+                label="Categoría"
+                name="category"
+                value={productData.category}
+                onChange={handleInputChange}
+                required
+                sx={{ flex: '1 1 200px', minWidth: '200px', ...inputSx }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Category color="action" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <TextField
+                fullWidth
+                label="Precio"
+                name="price"
+                value={productData.price}
+                onChange={handleInputChange}
+                required
+                sx={{ flex: '1 1 200px', minWidth: '200px', ...inputSx }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <PriceChange color="action" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <FormControl sx={{ flex: '1 1 200px', minWidth: '200px', ...selectSx }}>
+                <InputLabel>Tono</InputLabel>
+                <Select
+                  name="tone"
+                  value={productData.tone}
                   onChange={handleInputChange}
-                  required
-                  sx={inputSx}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <ShoppingBag color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Categoría"
-                  name="category"
-                  value={productData.category}
-                  onChange={handleInputChange}
-                  required
-                  sx={inputSx}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Category color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Precio"
-                  name="price"
-                  value={productData.price}
-                  onChange={handleInputChange}
-                  required
-                  sx={inputSx}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <PriceChange color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl fullWidth sx={selectSx}>
-                  <InputLabel>Tono de la Descripción</InputLabel>
-                  <Select
-                    name="tone"
-                    value={productData.tone}
-                    onChange={handleInputChange}
-                    label="Tono de la Descripción"
-                  >
-                    <MenuItem value="professional">Profesional</MenuItem>
-                    <MenuItem value="casual">Casual</MenuItem>
-                    <MenuItem value="luxury">Lujo</MenuItem>
-                    <MenuItem value="technical">Técnico</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Características del Producto"
-                  name="features"
-                  value={productData.features}
-                  onChange={handleInputChange}
-                  multiline
-                  rows={4}
-                  sx={textareaSx}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}>
-                        <Description color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  disabled={loading}
-                  startIcon={loading ? <CircularProgress size={24} /> : <AutoAwesome />}
-                  sx={actionButtonSx}
+                  label="Tono"
                 >
-                  {loading ? 'Generando...' : 'Generar Descripción'}
-                </Button>
-              </Grid>
-            </Grid>
+                  <MenuItem value="professional">Profesional</MenuItem>
+                  <MenuItem value="casual">Casual</MenuItem>
+                  <MenuItem value="luxury">Lujo</MenuItem>
+                  <MenuItem value="technical">Técnico</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+
+            {/* Tercera fila: Características del Producto */}
+            <Box>
+              <TextField
+                fullWidth
+                label="Características del Producto"
+                name="features"
+                value={productData.features}
+                onChange={handleInputChange}
+                multiline
+                rows={4}
+                placeholder="Describe las características principales, beneficios y detalles del producto..."
+                sx={textareaSx}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}>
+                      <Description color="action" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+
+            {/* Botón de acción */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading || !productData.name || !productData.category || !productData.price}
+                startIcon={loading ? <CircularProgress size={24} /> : <AutoAwesome />}
+                sx={{ ...actionButtonSx, minWidth: { xs: '100%', md: 240 } }}
+                fullWidth
+              >
+                {loading ? 'Generando...' : 'Generar Descripción'}
+              </Button>
+            </Box>
           </Box>
         </CardContent>
       </Card>
