@@ -257,6 +257,36 @@ def get_location_posts():
         logger.error(f"Error inesperado: {str(e)}")
         return jsonify({'error': 'Error interno del servidor'}), 500
 
+@mediafy_bp.route('/posts', methods=['GET'])
+@jwt_required()
+@credits_required(amount=3)
+def get_user_posts():
+    """Obtiene los posts de un usuario usando Mediafy API"""
+    try:
+        username = request.args.get('username')
+        if not username:
+            return jsonify({'error': 'Se requiere el parámetro username'}), 400
+        
+        # Llamar a la API de Mediafy
+        url = "https://mediafy-api.p.rapidapi.com/v1/posts"
+        headers = get_headers()
+        params = {
+            'username_or_id_or_url': username
+        }
+        
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        
+        result = response.json()
+        return jsonify(result), 200
+        
+    except requests.RequestException as e:
+        logger.error(f"Error en API Mediafy posts: {str(e)}")
+        return jsonify({'error': 'Error al obtener posts del usuario'}), 500
+    except Exception as e:
+        logger.error(f"Error inesperado: {str(e)}")
+        return jsonify({'error': 'Error interno del servidor'}), 500
+
 @mediafy_bp.route('/reels', methods=['GET'])
 @jwt_required()
 @credits_required(amount=3)
@@ -373,6 +403,36 @@ def get_user_tagged():
     except requests.RequestException as e:
         logger.error(f"Error en API Mediafy tagged: {str(e)}")
         return jsonify({'error': 'Error al obtener posts etiquetados del usuario'}), 500
+    except Exception as e:
+        logger.error(f"Error inesperado: {str(e)}")
+        return jsonify({'error': 'Error interno del servidor'}), 500
+
+@mediafy_bp.route('/audio_info', methods=['GET'])
+@jwt_required()
+@credits_required(amount=3)
+def get_audio_info():
+    """Obtiene información de un audio de Instagram usando Mediafy API"""
+    try:
+        audio_canonical_id = request.args.get('audio_canonical_id')
+        if not audio_canonical_id:
+            return jsonify({'error': 'Se requiere el parámetro audio_canonical_id'}), 400
+        
+        # Llamar a la API de Mediafy
+        url = "https://mediafy-api.p.rapidapi.com/v1/audio_info"
+        headers = get_headers()
+        params = {
+            'audio_canonical_id': audio_canonical_id
+        }
+        
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        
+        result = response.json()
+        return jsonify(result), 200
+        
+    except requests.RequestException as e:
+        logger.error(f"Error en API Mediafy audio_info: {str(e)}")
+        return jsonify({'error': 'Error al obtener información de audio'}), 500
     except Exception as e:
         logger.error(f"Error inesperado: {str(e)}")
         return jsonify({'error': 'Error interno del servidor'}), 500
