@@ -341,9 +341,9 @@ const Navbar = () => {
         subtitle: 'Métricas de dominio'
       },
       '/apps/page-speed': {
-        title: 'Page Speed Insights',
-        icon: Speed,
-        subtitle: 'Análisis de velocidad'
+        title: 'Website Speed Test',
+        icon: Assessment,
+        subtitle: 'Análisis de velocidad y rendimiento web'
       },
       '/apps/product-description': {
         title: 'AI eCommerce Product Description Generator',
